@@ -35,7 +35,7 @@ export default defineConfig({
       entry: 'src/main.ts',
       name: 'bizyAirLib',
       formats: ['umd'],
-      fileName: () => `biz_lib_frontend.js`,
+      fileName: () => `bizyair_frontend.js`,
     },
     rollupOptions: {
       external: [],
