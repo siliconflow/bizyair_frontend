@@ -152,6 +152,10 @@ watch(() => showDialog.value, async (newVal: boolean) => {
   }
 })
 
+const fetchData = async () => {
+  await getModelList()
+}
+
 const handleClose = () => {
   showDialog.value = false
 }
@@ -180,8 +184,7 @@ const handleClose = () => {
             class="flex-1 flex flex-col overflow-hidden ">
             <div class="flex flex-col min-h-[650px] ">
               <div class="flex-1 relative">
-                <ModelFilterBar v-model:show-sort-popover="showSortPopover" @fetchData="getModelList"
-                  class="shrink-0" />
+                <ModelFilterBar v-model:show-sort-popover="showSortPopover" @fetchData="fetchData" class="shrink-0" />
                 <div class="h-full">
                   <ModelTable />
                 </div>

@@ -27,7 +27,7 @@ export const base_model_types = () => customFetch('/bizyair/community/base_model
 export const get_model_list = (params: any, data: any) => customFetch(`/bizyair/community/models/query?${new URLSearchParams(params).toString()}`, {
     method: 'POST',
     body: JSON.stringify(data)
-})
+}, false)
 
 export const check_folder = (url: string) => customFetch(`/bizyair/modelhost/check_folder?absolute_path=${encodeURIComponent(url)}`, {method: 'GET'})
 

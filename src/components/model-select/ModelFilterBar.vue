@@ -52,24 +52,20 @@ const handleModelTypeChange = (type: string) => {
 }
 
 const handleBaseModelChange = (model: string) => {
-  const index = selectedBaseModels.value.indexOf(model)
-  if (index === -1) {
-    selectedBaseModels.value.push(model)
-  } else {
-    selectedBaseModels.value.splice(index, 1)
-  }
-
   const models = [...modelStoreInstance.filterState.base_models]
   const modelIndex = models.indexOf(model)
+
   if (modelIndex === -1) {
     models.push(model)
   } else {
     models.splice(modelIndex, 1)
   }
+
   modelStoreInstance.filterState.base_models = models
   emit('fetchData')
   emit('update:showSortPopover', false)
 }
+
 
 const handleSearch = () => {
   modelStoreInstance.modelListPathParams.current = 1
@@ -179,9 +175,10 @@ onMounted(async () => {
               </div>
               <CommandItem value="base-models" class="p-2">
                 <div class="flex flex-wrap gap-2">
-                  <Badge variant="secondary"
-                    v-for="model in modelStoreInstance.baseModelTypes.filter((m: any) => modelStoreInstance.selectedBaseModels?.includes(m.value))"
-                    :key="model.value" @click="handleBaseModelChange(model.value)" :class="[
+                  <Badge variant="secondary" v-for="model in modelStoreInstance.baseModelTypes.filter((m: any) =>
+                    modelStoreInstance.selectedBaseModels?.length === 0 ||
+                    modelStoreInstance.selectedBaseModels?.includes(m.value)
+                  )" :key="model.value" @click="handleBaseModelChange(model.value)" :class="[
                       'cursor-pointer hover:!bg-inherit',
                       modelStoreInstance.filterState.base_models.includes(model.value) ? 'bg-[#6D28D9] hover:!bg-[#6D28D9]' : 'bg-[#4E4E4E] hover:!bg-[#4E4E4E]'
                     ]">

@@ -3,15 +3,19 @@ import { useToaster } from '@/components/modules/toats/index'
 const fetchCache = new Map();
 
 
-export function customFetch(url: string, options = {}) {
+export function customFetch(url: string, options = {},needDebounce = true) {
   const now = Date.now();
-  if (fetchCache.has(url)) {
-    const lastFetchTime = fetchCache.get(url);
-    if (now - lastFetchTime < 1200) {
-      return Promise.resolve(null);
+
+  if (needDebounce) {
+    if (fetchCache.has(url)) {
+      const lastFetchTime = fetchCache.get(url);
+      if (now - lastFetchTime < 1200) {
+        return Promise.resolve(null);
+      }
     }
+    fetchCache.set(url, now);
   }
-  fetchCache.set(url, now);
+
   let host = `${window.location.origin}${window.location.pathname === '/' ? '' : window.location.pathname}`
   return window.fetch(`${host}${url}`, options)
     .then(response => {
