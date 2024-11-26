@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Hash Calculator</title>
+    <!-- 引入 js-md5 库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
+</head>
+<body>
+    <h1>File Hash Calculator</h1>
+    <input type="file" id="fileInput">
+    <button id="calculateButton">Calculate Hash</button>
+    <p id="result"></p>
+
+    <script>
+        // CRC64 相关函数
+        function _bytecrc(crc, poly, n) {
+            let mask = 1 << (n - 1);
+            for (let _ = 0; _ < 8; _++) {
+                crc = (crc & mask) ? ((crc << 1) ^ poly) : (crc << 1);
+            }
+            return crc & ((1 << n) - 1);
+        }
+
+        function _bytecrc_r(crc, poly, n) {
+            crc = BigInt(crc);
+            for (let _ = 0; _ < 8; _++) {
+                crc = (BigInt(crc) & BigInt(1)) ? ((crc >> BigInt(1)) ^ BigInt(poly)) : (crc >> BigInt(1));
+            }
+            return crc & ((BigInt(1) << BigInt(n)) - BigInt(1));
+        }
+
+        function _mkTable(poly, n) {
+            let table = [];
+            for (let i = 0; i < 256; i++) {
+                table.push(_bytecrc(i << (n - 8), poly, n));
+            }
+            return table;
+        }
+
+        function _mkTable_r(poly, n) {
+            poly = _bitrev(poly, n);
+            let table = [];
+            for (let i = 0; i < 256; i++) {
+                table.push(_bytecrc_r(i, poly, n));
+            }
+            return table;
+        }
+
+        function _bitrev(x, n) {
+            let y = 0;
+            for (let i = 0; i < n; i++) {
+                y = (BigInt(y) << BigInt(1)) | (x & BigInt(1));
+                x >>= BigInt(1);
+            }
+            return y;
+        }
+
+        function _crc8(data, crc, table) {
+            for (let i = 0; i < data.length; i++) {
+                crc = table[data[i] ^ crc];
+            }
+            return crc;
+        }
+
+        function _crc8r(data, crc, table) {
+            for (let i = 0; i < data.length; i++) {
+                crc = table[data[i] ^ (crc & 0xFF)];
+            }
+            return crc;
+        }
+
+        function _crc16(data, crc, table) {
+            for (let i = 0; i < data.length; i++) {
+                crc = table[data[i] ^ (crc >> 8)] ^ (crc << 8);
+            }
+            return crc & 0xFFFF;
+        }
+
+        function _crc16r(data, crc, table) {
+            for (let i = 0; i < data.length; i++) {
+                crc = table[data[i] ^ (crc & 0xFF)] ^ (crc >> 8);
+            }
+            return crc & 0xFFFF;
+        }
+
+        function _crc24(data, crc, table) {
+            for (let i = 0; i < data.length; i++) {
+                crc = table[data[i] ^ (crc >> 16)] ^ (crc << 8);
+            }
+            return crc & 0xFFFFFF;
+        }
+
+        function _crc24r(data, crc, table) {
+            for (let i = 0; i < data.length; i++) {
+                crc = table[data[i] ^ (crc & 0xFF)] ^ (crc >> 8);
+            }
+            return crc & 0xFFFFFF;
+        }
+
+        function _crc32(data, crc, table) {
+            for (let i = 0; i < data.length; i++) {
+                crc = table[data[i] ^ (crc >> 24)] ^ (crc << 8);
+            }
+            return crc & 0xFFFFFFFF;
+        }
+
+        function _crc32r(data, crc, table) {
+            for (let i = 0; i < data.length; i++) {
+                crc = table[data[i] ^ (crc & 0xFF)] ^ (crc >> 8);
+            }
+            return crc & 0xFFFFFFFF;
+        }
+
+        function _crc64(data, crc, table) {
+            for (let i = 0; i < data.length; i++) {
+                crc = table[data[i] ^ (crc >> 56)] ^ (crc << 8);
+            }
+            return crc & 0xFFFFFFFFFFFFFFFFn;
+        }
+
+        function _crc64r(data, crc, table) {
+            crc = BigInt(crc);
+            for (let i = 0; i < data.length; i++) {
+                crc = table[BigInt(data[i]) ^ (crc & BigInt(0xFF))] ^ (crc >> BigInt(8));
+            }
+            return crc & 0xFFFFFFFFFFFFFFFFn;
+        }
+
+        function mkCrcFun(poly, initCrc = ~0, rev = true, xorOut = 0) {
+            let sizeBits = _verifyPoly(poly);
+            initCrc &= (BigInt(1) << sizeBits) - BigInt(1);
+            xorOut &= (BigInt(1) << sizeBits) - BigInt(1);
+            let table = rev ? _mkTable_r(poly, sizeBits) : _mkTable(poly, sizeBits);
+            let fun = eval(`_crc${sizeBits}${rev ? 'r' : ''}`);
+            return function(data, crc = initCrc) {
+                return xorOut ^ fun(data, xorOut ^ crc, table);
+            };
+        }
+
+        function _verifyPoly(poly) {
+            for (let n of [8, 16, 24, 32, 64]) {
+                let lowerBound = BigInt(1) << BigInt(n);
+                let upperBound = BigInt(1) << BigInt(n + 1);
+                if (lowerBound <= poly && poly < upperBound) {
+                    return BigInt(n);
+                }
+            }
+            throw new Error("Invalid polynomial");
+        }
+
+        let do_crc64 = mkCrcFun(0x142F0E1EBA9EA3693n, 0n, true, 0xFFFFFFFFFFFFFFFFn);
+
+        // 计算哈希的函数
+        async function calculate_hash(file) {
+            return new Promise((resolve, reject) => {
+                let crc64_signature = BigInt(0);
+                let md5_hash = '';
+                const buf_size = 65536 * 16;
+
+                const fileReader = new FileReader();
+                let offset = 0;
+
+                fileReader.onerror = () => {
+                    reject(new Error('Error reading file'));
+                };
+
+                function hexToBytes(hex) {
+                    return Uint8Array.from(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+                }
+
+                function bytesToBase64(bytes) {
+                    return btoa(String.fromCharCode.apply(null, bytes));
+                }
+
+                fileReader.onload = () => {
+                    const chunk = new Uint8Array(fileReader.result);
+                    crc64_signature = do_crc64(chunk, crc64_signature);
+                    console.log("debug:", crc64_signature);
+                    md5_hash += String.fromCharCode.apply(null, chunk);
+
+                    offset += chunk.length;
+                    if (offset < file.size) {
+                        readChunk(offset);
+                    } else {
+                        const md5_digest = CryptoJS.MD5(md5_hash);
+                        let md5_str = hexToBytes(md5_digest.toString())
+                        md5_str = bytesToBase64(md5_str);
+
+                        //const md5_str = btoa(md5_digest);
+
+                        const encoder = new TextEncoder();
+                        console.log("debug:", md5_str, crc64_signature.toString());
+                        const data = encoder.encode(`${md5_str}${crc64_signature.toString()}`);
+
+                        crypto.subtle.digest('SHA-256', data).then(hashBuffer => {
+                            const hashArray = Array.from(new Uint8Array(hashBuffer));
+                            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                            resolve(hashHex);
+                        });
+                    }
+                };
+
+                function readChunk(offset) {
+                    const slice = file.slice(offset, offset + buf_size);
+                    fileReader.readAsArrayBuffer(slice);
+                }
+
+                readChunk(0);
+            });
+        }
+
+        // 事件监听
+        document.getElementById('calculateButton').addEventListener('click', async () => {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            try {
+                const hash_string = await calculate_hash(file);
+                document.getElementById('result').textContent = `Hash: ${hash_string}`;
+            } catch (err) {
+                console.error(err);
+                alert('Error calculating hash');
+            }
+        });
+    </script>
+</body>
+</html>
