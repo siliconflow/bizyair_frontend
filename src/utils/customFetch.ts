@@ -20,7 +20,6 @@ export function customFetch(url: string, options = {},needDebounce = true) {
   return window.fetch(`${host}${url}`, options)
     .then(response => {
       if (response.status === 404) {
-        alert(123)
         useToaster.error('You may be missing dependencies at the moment. For details, please refer to the ComfyUI logs.')
       }
       return response.json();
