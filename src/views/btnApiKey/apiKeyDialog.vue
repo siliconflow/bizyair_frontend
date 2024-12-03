@@ -1,12 +1,9 @@
 <template>
-  <v-dialog v-model:open="statusStore.showApiKeyDialog" layoutClass="z-9000" class="max-w-[680px] z-9000" @on-close="statusStore.handleApiKeyDialog(false)">
+  <v-dialog v-model:open="statusStore.showApiKeyDialog" layoutClass="z-9000" class="max-w-[680px] z-9000"
+    @on-close="statusStore.handleApiKeyDialog(false)">
     <template #title>Set API Key</template>
     <div class="comfy-modal-content-sml">
-      <Input
-        v-model="apiKey"
-        type="password"
-        placeholder="API Key"
-        :class="[{'border-red-500': hasError}]"
+      <Input v-model="apiKey" type="password" placeholder="API Key" :class="[{ 'border-red-500': hasError }]"
         @input="clearError" />
       <p class="py-2">
         Please
@@ -39,8 +36,8 @@ import { ref } from 'vue'
 import vDialog from '@/components/modules/vDialog.vue'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { set_api_key } from '@/api/user'
-import { useStatusStore} from '@/stores/userStatus'
+import { setApiKey } from '@/api/user'
+import { useStatusStore } from '@/stores/userStatus'
 import { useToaster } from '@/components/modules/toats/index'
 
 const statusStore = useStatusStore()
@@ -54,12 +51,12 @@ const openOAuthPopup = async (setKey: (key: string) => void) => {
   const authUrl = `${ACCOUNT_ENDPOINT}/oauth?client_id=${clientId}`;
   const popup = window.open(authUrl, 'oauthPopup', 'width=600,height=600');
   window.addEventListener('message', (event) => {
-      if (event.data.length > 0 && event.data[0]['secretKey'] !== undefined) {
-          setKey(event.data[0]['secretKey']);
-          if (popup) {
-            popup.close();
-          }
+    if (event.data.length > 0 && event.data[0]['secretKey'] !== undefined) {
+      setKey(event.data[0]['secretKey']);
+      if (popup) {
+        popup.close();
       }
+    }
   });
 };
 function clearError() {
@@ -71,7 +68,7 @@ async function toSubmit() {
     hasError.value = true;
     return false;
   }
-  const response = await set_api_key(`api_key=${encodeURIComponent(apiKey.value)}`)
+  const response = await setApiKey(`api_key=${encodeURIComponent(apiKey.value)}`)
   if (response.ok) {
     useToaster('API Key set successfully!')
     statusStore.handleApiKeyDialog(false)
