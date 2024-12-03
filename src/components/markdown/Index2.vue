@@ -1,6 +1,7 @@
 <template>
   <MdEditor :editorId="editorId" v-model="text" theme="dark" :toolbars="toolbar" ref="editorRef" :autoDetectCode="true"
-    language="en-US" @input="handleInput" @on-upload-img="handleUploadImg">
+    language="en-US" @input="handleInput" @on-upload-img="handleUploadImg" @on-focus="handleFocus"
+    @on-blur="handleBlur">
     <template #defToolbars>
       <NormalToolbar title="fullscreen" @onClick="handleFullClick">
         <template #trigger>
@@ -8,6 +9,7 @@
         </template>
       </NormalToolbar>
     </template>
+
   </MdEditor>
   <Teleport to="body" v-if='isFullscreen'>
     <MdEditor v-model="text" theme="dark" :autoDetectCode="true" :editorId="`full-${editorId}`" :toolbars="toolbar"
@@ -25,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import screenfull from 'screenfull';
 import highlight from 'highlight.js';
 import prettier from 'prettier';
@@ -37,6 +39,7 @@ import { Maximize } from 'lucide-vue-next';
 
 import 'md-editor-v3/lib/style.css';
 
+const BLOCKED_KEYS = ['r', 'q', 'w', 'n', 'm', 's', 'o', 'g', ',', '=', '+', '-', '.', 'p', 'c', 'b', 'm', '`', 'f', 'Enter'];
 
 const toolbar = [
   'bold', 'italic', 'underline', 'title', '-',
@@ -46,6 +49,7 @@ const toolbar = [
   'preview',
   0
 ];
+
 const isFullscreen = ref(false);
 const handleFullClick = () => {
   isFullscreen.value = !isFullscreen.value;
@@ -59,6 +63,7 @@ const handleFullClick = () => {
     document.querySelector('body').style['pointer-events'] = 'none';
   }
 };
+
 const props = defineProps({
   editorId: String,
   modelValue: String,
@@ -68,11 +73,27 @@ const props = defineProps({
     default: true
   }
 })
+
 const text = ref(props.modelValue);
 const emit = defineEmits(['update:modelValue', 'isUploading'])
+
 const handleInput = () => {
   emit('update:modelValue', text)
 };
+
+const handleKeydown = (event) => {
+  if (BLOCKED_KEYS.includes(event.key)) {
+    event.stopPropagation();
+  }
+};
+
+const handleFocus = (event) => {
+  document.addEventListener('keydown', handleKeydown, true);
+}
+
+const handleBlur = (event) => {
+  document.removeEventListener('keydown', handleKeydown, true);
+}
 
 const MAX_SIZE = 20 * 1024 * 1024; // 20MB
 const MAX_RETRIES = 3;
@@ -126,8 +147,6 @@ const handleUploadImg = async (files, callback) => {
   }
 };
 
-
-
 const editorRef = ref(null);
 
 config({
@@ -146,13 +165,15 @@ config({
       instance: screenfull,
     },
   },
-
 });
+
+
 </script>
 <style scoped>
 :deep(.md-editor-toolbar-item svg.md-editor-icon) {
   @apply w-6 h-6;
 }
+
 :deep(.md-editor-menu-item.md-editor-menu-item-image:last-child) {
   @apply hidden;
 }
