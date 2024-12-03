@@ -1,4 +1,5 @@
 import { createCRC64, createMD5, createSHA256 } from "hash-wasm";
+import crypto from "crypto";
 
 interface FileReaderEventTarget extends EventTarget {
   result: string | ArrayBuffer | null;
@@ -70,47 +71,19 @@ export async function calculateHash(file: File | Blob): Promise<any> {
 }
 
 export async function calculateMd5Hash(file: File | Blob): Promise<string> {
-  const chunkSize = 1024 * 1024; // 1MB chunks
-
-  const md5Hasher = await createMD5();
-  md5Hasher.init();
-
-  const fileSize = file.size;
-  let offset = 0;
-
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-    const readNextChunk = () => {
-      if (offset >= fileSize) {
-        const md5Hash = md5Hasher.digest();
-        resolve(md5Hash);
-        return;
-      }
-
-      const blob = file.slice(offset, offset + chunkSize);
-      reader.readAsArrayBuffer(blob);
-    };
-
-    reader.onload = (e: FileReaderEvent) => {
-      if (!e.target || !e.target.result) {
-        reject(new Error("FileReader result is null"));
-        return;
-      }
-
-      const arrayBuffer = e.target.result as ArrayBuffer;
-      const uint8Array = new Uint8Array(arrayBuffer);
-
-      md5Hasher.update(uint8Array);
-
-      offset += arrayBuffer.byteLength;
-      readNextChunk();
+    reader.onload = () => {
+      const buffer = reader.result as ArrayBuffer;
+      const hash = crypto.createHash("md5").update(new Uint8Array(buffer)).digest("base64");
+      resolve(hash);
     };
 
     reader.onerror = () => {
-      reject(new Error("FileReader error"));
+      reject(new Error("Failed to calculate MD5"));
     };
 
-    readNextChunk();
+    reader.readAsArrayBuffer(file);
   });
 }
