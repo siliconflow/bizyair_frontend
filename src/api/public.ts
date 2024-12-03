@@ -8,3 +8,7 @@ export const uploadImage = (file: string | Blob) => {
         body: formData
     })
 }
+
+export const ossSign = (sha256: string) => {
+    return customFetch(`/bizyair/community/sign?sha256sum=${sha256}`, { method: 'GET' })
+}

@@ -15,6 +15,7 @@ interface ModelVersion {
   progress?: number;
   file_upload_id?: string;
   file_name?: string;
+  showUpload?: boolean;
 }
 interface ModelDetail {
   name: string;

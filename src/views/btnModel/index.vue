@@ -65,16 +65,25 @@
                 <Label for="airplane-mode">Publicly Visible</Label>
               </div>
             </v-item>
-            <v-item label="File Path">
+            <v-item label="File Path" v-show="!e.showUpload">
               <div class="flex">
-                <Input
+                <vUpload 
+                  :parallel="1" 
+                  :chunkSize="1" 
+                  :class="{'border-red-500': e.filePathError}"
+                  @path="(path) => handlePath(path, i)"
+                  @start="() => startUpload(i)"
+                  @success="data => successUpload(data, i)"
+                  @error="() => errorUpload(i)"
+                  @progress="p => fnProgress(p, i)" />
+                <!-- <Input
                   :class="{'border-red-500': e.filePathError}"
                   type="text"
                   @change="checkFile(e.filePath, i)"
                   placeholder="File Path"
                   :disabled="typeof(e.progress) == 'number' && e.progress !== 100"
                   v-model:model-value="e.filePath" />
-                <Button @click="interrupt(e)" class="ml-2" :disabled="!e.progress || e.progress == 100">interrupt</Button>
+                <Button @click="interrupt(e)" class="ml-2" :disabled="!e.progress || e.progress == 100">interrupt</Button> -->
               </div>
             </v-item>
             <div v-if="e.progress">
@@ -110,20 +119,22 @@ import vDialog from '@/components/modules/vDialog.vue'
 import vSelect from '@/components/modules/vSelect.vue'
 import vItem from '@/components/modules/vItem.vue'
 import vAccordionTrigger from '@/components/modules/vAccordionTrigger.vue'
+import vUpload from './upload.vue'
 import { useAlertDialog  } from '@/components/modules/vAlertDialog/index'
-import { useShadet } from '@/components/modules/vShadet/index'
+// import { useShadet } from '@/components/modules/vShadet/index'
 
 import { useStatusStore} from '@/stores/userStatus'
 import { modelStore } from '@/stores/modelStatus'
 import Markdown from '@/components/markdown/Index2.vue'
-import { create_models, checkLocalFile, submitUpload, model_types, base_model_types, put_model, interrupt_upload } from '@/api/model'
+// checkLocalFile, submitUpload, interrupt_upload
+import { create_models, model_types, base_model_types, put_model } from '@/api/model'
 import { onMounted } from 'vue'
 import { Minus } from 'lucide-vue-next'
 
 const statusStore = useStatusStore();
 const modelStoreObject = modelStore();
 const modelBox = ref(true);
-const versionIndex = ref(0);
+// const versionIndex = ref(0);
 const typeLis = ref([{ value: '', label: '' }]);
 const baseTypeLis = ref([{ value: '', label: '' }]);
 const formData = ref({ ...modelStoreObject.modelDetail });
@@ -143,19 +154,21 @@ function handleChange(val: any, index: number) {
   }
 }
 let calculating: { close: any }
-async function checkFile(val: string, index: number) {
-  const res = await checkLocalFile({ absolute_path: val })
-  formData.value.versions[index].file_upload_id = res.data.upload_id
-  formData.value.versions[index].filePathError = false
-  versionIndex.value = index
-  await submitUpload({ upload_id: res.data.upload_id })
-  formData.value.versions[index].progress = 0.1
-  calculating = useShadet({
-    content: 'Start calculating the file hash',
-    z: 'z-12000'
-  })
+let asdasd = 0
+// async function checkFile(val: string, index: number) {
+//   const res = await checkLocalFile({ absolute_path: val })
+//   formData.value.versions[index].file_upload_id = res.data.upload_id
+//   formData.value.versions[index].filePathError = false
+//   versionIndex.value = index
+//   await submitUpload({ upload_id: res.data.upload_id })
+//   asdasd = new Date().getTime()
+//   formData.value.versions[index].progress = 0.1
+//   calculating = useShadet({
+//     content: 'Start calculating the file hash',
+//     z: 'z-12000'
+//   })
 
-}
+// }
 async function delVersion(index: number) {
   const res = await useAlertDialog({
     title: 'Are you sure you want to delete this version?',
@@ -232,20 +245,46 @@ function verifyVersion() {
       acActiveIndex.value = `${i}`
       break
     }
-    if (!e.filePath) {
+    if (!e.sign) {
       e.filePathError = true
       useToaster.error(`Please enter the file path for version ${i + 1}`)
       acActiveIndex.value = `${i}`
       break
     }
   }
-  return tempData.versions.every((e: any) => e.version && e.base_model && e.filePath)
+  console.log(tempData.versions.every((e: any) => e.version && e.base_model && e.sign))
+  return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
 }
 
-async function interrupt ({ file_upload_id }: any) {
+// async function interrupt ({ file_upload_id }: any) {
 
-  await interrupt_upload({ upload_id: file_upload_id })
+//   await interrupt_upload({ upload_id: file_upload_id })
 
+// }
+const fnProgress = (p: number, i: number) => {
+  formData.value.versions[i].progress = p
+}
+const handlePath = (path: string, i: number) => {
+  console.log('handlePath', path)
+  formData.value.versions[i].path = path
+  console.log(formData.value.versions[i])
+}
+const startUpload = (i: number) => {
+  console.log('start', i)
+  // formData.value.versions[i].showUpload = true
+  formData.value.versions[i].filePathError = false
+}
+const successUpload = (data: any, i: number) => {
+  console.log('successUpload', data, i)
+  // formData.value.versions[i].showUpload = false
+  formData.value.versions[i].sign = data.sha256sum
+  // formData.value.versions[i].path = data.path
+  formData.value.versions[i].filePathError = false
+}
+const errorUpload = (i: number) => {
+  console.log('errorUpload', i)
+  // formData.value.versions[i].showUpload = false
+  delete formData.value.versions[i].progress
 }
 
 async function submit() {
@@ -256,10 +295,17 @@ async function submit() {
   setTimeout(() => {
     showLayoutLoading.value = false
   }, 5000)
-  if (formData.value.id) {
-    await put_model(formData.value)
+  const tempData = {...formData.value}
+  tempData.versions.forEach((e: any) => {
+    delete e.baseModelError
+    delete e.filePath
+    delete e.filePathError
+    delete e.versionError
+  })
+  if (tempData.id) {
+    await put_model(tempData)
   } else {
-    await create_models(formData.value)
+    await create_models(tempData)
   }
   useToaster.success('Model published successfully')
 
@@ -304,6 +350,7 @@ watch(() => statusStore.socketMessage, (val: any) => {
   }
   if (val.type == "prepared") {
     calculating.close()
+    console.log((new Date().getTime() - asdasd) / 1000)
   }
   console.log(val)
   if (val.type === "errors" && val.data && val.data.code === 500101) {
