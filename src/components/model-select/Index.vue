@@ -162,8 +162,9 @@ const handleClose = () => {
 </script>
 
 <template>
-  <v-dialog v-model:open="showDialog" class=" max-w-[70%]  px-6 pb-6 overflow-hidden" @onClose="handleClose"
-    contentClass="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow">
+  <v-dialog v-model:open="showDialog" class=" max-w-[70%]  px-6 pb-6 overflow-hidden z-9000" layoutClass="z-9000"
+    @onClose="handleClose"
+    contentClass="custom-scrollbar max-h-[78vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow">
     <template #title>
       <span class="text-[#F9FAFB] mb-4 text-[18px] font-semibold leading-[18px] tracking-[-0.45px]">
         Select Model
