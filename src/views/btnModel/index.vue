@@ -54,7 +54,7 @@
               <SelectItem v-for="(e, i) in baseTypeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
             </v-select>
           </v-item>
-          <v-item label="Introduction======">
+          <v-item label="Introduction">
             <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />
           </v-item>
           <v-item label="">
