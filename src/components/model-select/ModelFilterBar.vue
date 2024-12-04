@@ -95,8 +95,7 @@ onMounted(async () => {
       </span>
     </div>
 
-    <Popover class="bg-[#353535] z-[5100]" :open="showSortPopover"
-      @update:open="emit('update:showSortPopover', $event)">
+    <Popover class="bg-[#353535]" :open="showSortPopover" @update:open="emit('update:showSortPopover', $event)">
       <PopoverTrigger class="bg-transparent">
         <Button variant="default" class="w-[44px] h-[44px] hover:border-2 hover:border-white cursor-pointer group">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -107,7 +106,7 @@ onMounted(async () => {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent side="bottom" align="end" class="w-[150px] p-0 bg-[#353535] rounded-lg">
+      <PopoverContent side="bottom" align="end" class="w-[150px] p-0 bg-[#353535] rounded-lg z-12000">
         <Command>
           <CommandList>
             <CommandGroup>
@@ -137,7 +136,7 @@ onMounted(async () => {
       </PopoverContent>
     </Popover>
 
-    <Popover class="z-[5100]">
+    <Popover>
       <PopoverTrigger class="bg-transparent">
         <Button variant="default" class="w-[44px] h-[44px] hover:border-2 hover:border-white cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="mr-2">
@@ -147,7 +146,7 @@ onMounted(async () => {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent side="bottom" align="end" class="w-[200px] p-0 bg-[#222] rounded-lg">
+      <PopoverContent side="bottom" align="end" class="w-[200px] p-0 bg-[#222] rounded-lg z-12000">
         <Command>
           <CommandList>
             <CommandGroup>
@@ -179,9 +178,9 @@ onMounted(async () => {
                     modelStoreInstance.selectedBaseModels?.length === 0 ||
                     modelStoreInstance.selectedBaseModels?.includes(m.value)
                   )" :key="model.value" @click="handleBaseModelChange(model.value)" :class="[
-                      'cursor-pointer hover:!bg-inherit',
-                      modelStoreInstance.filterState.base_models.includes(model.value) ? 'bg-[#6D28D9] hover:!bg-[#6D28D9]' : 'bg-[#4E4E4E] hover:!bg-[#4E4E4E]'
-                    ]">
+                    'cursor-pointer hover:!bg-inherit',
+                    modelStoreInstance.filterState.base_models.includes(model.value) ? 'bg-[#6D28D9] hover:!bg-[#6D28D9]' : 'bg-[#4E4E4E] hover:!bg-[#4E4E4E]'
+                  ]">
                     {{ model.label }}
                   </Badge>
                 </div>

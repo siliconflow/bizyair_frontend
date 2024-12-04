@@ -322,7 +322,7 @@ const handleCopy = async (sign: string) => {
               </div>
             </PopoverTrigger>
             <PopoverContent side="bottom" align="end"
-              class="w-[150px] p-0 bg-[#353535] rounded-lg group-hover:visible z-[9000]">
+              class="w-[150px] p-0 bg-[#353535] rounded-lg group-hover:visible z-15000">
               <Command>
                 <CommandList>
                   <CommandGroup>

@@ -160,7 +160,7 @@ const handleRemoveModel = async (id: string) => {
                         </div>
                       </PopoverTrigger>
                       <PopoverContent side="bottom" align="end"
-                        class="w-[150px] p-0 bg-[#353535] rounded-lg group-hover:visible">
+                        class="w-[150px] p-0 bg-[#353535] rounded-lg group-hover:visible z-12000">
                         <Command>
                           <CommandList>
                             <CommandGroup>
