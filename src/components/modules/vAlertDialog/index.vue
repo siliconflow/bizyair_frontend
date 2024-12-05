@@ -45,7 +45,7 @@ const cancelBtn = () => {
         <AlertDialogDescription>{{ desc }}</AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel @click="cancelBtn">{{ cancel }}</AlertDialogCancel>
+        <AlertDialogCancel class=" text-white" @click="cancelBtn">{{ cancel }}</AlertDialogCancel>
         <AlertDialogAction @click="continueBtn">{{ continue }}</AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>

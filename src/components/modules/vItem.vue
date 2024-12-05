@@ -6,7 +6,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="mt-3">
+  <div class="pt-3">
     <p class="text-sm">{{ label }}<span v-if="required">*</span></p>
     <div class="mt-2">
       <slot />
