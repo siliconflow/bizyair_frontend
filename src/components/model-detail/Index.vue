@@ -373,7 +373,7 @@ const handleCopy = async (sign: string) => {
           <div class="flex flex-row gap-2 items-center justify-start shrink-0 relative">
             <Avatar>
               <AvatarImage src="https://github.com/radix-vue.png" alt="@radix-vue" />
-              <AvatarFallback>{{ model?.user_name.slice(0, 2) }}</AvatarFallback>
+              <AvatarFallback>{{ model?.user_name?.slice(0, 2) }}</AvatarFallback>
             </Avatar>
             {{ model?.user_name }}
           </div>
