@@ -379,7 +379,9 @@ watch(() => modelStoreObject.modelDetail, (val: any) => {
 })
 watch(() => modelStoreObject.showVersionId, (val: any) => {
   const i = formData.value.versions.findIndex((e: any) => e.id == val)
-  acActiveIndex.value = i
+  setTimeout(() => {
+    acActiveIndex.value = i
+  })
   if (i != -1) {
     modelBox.value = false
   }
