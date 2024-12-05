@@ -73,6 +73,7 @@ const handleOperateChange = async (value: 'edit' | 'remove', model: Model) => {
       desc: 'This action cannot be undone.',
       cancel: 'No, Keep It',
       continue: 'Yes, Delete It',
+      z: 'z-9000'
     })
     if (!res) return
 
