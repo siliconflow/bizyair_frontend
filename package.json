@@ -15,11 +15,14 @@
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "@vee-validate/zod": "^4.14.6",
     "@vueuse/core": "^11.2.0",
+    "ali-oss": "^6.21.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "crc": "^4.3.2",
     "crc-multi": "^0.1.2",
     "cropperjs": "^1.6.2",
+    "crypto-js": "^4.2.0",
+    "hash-wasm": "^4.12.0",
     "highlight.js": "^11.10.0",
     "katex": "^0.16.11",
     "lucide-vue-next": "^0.454.0",
@@ -43,6 +46,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/ali-oss": "^6.16.11",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.8.4",
     "@vitejs/plugin-vue": "^5.1.4",
     "autoprefixer": "^10.4.20",

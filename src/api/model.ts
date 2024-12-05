@@ -89,3 +89,9 @@ export const like_model = (model_version_id: any) => customFetch(`/bizyair/commu
 export const fork_model = (model_version_id: any) => customFetch(`/bizyair/community/models/fork/${model_version_id}`, {
     method: 'POST'
 })
+
+export const commit_file = (data: any) => customFetch('/bizyair/community/commit_file', {
+    method: 'POST',
+    body: JSON.stringify(data)
+})
+

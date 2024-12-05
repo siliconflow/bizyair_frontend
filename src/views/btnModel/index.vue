@@ -13,70 +13,82 @@
     </svg>
     <span class="block leading h-full leading-8 text-sm">Publish</span>
   </div>
-
-
-  <v-dialog v-model:open="modelStoreObject.showDialog" @onClose="onDialogClose" class="px-0 overflow-hidden pb-0 z-9000"
-    v-if="modelStoreObject.showDialog" layoutClass="z-9000"
-    contentClass="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow">
-    <template #title><span class="px-6" @click="acActiveIndex = '-1'; modelBox = true">Publish a Model</span></template>
-    <div v-show="modelBox" class="px-6 pb-6">
-      <v-item label="Model Name">
-        <Input @change="formData.nameError = false" :class="{ 'border-red-500': formData.nameError }" type="text"
-          placeholder="Enter Model Name" v-model:model-value="formData.name" />
-      </v-item>
-      <v-item label="Model Type">
-        <v-select @update:open="formData.typeError = false" :class="{ 'border-red-500': formData.typeError }"
-          v-model:model-value="formData.type" placeholder="Select Model Type">
-          <SelectItem v-for="(e, i) in typeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
-        </v-select>
-      </v-item>
-      <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
-    </div>
-    <Accordion type="single" collapsible default-value="0" class="w-full" @update:model-value="acActiveFn"
-      v-model:model-value="acActiveIndex">
-      <AccordionItem class="bg-[#353535] z-1 px-6 w-full rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px]"
-        v-for="(e, i) in formData.versions" :key="i" :value="`${i}`">
-        <v-accordion-trigger class="justify-between relative">
-          <span v-if="acActiveIndex !== `${i}` && e.version">{{ e.version }}</span>
-          <span v-else>Add Version</span>
-          <Minus v-if="formData.versions.length !== 1" class="w-4 h-4" #icon @click.capture.stop="delVersion(i)" />
-          <Progress v-if="e.progress && acActiveIndex && acActiveIndex !== `${i}`" :model-value="e.progress"
-            class="absolute w-full bottom-0 left-0 h-1" />
-        </v-accordion-trigger>
-        <AccordionContent>
-          <v-item label="Version Name">
-            <Input @change="e.versionError = false" :class="{ 'border-red-500': e.versionError }" type="text"
-              placeholder="Version Name" v-model:model-value="e.version" />
-          </v-item>
-          <v-item label="Base Model">
-            <v-select @update:open="e.baseModelError = false" :class="{ 'border-red-500': e.baseModelError }"
-              v-model:model-value="e.base_model" placeholder="Select Base Model">
-              <SelectItem v-for="(e, i) in baseTypeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
-            </v-select>
-          </v-item>
-          <v-item label="Introduction">
-            <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />
-          </v-item>
-          <v-item label="">
-            <div class="flex items-center space-x-2 mt-2">
-              <Switch id="airplane-mode" @update:checked="(val) => { handleChange(val, i) }" />
-              <Label for="airplane-mode">Publicly Visible</Label>
-            </div>
-          </v-item>
-          <v-item label="File Path">
-            <div class="flex">
-              <Input :class="{ 'border-red-500': e.filePathError }" type="text" @change="checkFile(e.filePath, i)"
-                placeholder="File Path" :disabled="typeof (e.progress) == 'number' && e.progress !== 100"
-                v-model:model-value="e.filePath" />
-              <Button @click="interrupt(e)" class="ml-2" :disabled="!e.progress || e.progress == 100">interrupt</Button>
-            </div>
-          </v-item>
-          <div v-if="e.progress">
-            <Progress :model-value="e.progress" class="mt-4 h-3" />
-            <p class="text-center mt-2">{{ e.progress }}% Uploaded</p>
-          </div>
-        </AccordionContent>
-      </AccordionItem>
+    <v-dialog
+      v-model:open="modelStoreObject.showDialog"
+      @onClose="onDialogClose"
+      class="px-0 overflow-hidden pb-0 z-9000"
+      v-if="modelStoreObject.showDialog"
+      layoutClass="z-9000"
+      contentClass="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow">
+      <template #title><span class="px-6" @click="acActiveIndex = '-1'; modelBox = true">Publish a Model</span></template>
+      <div v-show="modelBox" class="px-6 pb-6">
+        <v-item label="Model Name">
+          <Input @change="formData.nameError = false" :class="{'border-red-500': formData.nameError}" type="text" placeholder="Enter Model Name" v-model:model-value="formData.name" />
+        </v-item>
+        <v-item label="Model Type">
+          <v-select @update:open="formData.typeError = false" :class="{'border-red-500': formData.typeError}" v-model:model-value="formData.type" placeholder="Select Model Type">
+            <SelectItem v-for="(e, i) in typeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
+          </v-select>
+        </v-item>
+        <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
+      </div>
+      <Accordion
+        type="single"
+        collapsible
+        default-value="0"
+        class="w-full"
+        @update:model-value="acActiveFn"
+        v-model:model-value="acActiveIndex">
+        <AccordionItem class="bg-[#353535] z-1 px-6 w-full rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px]" v-for="(e, i) in formData.versions" :key="i" :value="`${i}`">
+          <v-accordion-trigger class="justify-between relative">
+            <span v-if="acActiveIndex !== `${i}` && e.version">{{ e.version }}</span>
+            <span v-else>Add Version</span>
+            <Minus v-if="formData.versions.length !== 1" class="w-4 h-4" #icon @click.capture.stop="delVersion(i)" />
+            <Progress v-if="e.progress && acActiveIndex && acActiveIndex !== `${i}`" :model-value="e.progress" class="absolute w-full bottom-0 left-0 h-1" />
+          </v-accordion-trigger>
+          <AccordionContent>
+            <v-item label="Version Name">
+              <Input @change="e.versionError = false" :class="{'border-red-500': e.versionError}" type="text" placeholder="Version Name" v-model:model-value="e.version" />
+            </v-item>
+            <v-item label="Base Model">
+              <v-select @update:open="e.baseModelError = false" :class="{'border-red-500': e.baseModelError}" v-model:model-value="e.base_model" placeholder="Select Base Model">
+                <SelectItem v-for="(e, i) in baseTypeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
+              </v-select>
+            </v-item>
+            <v-item label="Introduction">
+              <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />
+            </v-item>
+            <v-item label="">
+              <div class="flex items-center space-x-2 mt-2">
+                <Switch id="airplane-mode" @update:checked="(val) => {handleChange(val, i)}" />
+                <Label for="airplane-mode">Publicly Visible</Label>
+              </div>
+            </v-item>
+            <v-item label="File" v-show="!e.showUpload">
+              <div class="flex h-28 items-center justify-end relative">
+                <p v-if="e.progress && e.fileName" class="absolute top-2 left-1 text-xs">{{ e.fileName }}</p>
+                <div v-if="e.progress" class="flex-1">
+                  <Progress :model-value="e.progress" class="mt-4 h-3" />
+                  <p class="text-center pt-2">
+                    {{ e.progress }}% Uploaded
+                    <span class="pl-2" v-if="e.speed">Speed: {{ e.speed }}</span>
+                  </p>
+                </div>
+                <vUpload 
+                  :parallel="1" 
+                  :ref="e.ref"
+                  :chunkSize="1" 
+                  :class="{'border-red-500': e.filePathError}"
+                  @path="(path) => handlePath(path, i)"
+                  @start="() => startUpload(i)"
+                  @success="data => successUpload(data, i)"
+                  @error="() => errorUpload(i)"
+                  @uploadInfo="data => handleUploadInfo(data, i)"
+                  @progress="p => fnProgress(p, i)" />
+              </div>
+            </v-item>
+          </AccordionContent>
+        </AccordionItem>
 
     </Accordion>
     <template #foot v-if="!modelBox">
@@ -105,20 +117,22 @@ import vDialog from '@/components/modules/vDialog.vue'
 import vSelect from '@/components/modules/vSelect.vue'
 import vItem from '@/components/modules/vItem.vue'
 import vAccordionTrigger from '@/components/modules/vAccordionTrigger.vue'
-import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
-import { useShadet } from '@/components/modules/vShadet/index'
+import vUpload from './upload.vue'
+import { useAlertDialog  } from '@/components/modules/vAlertDialog/index'
+// import { useShadet } from '@/components/modules/vShadet/index'
 
 import { useStatusStore } from '@/stores/userStatus'
 import { modelStore } from '@/stores/modelStatus'
 import Markdown from '@/components/markdown/Index2.vue'
-import { create_models, checkLocalFile, submitUpload, model_types, base_model_types, put_model, interrupt_upload } from '@/api/model'
+// checkLocalFile, submitUpload, interrupt_upload
+import { create_models, model_types, base_model_types, put_model } from '@/api/model'
 import { onMounted } from 'vue'
 import { Minus } from 'lucide-vue-next'
 
 const statusStore = useStatusStore();
 const modelStoreObject = modelStore();
 const modelBox = ref(true);
-const versionIndex = ref(0);
+// const versionIndex = ref(0);
 const typeLis = ref([{ value: '', label: '' }]);
 const baseTypeLis = ref([{ value: '', label: '' }]);
 const formData = ref({ ...modelStoreObject.modelDetail });
@@ -138,19 +152,21 @@ function handleChange(val: any, index: number) {
   }
 }
 let calculating: { close: any }
-async function checkFile(val: string, index: number) {
-  const res = await checkLocalFile({ absolute_path: val })
-  formData.value.versions[index].file_upload_id = res.data.upload_id
-  formData.value.versions[index].filePathError = false
-  versionIndex.value = index
-  await submitUpload({ upload_id: res.data.upload_id })
-  formData.value.versions[index].progress = 0.1
-  calculating = useShadet({
-    content: 'Start calculating the file hash',
-    z: 'z-12000'
-  })
+let asdasd = 0
+// async function checkFile(val: string, index: number) {
+//   const res = await checkLocalFile({ absolute_path: val })
+//   formData.value.versions[index].file_upload_id = res.data.upload_id
+//   formData.value.versions[index].filePathError = false
+//   versionIndex.value = index
+//   await submitUpload({ upload_id: res.data.upload_id })
+//   asdasd = new Date().getTime()
+//   formData.value.versions[index].progress = 0.1
+//   calculating = useShadet({
+//     content: 'Start calculating the file hash',
+//     z: 'z-12000'
+//   })
 
-}
+// }
 async function delVersion(index: number) {
   const res = await useAlertDialog({
     title: 'Are you sure you want to delete this version?',
@@ -227,22 +243,46 @@ function verifyVersion() {
       acActiveIndex.value = `${i}`
       break
     }
-    if (!e.filePath) {
+    if (!e.sign) {
       e.filePathError = true
       useToaster.error(`Please enter the file path for version ${i + 1}`)
       acActiveIndex.value = `${i}`
       break
     }
   }
-  return tempData.versions.every((e: any) => e.version && e.base_model && e.filePath)
+  console.log(tempData.versions.every((e: any) => e.version && e.base_model && e.sign))
+  return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
 }
 
-async function interrupt({ file_upload_id }: any) {
+// async function interrupt ({ file_upload_id }: any) {
 
-  await interrupt_upload({ upload_id: file_upload_id })
+//   await interrupt_upload({ upload_id: file_upload_id })
+
+// }
+const fnProgress = (p: number, i: number) => {
+  formData.value.versions[i].progress = p
+}
+const handlePath = (path: string, i: number) => {
+  formData.value.versions[i].path = path
+}
+const startUpload = (i: number) => {
+  formData.value.versions[i].filePathError = false
+}
+const successUpload = (data: any, i: number) => {
+  formData.value.versions[i].sign = data.sha256sum
+  formData.value.versions[i].filePathError = false
 
 }
-
+const errorUpload = (i: number) => {
+  console.log('errorUpload', i)
+  if (formData.value.versions[i].progress) {
+    delete formData.value.versions[i].progress
+  }
+}
+const handleUploadInfo = (data: any, i: number) => {
+  data.speed && (formData.value.versions[i].speed = data.speed)
+  data.fileName && (formData.value.versions[i].fileName = data.fileName)
+}
 async function submit() {
   if (!verifyVersion()) {
     return
@@ -251,10 +291,19 @@ async function submit() {
   setTimeout(() => {
     showLayoutLoading.value = false
   }, 5000)
-  if (formData.value.id) {
-    await put_model(formData.value)
+  const tempData = {...formData.value}
+  tempData.versions.forEach((e: any) => {
+    delete e.baseModelError
+    delete e.filePath
+    delete e.filePathError
+    delete e.versionError
+    delete e.speed
+    delete e.fileName
+  })
+  if (tempData.id) {
+    await put_model(tempData)
   } else {
-    await create_models(formData.value)
+    await create_models(tempData)
   }
   useToaster.success('Model published successfully')
 
@@ -299,6 +348,7 @@ watch(() => statusStore.socketMessage, (val: any) => {
   }
   if (val.type == "prepared") {
     calculating.close()
+    console.log((new Date().getTime() - asdasd) / 1000)
   }
   console.log(val)
   if (val.type === "errors" && val.data && val.data.code === 500101) {
@@ -306,7 +356,9 @@ watch(() => statusStore.socketMessage, (val: any) => {
     console.log(val.data.data)
     useToaster.error(val.data.message)
     const i = formData.value.versions.findIndex((e: any) => e.file_upload_id == val.data.data.upload_id)
-    delete formData.value.versions[i].progress
+    if (formData.value.versions[i].progress) {
+      delete formData.value.versions[i].progress
+    }
     formData.value.versions[i].filePath = ''
   }
 }, {

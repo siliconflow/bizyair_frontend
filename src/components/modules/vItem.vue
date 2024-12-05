@@ -6,8 +6,8 @@ defineProps({
 </script>
 
 <template>
-  <div>
-    <p class="text-sm mt-3">{{ label }}<span v-if="required">*</span></p>
+  <div class="mt-3">
+    <p class="text-sm">{{ label }}<span v-if="required">*</span></p>
     <div class="mt-2">
       <slot />
     </div>
