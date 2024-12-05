@@ -7,7 +7,7 @@ module.exports = {
   prefix: "",
 
   corePlugins: {
-    preflight: false,  // 禁用预设样式
+    preflight: false,
   },
 
   content: [

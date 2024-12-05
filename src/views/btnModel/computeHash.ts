@@ -60,7 +60,6 @@ export async function calculateHash(file: File | Blob): Promise<any> {
     };
 
     reader.onerror = (e) => {
-      console.log('错误了', e);
       reject(new Error("FileReader error"));
     };
 

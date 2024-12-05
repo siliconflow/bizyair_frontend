@@ -79,12 +79,13 @@ export class WebSocketClient {
   }
 
   onMessage(message: MessageEvent) {
-    const data = JSON.parse(message.data);
-    if (data === 'pong') {
-      // Do nothing
-    } else {
-      console.log('message:', data);
-    }
+    message
+    // const data = JSON.parse(message.data);
+    // if (data === 'pong') {
+    //   // Do nothing
+    // } else {
+    //   console.log('message:', data);
+    // }
   }
 
   onError(error: Event) {

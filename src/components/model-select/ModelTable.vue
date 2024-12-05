@@ -92,7 +92,6 @@ const handleOperateChange = async (value: 'edit' | 'remove', model: Model) => {
 
 
 const handleRemoveModel = async (id: string) => {
-  console.log('id', id)
   try {
     await remove_model(id)
     useToaster.success('Model removed successfully.')

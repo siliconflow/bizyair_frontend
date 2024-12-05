@@ -90,8 +90,8 @@ interface doUploadData{
 }
 async function doUpload(data: doUploadData){
   const {client, file, objectKey, retryLimit = 3} = data
-  let lastUploadedSize = 0; // 记录上一次上传的字节数
-  let lastTime = performance.now(); // 记录上一次的时间
+  let lastUploadedSize = 0;
+  let lastTime = performance.now();
   try {
     const completeResult = await client.multipartUpload(objectKey, file, {
       progress: (p: any) => {
@@ -108,7 +108,6 @@ async function doUpload(data: doUploadData){
           } else {
             speed = `${(speedInBytes / 1024).toFixed(2)} KB/s`;
           }
-          console.log(`Upload speed: ${speed}`);
         }
         lastUploadedSize = uploadedSize;
         lastTime = now;

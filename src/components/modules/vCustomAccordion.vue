@@ -23,7 +23,6 @@ const setActiveIndex = (index: number) => {
 
 watch(() => props.activeIndex, (newIndex) => {
   internalActiveIndex.value = newIndex;
-  console.log('activeIndex', internalActiveIndex.value);
 });
 
 provide('activeIndex', internalActiveIndex);

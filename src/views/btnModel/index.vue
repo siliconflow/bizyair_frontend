@@ -159,7 +159,6 @@ function handleChange(val: any, index: number) {
   }
 }
 let calculating: { close: any }
-let asdasd = 0
 // async function checkFile(val: string, index: number) {
 //   const res = await checkLocalFile({ absolute_path: val })
 //   formData.value.versions[index].file_upload_id = res.data.upload_id
@@ -189,7 +188,6 @@ async function delVersion(index: number) {
   }
   tempData.versions = tempData.versions || []
   tempData.versions.splice(index, 1)
-  console.log(tempData.versions)
   modelStoreObject.setModelDetail(tempData)
   if (tempData.versions.length === 1) {
     acActiveIndex.value = 0
@@ -258,7 +256,6 @@ function verifyVersion() {
       break
     }
   }
-  console.log(tempData.versions.every((e: any) => e.version && e.base_model && e.sign))
   return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
 }
 
@@ -282,7 +279,6 @@ const successUpload = (data: any, i: number) => {
 
 }
 const errorUpload = (i: number) => {
-  console.log('errorUpload', i)
   if (formData.value.versions[i].progress) {
     delete formData.value.versions[i].progress
   }
@@ -356,12 +352,9 @@ watch(() => statusStore.socketMessage, (val: any) => {
   }
   if (val.type == "prepared") {
     calculating.close()
-    console.log((new Date().getTime() - asdasd) / 1000)
   }
-  console.log(val)
   if (val.type === "errors" && val.data && val.data.code === 500101) {
     calculating.close()
-    console.log(val.data.data)
     useToaster.error(val.data.message)
     const i = formData.value.versions.findIndex((e: any) => e.file_upload_id == val.data.data.upload_id)
     if (formData.value.versions[i].progress) {

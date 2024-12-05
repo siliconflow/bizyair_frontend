@@ -5,7 +5,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
-import postcssNesting from 'tailwindcss/nesting'; // 导入插件
+import postcssNesting from 'tailwindcss/nesting';
 
 export default defineConfig({
   define: {

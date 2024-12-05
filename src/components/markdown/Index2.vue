@@ -119,12 +119,10 @@ const text = ref(props.modelValue);
 const emit = defineEmits(['update:modelValue', 'isUploading'])
 
 const handleInput = () => {
-  console.log('handleInput', text.value);
   emit('update:modelValue', text)
 };
 
 const handleKeydown = (event) => {
-  console.log(event.key)
   if (BLOCKED_KEYS.includes(event.key)) {
     event.stopPropagation();
   }
@@ -176,7 +174,6 @@ const uploadImg = async (e) => {
   });
 };
 const uploadImgFull = async (e) => {
-  console.log('uploadImgFull', e.target.files);
   handleUploadImg([e.target.files[0]], (urls) => {
     urls.forEach(url => {
       editorRefFull.value.insert(() => {
@@ -218,7 +215,6 @@ const handleUploadImg = async (files, callback) => {
       useToaster.error('Some files failed to upload');
     }
   } catch (error) {
-    console.log(error);
     useToaster.error('Upload failed, please try again');
   } finally {
     emit('isUploading', false);
