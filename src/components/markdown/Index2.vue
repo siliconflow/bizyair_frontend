@@ -1,18 +1,8 @@
 <template>
-  <MdEditor 
-    :editorId="editorId" 
-    v-model="text" 
-    theme="dark" 
-    :toolbars="toolbar" 
-    ref="editorRef" 
-    :autoDetectCode="true"
-    language="en-US" 
-    :preview="false"
-    @input="handleInput" 
-    :style="{
+  <MdEditor :editorId="editorId" v-model="text" theme="dark" :toolbars="toolbar" ref="editorRef" :autoDetectCode="true"
+    language="en-US" :preview="false" @input="handleInput" :style="{
       height: '200px'
-    }"
-    @on-upload-img="handleUploadImg">
+    }" @on-upload-img="handleUploadImg" @on-focus="handleFocus" @on-blur="handleBlur">
     <template #defToolbars>
       <NormalToolbar title="fullscreen" @onClick="handleFullClick">
         <template #trigger>
