@@ -68,8 +68,8 @@ const handleShowModelDetail = () => {
       </Button>
     </TableCell>
   </TableRow>
-  <vDialog v-model:open="showModelDetail" class="max-w-full h-screen px-6 overflow-hidden  pb-6 z-14000"
-    layoutClass="z-14000"
+  <vDialog v-model:open="showModelDetail" class="max-w-full h-screen px-6 overflow-hidden  pb-6 z-8000"
+    layoutClass="z-8000"
     contentClass="custom-scrollbar max-h-[100vh-120px]  overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
     :title="model.name">
     <ModelDetail :modelId="model.id" :version="version" />

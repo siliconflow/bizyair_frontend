@@ -145,6 +145,7 @@ const handleModelOperation = async (type: 'edit' | 'remove', id: string | number
     downloadOpen.value = false
   }
   if (type === 'remove') {
+    downloadOpen.value = false
     const res = await useAlertDialog({
       title: 'Are you sure you want to delete this model?',
       desc: 'This action cannot be undone.',
@@ -158,7 +159,6 @@ const handleModelOperation = async (type: 'edit' | 'remove', id: string | number
       const hasPublic = model.value?.versions.some((version) => version.public)
       if (hasPublic) {
         useToaster.warning('Model has public version, cannot remove.')
-        downloadOpen.value = false
         return
       }
     }

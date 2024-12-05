@@ -68,11 +68,13 @@ const handleOperateChange = async (value: 'edit' | 'remove', model: Model) => {
     currentOperateModel.value = ''
   }
   if (value === 'remove') {
+    modelStoreInstance.reloadModelSelectList = false;
     const res = await useAlertDialog({
       title: 'Are you sure you want to delete this model?',
       desc: 'This action cannot be undone.',
       cancel: 'No, Keep It',
       continue: 'Yes, Delete It',
+      z: 'z-9000'
     })
     if (!res) return
 
@@ -90,10 +92,11 @@ const handleOperateChange = async (value: 'edit' | 'remove', model: Model) => {
 
 
 const handleRemoveModel = async (id: string) => {
+  console.log('id', id)
   try {
     await remove_model(id)
     useToaster.success('Model removed successfully.')
-    modelStoreInstance.closeAndReload()
+    modelStoreInstance.reloadModelSelectList = true;
   } catch (error) {
     useToaster.error(`Failed to remove model. ${error}`)
   }
