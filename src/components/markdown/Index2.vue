@@ -6,9 +6,15 @@
     :toolbars="toolbar" 
     ref="editorRef" 
     :autoDetectCode="true"
-    language="en-US" :preview="false" @input="handleInput" :style="{
+    language="en-US" 
+    :preview="false" 
+    @input="handleInput" 
+    :style="{
       height: '200px'
-    }" @on-upload-img="handleUploadImg" @on-focus="handleFocus" @on-blur="handleBlur">
+    }" 
+    @on-upload-img="handleUploadImg" 
+    @on-focus="handleFocus" 
+    @on-blur="handleBlur">
     <template #defToolbars>
       <NormalToolbar title="fullscreen" @onClick="handleFullClick">
         <template #trigger>
@@ -17,9 +23,9 @@
       </NormalToolbar>
       <NormalToolbar title="image">
         <template #trigger>
-          <div class="relative w-4 h-4">
+          <div class="relative w-4 h-4 cursor-pointer">
             <input @change="uploadImg" type="file" class="absolute w-4 h-4 left-0 top-0 cursor-pointer opacity-0" />
-            <Image class='w-4 h-4' />
+            <Image class='w-4 h-4 cursor-pointer' />
           </div>
         </template>
       </NormalToolbar>
@@ -38,7 +44,9 @@
       :pageFullscreen="true" 
       class="fixed top-0 left-0 w-[100vw] h-[100vh] z-12000"
       @input="handleInput" 
-      @on-upload-img="handleUploadImg">
+      @on-upload-img="handleUploadImg" 
+      @on-focus="handleFocus" 
+      @on-blur="handleBlur">
       <template #defToolbars>
         <NormalToolbar title="fullscreen" @onClick="handleFullClick">
           <template #trigger>
@@ -71,7 +79,7 @@ import { Maximize, Image } from 'lucide-vue-next';
 
 import 'md-editor-v3/lib/style.css';
 
-const BLOCKED_KEYS = ['r', 'q', 'w', 'n', 'm', 's', 'o', 'g', ',', '=', '+', '-', '.', 'p', 'c', 'b', 'm', '`', 'f', 'Enter'];
+const BLOCKED_KEYS = ['r', 'q', 'w', 'n', 'm', 's', 'o', 'g', ',', '=', '+', '-', '.', 'p', 'c', 'b', 'm', '`', 'f', 'Enter', 'Backspace'];
 
 const toolbar = [
   'bold', 'italic', 'underline', 'title', '-',
@@ -111,10 +119,12 @@ const text = ref(props.modelValue);
 const emit = defineEmits(['update:modelValue', 'isUploading'])
 
 const handleInput = () => {
+  console.log('handleInput', text.value);
   emit('update:modelValue', text)
 };
 
 const handleKeydown = (event) => {
+  console.log(event.key)
   if (BLOCKED_KEYS.includes(event.key)) {
     event.stopPropagation();
   }
@@ -160,6 +170,8 @@ const uploadImg = async (e) => {
           deviationEnd: 0,
         };
       });
+      text.value += `![image](${url})`;
+      handleInput();
     });
   });
 };
@@ -175,6 +187,8 @@ const uploadImgFull = async (e) => {
           deviationEnd: 0,
         };
       });
+      text.value += `![image](${url})`;
+      handleInput();
     });
   });
 };
