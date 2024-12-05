@@ -65,31 +65,29 @@
                 <Label for="airplane-mode">Publicly Visible</Label>
               </div>
             </v-item>
-            <v-item label="File Path" v-show="!e.showUpload">
-              <div class="flex">
+            <v-item label="File" v-show="!e.showUpload">
+              <div class="flex h-28 items-center justify-end relative">
+                <p v-if="e.progress && e.fileName" class="absolute top-2 left-1 text-xs">{{ e.fileName }}</p>
+                <div v-if="e.progress" class="flex-1">
+                  <Progress :model-value="e.progress" class="mt-4 h-3" />
+                  <p class="text-center pt-2">
+                    {{ e.progress }}% Uploaded
+                    <span class="pl-2" v-if="e.speed">Speed: {{ e.speed }}</span>
+                  </p>
+                </div>
                 <vUpload 
                   :parallel="1" 
+                  :ref="e.ref"
                   :chunkSize="1" 
                   :class="{'border-red-500': e.filePathError}"
                   @path="(path) => handlePath(path, i)"
                   @start="() => startUpload(i)"
                   @success="data => successUpload(data, i)"
                   @error="() => errorUpload(i)"
+                  @uploadInfo="data => handleUploadInfo(data, i)"
                   @progress="p => fnProgress(p, i)" />
-                <!-- <Input
-                  :class="{'border-red-500': e.filePathError}"
-                  type="text"
-                  @change="checkFile(e.filePath, i)"
-                  placeholder="File Path"
-                  :disabled="typeof(e.progress) == 'number' && e.progress !== 100"
-                  v-model:model-value="e.filePath" />
-                <Button @click="interrupt(e)" class="ml-2" :disabled="!e.progress || e.progress == 100">interrupt</Button> -->
               </div>
             </v-item>
-            <div v-if="e.progress">
-              <Progress :model-value="e.progress" class="mt-4 h-3" />
-              <p class="text-center mt-2">{{ e.progress }}% Uploaded</p>
-            </div>
           </AccordionContent>
         </AccordionItem>
 
@@ -265,28 +263,26 @@ const fnProgress = (p: number, i: number) => {
   formData.value.versions[i].progress = p
 }
 const handlePath = (path: string, i: number) => {
-  console.log('handlePath', path)
   formData.value.versions[i].path = path
-  console.log(formData.value.versions[i])
 }
 const startUpload = (i: number) => {
-  console.log('start', i)
-  // formData.value.versions[i].showUpload = true
   formData.value.versions[i].filePathError = false
 }
 const successUpload = (data: any, i: number) => {
-  console.log('successUpload', data, i)
-  // formData.value.versions[i].showUpload = false
   formData.value.versions[i].sign = data.sha256sum
-  // formData.value.versions[i].path = data.path
   formData.value.versions[i].filePathError = false
+
 }
 const errorUpload = (i: number) => {
   console.log('errorUpload', i)
-  // formData.value.versions[i].showUpload = false
-  delete formData.value.versions[i].progress
+  if (formData.value.versions[i].progress) {
+    delete formData.value.versions[i].progress
+  }
 }
-
+const handleUploadInfo = (data: any, i: number) => {
+  data.speed && (formData.value.versions[i].speed = data.speed)
+  data.fileName && (formData.value.versions[i].fileName = data.fileName)
+}
 async function submit() {
   if (!verifyVersion()) {
     return
@@ -301,6 +297,8 @@ async function submit() {
     delete e.filePath
     delete e.filePathError
     delete e.versionError
+    delete e.speed
+    delete e.fileName
   })
   if (tempData.id) {
     await put_model(tempData)
@@ -358,7 +356,9 @@ watch(() => statusStore.socketMessage, (val: any) => {
     console.log(val.data.data)
     useToaster.error(val.data.message)
     const i = formData.value.versions.findIndex((e: any) => e.file_upload_id == val.data.data.upload_id)
-    delete formData.value.versions[i].progress
+    if (formData.value.versions[i].progress) {
+      delete formData.value.versions[i].progress
+    }
     formData.value.versions[i].filePath = ''
   }
 }, {

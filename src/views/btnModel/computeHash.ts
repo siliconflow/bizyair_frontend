@@ -1,5 +1,4 @@
 import { createCRC64, createMD5, createSHA256 } from "hash-wasm";
-import crypto from "crypto";
 
 interface FileReaderEventTarget extends EventTarget {
   result: string | ArrayBuffer | null;
@@ -36,7 +35,6 @@ export async function calculateHash(file: File | Blob): Promise<any> {
         );
         sha256Hasher.update(`${base64Md5}${flippedCrc64}`);
         const sha256Hash = sha256Hasher.digest();
-
         resolve({ sha256sum: sha256Hash, md5Hash: base64Md5, crc64Hash });
         return;
       }
@@ -67,23 +65,5 @@ export async function calculateHash(file: File | Blob): Promise<any> {
     };
 
     readNextChunk();
-  });
-}
-
-export async function calculateMd5Hash(file: File | Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const buffer = reader.result as ArrayBuffer;
-      const hash = crypto.createHash("md5").update(new Uint8Array(buffer)).digest("base64");
-      resolve(hash);
-    };
-
-    reader.onerror = () => {
-      reject(new Error("Failed to calculate MD5"));
-    };
-
-    reader.readAsArrayBuffer(file);
   });
 }
