@@ -1,5 +1,11 @@
 <template>
-  <MdEditor :editorId="editorId" v-model="text" theme="dark" :toolbars="toolbar" ref="editorRef" :autoDetectCode="true"
+  <MdEditor 
+    :editorId="editorId" 
+    v-model="text" 
+    theme="dark" 
+    :toolbars="toolbar" 
+    ref="editorRef" 
+    :autoDetectCode="true"
     language="en-US" :preview="false" @input="handleInput" :style="{
       height: '200px'
     }" @on-upload-img="handleUploadImg" @on-focus="handleFocus" @on-blur="handleBlur">
@@ -9,17 +15,42 @@
           <Maximize class='w-4 h-4 mt-1' />
         </template>
       </NormalToolbar>
+      <NormalToolbar title="image">
+        <template #trigger>
+          <div class="relative w-4 h-4">
+            <input @change="uploadImg" type="file" class="absolute w-4 h-4 left-0 top-0 cursor-pointer opacity-0" />
+            <Image class='w-4 h-4' />
+          </div>
+        </template>
+      </NormalToolbar>
     </template>
 
   </MdEditor>
   <Teleport to="body" v-if='isFullscreen'>
-    <MdEditor v-model="text" theme="dark" :autoDetectCode="true" :editorId="`full-${editorId}`" :toolbars="toolbar"
-      language="en-US" :pageFullscreen="true" class="fixed top-0 left-0 w-[100vw] h-[100vh] z-12000"
-      @input="handleInput" @on-upload-img="handleUploadImg">
+    <MdEditor 
+      v-model="text" 
+      theme="dark" 
+      :autoDetectCode="true" 
+      :editorId="`full-${editorId}`" 
+      :toolbars="toolbar"
+      ref="editorRefFull"
+      language="en-US" 
+      :pageFullscreen="true" 
+      class="fixed top-0 left-0 w-[100vw] h-[100vh] z-12000"
+      @input="handleInput" 
+      @on-upload-img="handleUploadImg">
       <template #defToolbars>
         <NormalToolbar title="fullscreen" @onClick="handleFullClick">
           <template #trigger>
             <Maximize class='w-4 h-4 mt-1' />
+          </template>
+        </NormalToolbar>
+        <NormalToolbar title="image">
+          <template #trigger>
+            <div class="relative w-4 h-4">
+              <input @change="uploadImgFull" type="file" class="absolute w-4 h-4 left-0 top-0 cursor-pointer opacity-0" />
+              <Image class='w-4 h-4' />
+            </div>
           </template>
         </NormalToolbar>
       </template>
@@ -36,7 +67,7 @@ import cropper from 'cropperjs';
 import { uploadImage } from '@/api/public'
 import { MdEditor, config, NormalToolbar } from 'md-editor-v3';
 import { useToaster } from '@/components/modules/toats/index'
-import { Maximize } from 'lucide-vue-next';
+import { Maximize, Image } from 'lucide-vue-next';
 
 import 'md-editor-v3/lib/style.css';
 
@@ -44,13 +75,14 @@ const BLOCKED_KEYS = ['r', 'q', 'w', 'n', 'm', 's', 'o', 'g', ',', '=', '+', '-'
 
 const toolbar = [
   'bold', 'italic', 'underline', 'title', '-',
-  'quote', 'code', 'table', 'image', '-',
-  'mermaid', 'katex', '-',
-  'link', '=',
+  'quote', 'code', 'table', 1, '-',
+  'mermaid', 'katex', '-', '=',
   'preview',
   0
 ];
 
+const editorRef = ref(null);
+const editorRefFull = ref(null);
 const isFullscreen = ref(false);
 const handleFullClick = () => {
   isFullscreen.value = !isFullscreen.value;
@@ -117,6 +149,36 @@ const uploadWithRetry = async (file, retryCount = 0) => {
   }
 };
 
+const uploadImg = async (e) => {
+  handleUploadImg([e.target.files[0]], (urls) => {
+    urls.forEach(url => {
+      editorRef.value.insert(() => {
+        return {
+          targetValue: `![image](${url})`,
+          select: false,
+          deviationStart: 0,
+          deviationEnd: 0,
+        };
+      });
+    });
+  });
+};
+const uploadImgFull = async (e) => {
+  console.log('uploadImgFull', e.target.files);
+  handleUploadImg([e.target.files[0]], (urls) => {
+    urls.forEach(url => {
+      editorRefFull.value.insert(() => {
+        return {
+          targetValue: `![image](${url})`,
+          select: false,
+          deviationStart: 0,
+          deviationEnd: 0,
+        };
+      });
+    });
+  });
+};
+
 const handleUploadImg = async (files, callback) => {
   const invalidFiles = files.filter(file => !ALLOWED_TYPES.includes(file.type));
   if (invalidFiles.length > 0) {
@@ -142,13 +204,13 @@ const handleUploadImg = async (files, callback) => {
       useToaster.error('Some files failed to upload');
     }
   } catch (error) {
+    console.log(error);
     useToaster.error('Upload failed, please try again');
   } finally {
     emit('isUploading', false);
   }
 };
 
-const editorRef = ref(null);
 
 config({
   editorExtensions: {
@@ -175,7 +237,7 @@ config({
   @apply w-6 h-6;
 }
 
-:deep(.md-editor-menu-item.md-editor-menu-item-image:last-child) {
+/* :deep(.md-editor-menu-item.md-editor-menu-item-image:last-child) {
   @apply hidden;
-}
+} */
 </style>
