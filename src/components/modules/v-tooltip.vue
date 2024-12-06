@@ -13,14 +13,9 @@
   </TooltipProvider>
 </template>
 <script setup lang="ts">
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-defineProps({
-  tips: String
-})
+  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+  defineProps({
+    tips: String
+  })
 </script>
 <style scoped></style>

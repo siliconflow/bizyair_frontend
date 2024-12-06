@@ -1,81 +1,81 @@
 export class WebSocketClient {
-  private url: string;
-  private protocols: string | string[];
-  private reconnectDelay: number;
-  private maxReconnectDelay: number;
-  private keepAliveInterval: number;
-  private ws: WebSocket | null;
-  private keepAliveTimer: NodeJS.Timeout | null;
-  private reconnectTimer: NodeJS.Timeout | null;
+  private url: string
+  private protocols: string | string[]
+  private reconnectDelay: number
+  private maxReconnectDelay: number
+  private keepAliveInterval: number
+  private ws: WebSocket | null
+  private keepAliveTimer: NodeJS.Timeout | null
+  private reconnectTimer: NodeJS.Timeout | null
 
   constructor(url: string, protocols: string | string[]) {
-    this.url = url;
-    this.protocols = protocols;
-    this.reconnectDelay = 1000;
-    this.maxReconnectDelay = 30000;
-    this.keepAliveInterval = 10000;
-    this.ws = null;
-    this.keepAliveTimer = null;
-    this.reconnectTimer = null;
+    this.url = url
+    this.protocols = protocols
+    this.reconnectDelay = 1000
+    this.maxReconnectDelay = 30000
+    this.keepAliveInterval = 10000
+    this.ws = null
+    this.keepAliveTimer = null
+    this.reconnectTimer = null
 
-    this.connect();
+    this.connect()
   }
 
   connect() {
-    this.ws = new WebSocket(this.url, this.protocols);
+    this.ws = new WebSocket(this.url, this.protocols)
     this.ws.onopen = () => {
-      this.onOpen();
-    };
+      this.onOpen()
+    }
 
     this.ws.onmessage = (message: MessageEvent) => {
       if (message.data !== 'pong') {
-        this.onMessage(message);
+        this.onMessage(message)
       }
-    };
+    }
 
     this.ws.onerror = (error: Event) => {
-      this.onError(error);
-    };
+      this.onError(error)
+    }
 
     this.ws.onclose = () => {
-      console.warn('The WebSocket connection has been closed and is ready to be reconnected');
-      this.onClose();
-      this.scheduleReconnect();
-    };
+      console.warn('The WebSocket connection has been closed and is ready to be reconnected')
+      this.onClose()
+      this.scheduleReconnect()
+    }
   }
 
   startKeepAlive() {
-    if (this.keepAliveTimer) return;
+    if (this.keepAliveTimer) return
 
     this.keepAliveTimer = setInterval(() => {
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.ws.send('ping');
+        this.ws.send('ping')
       }
-    }, this.keepAliveInterval);
+    }, this.keepAliveInterval)
   }
 
   stopKeepAlive() {
     if (this.keepAliveTimer) {
-      clearInterval(this.keepAliveTimer);
-      this.keepAliveTimer = null;
+      clearInterval(this.keepAliveTimer)
+      this.keepAliveTimer = null
     }
   }
 
   scheduleReconnect() {
-    if (this.reconnectTimer) return;
+    if (this.reconnectTimer) return
 
     this.reconnectTimer = setTimeout(() => {
-      console.log(`Attempt to reconnect...`);
-      this.connect();
-      this.reconnectTimer = null;
+      console.log(`Attempt to reconnect...`)
+      this.connect()
+      this.reconnectTimer = null
 
-      this.reconnectDelay = Math.min(this.reconnectDelay * 2, this.maxReconnectDelay);
-    }, this.reconnectDelay);
+      this.reconnectDelay = Math.min(this.reconnectDelay * 2, this.maxReconnectDelay)
+    }, this.reconnectDelay)
   }
 
   onOpen() {
-    this.reconnectDelay = 2000;
-    this.startKeepAlive();
+    this.reconnectDelay = 2000
+    this.startKeepAlive()
   }
 
   onMessage(message: MessageEvent) {
@@ -89,21 +89,21 @@ export class WebSocketClient {
   }
 
   onError(error: Event) {
-    console.error('WebSocket Error: ', error);
+    console.error('WebSocket Error: ', error)
   }
 
   onClose() {
-    this.stopKeepAlive();
+    this.stopKeepAlive()
   }
 
   close() {
     if (this.ws) {
-      this.ws.close();
+      this.ws.close()
     }
-    this.stopKeepAlive();
+    this.stopKeepAlive()
     if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
     }
   }
 }

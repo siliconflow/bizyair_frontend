@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref } from 'vue'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-const showAlert = ref(true)
-defineProps({
-  cancel: {
-    type: String,
-    default: 'Cancel',
-  },
-  continue: {
-    type: String,
-    default: 'Continue',
-  },
-  title: {
-    type: String,
-    default: 'Are you absolutely sure?',
-  },
-  desc: String,
-  z: String,
-})
+  import { defineProps, defineEmits, ref } from 'vue'
+  import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+  } from '@/components/ui/alert-dialog'
+  const showAlert = ref(true)
+  defineProps({
+    cancel: {
+      type: String,
+      default: 'Cancel'
+    },
+    continue: {
+      type: String,
+      default: 'Continue'
+    },
+    title: {
+      type: String,
+      default: 'Are you absolutely sure?'
+    },
+    desc: String,
+    z: String
+  })
 
-const emit = defineEmits(['continueClick', 'cancelClick'])
-const continueBtn = () => {
-  emit('continueClick')
-}
-const cancelBtn = () => {
-  emit('cancelClick')
-}
+  const emit = defineEmits(['continueClick', 'cancelClick'])
+  const continueBtn = () => {
+    emit('continueClick')
+  }
+  const cancelBtn = () => {
+    emit('cancelClick')
+  }
 </script>
 
 <template>
@@ -45,7 +45,7 @@ const cancelBtn = () => {
         <AlertDialogDescription>{{ desc }}</AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel class=" text-white" @click="cancelBtn">{{ cancel }}</AlertDialogCancel>
+        <AlertDialogCancel class="text-white" @click="cancelBtn">{{ cancel }}</AlertDialogCancel>
         <AlertDialogAction @click="continueBtn">{{ continue }}</AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
