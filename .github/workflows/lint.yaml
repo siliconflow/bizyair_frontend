@@ -24,7 +24,7 @@ jobs:
         node-version: '20.9.0'
 
     - name: Install dependencies
-      run: npm install -g prettier eslint @eslint/js typescript-eslint eslint-plugin-vue globals
+      run: npm install prettier eslint @eslint/js typescript-eslint eslint-plugin-vue globals
 
     - name: Run Prettier & ESLint
       id: lint
