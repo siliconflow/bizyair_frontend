@@ -24,7 +24,7 @@ jobs:
         node-version: '20.9.0'
 
     - name: Install dependencies
-      run: npm install -g prettier eslint @eslint/js typescript-eslint eslint-plugin-vue
+      run: npm install -g prettier eslint @eslint/js typescript-eslint eslint-plugin-vue globals
 
     - name: Run Prettier
       run: npx prettier --write src//**/*.{css,ts,vue}
@@ -33,11 +33,10 @@ jobs:
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "auto prettier format code"
-        file_pattern: "*.css *.ts *.vue"
+        file_pattern: "*.css *.ts *.vue" # Don't update package-lock.json and package.json
 
     - name: Run ESLint
-      run: |
-        npx eslint src
+      run: npx eslint src
 
     - name: Add PR review comment if eslint fails
       if: failure()
