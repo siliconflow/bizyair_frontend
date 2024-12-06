@@ -18,9 +18,9 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from "@/components/ui/tooltip";
 defineProps({
-  tips: String
-})
+  tips: String,
+});
 </script>
 <style scoped></style>

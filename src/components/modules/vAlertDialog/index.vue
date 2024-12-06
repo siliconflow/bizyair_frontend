@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref } from 'vue'
+import { defineProps, defineEmits, ref } from "vue";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,32 +9,32 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-const showAlert = ref(true)
+} from "@/components/ui/alert-dialog";
+const showAlert = ref(true);
 defineProps({
   cancel: {
     type: String,
-    default: 'Cancel',
+    default: "Cancel",
   },
   continue: {
     type: String,
-    default: 'Continue',
+    default: "Continue",
   },
   title: {
     type: String,
-    default: 'Are you absolutely sure?',
+    default: "Are you absolutely sure?",
   },
   desc: String,
   z: String,
-})
+});
 
-const emit = defineEmits(['continueClick', 'cancelClick'])
+const emit = defineEmits(["continueClick", "cancelClick"]);
 const continueBtn = () => {
-  emit('continueClick')
-}
+  emit("continueClick");
+};
 const cancelBtn = () => {
-  emit('cancelClick')
-}
+  emit("cancelClick");
+};
 </script>
 
 <template>
@@ -46,7 +46,10 @@ const cancelBtn = () => {
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel @click="cancelBtn">{{ cancel }}</AlertDialogCancel>
-        <AlertDialogAction @click="continueBtn">{{ continue }}</AlertDialogAction>
+        <AlertDialogAction
+          @click="continueBtn"
+          >{{ continue }}</AlertDialogAction
+        >
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>

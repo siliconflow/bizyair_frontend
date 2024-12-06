@@ -1,5 +1,11 @@
-import { CommonModelType, FilterState, Model, ModelListPathParams, ModelVersion as ModelVersionType } from '@/types/model';
-import { defineStore } from 'pinia';
+import {
+  CommonModelType,
+  FilterState,
+  Model,
+  ModelListPathParams,
+  ModelVersion as ModelVersionType,
+} from "@/types/model";
+import { defineStore } from "pinia";
 interface ModelVersion {
   id?: number;
   version: string;
@@ -25,21 +31,21 @@ interface ModelDetail {
   versions: ModelVersion[];
 }
 type ShowVersionId = number | undefined;
-export const modelStore = defineStore('modelStore', {
+export const modelStore = defineStore("modelStore", {
   state: () => ({
     isLoading: false,
     modelDetail: {
-      name: '',
-      type: '',
-      versions: []
+      name: "",
+      type: "",
+      versions: [],
     } as ModelDetail,
     showDialog: false,
-    reloadModelSelectList:false,
-    closeModelSelectDialog:false,
-    closeModelDetailDialog:false,
+    reloadModelSelectList: false,
+    closeModelSelectDialog: false,
+    closeModelDetailDialog: false,
     showVersionId: 0 as ShowVersionId,
-    mode: 'my' as 'my' | 'my_fork' | 'publicity',
-    applyObject:{version: {} as ModelVersionType, model: {} as Model},
+    mode: "my" as "my" | "my_fork" | "publicity",
+    applyObject: { version: {} as ModelVersionType, model: {} as Model },
     reload: 0,
     modelTypes: [] as CommonModelType[],
     baseModelTypes: [] as CommonModelType[],
@@ -47,17 +53,17 @@ export const modelStore = defineStore('modelStore', {
     selectedBaseModels: [] as string[],
     models: [] as Model[],
     modelListPathParams: {
-      mode: 'my',
+      mode: "my",
       current: 1,
       page_size: 5,
-      total: 0
+      total: 0,
     } as ModelListPathParams,
     filterState: {
-      keyword: '',
+      keyword: "",
       model_types: [],
       base_models: [],
-      sort: 'Recently'
-    } as FilterState
+      sort: "Recently",
+    } as FilterState,
   }),
   actions: {
     setModelDetail(data: any) {
@@ -65,15 +71,15 @@ export const modelStore = defineStore('modelStore', {
       if (this.modelDetail.id) {
         this.modelDetail.versions.forEach((item: ModelVersion) => {
           item.filePath = item.file_name as string;
-        })
+        });
       }
     },
     clearModelDetail() {
       this.modelDetail = {
-        name: '',
-        type: '',
-        versions: []
-      }
+        name: "",
+        type: "",
+        versions: [],
+      };
     },
     setDialogStatus(status: boolean, versionId?: number) {
       this.showDialog = status;
@@ -83,13 +89,13 @@ export const modelStore = defineStore('modelStore', {
       this.reload += 1;
     },
     closeAndReload() {
-      this.closeModelDetailDialog=true;
-      this.reloadModelSelectList =true;
+      this.closeModelDetailDialog = true;
+      this.reloadModelSelectList = true;
     },
     setApplyObject(version: ModelVersionType, model: Model) {
-      this.closeModelSelectDialog=true;
-      this.closeModelDetailDialog=true;
-      this.applyObject = {version, model};
+      this.closeModelSelectDialog = true;
+      this.closeModelDetailDialog = true;
+      this.applyObject = { version, model };
     },
     setModelTypes(types: CommonModelType[]) {
       this.modelTypes = types;
@@ -109,26 +115,26 @@ export const modelStore = defineStore('modelStore', {
     setFilterState(state: FilterState) {
       this.filterState = state;
     },
-     setIsLoading(status: boolean) {
+    setIsLoading(status: boolean) {
       this.isLoading = status;
     },
     resetModelListPathParams() {
-      this.mode = 'my'
+      this.mode = "my";
       this.modelListPathParams = {
-        mode: 'my',
+        mode: "my",
         current: 1,
         page_size: 5,
-        total: 0
-      }
+        total: 0,
+      };
       this.filterState = {
-        keyword: '',
+        keyword: "",
         model_types: [],
         base_models: [],
-        sort: 'Recently'
-      }
+        sort: "Recently",
+      };
     },
     updatePagination(page: number) {
-      this.modelListPathParams.current = page
-    }
+      this.modelListPathParams.current = page;
+    },
   },
 });

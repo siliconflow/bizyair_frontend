@@ -28,7 +28,7 @@ export class WebSocketClient {
     };
 
     this.ws.onmessage = (message: MessageEvent) => {
-      if (message.data !== 'pong') {
+      if (message.data !== "pong") {
         this.onMessage(message);
       }
     };
@@ -38,7 +38,9 @@ export class WebSocketClient {
     };
 
     this.ws.onclose = () => {
-      console.warn('The WebSocket connection has been closed and is ready to be reconnected');
+      console.warn(
+        "The WebSocket connection has been closed and is ready to be reconnected",
+      );
       this.onClose();
       this.scheduleReconnect();
     };
@@ -49,7 +51,7 @@ export class WebSocketClient {
 
     this.keepAliveTimer = setInterval(() => {
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.ws.send('ping');
+        this.ws.send("ping");
       }
     }, this.keepAliveInterval);
   }
@@ -69,7 +71,10 @@ export class WebSocketClient {
       this.connect();
       this.reconnectTimer = null;
 
-      this.reconnectDelay = Math.min(this.reconnectDelay * 2, this.maxReconnectDelay);
+      this.reconnectDelay = Math.min(
+        this.reconnectDelay * 2,
+        this.maxReconnectDelay,
+      );
     }, this.reconnectDelay);
   }
 
@@ -80,15 +85,15 @@ export class WebSocketClient {
 
   onMessage(message: MessageEvent) {
     const data = JSON.parse(message.data);
-    if (data === 'pong') {
+    if (data === "pong") {
       // Do nothing
     } else {
-      console.log('message:', data);
+      console.log("message:", data);
     }
   }
 
   onError(error: Event) {
-    console.error('WebSocket Error: ', error);
+    console.error("WebSocket Error: ", error);
   }
 
   onClose() {

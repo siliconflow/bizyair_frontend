@@ -56,7 +56,7 @@
 
 .shadcn-root ::before,
 .shadcn-root ::after {
-  --tw-content: '';
+  --tw-content: "";
 }
 
 /*
@@ -75,7 +75,8 @@
   -moz-tab-size: 4; /* 3 */
   -o-tab-size: 4;
   tab-size: 4; /* 3 */
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* 4 */
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* 4 */
   font-feature-settings: normal; /* 5 */
   font-variation-settings: normal; /* 6 */
   -webkit-tap-highlight-color: transparent; /* 7 */
@@ -148,7 +149,8 @@ Add the correct font weight in Edge and Safari.
 .shadcn-root kbd,
 .shadcn-root samp,
 .shadcn-root pre {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; /* 1 */
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace; /* 1 */
   font-feature-settings: normal; /* 2 */
   font-variation-settings: normal; /* 3 */
   font-size: 1em; /* 4 */
@@ -213,7 +215,7 @@ Prevent `sub` and `sup` elements from affecting the line height in all browsers.
   /* padding: 0; */
 }
 /* role switch */
-.shadcn-root button[role='switch']{
+.shadcn-root button[role="switch"] {
   margin: 0;
   padding: 0;
 }
@@ -231,14 +233,14 @@ Remove the inheritance of text transform in Edge and Firefox.
 2. Remove default button styles.
 */
 .shadcn-root button,
-.shadcn-root input:where([type='button']),
-.shadcn-root input:where([type='reset']),
-.shadcn-root input:where([type='submit']) {
+.shadcn-root input:where([type="button"]),
+.shadcn-root input:where([type="reset"]),
+.shadcn-root input:where([type="submit"]) {
   -webkit-appearance: button; /* 1 */
   /* background-color: transparent; */
   background-image: none;
 }
-h3.shadcn-root button{
+h3.shadcn-root button {
   background-color: transparent;
 }
 /*
@@ -274,7 +276,7 @@ Correct the cursor style of increment and decrement buttons in Safari.
 1. Correct the odd appearance in Chrome and Safari.
 2. Correct the outline style in Safari.
 */
-.shadcn-root [type='search'] {
+.shadcn-root [type="search"] {
   -webkit-appearance: textfield; /* 1 */
   outline-offset: -2px; /* 2 */
 }
@@ -440,6 +442,3 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
 .shadcn-root * {
   border-color: hsl(var(--border));
 }
-
-
-

@@ -1,9 +1,8 @@
-import { useToaster } from '@/components/modules/toats/index'
+import { useToaster } from "@/components/modules/toats/index";
 
 const fetchCache = new Map();
 
-
-export function customFetch(url: string, options = {},needDebounce = true) {
+export function customFetch(url: string, options = {}, needDebounce = true) {
   const now = Date.now();
 
   if (needDebounce) {
@@ -16,24 +15,27 @@ export function customFetch(url: string, options = {},needDebounce = true) {
     fetchCache.set(url, now);
   }
 
-  let host = `${window.location.origin}${window.location.pathname === '/' ? '' : window.location.pathname}`
-  return window.fetch(`${host}${url}`, options)
-    .then(response => {
+  let host = `${window.location.origin}${window.location.pathname === "/" ? "" : window.location.pathname}`;
+  return window
+    .fetch(`${host}${url}`, options)
+    .then((response) => {
       if (response.status === 404) {
-        useToaster.error('You may be missing dependencies at the moment. For details, please refer to the ComfyUI logs.')
+        useToaster.error(
+          "You may be missing dependencies at the moment. For details, please refer to the ComfyUI logs.",
+        );
       }
       return response.json();
     })
-    .then(data => {
+    .then((data) => {
       const { code, message } = data;
       if (code !== 20000) {
-        useToaster.error(message)
+        useToaster.error(message);
         return;
       }
       return data;
     })
-    .catch(error => {
-      console.error('Fetch error:', error);
+    .catch((error) => {
+      console.error("Fetch error:", error);
       throw error;
     });
 }
