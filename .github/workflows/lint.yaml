@@ -1,43 +1,51 @@
-name: Check JavaScript, HTML, and CSS Formatting
+name: TypeScript, Vue.js, and CSS Formatting And Linting
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
-  lint-and-format:
+  format_and_lint:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
-        node-version: '16'
+        node-version: '20.9.0'
 
     - name: Install dependencies
-      run: |
-        npm install -g eslint prettier
-        npm install eslint-config-prettier eslint-plugin-prettier
+      run: npm install -g prettier eslint @eslint/js typescript-eslint eslint-plugin-vue
 
-    - name: Run ESLint and Prettier
-      run: |
-        eslint --ext .js,.html,.css .
-        prettier --write "**/*.{js,html,css}"
+    - name: Run Prettier
+      run: npx prettier --write src//**/*.{css,ts,vue}
+      
+    - name: Auto commit Prettierformatted files
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "auto prettier format code"
+        file_pattern: "*.css *.ts *.vue"
 
-    - name: Add PR review comment if formatting is incorrect
+    - name: Run ESLint
+      run: |
+        npx eslint src
+
+    - name: Add PR review comment if eslint fails
       if: failure()
       uses: actions/github-script@v4
       with:
         script: |
           const { pull_request } = context.payload;
-          const comment = "Your code does not meet the formatting standards.\nPlease run `npm install -g eslint prettier && npm install eslint-config-prettier eslint-plugin-prettier && eslint --ext .js,.html,.css . && prettier --write \"**/*.{js,html,css}\"` to format your code.";
+          const comment = "Your code does not meet our eslint standards.\nPlease run `npm install -g eslint @eslint/js typescript-eslint eslint-plugin-vue && npx eslint src` to lint your code.";
           await github.issues.createComment({
             issue_number: pull_request.number,
             owner: context.repo.owner,
