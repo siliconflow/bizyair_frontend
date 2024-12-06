@@ -3,6 +3,10 @@ name: TypeScript, Vue.js, and CSS Formatting And Linting
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - "**.css"
+      - "**.ts"
+      - "**.vue"
 
 permissions:
   contents: write
@@ -46,7 +50,7 @@ jobs:
       with:
         script: |
           const { pull_request } = context.payload;
-          const comment = "Your code does not meet our eslint standards.\nPlease run `npm install -g eslint @eslint/js typescript-eslint eslint-plugin-vue && npx eslint src` to lint your code.";
+          const comment = "Your code does not meet our eslint standards.\nPlease run `npm install eslint @eslint/js typescript-eslint eslint-plugin-vue globals && npx eslint src` to lint your code.";
           await github.issues.createComment({
             issue_number: pull_request.number,
             owner: context.repo.owner,
