@@ -7,13 +7,10 @@ import { ModelSelect } from '@/components/model-select/'
 
 export const showModelSelect = (options: { [x: string]: unknown; } | null | undefined) => {
   let isMounted = false;
-  const existingContainer = document.getElementById('bizyair-model-select');
-  if (existingContainer) {
-    document.body.removeChild(existingContainer);
-  }
+  const uniqueId = `bizyair-model-select-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   const container = document.createElement('div');
-  container.id = 'bizyair-model-select'
-  document.body.appendChild(container);
+  container.id = uniqueId;
+  document.body.appendChild(container)
   const app = createApp(ModelSelect, {
     ...options,
     onClose: () => {

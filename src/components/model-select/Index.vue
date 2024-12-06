@@ -95,7 +95,7 @@ watch(() => modelStoreInstance.applyObject, (newVal: { version: ModelVersion, mo
   if (newVal.version && newVal.model) {
     emit('apply', newVal.version, newVal.model.name)
   }
-}, { deep: true, immediate: true })
+}, { deep: true })
 
 watch(() => modelStoreInstance.closeModelSelectDialog, (newVal: boolean, oldVal: boolean) => {
   if (newVal !== oldVal) {
