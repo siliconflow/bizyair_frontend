@@ -59,7 +59,7 @@ export const showModelSelect = (options: { [x: string]: unknown; } | null | unde
   };
 }
 
-let app = createApp(App)
+const app = createApp(App)
 app.use(createPinia())
 export function mount(container: string | Element,comfyUIApp?: any) {
 

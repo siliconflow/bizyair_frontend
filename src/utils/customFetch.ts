@@ -16,7 +16,7 @@ export function customFetch(url: string, options = {},needDebounce = true) {
     fetchCache.set(url, now);
   }
 
-  let host = `${window.location.origin}${window.location.pathname === '/' ? '' : window.location.pathname}`
+  const host = `${window.location.origin}${window.location.pathname === '/' ? '' : window.location.pathname}`
   return window.fetch(`${host}${url}`, options)
     .then(response => {
       if (response.status === 404) {

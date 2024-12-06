@@ -1,6 +1,6 @@
 import { customFetch } from '@/utils/customFetch';
 
-let host = `${window.location.origin}${window.location.pathname === '/' ? '' : window.location.pathname}`
+const host = `${window.location.origin}${window.location.pathname === '/' ? '' : window.location.pathname}`
 export const setApiKey = (data: any) => fetch(`${host}/bizyair/set_api_key`, {
     method: 'POST',
     headers: {
