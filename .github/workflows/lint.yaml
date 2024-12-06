@@ -26,20 +26,22 @@ jobs:
     - name: Install dependencies
       run: npm install -g prettier eslint @eslint/js typescript-eslint eslint-plugin-vue globals
 
-    - name: Run Prettier
-      run: npx prettier --write src//**/*.{css,ts,vue}
-      
+    - name: Run Prettier & ESLint
+      id: lint
+      run: |
+        npx prettier --write src//**/*.{css,ts,vue}
+        npx eslint src
+        eslint_ret=$?
+        echo "eslint_ret=$eslint_ret" >> $GITHUB_OUTPUT
+
     - name: Auto commit Prettierformatted files
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "auto prettier format code"
         file_pattern: "*.css *.ts *.vue" # Don't update package-lock.json and package.json
 
-    - name: Run ESLint
-      run: npx eslint src
-
     - name: Add PR review comment if eslint fails
-      if: failure()
+      if: steps.lint.outputs.eslint_ret != 0
       uses: actions/github-script@v4
       with:
         script: |
