@@ -35,6 +35,7 @@ jobs:
         npm run format
 
     - name: Run ESLint
+      continue-on-error: true
       id: lint
       run: |
         npx eslint src
@@ -42,16 +43,13 @@ jobs:
         echo "eslint_ret=$eslint_ret" >> $GITHUB_OUTPUT
 
     - name: Auto commit Prettier formatted files
-      if: !cancelled()
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "auto prettier format code"
         file_pattern: "*.css *.ts *.vue" # Don't update package-lock.json and package.json
 
     - name: Add PR review comment if eslint fails
-      if: |
-        !cancelled() &&
-        steps.lint.outputs.eslint_ret != 0
+      if: steps.lint.outputs.eslint_ret != 0
       uses: actions/github-script@v4
       with:
         script: |

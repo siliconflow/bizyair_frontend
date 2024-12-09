@@ -6,7 +6,7 @@ import { createPinia } from 'pinia'
 import { ModelSelect } from '@/components/model-select/'
 
 export const showModelSelect = (options: { [x: string]: unknown } | null | undefined) => {
-  if (true) {
+  if (false) {
     console.log("test workflow!")
   }
   let isMounted = false
