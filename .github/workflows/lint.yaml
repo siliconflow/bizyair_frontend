@@ -30,10 +30,13 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run Prettier & ESLint
-      id: lint
+    - name: Run Prettier
       run: |
         npm run format
+
+    - name: Run ESLint
+      id: lint
+      run: |
         npx eslint src
         eslint_ret=$?
         echo "eslint_ret=$eslint_ret" >> $GITHUB_OUTPUT
