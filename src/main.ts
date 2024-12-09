@@ -6,9 +6,6 @@ import { createPinia } from 'pinia'
 import { ModelSelect } from '@/components/model-select/'
 
 export const showModelSelect = (options: { [x: string]: unknown } | null | undefined) => {
-  if (false) {
-    console.log("test workflow!")
-  }
   let isMounted = false
   const uniqueId = `bizyair-model-select-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   const container = document.createElement('div')
