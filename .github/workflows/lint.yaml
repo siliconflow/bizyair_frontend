@@ -42,6 +42,7 @@ jobs:
         echo "eslint_ret=$eslint_ret" >> $GITHUB_OUTPUT
 
     - name: Auto commit Prettier formatted files
+      if: always()
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "auto prettier format code"
