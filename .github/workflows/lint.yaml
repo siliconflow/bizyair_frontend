@@ -49,7 +49,9 @@ jobs:
         file_pattern: "*.css *.ts *.vue" # Don't update package-lock.json and package.json
 
     - name: Add PR review comment if eslint fails
-      if: ${{ !cancelled() && steps.lint.outputs.eslint_ret != 0 }}
+      if: |
+        !cancelled() &&
+        steps.lint.outputs.eslint_ret != 0
       uses: actions/github-script@v4
       with:
         script: |
