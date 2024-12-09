@@ -57,4 +57,4 @@ jobs:
             repo: context.repo.repo,
             body: comment
           });
-          exit 1
+          core.setFailed("eslint failed")
