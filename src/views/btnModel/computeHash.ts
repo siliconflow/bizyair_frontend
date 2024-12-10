@@ -59,7 +59,7 @@ export async function calculateHash(file: File | Blob): Promise<any> {
       readNextChunk();
     };
 
-    reader.onerror = (e) => {
+    reader.onerror = () => {
       reject(new Error("FileReader error"));
     };
 
