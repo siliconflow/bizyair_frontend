@@ -33,7 +33,7 @@ export const useStatusStore = defineStore('userStatus', {
     },
     sendSocket() {
       const wsClient = new WebSocketClient(
-        `ws://${location.host}/bizyair/ws?clientId=${sessionStorage.getItem('clientId')}`,
+        `/bizyair/ws?clientId=${sessionStorage.getItem('clientId')}`,
         []
       )
       wsClient.onMessage = message => {
