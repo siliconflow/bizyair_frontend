@@ -2,7 +2,7 @@
   import { nextTick, onMounted, onUnmounted, ref } from 'vue'
   import Vditor from 'vditor'
   import 'vditor/dist/index.css'
-  import { uploadImage } from '@/api/public'
+  import { upload_image } from '@/api/public'
   import { useToaster } from '@/components/modules/toats/index'
 
   const props = defineProps<{
@@ -99,7 +99,7 @@
                 let retryCount = 3
                 while (retryCount > 0) {
                   try {
-                    const response = await uploadImage(file)
+                    const response = await upload_image(file)
                     if (vditor.value) {
                       vditor.value.tip(
                         `Uploading file ${currentIndex + 1}/${files.length}...`,

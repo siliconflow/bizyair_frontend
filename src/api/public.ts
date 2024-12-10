@@ -1,6 +1,6 @@
 import { customFetch } from '@/utils/customFetch'
 
-export const uploadImage = (file: string | Blob) => {
+export const upload_image = (file: string | Blob) => {
   const formData = new FormData()
   formData.append('file', file)
   return customFetch('/bizyair/community/files/upload', {
@@ -9,6 +9,6 @@ export const uploadImage = (file: string | Blob) => {
   })
 }
 
-export const ossSign = (sha256: string) => {
+export const oss_sign = (sha256: string) => {
   return customFetch(`/bizyair/community/sign?sha256sum=${sha256}`, { method: 'GET' })
 }

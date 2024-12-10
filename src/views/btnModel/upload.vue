@@ -50,7 +50,7 @@
   import { Button } from '@/components/ui/button'
   import { calculateHash } from './computeHash'
   import OSS from 'ali-oss'
-  import { ossSign } from '@/api/public'
+  import { oss_sign } from '@/api/public'
   import { commit_file } from '@/api/model'
 
   let calculatingDialog: any
@@ -195,7 +195,7 @@
     })
     const { sha256sum, md5Hash } = await calculateHash(file)
     calculatingDialog.close()
-    let ossData = await ossSign(sha256sum)
+    let ossData = await oss_sign(sha256sum)
     if (ossData.data.file.id) {
       emit('success', { sha256sum, path: file.name })
       emit('uploadInfo', {

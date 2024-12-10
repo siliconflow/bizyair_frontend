@@ -81,7 +81,7 @@
   import highlight from 'highlight.js'
   import prettier from 'prettier'
   import cropper from 'cropperjs'
-  import { uploadImage } from '@/api/public'
+  import { upload_image } from '@/api/public'
   import { MdEditor, config, NormalToolbar } from 'md-editor-v3'
   import { useToaster } from '@/components/modules/toats/index'
   import { Maximize, Image } from 'lucide-vue-next'
@@ -184,7 +184,7 @@
 
   const uploadWithRetry = async (file, retryCount = 0) => {
     try {
-      const res = await uploadImage(file)
+      const res = await upload_image(file)
       if (!res.data?.url) {
         throw new Error('Upload response missing URL')
       }

@@ -191,7 +191,7 @@
   import { useStatusStore } from '@/stores/userStatus'
   import { modelStore } from '@/stores/modelStatus'
   import Markdown from '@/components/markdown/Index2.vue'
-  // checkLocalFile, submitUpload, interrupt_upload
+  // check_local_file, submit_upload, interrupt_upload
   import { create_models, model_types, base_model_types, put_model } from '@/api/model'
   import { onMounted } from 'vue'
   import { Trash2 } from 'lucide-vue-next'
@@ -227,11 +227,11 @@
   }
   let calculating: { close: any }
   // async function checkFile(val: string, index: number) {
-  //   const res = await checkLocalFile({ absolute_path: val })
+  //   const res = await check_local_file({ absolute_path: val })
   //   formData.value.versions[index].file_upload_id = res.data.upload_id
   //   formData.value.versions[index].filePathError = false
   //   versionIndex.value = index
-  //   await submitUpload({ upload_id: res.data.upload_id })
+  //   await submit_upload({ upload_id: res.data.upload_id })
   //   asdasd = new Date().getTime()
   //   formData.value.versions[index].progress = 0.1
   //   calculating = useShadet({

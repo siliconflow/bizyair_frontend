@@ -49,7 +49,7 @@
   import vDialog from '@/components/modules/vDialog.vue'
   import { Input } from '@/components/ui/input'
   import { Button } from '@/components/ui/button'
-  import { setApiKey } from '@/api/user'
+  import { set_api_key } from '@/api/user'
   import { useStatusStore } from '@/stores/userStatus'
   import { useToaster } from '@/components/modules/toats/index'
 
@@ -81,7 +81,7 @@
       hasError.value = true
       return false
     }
-    const response = await setApiKey(`api_key=${encodeURIComponent(apiKey.value)}`)
+    const response = await set_api_key(`api_key=${encodeURIComponent(apiKey.value)}`)
     if (response.ok) {
       useToaster('API Key set successfully!')
       statusStore.handleApiKeyDialog(false)
