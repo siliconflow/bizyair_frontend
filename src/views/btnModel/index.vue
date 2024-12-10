@@ -30,11 +30,7 @@
     contentClass="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
   >
     <template #title
-      ><span
-        class="px-6 cursor-pointer"
-        @click="handleToggleTitle"
-        >Publish a Model</span
-      ></template
+      ><span class="px-6 cursor-pointer" @click="handleToggleTitle">Publish a Model</span></template
     >
     <div v-show="modelBox" class="px-6 pb-6">
       <v-item label="Model Name">
