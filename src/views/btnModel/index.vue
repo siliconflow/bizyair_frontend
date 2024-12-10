@@ -190,7 +190,7 @@
 
   import { useStatusStore } from '@/stores/userStatus'
   import { modelStore } from '@/stores/modelStatus'
-  import Markdown from '@/components/markdown/Index2.vue'
+  import Markdown from '@/components/markdown/Index.vue'
   // check_local_file, submit_upload, interrupt_upload
   import { create_models, model_types, base_model_types, put_model } from '@/api/model'
   import { onMounted } from 'vue'
