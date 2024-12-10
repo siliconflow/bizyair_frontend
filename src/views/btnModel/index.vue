@@ -32,10 +32,7 @@
     <template #title
       ><span
         class="px-6 cursor-pointer"
-        @click="
-          acActiveIndex = -1
-          modelBox = true
-        "
+        @click="handleToggleTitle"
         >Publish a Model</span
       ></template
     >
@@ -211,6 +208,11 @@
     if (modelBox.value) {
       modelBox.value = false
     }
+  }
+
+  const handleToggleTitle = () => {
+    acActiveIndex.value = -1
+    modelBox.value = true
   }
 
   const disabledPublish = computed(() => {
