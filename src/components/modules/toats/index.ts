@@ -1,8 +1,8 @@
 import { createApp } from 'vue'
 import Toaster from './index.vue'
 
-export function useToaster(options: { [x: string]: unknown; } | string) {
-  let containerBox:HTMLDivElement
+export function useToaster(options: { [x: string]: unknown } | string) {
+  let containerBox: HTMLDivElement
   if (document.querySelector('.bizyair-toaster-container')) {
     containerBox = document.querySelector('.bizyair-toaster-container') as HTMLDivElement
   } else {
@@ -29,7 +29,6 @@ export function useToaster(options: { [x: string]: unknown; } | string) {
   }
   document.body.appendChild(containerBox)
 
-
   const container = document.createElement('div')
   container.style.transition = 'all 0.3s'
   containerBox.appendChild(container)
@@ -52,7 +51,6 @@ useToaster.warning = (message: string) => {
     type: 'warning'
   })
 }
-
 
 useToaster.success = (message: string) => {
   useToaster({
