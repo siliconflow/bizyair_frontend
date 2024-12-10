@@ -33,7 +33,7 @@
       ><span
         class="px-6 cursor-pointer"
         @click="
-          acActiveIndex = -1;
+          acActiveIndex = -1
           modelBox = true
         "
         >Publish a Model</span
