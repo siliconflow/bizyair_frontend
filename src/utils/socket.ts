@@ -9,7 +9,7 @@ export class WebSocketClient {
   private reconnectTimer: NodeJS.Timeout | null
 
   constructor(url: string, protocols: string | string[]) {
-    this.url = `${location.protocol == 'http:' ? 'ws' : 'wss'}://${location.host}${url}`
+    this.url = `${location.protocol == 'http:' ? 'ws' : 'wss'}://${location.host}${location.pathname.split('/').slice(0, -1).join('/')}${url}`
     this.protocols = protocols
     this.reconnectDelay = 1000
     this.maxReconnectDelay = 30000
