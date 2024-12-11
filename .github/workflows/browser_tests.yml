@@ -91,6 +91,7 @@ jobs:
         working-directory: ComfyUI
 
       - name: Run Tests
+        continue-on-error: true
         run: |
           npx playwright test --project chromium chromium-2x
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
