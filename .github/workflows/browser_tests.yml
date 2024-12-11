@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: siliconflow/bizyair_frontend
-          ref: dev_bbs
+          ref: dev_bbs_ci
           path: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
 
       - uses: actions/setup-python@v4
