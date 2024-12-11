@@ -30,14 +30,7 @@
     contentClass="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
   >
     <template #title
-      ><span
-        class="px-6 cursor-pointer"
-        @click="
-          acActiveIndex = -1
-          modelBox = true
-        "
-        >Publish a Model</span
-      ></template
+      ><span class="px-6 cursor-pointer" @click="handleToggleTitle">Publish a Model</span></template
     >
     <div v-show="modelBox" class="px-6 pb-6">
       <v-item label="Model Name">
@@ -190,8 +183,8 @@
 
   import { useStatusStore } from '@/stores/userStatus'
   import { modelStore } from '@/stores/modelStatus'
-  import Markdown from '@/components/markdown/Index2.vue'
-  // checkLocalFile, submitUpload, interrupt_upload
+  import Markdown from '@/components/markdown/Index.vue'
+  // check_local_file, submit_upload, interrupt_upload
   import { create_models, model_types, base_model_types, put_model } from '@/api/model'
   import { onMounted } from 'vue'
   import { Trash2 } from 'lucide-vue-next'
@@ -213,6 +206,11 @@
     }
   }
 
+  const handleToggleTitle = () => {
+    acActiveIndex.value = -1
+    modelBox.value = true
+  }
+
   const disabledPublish = computed(() => {
     const progress = formData.value.versions
       .map(e => e.progress)
@@ -227,11 +225,11 @@
   }
   let calculating: { close: any }
   // async function checkFile(val: string, index: number) {
-  //   const res = await checkLocalFile({ absolute_path: val })
+  //   const res = await check_local_file({ absolute_path: val })
   //   formData.value.versions[index].file_upload_id = res.data.upload_id
   //   formData.value.versions[index].filePathError = false
   //   versionIndex.value = index
-  //   await submitUpload({ upload_id: res.data.upload_id })
+  //   await submit_upload({ upload_id: res.data.upload_id })
   //   asdasd = new Date().getTime()
   //   formData.value.versions[index].progress = 0.1
   //   calculating = useShadet({

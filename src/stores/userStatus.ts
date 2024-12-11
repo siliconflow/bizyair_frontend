@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getUserInfo } from '@/api/user'
+import { get_user_info } from '@/api/user'
 import { WebSocketClient } from '@/utils/socket.ts'
 import useClipboard from 'vue-clipboard3'
 import { useToaster } from '@/components/modules/toats/index'
@@ -21,7 +21,7 @@ export const useStatusStore = defineStore('userStatus', {
   }),
   actions: {
     loginRefresh() {
-      getUserInfo()
+      get_user_info()
         .then((info: { data: any }) => {
           sessionStorage.setItem('userInfo', JSON.stringify(info.data))
           this.infoData = info.data
@@ -33,7 +33,7 @@ export const useStatusStore = defineStore('userStatus', {
     },
     sendSocket() {
       const wsClient = new WebSocketClient(
-        `ws://${location.host}/bizyair/ws?clientId=${sessionStorage.getItem('clientId')}`,
+        `/bizyair/ws?clientId=${sessionStorage.getItem('clientId')}`,
         []
       )
       wsClient.onMessage = message => {

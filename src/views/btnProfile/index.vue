@@ -81,7 +81,7 @@
   </vDrawer>
 </template>
 <script setup lang="ts">
-  import { putShareId } from '@/api/user'
+  import { put_share_id } from '@/api/user'
   import vDrawer from '@/components/modules/vDrawer.vue'
   import { FilePenLine, Copy, Save } from 'lucide-vue-next'
   import { Input } from '@/components/ui/input'
@@ -130,7 +130,7 @@
     if (!res) {
       statusStore.infoData.share_id = recordShareId.value
     } else {
-      await putShareId({ share_id: statusStore.infoData.share_id })
+      await put_share_id({ share_id: statusStore.infoData.share_id })
       statusStore.loginRefresh()
     }
   }

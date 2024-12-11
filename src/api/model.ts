@@ -42,7 +42,7 @@ export const check_folder = (url: string) =>
     method: 'GET'
   })
 
-export const delModels = (data: { type: string; name: string }) =>
+export const del_models = (data: { type: string; name: string }) =>
   customFetch('/bizyair/modelhost/models', {
     method: 'DELETE',
     body: JSON.stringify({
@@ -51,12 +51,12 @@ export const delModels = (data: { type: string; name: string }) =>
     })
   })
 
-export const getDescription = (data: any) =>
+export const get_description = (data: any) =>
   customFetch(`/bizyair/modelhost/models/description?${new URLSearchParams(data).toString()}`, {
     method: 'get'
   })
 
-export const putDescription = (data: any) =>
+export const put_description = (data: any) =>
   customFetch('/bizyair/modelhost/models/description', {
     method: 'put',
     body: JSON.stringify(data)
@@ -68,12 +68,12 @@ export const create_models = (data: any) =>
     body: JSON.stringify(data)
   })
 
-export const checkLocalFile = (data: any) =>
+export const check_local_file = (data: any) =>
   customFetch(`/bizyair/community/check_local_file?${new URLSearchParams(data).toString()}`, {
     method: 'get'
   })
 
-export const submitUpload = (data: any) =>
+export const submit_upload = (data: any) =>
   customFetch(`/bizyair/community/submit_upload?clientId=${sessionStorage.getItem('clientId')}`, {
     method: 'POST',
     body: JSON.stringify(data)

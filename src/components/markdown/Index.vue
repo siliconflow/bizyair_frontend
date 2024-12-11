@@ -1,313 +1,292 @@
-<script setup lang="ts">
-  import { nextTick, onMounted, onUnmounted, ref } from 'vue'
-  import Vditor from 'vditor'
-  import 'vditor/dist/index.css'
-  import { uploadImage } from '@/api/public'
-  import { useToaster } from '@/components/modules/toats/index'
-
-  const props = defineProps<{
-    modelValue?: string
-    editorId: string
-  }>()
-
-  const editor = ref<any>(null)
-  const vditor = ref<Vditor | null>(null)
-  const vditorContainer = ref<HTMLElement | null>(null)
-  const isFullscreen = ref(false)
-
-  const emit = defineEmits(['update:modelValue', 'update:dialog-modal', 'isUploading'])
-
-  const vditorConfig: IOptions = {
-    height: 400,
-    mode: 'ir',
-    theme: 'dark',
-    cache: {
-      enable: false
-    },
-    lang: 'en_US',
-    placeholder: 'Please enter content...',
-    fullscreen: {
-      index: 9999
-    },
-    input: (value: string) => {
-      emit('update:modelValue', value)
-    },
-    toolbar: [
-      'emoji',
-      'headings',
-      'bold',
-      'italic',
-      'strike',
-      'link',
-      '|',
-      'list',
-      'ordered-list',
-      'check',
-      'outdent',
-      'indent',
-      '|',
-      'quote',
-      'line',
-      'code',
-      '|',
-      'upload',
-      {
-        name: 'fullscreen',
-        tip: 'Fullscreen',
-        click: () => {
-          isFullscreen.value = !isFullscreen.value
-          if (isFullscreen.value) {
-            moveEditorToBody()
-          } else {
-            moveEditorBackToContainer()
-          }
-        }
-      }
-    ],
-    upload: {
-      url: '/bizyair/community/files/upload',
-      max: 20 * 1024 * 1024,
-      accept: 'image/*, video/*',
-      multiple: true,
-      fieldName: 'file',
-      extraData: {
-        platform: 'vditor'
-      },
-      handler: (files: File[]): Promise<string> => {
-        return new Promise(resolve => {
-          try {
-            emit('isUploading', true)
-            if (files.length > 3) {
-              if (vditor.value) {
-                useToaster.warning('Maximum 3 files can be uploaded at once')
-              }
-              emit('isUploading', false)
-              resolve('')
-              return
-            }
-
-            const batchSize = 3
-            const batches: File[][] = []
-            for (let i = 0; i < files.length; i += batchSize) {
-              batches.push(files.slice(i, i + batchSize))
-            }
-            const processBatch = async (batch: File[], startIndex: number) => {
-              const results = []
-              for (let index = 0; index < batch.length; index++) {
-                const file = batch[index]
-                const currentIndex = startIndex + index
-                let retryCount = 3
-                while (retryCount > 0) {
-                  try {
-                    const response = await uploadImage(file)
-                    if (vditor.value) {
-                      vditor.value.tip(
-                        `Uploading file ${currentIndex + 1}/${files.length}...`,
-                        1500
-                      )
-                    }
-                    results.push({
-                      success: true,
-                      fileName: file.name,
-                      imageUrl: response.data.url
-                    })
-                    break
-                  } catch (err) {
-                    retryCount--
-                    if (retryCount === 0) {
-                      if (vditor.value) {
-                        vditor.value.tip(`File ${currentIndex + 1} upload failed`, 1500)
-                      }
-                    } else {
-                      await new Promise(resolve => setTimeout(resolve, 1000))
-                    }
-                  }
-                }
-              }
-              return results
-            }
-            const processAllBatches = async () => {
-              let allResults: any[] = []
-              for (let i = 0; i < batches.length; i++) {
-                const results = await processBatch(batches[i], i * batchSize)
-                allResults = allResults.concat(results)
-              }
-              if (allResults.length > 0 && vditor.value) {
-                const markdownContent = allResults
-                  .map(result => {
-                    if (result.fileName.match(/\.(mp4|webm|ogg)$/i)) {
-                      return `<video src="${result.imageUrl}" controls>
-                        Your browser does not support the video tag.
-                      </video>`
-                    } else {
-                      return `![${result.fileName}](${result.imageUrl})`
-                    }
-                  })
-                  .join('\n')
-                vditor.value.insertValue(markdownContent)
-              }
-              emit('isUploading', false)
-              resolve('')
-            }
-            processAllBatches().catch(_ => {
-              if (vditor.value) {
-                vditor.value.tip('Some files failed to upload', 3000)
-              }
-              emit('isUploading', false)
-              resolve('')
-            })
-          } catch (error) {
-            if (vditor.value) {
-              vditor.value.tip('Image upload failed, please try again', 3000)
-            }
-            emit('isUploading', false)
-            resolve('')
-          }
-        })
-      },
-      filename: (name: string) => {
-        return `${Date.now()}-${name}`
-      }
-    },
-
-    after: () => {
-      document.querySelector(`#${props.editorId}`)?.classList.add('vditor-dark')
-      const editor = document.querySelector(`#${props.editorId}`)
-      editor?.addEventListener(
-        'keydown',
-        (e: Event) => {
-          if ((e as KeyboardEvent).key === 'Backspace' || (e as KeyboardEvent).key === 'Delete') {
-            e.stopPropagation()
-          }
-        },
-        true
-      )
-    }
-  }
-
-  const moveEditorToBody = () => {
-    const vditorEl = document.querySelector(`#${props.editorId}`) as HTMLElement
-    if (vditorEl) {
-      const rect = vditorEl.getBoundingClientRect()
-      nextTick(() => {
-        document.body.appendChild(vditorEl)
-        vditorEl.style.position = 'fixed'
-        vditorEl.style.left = `${rect.left}px`
-        vditorEl.style.top = `${rect.top}px`
-        vditorEl.style.width = `${rect.width}px`
-        vditorEl.style.height = `${rect.height}px`
-
-        vditorEl.offsetHeight
-        vditorEl.style.left = '0'
-        vditorEl.style.top = '0'
-        vditorEl.style.width = '100vw'
-        vditorEl.style.height = '100vh'
-        vditorEl.style.zIndex = '99999'
-        vditorEl.style.background = 'var(--background)'
-        vditorEl.style.transition = 'all 0.3s ease'
-        vditorEl.style.margin = '0'
-        vditorEl.style.padding = '0'
-        vditorEl.style.border = 'none'
-        nextTick(() => {
-          const dialogElement = document.querySelector('[role="dialog"][tabindex="-1"]')
-          if (dialogElement) {
-            dialogElement.removeAttribute('tabindex')
-          }
-        })
-      })
-    }
-  }
-
-  const moveEditorBackToContainer = () => {
-    const vditorEl = document.querySelector(`#${props.editorId}`) as HTMLElement
-    const container = vditorContainer.value
-    if (vditorEl && container) {
-      vditorEl.style.position = 'relative'
-      vditorEl.style.left = ''
-      vditorEl.style.top = ''
-      vditorEl.style.width = '100%'
-      vditorEl.style.height = '400px'
-      vditorEl.style.zIndex = ''
-      vditorEl.style.background = ''
-      vditorEl.style.transition = 'all 0.3s ease'
-      vditorEl.style.margin = ''
-      vditorEl.style.padding = ''
-      vditorEl.style.border = ''
-      vditorEl.style.pointerEvents = 'auto'
-      const wrapper = container.querySelector('.vditor-wrapper')
-      if (wrapper) {
-        wrapper.appendChild(vditorEl)
-      } else {
-        useToaster.error('Vditor wrapper not found')
-      }
-      vditorEl.offsetHeight
-      nextTick(() => {
-        const dialogElement = document.querySelector('[role="dialog"]')
-        if (dialogElement) {
-          dialogElement.setAttribute('tabindex', '-1')
-        }
-      })
-    }
-  }
-
-  onUnmounted(() => {
-    const vditorEl = document.querySelector(`#${props.editorId}`)
-    if (vditorEl && vditorEl.parentElement === document.body) {
-      vditorEl.remove()
-    }
-  })
-
-  onMounted(() => {
-    vditor.value = new Vditor(props.editorId, {
-      ...vditorConfig,
-      after: () => {
-        document.querySelector(`#${props.editorId}`)?.classList.add('vditor-dark')
-        const editor = document.querySelector(`#${props.editorId}`)
-        editor?.addEventListener(
-          'keydown',
-          (e: Event) => {
-            if ((e as KeyboardEvent).key === 'Backspace' || (e as KeyboardEvent).key === 'Delete') {
-              e.stopPropagation()
-            }
-          },
-          true
-        )
-
-        if (props.modelValue) {
-          vditor.value?.setValue(props.modelValue)
-        }
-      }
-    })
-  })
-</script>
-
 <template>
-  <div ref="vditorContainer" id="vditor-container">
-    <div class="vditor-wrapper" id="vditor-wrapper">
-      <div :id="editorId" ref="editor" class="editor"></div>
-    </div>
-  </div>
+  <MdEditor
+    :editorId="editorId"
+    v-model="text"
+    theme="dark"
+    :toolbars="toolbar"
+    ref="editorRef"
+    :autoDetectCode="true"
+    language="en-US"
+    :preview="false"
+    @input="handleInput"
+    :style="{
+      height: '200px'
+    }"
+    @on-upload-img="handleUploadImg"
+    @on-focus="handleFocus"
+    @on-blur="handleBlur"
+  >
+    <template #defToolbars>
+      <NormalToolbar title="fullscreen" @onClick="handleFullClick">
+        <template #trigger>
+          <Maximize class="w-4 h-4 mt-1" />
+        </template>
+      </NormalToolbar>
+      <NormalToolbar title="image">
+        <template #trigger>
+          <div class="relative w-4 h-4 cursor-pointer">
+            <input
+              @change="uploadImg"
+              type="file"
+              class="absolute w-4 h-4 left-0 top-0 cursor-pointer opacity-0"
+            />
+            <Image class="w-4 h-4 cursor-pointer" />
+          </div>
+        </template>
+      </NormalToolbar>
+    </template>
+  </MdEditor>
+  <Teleport to="body" v-if="isFullscreen">
+    <MdEditor
+      v-model="text"
+      theme="dark"
+      :autoDetectCode="true"
+      :editorId="`full-${editorId}`"
+      :toolbars="toolbar"
+      ref="editorRefFull"
+      language="en-US"
+      :pageFullscreen="true"
+      class="fixed top-0 left-0 w-[100vw] h-[100vh] z-12000"
+      @input="handleInput"
+      @on-upload-img="handleUploadImg"
+      @on-focus="handleFocus"
+      @on-blur="handleBlur"
+    >
+      <template #defToolbars>
+        <NormalToolbar title="fullscreen" @onClick="handleFullClick">
+          <template #trigger>
+            <Maximize class="w-4 h-4 mt-1" />
+          </template>
+        </NormalToolbar>
+        <NormalToolbar title="image">
+          <template #trigger>
+            <div class="relative w-4 h-4">
+              <input
+                @change="uploadImgFull"
+                type="file"
+                class="absolute w-4 h-4 left-0 top-0 cursor-pointer opacity-0"
+              />
+              <Image class="w-4 h-4" />
+            </div>
+          </template>
+        </NormalToolbar>
+      </template>
+    </MdEditor>
+  </Teleport>
 </template>
 
-<style>
-  .vditor-dark {
-    color: #fff;
+<script setup>
+  import { ref, onMounted } from 'vue'
+  import screenfull from 'screenfull'
+  import highlight from 'highlight.js'
+  import prettier from 'prettier'
+  import cropper from 'cropperjs'
+  import { upload_image } from '@/api/public'
+  import { MdEditor, config, NormalToolbar } from 'md-editor-v3'
+  import { useToaster } from '@/components/modules/toats/index'
+  import { Maximize, Image } from 'lucide-vue-next'
+
+  import 'md-editor-v3/lib/style.css'
+
+  const BLOCKED_KEYS = [
+    'r',
+    'q',
+    'w',
+    'n',
+    'm',
+    's',
+    'o',
+    'g',
+    ',',
+    '=',
+    '+',
+    '-',
+    '.',
+    'p',
+    'c',
+    'b',
+    'm',
+    '`',
+    'f',
+    'Enter',
+    'Backspace'
+  ]
+
+  const toolbar = [
+    'bold',
+    'italic',
+    'underline',
+    'title',
+    '-',
+    'quote',
+    'code',
+    'table',
+    1,
+    '-',
+    'mermaid',
+    'katex',
+    '-',
+    '=',
+    'preview',
+    0
+  ]
+
+  const editorRef = ref(null)
+  const editorRefFull = ref(null)
+  const isFullscreen = ref(false)
+  const handleFullClick = () => {
+    isFullscreen.value = !isFullscreen.value
+    if (isFullscreen.value) {
+      screenfull.request()
+      document.querySelectorAll('[role="dialog"]').forEach(el => (el.style.display = 'none'))
+      document.querySelector('body').style['pointer-events'] = 'auto'
+    } else {
+      screenfull.exit()
+      document.querySelectorAll('[role="dialog"]').forEach(el => (el.style.display = 'block'))
+      document.querySelector('body').style['pointer-events'] = 'none'
+    }
   }
 
-  .vditor-dark .vditor-ir {
-    color: #fff;
+  const props = defineProps({
+    editorId: String,
+    modelValue: String,
+    modelModifiers: Object,
+    autoDetectCode: {
+      type: Boolean,
+      default: true
+    }
+  })
+
+  const text = ref(props.modelValue)
+  const emit = defineEmits(['update:modelValue', 'isUploading'])
+
+  const handleInput = () => {
+    emit('update:modelValue', text)
   }
 
-  .vditor-img {
-    z-index: 99999;
+  const handleKeydown = event => {
+    if (BLOCKED_KEYS.includes(event.key)) {
+      event.stopPropagation()
+    }
   }
 
-  .vditor-dark .vditor-ir pre.vditor-reset {
-    color: #fff;
+  const handleFocus = event => {
+    document.addEventListener('keydown', handleKeydown, true)
   }
 
-  .editor {
-    transition: all 0.2s;
-    pointer-events: auto;
+  const handleBlur = event => {
+    document.removeEventListener('keydown', handleKeydown, true)
   }
+
+  const MAX_SIZE = 20 * 1024 * 1024 // 20MB
+  const MAX_RETRIES = 3
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+
+  const uploadWithRetry = async (file, retryCount = 0) => {
+    try {
+      const res = await upload_image(file)
+      if (!res.data?.url) {
+        throw new Error('Upload response missing URL')
+      }
+      return res.data.url
+    } catch (error) {
+      console.error(`Upload attempt ${retryCount + 1} failed:`, error)
+      if (retryCount < MAX_RETRIES) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)))
+        return uploadWithRetry(file, retryCount + 1)
+      }
+      throw error
+    }
+  }
+
+  const uploadImg = async e => {
+    handleUploadImg([e.target.files[0]], urls => {
+      urls.forEach(url => {
+        editorRef.value.insert(() => {
+          return {
+            targetValue: `![image](${url})`,
+            select: false,
+            deviationStart: 0,
+            deviationEnd: 0
+          }
+        })
+        text.value += `![image](${url})`
+        handleInput()
+      })
+    })
+  }
+  const uploadImgFull = async e => {
+    handleUploadImg([e.target.files[0]], urls => {
+      urls.forEach(url => {
+        editorRefFull.value.insert(() => {
+          return {
+            targetValue: `![image](${url})`,
+            select: false,
+            deviationStart: 0,
+            deviationEnd: 0
+          }
+        })
+        text.value += `![image](${url})`
+        handleInput()
+      })
+    })
+  }
+
+  const handleUploadImg = async (files, callback) => {
+    const invalidFiles = files.filter(file => !ALLOWED_TYPES.includes(file.type))
+    if (invalidFiles.length > 0) {
+      useToaster.warning('Only image files allowed (jpg, png, gif, webp)')
+      return
+    }
+
+    const oversizedFiles = files.filter(file => file.size > MAX_SIZE)
+    if (oversizedFiles.length > 0) {
+      useToaster.warning('Image size cannot exceed 20MB')
+      return
+    }
+    try {
+      emit('isUploading', true)
+      const urls = []
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadWithRetry(files[i])
+        urls.push(url)
+      }
+      if (urls.length === files.length) {
+        callback(urls)
+      } else {
+        useToaster.error('Some files failed to upload')
+      }
+    } catch (error) {
+      useToaster.error('Upload failed, please try again')
+    } finally {
+      emit('isUploading', false)
+    }
+  }
+
+  config({
+    editorExtensions: {
+      highlight: {
+        instance: highlight
+      },
+      prettier: {
+        prettierInstance: prettier,
+        parserMarkdownInstance: 'markdown'
+      },
+      cropper: {
+        instance: cropper
+      },
+      screenfull: {
+        instance: screenfull
+      }
+    }
+  })
+</script>
+<style scoped>
+  :deep(.md-editor-toolbar-item svg.md-editor-icon) {
+    @apply w-6 h-6;
+  }
+
+  /* :deep(.md-editor-menu-item.md-editor-menu-item-image:last-child) {
+  @apply hidden;
+} */
 </style>
