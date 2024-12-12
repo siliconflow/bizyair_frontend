@@ -80,10 +80,11 @@ jobs:
           npm install
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
               
-      - name: Copy over test workflows
+      - name: Copy over test setup files
         run: |
           mkdir -p ComfyUI/user/default
           cp -r ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/workflows ComfyUI/user/default
+          cp ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/api_key.ini ComfyUI/custom_nodes/BizyAir/api_key.ini
       
       - name: Update bizyair_frontend.js
         run: |
