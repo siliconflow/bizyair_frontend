@@ -25,6 +25,7 @@ interface ModelVersion {
   speed?: string
   fileName?: string
   ref?: string
+  cover?: string
 }
 interface ModelDetail {
   name: string

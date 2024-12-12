@@ -16,9 +16,12 @@
   import btnNews from '@/views/btnNews/index.vue'
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
   import { useStatusStore } from '@/stores/userStatus'
+  import { provide } from 'vue'
 
   const statusStore = useStatusStore()
   statusStore.loginRefresh()
-  statusStore.sendSocket()
+  statusStore.sendSocket(res => {
+    provide('socket', res)
+  })
 </script>
 <style scoped></style>

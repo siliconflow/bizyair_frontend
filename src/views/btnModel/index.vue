@@ -1,10 +1,4 @@
 <template>
-  <!-- <btnMenu :show_cases="show_cases" buttonText="Examples" icon="book-open" :isJson="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
-      <path fill="none" stroke="#ddd" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 16.008V7.99a1.98 1.98 0 0 0-1-1.717l-7-4.008a2.02 2.02 0 0 0-2 0L4 6.273c-.619.355-1 1.01-1 1.718v8.018c0 .709.381 1.363 1 1.717l7 4.008a2.02 2.02 0 0 0 2 0l7-4.008c.619-.355 1-1.01 1-1.718M12 22V12m0 0l8.73-5.04m-17.46 0L12 12" />
-    </svg>
-  </btnMenu> -->
-  <!-- <Form as="" :validation-schema="formSchema"> -->
   <div
     @click="modelStoreObject.setDialogStatus(true)"
     class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3"
@@ -103,6 +97,9 @@
                 }}</SelectItem>
               </v-select>
             </v-item>
+            <v-item label="Upload Image">
+              <vUploadImage v-model.modelValue="e.cover" />
+            </v-item>
             <v-item label="Introduction">
               <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />
             </v-item>
@@ -164,53 +161,43 @@
 <script setup lang="ts">
   import { useToaster } from '@/components/modules/toats/index'
   import { computed, ref, watch } from 'vue'
-  // import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion'
   import { SelectItem } from '@/components/ui/select'
   import { Input } from '@/components/ui/input'
   import { Button } from '@/components/ui/button'
   import { Label } from '@/components/ui/label'
   import { Switch } from '@/components/ui/switch'
   import { Progress } from '@/components/ui/progress'
-  import vDialog from '@/components/modules/vDialog.vue'
-  import vSelect from '@/components/modules/vSelect.vue'
-  import vItem from '@/components/modules/vItem.vue'
-  // import vAccordionTrigger from '@/components/modules/vAccordionTrigger.vue'
-  import vCustomAccordion from '@/components/modules/vCustomAccordion.vue'
-  import vCustomAccordionItem from '@/components/modules/vCustomAccordionItem.vue'
-  import vUpload from './upload.vue'
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
-  // import { useShadet } from '@/components/modules/vShadet/index'
-
-  import { useStatusStore } from '@/stores/userStatus'
   import { modelStore } from '@/stores/modelStatus'
-  import Markdown from '@/components/markdown/Index.vue'
-  // check_local_file, submit_upload, interrupt_upload
   import { create_models, model_types, base_model_types, put_model } from '@/api/model'
   import { onMounted } from 'vue'
   import { Trash2 } from 'lucide-vue-next'
+  import vDialog from '@/components/modules/vDialog.vue'
+  import vSelect from '@/components/modules/vSelect.vue'
+  import vItem from '@/components/modules/vItem.vue'
+  import vCustomAccordion from '@/components/modules/vCustomAccordion.vue'
+  import vCustomAccordionItem from '@/components/modules/vCustomAccordionItem.vue'
+  import vUpload from './upload.vue'
+  import vUploadImage from '@/components/modules/vUploadImage.vue'
+  import Markdown from '@/components/markdown/Index.vue'
 
-  const statusStore = useStatusStore()
   const modelStoreObject = modelStore()
   const modelBox = ref(true)
-  // const versionIndex = ref(0);
   const typeLis = ref([{ value: '', label: '' }])
   const baseTypeLis = ref([{ value: '', label: '' }])
   const formData = ref({ ...modelStoreObject.modelDetail })
   const acActiveIndex = ref(-1)
   const showLayoutLoading = ref(false)
-
   const handleToggle = (i: number) => {
     acActiveIndex.value = i
     if (modelBox.value) {
       modelBox.value = false
     }
   }
-
   const handleToggleTitle = () => {
     acActiveIndex.value = -1
     modelBox.value = true
   }
-
   const disabledPublish = computed(() => {
     const progress = formData.value.versions
       .map(e => e.progress)
@@ -223,21 +210,6 @@
       formData.value.versions[index].public = val
     }
   }
-  let calculating: { close: any }
-  // async function checkFile(val: string, index: number) {
-  //   const res = await check_local_file({ absolute_path: val })
-  //   formData.value.versions[index].file_upload_id = res.data.upload_id
-  //   formData.value.versions[index].filePathError = false
-  //   versionIndex.value = index
-  //   await submit_upload({ upload_id: res.data.upload_id })
-  //   asdasd = new Date().getTime()
-  //   formData.value.versions[index].progress = 0.1
-  //   calculating = useShadet({
-  //     content: 'Start calculating the file hash',
-  //     z: 'z-12000'
-  //   })
-
-  // }
   async function delVersion(index: number) {
     const res = await useAlertDialog({
       title: 'Are you sure you want to delete this version?',
@@ -277,7 +249,6 @@
     modelBox.value = false
     acActiveIndex.value = tempData.versions.length - 1
   }
-
   function nextStep() {
     if (!formData.value.name) {
       useToaster.error('Please enter the model name')
@@ -296,7 +267,6 @@
       addVersions()
     }
   }
-
   function verifyVersion() {
     const tempData = { ...formData.value }
     tempData.versions = tempData.versions || []
@@ -323,12 +293,6 @@
     }
     return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
   }
-
-  // async function interrupt ({ file_upload_id }: any) {
-
-  //   await interrupt_upload({ upload_id: file_upload_id })
-
-  // }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p
   }
@@ -374,15 +338,8 @@
       await create_models(tempData)
     }
     useToaster.success('Model published successfully')
-
     onDialogClose()
   }
-
-  // const acActiveFn = () => {
-  //   if (modelBox.value) {
-  //     modelBox.value = false
-  //   }
-  // }
   const onDialogClose = () => {
     modelStoreObject.setDialogStatus(false, 0)
     modelStoreObject.clearModelDetail()
@@ -390,59 +347,6 @@
     showLayoutLoading.value = false
     modelStoreObject.uploadModelDone()
   }
-  watch(
-    () => statusStore.socketMessage,
-    (val: any) => {
-      if (val.type == 'progress') {
-        const i = formData.value.versions.findIndex(
-          (e: any) => e.file_upload_id == val.data.upload_id
-        )
-        formData.value.versions[i].progress = Number(val.data.progress.replace('%', ''))
-      }
-      if (val.type == 'status' && val.data.status == 'finish') {
-        const i = formData.value.versions.findIndex(
-          (e: any) => e.file_upload_id == val.data.upload_id
-        )
-        if (formData.value.versions[i]) {
-          formData.value.versions[i].path = val.data.model_files[0].path
-          formData.value.versions[i].sign = val.data.model_files[0].sign
-        }
-      }
-      if (val.type == 'interrupted') {
-        useToaster.success('Upload interrupted')
-        const i = formData.value.versions.findIndex(
-          (e: any) => e.file_upload_id == val.data.upload_id
-        )
-        delete formData.value.versions[i].progress
-        formData.value.versions[i].filePath = ''
-      }
-      if (val.type == 'error') {
-        useToaster.error(val.data.message)
-        const i = formData.value.versions.findIndex(
-          (e: any) => e.file_upload_id == val.data.upload_id
-        )
-        delete formData.value.versions[i].progress
-        formData.value.versions[i].filePath = ''
-      }
-      if (val.type == 'prepared') {
-        calculating.close()
-      }
-      if (val.type === 'errors' && val.data && val.data.code === 500101) {
-        calculating.close()
-        useToaster.error(val.data.message)
-        const i = formData.value.versions.findIndex(
-          (e: any) => e.file_upload_id == val.data.data.upload_id
-        )
-        if (formData.value.versions[i].progress) {
-          delete formData.value.versions[i].progress
-        }
-        formData.value.versions[i].filePath = ''
-      }
-    },
-    {
-      deep: true
-    }
-  )
   watch(
     () => modelStoreObject.modelDetail,
     (val: any) => {
