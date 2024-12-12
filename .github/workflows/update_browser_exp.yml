@@ -6,6 +6,9 @@ name: Update Browser Tests Expectations
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update_browser_expectations:
     if: github.event.pull_request.merged || github.event_name == 'workflow_dispatch'
