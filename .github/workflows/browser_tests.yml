@@ -6,8 +6,12 @@ on:
   push:
     branches:
       - dev_bbs
+      # TODO: add master when it's ready
   pull_request:
     types: [opened, synchronize, reopened]
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
   browser_tests:
@@ -37,7 +41,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: siliconflow/bizyair_frontend
-          ref: dev_bbs_ci
+          ref: ${{ env.BRANCH_NAME }}
           path: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
 
       - uses: actions/setup-python@v4
