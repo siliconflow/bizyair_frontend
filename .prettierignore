@@ -1,0 +1,11 @@
+dist
+node_modules
+*.d.ts
+.DS_Store
+.eslintignore
+.eslintrc.js
+.prettierrc.js
+package.json
+package-lock.json
+pnpm-lock.yaml
+README.md 
