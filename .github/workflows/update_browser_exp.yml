@@ -10,10 +10,6 @@ on:
       - master
     types:
       - closed
-  # TODO: for testing, remove before PR
-  push:
-    branches:
-      - fix_ci
 
 jobs:
   update_browser_expectations:
@@ -44,7 +40,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: siliconflow/bizyair_frontend
-          ref: master
+          # TODO: change to master after testing
+          ref: fix_ci
           path: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
 
       - uses: actions/setup-python@v4
@@ -100,7 +97,7 @@ jobs:
 
       - name: Run Playwright tests and update snapshots
         run: |
-          npx playwright test --update-snapshots --project chromium chromium-2x
+          npx playwright test --update-snapshots --project chromium chromium-2x --workers=4
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
       - uses: actions/upload-artifact@v4
