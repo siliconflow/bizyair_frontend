@@ -111,7 +111,6 @@ import { expect, test } from "@playwright/test";
 ].forEach((nodeName) => {
   test(nodeName, async ({ page }) => {
     await page.goto("http://localhost:8188/");
-    await page.waitForTimeout(500);
     await page.locator(".workflows-tab-button").click();
     await page
       .locator(".comfyui-workflows-browse .node-label", {
@@ -133,15 +132,15 @@ import { expect, test } from "@playwright/test";
           y: 300,
         },
       });
-      await input.waitFor({ state: "visible" });
+      await input.waitFor({ state: "visible" , timeout: 1000});
       await input.fill(nodeName);
-      await dropdown.waitFor({ state: "visible" });
+      await dropdown.waitFor({ state: "visible" , timeout: 1000});
     }).toPass({timeout: 10000})
 
     // Wait for some time for the auto complete list to update.
     // The auto complete list is debounced and may take some time to update.
     await dropdown.locator("li").nth(0).click();
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(500);
     await page.mouse.move(700, 350);
     await page.mouse.down();
     await page.mouse.move(1000, 350);
