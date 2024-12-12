@@ -89,3 +89,7 @@ typings/
 .DS_Store
 Thumbs.db
 
+# Browser tests
+browser_tests/test-results/
+browser_tests/playwright-report/
+browser_tests/blob-report/
