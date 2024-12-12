@@ -48,3 +48,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create --title "Update test expectations" --body "Update test expectations" --base master --head update_snapshots
+        working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
