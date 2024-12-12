@@ -109,13 +109,17 @@ jobs:
       # Use a dedicated branch to update test expectations
       - name: Commit updated expectations
         if: success()
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update test expectations [skip ci]"
+          file_pattern: "*.png"
+          branch: update_snapshots
+          skip_fetch: false
+          skip_checkout: false
+        working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
+        
+      - name: Create PR
+        if: success()
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git fetch
-          git checkout -b update_snapshots origin/update_snapshots
-          git add .
-          git commit -m "Update test expectations [skip ci]"
-          git push
           gh pr create --title "Update test expectations" --body "Update test expectations" --base master --head update_snapshots
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
