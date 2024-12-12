@@ -119,12 +119,6 @@ import { expect, test } from "@playwright/test";
       })
       .click();
     await page.waitForTimeout(500);
-    await page.locator("#graph-canvas").dblclick({
-      position: {
-        x: 600,
-        y: 300,
-      },
-    });
     // Ref: https://github.com/Comfy-Org/ComfyUI_frontend/blob/57701f6145f622bf17237410c165966fb4aecc75/browser_tests/fixtures/components/ComfyNodeSearchBox.ts
     const input = page.locator(
       '.comfy-vue-node-search-container input[type="text"]',
@@ -132,15 +126,22 @@ import { expect, test } from "@playwright/test";
     const dropdown = page.locator(
       ".comfy-vue-node-search-container .p-autocomplete-list",
     );
-    // TODO: sometimes the input search box never shows up?
-    await input.waitFor({ state: "visible" });
-    await input.fill(nodeName);
-    await dropdown.waitFor({ state: "visible" });
+    await expect(async() => {
+      await page.locator("#graph-canvas").dblclick({
+        position: {
+          x: 600,
+          y: 300,
+        },
+      });
+      await input.waitFor({ state: "visible" });
+      await input.fill(nodeName);
+      await dropdown.waitFor({ state: "visible" });
+    }).toPass({timeout: 10000})
+
     // Wait for some time for the auto complete list to update.
     // The auto complete list is debounced and may take some time to update.
-    await page.waitForTimeout(500);
     await dropdown.locator("li").nth(0).click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(100);
     await page.mouse.move(700, 350);
     await page.mouse.down();
     await page.mouse.move(1000, 350);
