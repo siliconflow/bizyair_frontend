@@ -116,7 +116,7 @@ jobs:
           branch: update_snapshots
           skip_fetch: false
           skip_checkout: false
-        working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
+          repository: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
         
       - name: Create PR
         if: success()
