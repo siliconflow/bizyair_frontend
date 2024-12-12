@@ -98,7 +98,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          npx playwright test --project chromium chromium-2x
+          npx playwright test --project chromium chromium-2x --workers=4
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
       - uses: actions/upload-artifact@v4
