@@ -14,7 +14,6 @@ permissions:
 
 jobs:
   update_browser_expectations:
-    if: github.event.pull_request.merged || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:       
       - name: Create PR
