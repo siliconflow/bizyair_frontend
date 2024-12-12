@@ -134,6 +134,7 @@ import { expect, test } from "@playwright/test";
       });
       await input.waitFor({ state: "visible" , timeout: 1000});
       await input.fill(nodeName);
+      await page.waitForTimeout(500);
       await dropdown.waitFor({ state: "visible" , timeout: 1000});
     }).toPass({timeout: test.info().timeout})
 
@@ -147,6 +148,7 @@ import { expect, test } from "@playwright/test";
     await page.mouse.up();
     await expect(page).toHaveScreenshot(`move_${nodeName}.png`, {
       maxDiffPixelRatio: 0.01,
+      threshold: 0.1,
     });
   });
 });

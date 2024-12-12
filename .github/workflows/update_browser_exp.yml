@@ -117,7 +117,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git fetch
+          git fetch origin ${{ github.head_ref || github.ref_name }}
           git checkout -b update_snapshots origin/update_snapshots
           git add .
           git commit -m "Update test expectations [skip ci]"
