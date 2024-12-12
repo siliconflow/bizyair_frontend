@@ -110,6 +110,7 @@ jobs:
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
       # Use a dedicated branch to update test expectations
+      # NOTE: PR from github action bot is not enabled so need to manually create a PR
       - name: Commit updated expectations
         if: success()
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -120,9 +121,3 @@ jobs:
           skip_fetch: false
           skip_checkout: false
           repository: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
-        
-      - name: Create PR
-        if: success()
-        run: |
-          gh pr create --title "Update test expectations" --body "Update test expectations" --base master --head update_snapshots
-        working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
