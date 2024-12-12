@@ -1,0 +1,25 @@
+# Inspired by: https://github.com/Comfy-Org/ComfyUI_frontend/blob/57701f6145f622bf17237410c165966fb4aecc75/.github/workflows/test-browser-exp.yaml
+name: Update Browser Tests Expectations
+
+# Run on PR merged into master or manually triggered, can assume this always runs on master
+# But since master is protected, updated images need to push to a dedicated branch and PR to master
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - fix_ci
+
+permissions:
+  contents: write
+
+jobs:
+  update_browser_expectations:
+    if: github.event.pull_request.merged || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:       
+      - name: Create PR
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create --title "Update test expectations" --body "Update test expectations" --base master --head update_snapshots
