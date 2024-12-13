@@ -4,6 +4,7 @@ import vImage from '@/components/modules/vImage.vue'
 import { Trash2 } from 'lucide-vue-next';
 
 const imageSrc = ref('')
+const emit = defineEmits(['update:modelValue'])
 
 function base64ToFile(base64: string, filename: string, mimeType: any) {
   const byteCharacters = atob(base64.split(',')[1]);
@@ -41,6 +42,8 @@ const handleFileChange = (e: Event) => {
     formatToWebp(files[0])
     imageSrc.value = URL.createObjectURL(files[0])
     console.log(URL.createObjectURL(files[0]))
+
+    emit('update:modelValue', imageSrc.value)
   }
 }
 </script>

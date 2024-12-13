@@ -177,7 +177,7 @@
   import vItem from '@/components/modules/vItem.vue'
   import vCustomAccordion from '@/components/modules/vCustomAccordion.vue'
   import vCustomAccordionItem from '@/components/modules/vCustomAccordionItem.vue'
-  import vUpload from './upload.vue'
+  import vUpload from '@/components/modules/vUpload/index.vue'
   import vUploadImage from '@/components/modules/vUploadImage.vue'
   import Markdown from '@/components/markdown/Index.vue'
 
