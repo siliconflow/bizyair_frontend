@@ -83,7 +83,7 @@ jobs:
         run: |
           mkdir -p ComfyUI/user/default
           cp -r ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/workflows ComfyUI/user/default
-          echo "[auth]\napi_key = $BIZYAIR_KEY" >> ComfyUI/custom_nodes/BizyAir/api_key.ini
+          python3 ComfyUI/custom_nodes/BizyAir/tests/write_api_ini_file.py
         env:
           BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
 
