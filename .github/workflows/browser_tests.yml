@@ -79,11 +79,14 @@ jobs:
           npm install
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
               
-      - name: Copy over test workflows
+      - name: Set up test environment
         run: |
           mkdir -p ComfyUI/user/default
           cp -r ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/workflows ComfyUI/user/default
-      
+          echo "[auth]\napi_key = ${{ secrets.BIZYAIR_KEY }}" >> ComfyUI/custom_nodes/BizyAir/api_key.ini
+        env:
+          BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
+
       - name: Update bizyair_frontend.js
         run: |
           npx vue-tsc -b

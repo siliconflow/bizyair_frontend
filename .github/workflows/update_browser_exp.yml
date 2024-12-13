@@ -9,7 +9,6 @@ permissions:
 
 jobs:
   update_browser_expectations:
-    if: github.event.pull_request.merged || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       # Ref: https://github.com/orgs/community/discussions/25199#discussioncomment-3246802
@@ -71,11 +70,13 @@ jobs:
           npm install
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
               
-      - name: Copy over test setup files
+      - name: Set up test environment
         run: |
           mkdir -p ComfyUI/user/default
           cp -r ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/workflows ComfyUI/user/default
-          cp ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/api_key.ini ComfyUI/custom_nodes/BizyAir/api_key.ini
+          echo "[auth]\napi_key = ${{ secrets.BIZYAIR_KEY }}" >> ComfyUI/custom_nodes/BizyAir/api_key.ini
+        env:
+          BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
       
       - name: Update bizyair_frontend.js
         run: |
