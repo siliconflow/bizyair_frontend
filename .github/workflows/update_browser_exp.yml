@@ -1,8 +1,6 @@
 # Inspired by: https://github.com/Comfy-Org/ComfyUI_frontend/blob/57701f6145f622bf17237410c165966fb4aecc75/.github/workflows/test-browser-exp.yaml
 name: Update Browser Tests Expectations
 
-# Run on PR merged into master or manually triggered, can assume this always runs on master
-# But since master is protected, updated images need to push to a dedicated branch and PR to master
 on:
   workflow_dispatch:
 
@@ -109,7 +107,8 @@ jobs:
           git status
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
-      # Use a dedicated branch to update test expectations
+      # Using a dedicated branch to update test expectations, because
+      # master is protected, updated images need to push to that branch and PR to master
       # NOTE: PR from github action bot is not enabled so need to manually create a PR
       - name: Commit updated expectations
         if: success()
