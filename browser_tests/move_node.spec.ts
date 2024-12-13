@@ -142,9 +142,15 @@ import { expect, test } from "@playwright/test";
     // The auto complete list is debounced and may take some time to update.
     await dropdown.locator("li").nth(0).click();
     await page.waitForTimeout(500);
-    await page.mouse.move(700, 350);
+    // NOTE: not elegant but for BizyAirToggleServerEndpoint it clicks on its dropdown so need some
+    // offset while not breaking the others.
+    let y = 350;
+    if (nodeName === "BizyAirToggleServerEndpoint") {
+      y = 370;
+    }
+    await page.mouse.move(700, y);
     await page.mouse.down();
-    await page.mouse.move(1000, 350);
+    await page.mouse.move(1000, y);
     await page.mouse.up();
     await expect(page).toHaveScreenshot(`move_${nodeName}.png`, {
       maxDiffPixelRatio: 0.01,
