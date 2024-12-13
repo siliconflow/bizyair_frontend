@@ -3,12 +3,14 @@ name: Browser Tests
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - dev_bbs
-      # TODO: add master when it's ready
   pull_request:
     types: [opened, synchronize, reopened]
+    paths-ignore:
+      - 'browser_tests/*snapshots'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
@@ -77,11 +79,14 @@ jobs:
           npm install
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
               
-      - name: Copy over test workflows
+      - name: Set up test environment
         run: |
           mkdir -p ComfyUI/user/default
           cp -r ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/workflows ComfyUI/user/default
-      
+          python3 ComfyUI/custom_nodes/BizyAir/tests/write_api_ini_file.py
+        env:
+          BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
+
       - name: Update bizyair_frontend.js
         run: |
           npx vue-tsc -b
@@ -95,13 +100,12 @@ jobs:
         working-directory: ComfyUI
 
       - name: Run Tests
-        continue-on-error: true
         run: |
-          npx playwright test --project chromium chromium-2x
+          npx playwright test --project chromium chromium-2x --workers=4
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: success() || failure()
         with:
           name: playwright-report
           path: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/playwright-report/
