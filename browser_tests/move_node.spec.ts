@@ -1,11 +1,14 @@
 import { expect, test } from "@playwright/test";
-import { startComfy, killComfy } from "./comfyProc";
+import { startComfy, killComfy, waitComfy } from "./comfyProc";
 
 test.describe("", () => {
   test.beforeAll(async () => {
     // NOTE: API key must be valid by now
     if (process.env.TEST_PARALLEL_INDEX === "0") {
       await startComfy();
+    } else {
+      // Wait for comfy
+      waitComfy();
     }
   });
 
