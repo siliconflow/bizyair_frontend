@@ -23,9 +23,11 @@ export const useStatusStore = defineStore('userStatus', {
     loginRefresh() {
       get_user_info()
         .then((info: { data: any }) => {
-          sessionStorage.setItem('userInfo', JSON.stringify(info.data))
-          this.infoData = info.data
-          this.isLogin = true
+          if (info !== null) {
+            sessionStorage.setItem('userInfo', JSON.stringify(info.data))
+            this.infoData = info.data
+            this.isLogin = true
+          }
         })
         .catch(() => {
           this.isLogin = false
