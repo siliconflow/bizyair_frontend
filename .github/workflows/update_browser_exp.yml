@@ -81,12 +81,6 @@ jobs:
           npx vite build
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
 
-      - name: Start ComfyUI server
-        run: |
-          python main.py --cpu &
-          wait-for-it --service 127.0.0.1:8188 -t 600
-        working-directory: ComfyUI
-
       - name: Run Playwright tests and update snapshots
         env:
           BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
