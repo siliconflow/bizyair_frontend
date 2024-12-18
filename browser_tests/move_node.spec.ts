@@ -1,4 +1,17 @@
 import { expect, test } from "@playwright/test";
+import { startComfy, killComfy } from "./comfyProc";
+
+test.describe("", () => {
+  test.beforeAll(async () => {
+    // NOTE: API key must be valid by now
+    // Start comfy
+    await startComfy();
+  });
+
+  test.afterAll(async () => {
+    // Kill comfy
+    await killComfy();
+  });
 
 [
   "BizyAir_StyleModelApplySimple",
@@ -152,9 +165,7 @@ import { expect, test } from "@playwright/test";
     await page.mouse.down();
     await page.mouse.move(1000, y);
     await page.mouse.up();
-    await expect(page).toHaveScreenshot(`move_${nodeName}.png`, {
-      maxDiffPixelRatio: 0.01,
-      threshold: 0.1,
-    });
+    await expect(page).toHaveScreenshot(`move_${nodeName}.png`);
   });
 });
+})
