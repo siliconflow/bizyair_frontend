@@ -60,6 +60,7 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: 'floating_button.spec.ts',
       grepInvert: /@mobile/, // Run all tests except those tagged with @mobile
       dependencies: ['floating-button-chromium-2x']
     },
@@ -67,6 +68,7 @@ export default defineConfig({
     {
       name: 'chromium-2x',
       use: { ...devices['Desktop Chrome'], deviceScaleFactor: 2 },
+      testIgnore: 'floating_button.spec.ts',
       grepInvert: /@mobile/, // Run all tests except those tagged with @mobile
       dependencies: ['floating-button-chromium-2x']
     },
