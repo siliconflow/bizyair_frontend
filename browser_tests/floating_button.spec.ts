@@ -77,10 +77,15 @@ test.describe('Floating Button', () => {
     await expect(page).toHaveScreenshot(`floating_button_${testInfo.title}.png`)
   })
 
-  // TODO: move floating button
+  // #5 Move floating button
+  test('move widget', async ({page}, testInfo) => {
+    await page.mouse.move(390, 60);
+    await page.mouse.down();
+    await page.mouse.move(390, 360);
+    await page.mouse.up();
+    await expect(page).toHaveScreenshot(`floating_button_${testInfo.title}.png`)
+  })
+
   // TODO: test publish model & workflow
   // TODO: test examples
-  /*test("set invalid api key", async ({ page }) => {
-
-  })*/
 })
