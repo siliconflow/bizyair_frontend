@@ -30,24 +30,37 @@ export default defineConfig({
     trace: 'on-first-retry'
   },
   /* Path to global setup file. Exported function runs once before all the tests */
-  // globalSetup: './browser_tests/globalSetup.ts',
+  globalSetup: './globalSetup.ts',
   /* Path to global teardown file. Exported function runs once after all the tests */
-  // globalTeardown: './browser_tests/globalTeardown.ts',
+  globalTeardown: './globalTeardown.ts',
+  
+  timeout: 10000,
 
   /* Configure projects for major browsers */
   projects: [
     {
+      name: 'floating-button-chromium',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: 'floating_button.spec.ts'
+    },
+    {
+      name: 'floating-button-chromium-2x',
+      use: { ...devices['Desktop Chrome'], deviceScaleFactor: 2 },
+      testMatch: 'floating_button.spec.ts'
+    },
+
+    {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      timeout: 10000,
-      grepInvert: /@mobile/ // Run all tests except those tagged with @mobile
+      grepInvert: /@mobile/, // Run all tests except those tagged with @mobile
+      dependencies: ['floating-button-chromium']
     },
 
     {
       name: 'chromium-2x',
       use: { ...devices['Desktop Chrome'], deviceScaleFactor: 2 },
-      timeout: 10000,
-      grepInvert: /@mobile/ // Run all tests except those tagged with @mobile
+      grepInvert: /@mobile/, // Run all tests except those tagged with @mobile
+      dependencies: ['floating-button-chromium-2x']
     },
 
     // {
