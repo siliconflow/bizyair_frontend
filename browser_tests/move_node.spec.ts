@@ -4,13 +4,15 @@ import { startComfy, killComfy } from "./comfyProc";
 test.describe("", () => {
   test.beforeAll(async () => {
     // NOTE: API key must be valid by now
-    // Start comfy
-    await startComfy();
+    if (process.env.TEST_PARALLEL_INDEX === "0") {
+      await startComfy();
+    }
   });
 
   test.afterAll(async () => {
-    // Kill comfy
-    await killComfy();
+    if (process.env.TEST_PARALLEL_INDEX === "0") {
+      await killComfy();
+    }
   });
 
 [
