@@ -19,12 +19,16 @@ export async function startComfy() {
   comfyProc.stdout?.on('data', (data) => {
     console.log(`stdout: ${data}`);
   });
-  var r = execSync('wait-for-it --service 127.0.0.1:8188 -t 600')
-  console.log(r.toString())
-  console.log('comfy server is ready!')
+  waitComfy();
 }
 
 export function killComfy() {
   comfyProc?.kill()
   comfyProc = null
+}
+
+export function waitComfy() {
+  var r = execSync('wait-for-it --service 127.0.0.1:8188 -t 60')
+  console.log(r.toString())
+  console.log('comfy server is ready!')
 }
