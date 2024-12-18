@@ -18,6 +18,8 @@ env:
 jobs:
   browser_tests:
     runs-on: ubuntu-latest
+    env:
+      BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
     steps:
       # Ref: https://github.com/orgs/community/discussions/25199#discussioncomment-3246802
       - name: Get latest ComfyUI release with tag
@@ -83,9 +85,6 @@ jobs:
         run: |
           mkdir -p ComfyUI/user/default
           cp -r ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/workflows ComfyUI/user/default
-          python3 ComfyUI/custom_nodes/BizyAir/tests/write_api_ini_file.py
-        env:
-          BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
 
       - name: Update bizyair_frontend.js
         run: |
@@ -101,7 +100,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          npx playwright test --project chromium chromium-2x --workers=4
+          npx playwright test --workers=4
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
       - uses: actions/upload-artifact@v4
