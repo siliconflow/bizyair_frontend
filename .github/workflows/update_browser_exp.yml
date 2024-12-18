@@ -10,8 +10,6 @@ permissions:
 jobs:
   update_browser_expectations:
     runs-on: ubuntu-latest
-    env:
-      BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
     steps:
       # Ref: https://github.com/orgs/community/discussions/25199#discussioncomment-3246802
       - name: Get latest ComfyUI release with tag
@@ -90,6 +88,9 @@ jobs:
         working-directory: ComfyUI
 
       - name: Run Playwright tests and update snapshots
+        env:
+          BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
+          COMFY_PATH: "../../../.."
         run: |
           npx playwright test --update-snapshots --workers=4
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
