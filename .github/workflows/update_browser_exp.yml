@@ -81,8 +81,10 @@ jobs:
           npx vite build
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
 
-      - name: Remove all from update_snapshots for snapshots regen
+      - name: Remove all png from update_snapshots for regen
         run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git fetch origin update_snapshots
           git checkout -b update_snapshots origin/update_snapshots
           git rm -r "**/*.png"
@@ -121,6 +123,6 @@ jobs:
           commit_message: "Update test expectations [skip ci]"
           file_pattern: "*.png"
           branch: update_snapshots
-          skip_fetch: false
+          skip_fetch: true
           skip_checkout: false
           repository: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
