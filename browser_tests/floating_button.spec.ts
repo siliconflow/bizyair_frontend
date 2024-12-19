@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { startComfy, killComfy } from './comfyProc'
+import { startComfy, killComfy, defaultComfyPort } from './comfyProc'
 import * as fs from 'fs'
 
 const apiKeyPath = '../../api_key.ini'
@@ -29,7 +29,7 @@ test.describe('Floating Button', () => {
 
   // Navigate to comfy and open the empty workflow
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:8188/')
+    await page.goto(`http://localhost:${defaultComfyPort}/`)
     await page.locator('.workflows-tab-button').click()
     await page
       .locator('.comfyui-workflows-browse .node-label', {
