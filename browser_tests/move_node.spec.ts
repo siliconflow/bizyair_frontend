@@ -1,4 +1,16 @@
 import { expect, test } from "@playwright/test";
+import { startComfy, killComfy, defaultComfyPort } from "./comfyProc";
+
+// This test suite runs in parallel, and each playwright worker is an OS process so only conflicting on port
+test.describe("", () => {
+  test.beforeAll(async () => {
+    // NOTE: API key must be valid by now
+    await startComfy(parseInt(process.env.TEST_PARALLEL_INDEX))
+  });
+
+  test.afterAll(async () => {
+    await killComfy();
+  });
 
 [
   "BizyAir_StyleModelApplySimple",
@@ -110,7 +122,7 @@ import { expect, test } from "@playwright/test";
   "BizyAirSegmentAnythingPointBox",
 ].forEach((nodeName) => {
   test(nodeName, async ({ page }) => {
-    await page.goto("http://localhost:8188/");
+    await page.goto(`http://localhost:${defaultComfyPort+parseInt(process.env.TEST_PARALLEL_INDEX)}/`);
     await page.locator(".workflows-tab-button").click();
     await page
       .locator(".comfyui-workflows-browse .node-label", {
@@ -152,9 +164,7 @@ import { expect, test } from "@playwright/test";
     await page.mouse.down();
     await page.mouse.move(1000, y);
     await page.mouse.up();
-    await expect(page).toHaveScreenshot(`move_${nodeName}.png`, {
-      maxDiffPixelRatio: 0.01,
-      threshold: 0.1,
-    });
+    await expect(page).toHaveScreenshot(`move_${nodeName}.png`);
   });
 });
+})

@@ -74,9 +74,6 @@ jobs:
         run: |
           mkdir -p ComfyUI/user/default
           cp -r ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/workflows ComfyUI/user/default
-          python3 ComfyUI/custom_nodes/BizyAir/tests/write_api_ini_file.py
-        env:
-          BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
       
       - name: Update bizyair_frontend.js
         run: |
@@ -84,15 +81,23 @@ jobs:
           npx vite build
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
 
-      - name: Start ComfyUI server
+      - name: Remove all png from update_snapshots for regen
         run: |
-          python main.py --cpu &
-          wait-for-it --service 127.0.0.1:8188 -t 600
-        working-directory: ComfyUI
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git fetch origin update_snapshots
+          git checkout -b update_snapshots origin/update_snapshots
+          git rm -r "**/*.png"
+          git commit -m "rm for regen"
+          git checkout ${{ github.ref_name }}
+        working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
 
       - name: Run Playwright tests and update snapshots
+        env:
+          BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
+          COMFY_PATH: "../../../.."
         run: |
-          npx playwright test --update-snapshots --project chromium chromium-2x --workers=4
+          npx playwright test --update-snapshots --workers=2 --trace on
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
       - uses: actions/upload-artifact@v4
@@ -118,6 +123,6 @@ jobs:
           commit_message: "Update test expectations [skip ci]"
           file_pattern: "*.png"
           branch: update_snapshots
-          skip_fetch: false
+          skip_fetch: true
           skip_checkout: false
           repository: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
