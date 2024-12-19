@@ -42,7 +42,7 @@ jobs:
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "auto prettier format code"
-        file_pattern: "**/*.[css][ts][vue]" # Don't update package-lock.json and package.json
+        file_pattern: "**/*.{css,ts,vue}" # Don't update package-lock.json and package.json
 
     - name: Add PR review comment if eslint fails
       if: ${{ steps.lint.outcome == 'failure' }}
