@@ -87,7 +87,7 @@ jobs:
           git config user.email github-actions@github.com
           git fetch origin update_snapshots
           git checkout -b update_snapshots origin/update_snapshots
-          git rm -r "browser_tests/floating_button.spec.ts-snapshots/*.png"
+          git rm -r "**/*.png"
           git commit -m "rm for regen"
           git checkout ${{ github.ref_name }}
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
@@ -97,7 +97,7 @@ jobs:
           BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
           COMFY_PATH: "../../../.."
         run: |
-          npx playwright test floating_button.spec.ts --update-snapshots --workers=2 --trace on
+          npx playwright test --update-snapshots --workers=2 --trace on
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
       - uses: actions/upload-artifact@v4
