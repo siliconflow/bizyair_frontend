@@ -86,7 +86,7 @@ jobs:
           BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
           COMFY_PATH: "../../../.."
         run: |
-          npx playwright test --update-snapshots --workers=4
+          npx playwright test --update-snapshots --workers=4 --trace on
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
       - uses: actions/upload-artifact@v4
