@@ -81,6 +81,15 @@ jobs:
           npx vite build
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
 
+      - name: Remove all from update_snapshots for snapshots regen
+        run: |
+          git fetch origin update_snapshots
+          git checkout -b update_snapshots origin/update_snapshots
+          git rm -r "**/*.png"
+          git commit -m "rm for regen"
+          git checkout ${{ github.ref_name }}
+        working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
+
       - name: Run Playwright tests and update snapshots
         env:
           BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
