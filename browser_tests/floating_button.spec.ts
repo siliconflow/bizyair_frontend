@@ -58,8 +58,9 @@ test.describe('Floating Button', () => {
   test('set valid api key', async ({ page }, testInfo) => {
     await page.getByText('API Key', { exact: true }).locator('..').click()
     await page.getByPlaceholder('API Key').fill(process.env.BIZYAIR_KEY)
-    await page.getByRole('button', { name: 'Submit' }).click()
-    await page.waitForTimeout(500)
+    const submitBtn = page.getByRole('button', { name: 'Submit' })
+    await submitBtn.click()
+    await submitBtn.waitFor( { state: 'hidden'} )
     await expect(page).toHaveScreenshot(`floating_button_${testInfo.title}.png`)
   })
 
