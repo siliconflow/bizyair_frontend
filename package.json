@@ -8,7 +8,7 @@
     "dev": "vue-tsc -b && vite build --watch",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
-    "format": "prettier --write \"src/**/*.{vue,ts,tsx,js,jsx,css,less,scss,json,md}\""
+    "format": "prettier --write \"{src,browser_tests}/**/*.{vue,ts,tsx,js,jsx,css,less,scss,json,md}\""
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
