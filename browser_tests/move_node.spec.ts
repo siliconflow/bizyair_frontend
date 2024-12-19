@@ -1,21 +1,15 @@
 import { expect, test } from "@playwright/test";
-import { startComfy, killComfy, waitComfy } from "./comfyProc";
+import { startComfy, killComfy, defaultComfyPort } from "./comfyProc";
 
+// This test suite runs in parallel, and each playwright worker is an OS process so only conflicting on port
 test.describe("", () => {
   test.beforeAll(async () => {
     // NOTE: API key must be valid by now
-    if (process.env.TEST_PARALLEL_INDEX === "0") {
-      await startComfy();
-    } else {
-      // Wait for comfy
-      waitComfy();
-    }
+    await startComfy(parseInt(process.env.TEST_PARALLEL_INDEX))
   });
 
   test.afterAll(async () => {
-    if (process.env.TEST_PARALLEL_INDEX === "0") {
-      await killComfy();
-    }
+    await killComfy();
   });
 
 [
@@ -128,7 +122,7 @@ test.describe("", () => {
   "BizyAirSegmentAnythingPointBox",
 ].forEach((nodeName) => {
   test(nodeName, async ({ page }) => {
-    await page.goto("http://localhost:8188/");
+    await page.goto(`http://localhost:${defaultComfyPort+parseInt(process.env.TEST_PARALLEL_INDEX)}/`);
     await page.locator(".workflows-tab-button").click();
     await page
       .locator(".comfyui-workflows-browse .node-label", {
