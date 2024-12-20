@@ -8,8 +8,8 @@ test.describe('', () => {
     await startComfy(parseInt(process.env.TEST_PARALLEL_INDEX))
   })
 
-  test.afterAll(async () => {
-    await killComfy()
+  test.afterAll(() => {
+    killComfy()
   })
 
   ;[
