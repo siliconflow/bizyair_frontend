@@ -38,6 +38,18 @@ jobs:
       id: lint
       run: npx eslint src
 
+    - name: Debugging info
+      if: success()
+      run: |
+        git status
+      working-directory: ./
+
+    - name: Debugging info
+      if: success()
+      run: |
+        git status
+      working-directory: ./browser_tests
+
     - name: Auto commit Prettier formatted files
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
