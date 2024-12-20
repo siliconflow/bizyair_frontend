@@ -60,7 +60,7 @@ test.describe('Floating Button', () => {
     await page.getByPlaceholder('API Key').fill(process.env.BIZYAIR_KEY)
     const submitBtn = page.getByRole('button', { name: 'Submit' })
     await submitBtn.click()
-    await submitBtn.waitFor( { state: 'hidden'} )
+    await submitBtn.waitFor({ state: 'hidden' })
     await expect(page).toHaveScreenshot(`floating_button_${testInfo.title}.png`)
   })
 
@@ -79,11 +79,11 @@ test.describe('Floating Button', () => {
   })
 
   // #5 Move floating button
-  test('move widget', async ({page}, testInfo) => {
-    await page.mouse.move(390, 60);
-    await page.mouse.down();
-    await page.mouse.move(390, 360);
-    await page.mouse.up();
+  test('move widget', async ({ page }, testInfo) => {
+    await page.mouse.move(390, 60)
+    await page.mouse.down()
+    await page.mouse.move(390, 360)
+    await page.mouse.up()
     await expect(page).toHaveScreenshot(`floating_button_${testInfo.title}.png`)
   })
 
