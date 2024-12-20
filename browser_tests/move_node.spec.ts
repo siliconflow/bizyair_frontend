@@ -11,7 +11,6 @@ test.describe('', () => {
   test.afterAll(() => {
     killComfy()
   })
-
   ;[
     'BizyAir_StyleModelApplySimple',
     'BizyAir_ReduxAdvanced',
