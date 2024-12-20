@@ -19,12 +19,12 @@ test.describe('Floating Button', () => {
     await startComfy()
   })
 
-  test.afterAll(async () => {
+  test.afterAll(() => {
+    killComfy()
     if (!fs.existsSync(apiKeyPath)) {
       console.error("api_key.ini doesn't exsit")
       throw Error("api_key.ini doesn't exsit")
     }
-    await killComfy()
   })
 
   // Navigate to comfy and open the empty workflow
