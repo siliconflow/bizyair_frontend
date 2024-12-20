@@ -29,12 +29,10 @@ export async function startComfy(portOffset: number = 0) {
 }
 
 export function killComfy() {
-  if (!comfyProc?.kill()){
-    console.error("Failed to kill comfy process")
-  }
-  else
-  {
-    console.log("Comfy process killed")
+  if (!comfyProc?.kill()) {
+    console.error('Failed to kill comfy process')
+  } else {
+    console.log('Comfy process killed')
   }
   comfyProc = null
 }
