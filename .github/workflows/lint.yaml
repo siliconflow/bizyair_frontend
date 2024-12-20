@@ -44,17 +44,10 @@ jobs:
         git status
       working-directory: ./
 
-    - name: Debugging info
-      if: success()
-      run: |
-        git status
-      working-directory: ./browser_tests
-
     - name: Auto commit Prettier formatted files
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "auto prettier format code"
-        file_pattern: "{src,browser_tests}/**/*.{vue,ts,tsx,js,jsx,css,less,scss,json,md}" # Don't update package-lock.json and package.json
 
     - name: Add PR review comment if eslint fails
       if: ${{ steps.lint.outcome == 'failure' }}
