@@ -48,10 +48,12 @@
   import { ref } from 'vue'
   import { useShadet } from '@/components/modules/vShadet/index'
   import { Button } from '@/components/ui/button'
-  import { calculateHash } from './computeHash'
-  import OSS from 'ali-oss'
-  import { oss_sign } from '@/api/public'
   import { commit_file } from '@/api/model'
+  import { creatClient } from './ossClient'
+  
+  const props = defineProps({
+    modelType: String
+  })
 
   let calculatingDialog: any
   const uploadText = ref('Click or drag file to this area to upload')
@@ -164,22 +166,7 @@
     uploadText.value = 'Click or drag file to this area to upload'
     emit('progress', '')
   }
-  function creatClient(accessFile: any) {
-    const accessKeyId = accessFile.file.access_key_id
-    const accessKeySecret = accessFile.file.access_key_secret
-    const bucket = accessFile.storage.bucket
-    const stsToken = accessFile.file.security_token
-    const region = accessFile.storage.region
-
-    return new OSS({
-      accessKeyId,
-      accessKeySecret,
-      stsToken,
-      bucket,
-      region,
-      secure: true
-    })
-  }
+  
   async function uploadFile(file: File) {
     uploadText.value = file.name
     const fileExtension = file.name.split('.').pop()
@@ -193,10 +180,9 @@
       content: 'In hash calculation',
       z: 'z-12000'
     })
-    const { sha256sum, md5Hash } = await calculateHash(file)
+    const { oss, objectKey, md5Hash, sha256sum, fileId } = await creatClient(file)
     calculatingDialog.close()
-    let ossData = await oss_sign(sha256sum)
-    if (ossData.data.file.id) {
+    if (fileId) {
       emit('success', { sha256sum, path: file.name })
       emit('uploadInfo', {
         fileName: file.name
@@ -206,13 +192,13 @@
       // disableUpload.value = false
       return
     }
-    const accessFile = ossData.data
-    client = creatClient(accessFile)
+
+    client = oss
     emit('start')
     const result = await doUpload({
       client,
       file,
-      objectKey: accessFile.file.object_key,
+      objectKey,
       md5Hash,
       sha256sum
     })
@@ -223,10 +209,11 @@
         md5_hash: md5Hash,
         md5Hash,
         sha256sum,
-        object_key: accessFile.file.object_key
+        object_key: objectKey,
+        type: props.modelType,
       })
       // disableUpload.value = false
-      emit('success', { sha256sum, object_key: accessFile.file.object_key })
+      emit('success', { sha256sum, object_key: objectKey })
       uploadSuccessful.value = true
       emit('uploadInfo', {
         fileName: file.name,

@@ -12,3 +12,7 @@ export const upload_image = (file: string | Blob) => {
 export const oss_sign = (sha256: string) => {
   return customFetch(`/bizyair/community/sign?sha256sum=${sha256}`, { method: 'GET' })
 }
+
+export const oss_upload_token = (filename: string) => {
+  return customFetch(`/bizyair/community/upload_token?filename=${filename}`, { method: 'GET' })
+}

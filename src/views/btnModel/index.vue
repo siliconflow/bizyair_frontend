@@ -123,9 +123,8 @@
                   </p>
                 </div>
                 <vUpload
-                  :parallel="1"
+                  :modelType="formData.type"
                   :ref="e.ref"
-                  :chunkSize="1"
                   :class="{ 'border-red-500': e.filePathError }"
                   @path="path => handlePath(path, i)"
                   @start="() => startUpload(i)"
@@ -171,7 +170,7 @@
   import vCustomAccordion from '@/components/modules/vCustomAccordion.vue'
   import vCustomAccordionItem from '@/components/modules/vCustomAccordionItem.vue'
   import vUpload from '@/components/modules/vUpload/index.vue'
-  import vUploadImage from '@/components/modules/vUploadImage.vue'
+  import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import Markdown from '@/components/markdown/Index.vue'
 
   const modelStoreObject = modelStore()
