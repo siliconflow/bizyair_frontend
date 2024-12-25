@@ -35,28 +35,29 @@ export const useCommunityStore = defineStore('community', {
     reload: 0,
     models: [] as Model[],
     mainContent: {
+      modelListPathParams: {
+        mode: 'workflow',
+        current: 1,
+        page_size: 24,
+        total: 0
+      } as ModelListPathParams,
+      models: [],
       modelTypes: [],
       baseModelTypes: [],
-      mode: 'publicity',
-      models: [],
-      modelListPathParams: {
-        mode: 'my',
-        current: 1,
-        page_size: 5,
-        total: 0
-      },
       filterState: {
         keyword: '',
+        sort: 'Recently',
         model_types: [],
         base_models: [],
-        sort: 'Recently'
-      }
+        is_official: true
+      },
+      mode: 'publicity'
     } as PageState,
     quickStart: {
       modelListPathParams: {
         mode: 'workflow',
         current: 1,
-        page_size: 5,
+        page_size: 24,
         total: 0
       } as ModelListPathParams,
       models: [],
@@ -72,22 +73,22 @@ export const useCommunityStore = defineStore('community', {
       mode: 'publicity'
     } as PageState,
     workflows: {
+      modelListPathParams: {
+        mode: 'workflow',
+        current: 1,
+        page_size: 24,
+        total: 0
+      } as ModelListPathParams,
+      models: [],
       modelTypes: [],
       baseModelTypes: [],
-      mode: 'publicity',
-      models: [],
-      modelListPathParams: {
-        mode: 'my',
-        current: 1,
-        page_size: 5,
-        total: 0
-      },
       filterState: {
         keyword: '',
+        sort: 'Recently',
         model_types: [],
         base_models: [],
-        sort: 'Recently'
-      }
+      },
+      mode: 'publicity'
     } as PageState,
     modelListPathParams: {
       mode: 'my',

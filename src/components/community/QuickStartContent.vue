@@ -31,8 +31,8 @@
     }))
   }
 
-  const ITEMS_PER_PAGE = communityStore.quickStart.modelListPathParams.page_size // 每页数据量
-  const SCROLL_THRESHOLD = 100 // 滚动阈值
+  const ITEMS_PER_PAGE = communityStore.quickStart.modelListPathParams.page_size
+  const SCROLL_THRESHOLD = 100 
 
   const models = ref<Model[]>(generateMockData(1, ITEMS_PER_PAGE))
   const loading = ref(false)
