@@ -7,7 +7,9 @@
     contentClass="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
   >
     <template #title
-      ><span class="px-6 cursor-pointer" @click="handleToggleTitle">Publish a Workflow</span></template
+      ><span class="px-6 cursor-pointer" @click="handleToggleTitle"
+        >Publish a Workflow</span
+      ></template
     >
     <div v-show="modelBox" class="px-6 pb-6">
       <v-item label="Model Name">
@@ -65,9 +67,12 @@
                 v-model:model-value="e.base_model"
                 placeholder="Select Base Model"
               >
-                <SelectItem v-for="(e, i) in modelStoreObject.baseTypeLis" :key="i" :value="e.value">{{
-                  e.label
-                }}</SelectItem>
+                <SelectItem
+                  v-for="(e, i) in modelStoreObject.baseTypeLis"
+                  :key="i"
+                  :value="e.value"
+                  >{{ e.label }}</SelectItem
+                >
               </v-select>
             </v-item>
             <v-item label="Upload Image">

@@ -50,7 +50,7 @@
   import { Button } from '@/components/ui/button'
   import { commit_file } from '@/api/model'
   import { creatClient } from './ossClient'
-  
+
   const props = defineProps({
     modelType: String
   })
@@ -166,7 +166,7 @@
     uploadText.value = 'Click or drag file to this area to upload'
     emit('progress', '')
   }
-  
+
   async function uploadFile(file: File) {
     uploadText.value = file.name
     const fileExtension = file.name.split('.').pop()
@@ -210,7 +210,7 @@
         md5Hash,
         sha256sum,
         object_key: objectKey,
-        type: props.modelType,
+        type: props.modelType
       })
       // disableUpload.value = false
       emit('success', { sha256sum, object_key: objectKey })

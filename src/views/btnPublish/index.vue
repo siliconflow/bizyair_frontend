@@ -17,19 +17,16 @@
   import { onMounted, ref } from 'vue'
   import { modelStore } from '@/stores/modelStatus'
   const modelStoreObject = modelStore()
-  
+
   const show_cases = ref({
-    'Model': () => {
+    Model: () => {
       modelStoreObject.setDialogStatus(true)
     },
-    'Workflow': () => {
-      
-    },
+    Workflow: () => {}
   })
 
   onMounted(() => {
     modelStoreObject.getModelTypes()
   })
-  
 </script>
 <style scoped></style>

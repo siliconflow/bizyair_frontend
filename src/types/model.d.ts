@@ -50,3 +50,21 @@ export interface CommonModelType {
   label: string
   value: string
 }
+
+export interface FilterState {
+  keyword: string
+  model_types: string[]
+  base_models: string[]
+  sort: SortValue
+}
+
+
+export interface MineState {
+  posts: {
+    filterState: FilterState
+  }
+  forked: {
+    filterState: FilterState
+  }
+}
+
