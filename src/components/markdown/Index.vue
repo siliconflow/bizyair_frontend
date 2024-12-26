@@ -82,6 +82,8 @@
   import prettier from 'prettier'
   import cropper from 'cropperjs'
   import { upload_image } from '@/api/public'
+  
+  import { formatToWebp, imageToOss } from '../modules/vUpload/imageToOss'
   import { MdEditor, config, NormalToolbar } from 'md-editor-v3'
   import { useToaster } from '@/components/modules/toats/index'
   import { Maximize, Image } from 'lucide-vue-next'
@@ -182,21 +184,27 @@
   const MAX_RETRIES = 3
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 
-  const uploadWithRetry = async (file, retryCount = 0) => {
-    try {
-      const res = await upload_image(file)
-      if (!res.data?.url) {
-        throw new Error('Upload response missing URL')
-      }
-      return res.data.url
-    } catch (error) {
-      console.error(`Upload attempt ${retryCount + 1} failed:`, error)
-      if (retryCount < MAX_RETRIES) {
-        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)))
-        return uploadWithRetry(file, retryCount + 1)
-      }
-      throw error
-    }
+  const uploadWithRetry = async (fileBlob, retryCount = 0) => {
+    // formatToWebp
+    // imageToOss
+    const { file } = await formatToWebp(fileBlob)
+    const { url } = await imageToOss(file)
+
+    return url
+    // try {
+    //   const res = await upload_image(file)
+    //   if (!res.data?.url) {
+    //     throw new Error('Upload response missing URL')
+    //   }
+    //   return res.data.url
+    // } catch (error) {
+    //   console.error(`Upload attempt ${retryCount + 1} failed:`, error)
+    //   if (retryCount < MAX_RETRIES) {
+    //     await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)))
+    //     return uploadWithRetry(file, retryCount + 1)
+    //   }
+    //   throw error
+    // }
   }
 
   const uploadImg = async e => {

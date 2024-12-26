@@ -45,14 +45,18 @@
 
 <script setup lang="ts">
   import { useToaster } from '@/components/modules/toats/index'
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { useShadet } from '@/components/modules/vShadet/index'
   import { Button } from '@/components/ui/button'
   import { commit_file } from '@/api/model'
   import { creatClient } from './ossClient'
 
   const props = defineProps({
-    modelType: String
+    modelType: String,
+    accept: {
+      type: String,
+      default: '.safetensors, .pth, .bin, .pt, .ckpt, .gguf, .sft'
+    }
   })
 
   let calculatingDialog: any
@@ -180,7 +184,7 @@
       content: 'In hash calculation',
       z: 'z-12000'
     })
-    const { oss, objectKey, md5Hash, sha256sum, fileId } = await creatClient(file)
+    const { oss, objectKey, md5Hash, sha256sum, fileId } = await creatClient(file, props.modelType as string)
     calculatingDialog.close()
     if (fileId) {
       emit('success', { sha256sum, path: file.name })
@@ -228,6 +232,11 @@
       throw new Error(`Upload to OSS failed: ${result.res.statusText}`)
     }
   }
+  onMounted(() => {
+    if (props.accept) {
+      ALLOW_UPLOADABLE_EXT_NAMES.value = props.accept
+    }
+  })
 </script>
 
 <style scoped>

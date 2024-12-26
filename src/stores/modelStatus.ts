@@ -27,6 +27,9 @@ interface ModelVersion {
   fileName?: string
   ref?: string
   cover?: string
+  hideUpload?: boolean
+  imageDone?: boolean
+  imageError?: boolean
 }
 interface ModelDetail {
   name: string
