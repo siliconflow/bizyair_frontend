@@ -95,7 +95,7 @@
 
   const handleSearch = () => {
     const storeRef = getStoreRef(props.page)
-    console.log('aa', storeRef.filterState.keyword)
+    storeRef.modelListPathParams.current = 1
     emit('fetchData')
     emit('update:showSortPopover', false)
   }

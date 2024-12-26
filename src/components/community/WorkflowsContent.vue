@@ -442,7 +442,7 @@
 
         <div ref="loadingRef" class="py-4 text-center mt-8">
           <div v-if="loading" class="text-white/60">加载中...</div>
-          <div v-else-if="!hasMore" class="text-white/60">没有更多数据了</div>
+          <!-- <div v-else-if="!hasMore" class="text-white/60">没有更多数据了</div> -->
           <div v-else class="h-8"></div>
         </div>
       </div>
