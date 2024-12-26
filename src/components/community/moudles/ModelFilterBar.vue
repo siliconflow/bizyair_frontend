@@ -4,7 +4,7 @@
   import { Badge } from '@/components/ui/badge'
   import { onMounted } from 'vue'
   import { useCommunityStore } from '@/stores/communityStore'
-  import type { SortValue, CommonModelType } from '@/types/model'
+  import type { SortValue, CommonModelType, PageType } from '@/types/model'
   import { base_model_types, model_types } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -18,9 +18,10 @@
 
   const store = useCommunityStore()
 
+ 
   interface Props {
     showSortPopover: boolean
-    page: string
+    page: PageType
   }
 
   interface Emits {
@@ -33,32 +34,29 @@
 
   const handleSortChange = (value: SortValue) => {
     store[props.page].filterState.sort = value
-    store[props.page].filterState.current = 1
+    store[props.page].modelListPathParams.current = 1
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
 
   const handleModelTypeChange = (type: string) => {
     const types = [...store[props.page].filterState.model_types]
-    const index = types.indexOf(type)
-    index === -1 ? types.push(type) : types.splice(index, 1)
-    store[props.page].filterState.current = 1
+    const index = types.indexOf(String(type))
+    index === -1 ? types.push(String(type)) : types.splice(index, 1)
+    store[props.page].modelListPathParams.current = 1
     store[props.page].filterState.model_types = types
-
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
 
   const handleBaseModelChange = (model: string) => {
     const models = [...store[props.page].filterState.base_models]
-    const modelIndex = models.indexOf(model)
-
+    const modelIndex = models.indexOf(String(model))
     if (modelIndex === -1) {
-      models.push(model)
+      models.push(String(model))
     } else {
       models.splice(modelIndex, 1)
     }
-
     store[props.page].filterState.base_models = models
     emit('fetchData')
     emit('update:showSortPopover', false)
@@ -66,23 +64,19 @@
 
   const getFilterData = async () => {
     try {
-      // 并行发起两个请求
       const [modelTypesResponse, baseModelResponse] = await Promise.all([
         model_types(),
         base_model_types()
       ])
 
-      // 处理 model types
       if (modelTypesResponse?.data) {
-        store.setModelTypes(props.page, modelTypesResponse.data as CommonModelType[])
+        store.setModelTypes(props.page as PageType, modelTypesResponse.data as CommonModelType[])
       }
 
-      // 处理 base model types
       if (baseModelResponse?.data) {
         store.setBaseModelTypes(props.page, baseModelResponse.data as CommonModelType[])
       }
 
-      // 验证数据是否正确设置
       console.log('Final store state:', {
         modelTypes: store[props.page].modelTypes,
         baseModelTypes: store[props.page].baseModelTypes
@@ -95,13 +89,8 @@
     }
   }
 
-  const getStoreRef = (path: string) => {
-    const parts = path.split('.')
-    let ref = store
-    for (const part of parts) {
-      ref = ref[part]
-    }
-    return ref
+  const getStoreRef = (path: PageType) => {
+    return store[path]
   }
 
   const handleSearch = () => {
@@ -112,7 +101,6 @@
   }
 
   onMounted(async () => {
-    // 确保页面状态已初始化
     if (!store[props.page]) {
       store.resetPageState(props.page)
     }
@@ -128,7 +116,7 @@
         v-debounce="handleSearch"
         placeholder="Filter by name"
         class="h-[44px] border border-[#9CA3AF] w-full bg-[#222] rounded-lg pr-8 pl-8"
-        @update:model-value="val => (store[props.page].filterState.keyword = val)"
+        @update:model-value="val => (store[props.page].filterState.keyword = String(val))"
       />
       <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
         <svg

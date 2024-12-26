@@ -10,7 +10,7 @@
   import type { Model, MineState } from '@/types/model'
 
   type TabType = 'posts' | 'forked'
-  type MineStateKey = keyof MineState
+
 
   const communityStore = useCommunityStore()
   const currentTab = ref<TabType>('posts')

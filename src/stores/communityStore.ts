@@ -1,20 +1,11 @@
 import { defineStore } from 'pinia'
 import {
   CommonModelType,
-  FilterState,
   Model,
-  ModelListPathParams,
-  ModelVersion as ModelVersionType
+  ModelListPathParams
 } from '@/types/model'
 
-interface PageState {
-  modelTypes: CommonModelType[]
-  baseModelTypes: CommonModelType[]
-  filterState: FilterState
-
-  modelListPathParams: ModelListPathParams
-  models: Model[]
-}
+import { PageType, PageState } from '@/types/model'
 
 export const useCommunityStore = defineStore('community', {
   state: () => ({
@@ -57,7 +48,6 @@ export const useCommunityStore = defineStore('community', {
         sort: 'Recently',
         model_types: ['workflow'],
         base_models: [],
-        is_official: true
       }
     } as PageState,
     workflows: {
@@ -125,24 +115,41 @@ export const useCommunityStore = defineStore('community', {
     }
   }),
   actions: {
-    setModelTypes(page: 'mainContent' | 'quickStart' | 'workflows', types: CommonModelType[]) {
+    setModelTypes(page: PageType, types: CommonModelType[]) {
       if (this[page]) {
         this[page].modelTypes = types
       }
     },
 
-    setBaseModelTypes(page: 'mainContent' | 'quickStart' | 'workflows', types: CommonModelType[]) {
+    setBaseModelTypes(page: PageType, types: CommonModelType[]) {
       if (this[page]) {
         this[page].baseModelTypes = types
       }
     },
 
-    resetPageState(page: 'mainContent' | 'quickStart' | 'workflows') {
-      if (this[page]) {
+    resetPageState(page: PageType) {
+      if (page === 'posts' || page === 'forked') {
+        this.mine[page] = {
+          modelTypes: [],
+          baseModelTypes: [],
+          models: [],
+          modelListPathParams: {
+            mode: page === 'posts' ? 'my' : 'my_fork',
+            current: 1,
+            page_size: 5,
+            total: 0
+          },
+          filterState: {
+            keyword: '',
+            model_types: [],
+            base_models: [],
+            sort: 'Recently'
+          }
+        }
+      } else if (this[page]) {
         this[page] = {
           modelTypes: [],
           baseModelTypes: [],
-          mode: 'publicity',
           models: [],
           modelListPathParams: {
             mode: 'my',

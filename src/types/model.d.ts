@@ -69,3 +69,14 @@ export interface MineState {
   }
 }
 
+export type PageType = 'mainContent' | 'quickStart' | 'workflows' | 'posts' | 'forked'
+
+export interface PageState {
+  modelTypes: CommonModelType[]
+  baseModelTypes: CommonModelType[]
+  filterState: FilterState
+
+  modelListPathParams: ModelListPathParams
+  models: Model[]
+}
+
