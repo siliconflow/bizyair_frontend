@@ -38,7 +38,7 @@ export const formatToWebp = (file: File): Promise<{ file: File; base64: string }
 
 
 export async function imageToOss(file: File) {
-  const { data } = await oss_upload_token(file.name)
+  const { data } = await oss_upload_token(file.name, 'Image')
   const client = new OSS({
     accessKeyId: data.file.access_key_id,
     accessKeySecret: data.file.access_key_secret,

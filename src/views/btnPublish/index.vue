@@ -23,7 +23,7 @@
       modelStoreObject.setDialogStatus(true)
     },
     'Workflow': () => {
-      
+      modelStoreObject.setDialogStatusWorkflow(true)
     },
   })
 

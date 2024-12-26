@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model:open="showDialog"
+    v-model:open="modelStoreObject.showWorkflowDialog"
     @onClose="onDialogClose"
     class="px-0 overflow-hidden pb-0 z-9000"
     layoutClass="z-9000"
@@ -21,6 +21,7 @@
       </v-item>
       <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
     </div>
+
     <vCustomAccordion :multiple="true" :activeIndex="acActiveIndex">
       <vCustomAccordionItem
         v-for="(e, i) in formData.versions"
@@ -71,7 +72,11 @@
               </v-select>
             </v-item>
             <v-item label="Upload Image">
-              <vUploadImage v-model.modelValue="e.cover" />{{ e.cover }}
+              <vUploadImage 
+                :previewPrc="e.cover"
+                :className="e.imageError ? 'border-red-500' : ''"
+                v-model.modelValue="e.cover" 
+                @done="imageUploadDone(i)" />
             </v-item>
             <v-item label="Introduction">
               <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />
@@ -91,9 +96,9 @@
               </div>
             </v-item>
             <v-item label="File" v-show="!e.showUpload">
-              <div class="flex h-28 items-center justify-end relative">
+              <div class="flex h-32 items-center justify-end relative">
                 <p v-if="e.progress && e.fileName" class="absolute top-2 left-1 text-xs">
-                  {{ e.fileName }}
+                  e.fileName{{ e.fileName }}
                 </p>
                 <div v-if="e.progress" class="flex-1">
                   <Progress :model-value="e.progress" class="mt-4 h-3" />
@@ -102,18 +107,22 @@
                     <span class="pl-2" v-if="e.speed">Speed: {{ e.speed }}</span>
                   </p>
                 </div>
-                <vUpload
-                  :parallel="1"
-                  :ref="e.ref"
-                  :chunkSize="1"
-                  :class="{ 'border-red-500': e.filePathError }"
-                  @path="path => handlePath(path, i)"
-                  @start="() => startUpload(i)"
-                  @success="data => successUpload(data, i)"
-                  @error="() => errorUpload(i)"
-                  @uploadInfo="data => handleUploadInfo(data, i)"
-                  @progress="p => fnProgress(p, i)"
-                />
+                <Button class="ml-2" v-if="e.hideUpload" @click="cancelFile">cancel</Button>
+                <div :class="{ 'w-full' : !e.progress }" v-if="!e.hideUpload">
+                  <Button v-if="!e.progress" class="w-full my-2" @click="loadWorkflow()">Load from current workspace</Button>
+                  <vUpload
+                    modelType="ComfyUI"
+                    :ref="e.ref"
+                    accept=".json"
+                    :class="{ 'border-red-500': e.filePathError }"
+                    @path="path => handlePath(path, i)"
+                    @start="() => startUpload(i)"
+                    @success="data => successUpload(data, i)"
+                    @error="() => errorUpload(i)"
+                    @uploadInfo="data => handleUploadInfo(data, i)"
+                    @progress="p => fnProgress(p, i)"
+                  />
+                </div>
               </div>
             </v-item>
           </div>
@@ -133,7 +142,7 @@
 </template>
 <script setup lang="ts">
   import { useToaster } from '@/components/modules/toats/index'
-  import { computed, ref, watch } from 'vue'
+  import { computed, inject, ref, watch } from 'vue'
   import { SelectItem } from '@/components/ui/select'
   import { Input } from '@/components/ui/input'
   import { Button } from '@/components/ui/button'
@@ -152,8 +161,10 @@
   import vUpload from '@/components/modules/vUpload/index.vue'
   import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import Markdown from '@/components/markdown/Index.vue'
+  import { uploadFile } from "@/components/modules/vUpload/virtualUpload"
 
-  const showDialog = ref(false)
+  const comfyUIApp: any = inject('comfyUIApp')
+  
   const modelStoreObject = modelStore()
   const modelBox = ref(true)
   const formData = ref({ ...modelStoreObject.modelDetail })
@@ -233,6 +244,10 @@
       addVersions()
     }
   }
+  function imageUploadDone(i: number) {
+    formData.value.versions[i].imageDone = true
+    formData.value.versions[i].imageError = false
+  }
   function verifyVersion() {
     const tempData = { ...formData.value }
     tempData.versions = tempData.versions || []
@@ -250,6 +265,12 @@
         acActiveIndex.value = i
         break
       }
+      if (!e.imageDone) {
+        e.imageError = true
+        useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
+        acActiveIndex.value = i
+        break
+      }
       if (!e.sign) {
         e.filePathError = true
         useToaster.error(`Please enter the file path for version ${i + 1}`)
@@ -257,7 +278,7 @@
         break
       }
     }
-    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
+    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign && e.imageDone)
   }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p
@@ -281,6 +302,34 @@
     data.speed && (formData.value.versions[i].speed = data.speed)
     data.fileName && (formData.value.versions[i].fileName = data.fileName)
   }
+  const cancelFile = () => {
+    formData.value.versions[0].progress = 0
+    formData.value.versions[0].fileName = ''
+    formData.value.versions[0].hideUpload = false
+    formData.value.versions[0].sign = ''
+    formData.value.versions[0].path = ''
+  }
+  const loadWorkflow = async () => {
+    // const tempData = { ...formData.value }
+    // formData.value.versions[0].progress = 100
+    // formData.value.versions[0].fileName = `${formData.value.name}-workflow.json`
+    // formData.value.versions[0].hideUpload = true
+    // app.graphToPrompt().then(e => {
+    //   console.log(e.workflow)
+    // })
+    const graph = await comfyUIApp.graphToPrompt()
+    console.log(JSON.stringify(graph.workflow))
+    const file = new File([JSON.stringify(graph.workflow)], `${formData.value.name}-workflow.json`, {
+      type: 'application/json'
+    })
+    uploadFile(file, 'Workflow', (sha256sum: string) => {
+      formData.value.versions[0].progress = 100
+      formData.value.versions[0].fileName = `${formData.value.name}-workflow.json`
+      formData.value.versions[0].hideUpload = true
+      formData.value.versions[0].sign = sha256sum
+      formData.value.versions[0].path = `${formData.value.name}-workflow.json`
+    })
+  }
   async function submit() {
     if (!verifyVersion()) {
       return
@@ -297,7 +346,12 @@
       delete e.versionError
       delete e.speed
       delete e.fileName
+      delete e.imageError
+      delete e.hideUpload
+      delete e.showUpload
+      delete e.imageDone
     })
+    tempData.type = 'Workflow'
     if (tempData.id) {
       await put_model(tempData)
     } else {
@@ -307,9 +361,10 @@
     onDialogClose()
   }
   const onDialogClose = () => {
-    modelStoreObject.setDialogStatus(false, 0)
+    modelStoreObject.setDialogStatusWorkflow(false, 0)
     modelStoreObject.clearModelDetail()
     modelBox.value = true
+    acActiveIndex.value = -1
     showLayoutLoading.value = false
     modelStoreObject.uploadModelDone()
   }

@@ -2,9 +2,9 @@ import OSS from 'ali-oss'
 import { calculateHash } from './computeHash'
 import { oss_sign } from '@/api/public'
 
-export async function creatClient(file: File | Blob) {
+export async function creatClient(file: File | Blob, type: string) {
   const { sha256sum, md5Hash } = await calculateHash(file)
-  let { data } = await oss_sign(sha256sum)
+  let { data } = await oss_sign(sha256sum, type)
   if (data.file.id) {
     return {
       sha256sum,

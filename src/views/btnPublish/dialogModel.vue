@@ -82,7 +82,11 @@
               </v-select>
             </v-item>
             <v-item label="Upload Image">
-              <vUploadImage v-model.modelValue="e.cover" />{{ e.cover }}
+              <vUploadImage 
+                :previewPrc="e.cover"
+                :className="e.imageError ? 'border-red-500' : ''"
+                v-model.modelValue="e.cover" 
+                @done="imageUploadDone(i)" />
             </v-item>
             <v-item label="Introduction">
               <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />
@@ -247,6 +251,10 @@
       addVersions()
     }
   }
+  function imageUploadDone(i: number) {
+    formData.value.versions[i].imageDone = true
+    formData.value.versions[i].imageError = false
+  }
   function verifyVersion() {
     const tempData = { ...formData.value }
     tempData.versions = tempData.versions || []
@@ -264,6 +272,12 @@
         acActiveIndex.value = i
         break
       }
+      if (!e.imageDone) {
+        e.imageError = true
+        useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
+        acActiveIndex.value = i
+        break
+      }
       if (!e.sign) {
         e.filePathError = true
         useToaster.error(`Please enter the file path for version ${i + 1}`)
@@ -271,7 +285,7 @@
         break
       }
     }
-    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
+    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign && e.imageDone)
   }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p
@@ -311,6 +325,8 @@
       delete e.versionError
       delete e.speed
       delete e.fileName
+      delete e.imageError
+      delete e.imageDone
     })
     if (tempData.id) {
       await put_model(tempData)
