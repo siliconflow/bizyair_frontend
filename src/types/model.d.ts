@@ -25,6 +25,7 @@ export interface ModelVersion {
   created_at: string
   file_name: string
   file_size:number
+  cover_image:string
   id:number
   public:boolean
   updated_at:string

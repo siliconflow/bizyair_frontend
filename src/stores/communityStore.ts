@@ -11,18 +11,9 @@ interface PageState {
   modelTypes: CommonModelType[]
   baseModelTypes: CommonModelType[]
   filterState: FilterState
-  mode: 'my' | 'my_fork' | 'publicity'
+
   modelListPathParams: ModelListPathParams
   models: Model[]
-}
-
-interface MineState {
-  posts: {
-    filterState: FilterState
-  }
-  forked: {
-    filterState: FilterState
-  }
 }
 
 export const useCommunityStore = defineStore('community', {
@@ -36,7 +27,7 @@ export const useCommunityStore = defineStore('community', {
     models: [] as Model[],
     mainContent: {
       modelListPathParams: {
-        mode: 'workflow',
+        mode: 'publicity',
         current: 1,
         page_size: 24,
         total: 0
@@ -48,14 +39,12 @@ export const useCommunityStore = defineStore('community', {
         keyword: '',
         sort: 'Recently',
         model_types: [],
-        base_models: [],
-        is_official: true
-      },
-      mode: 'publicity'
+        base_models: []
+      }
     } as PageState,
     quickStart: {
       modelListPathParams: {
-        mode: 'workflow',
+        mode: 'official',
         current: 1,
         page_size: 24,
         total: 0
@@ -66,15 +55,14 @@ export const useCommunityStore = defineStore('community', {
       filterState: {
         keyword: '',
         sort: 'Recently',
-        model_types: [],
+        model_types: ['workflow'],
         base_models: [],
         is_official: true
-      },
-      mode: 'publicity'
+      }
     } as PageState,
     workflows: {
       modelListPathParams: {
-        mode: 'workflow',
+        mode: 'publicity',
         current: 1,
         page_size: 24,
         total: 0
@@ -86,51 +74,69 @@ export const useCommunityStore = defineStore('community', {
         keyword: '',
         sort: 'Recently',
         model_types: [],
-        base_models: [],
-      },
-      mode: 'publicity'
+        base_models: []
+      }
     } as PageState,
-    modelListPathParams: {
-      mode: 'my',
-      current: 1,
-      page_size: 5,
-      total: 0
-    } as ModelListPathParams,
+
     mine: {
       posts: {
+        modelListPathParams: {
+          mode: 'my',
+          current: 1,
+          page_size: 24,
+          total: 0
+        } as ModelListPathParams,
+        models: [],
+        modelTypes: [],
+        baseModelTypes: [],
         filterState: {
           keyword: '',
+          sort: 'Recently',
           model_types: [],
           base_models: [],
-          sort: 'Recently'
+          is_official: true
         }
-      },
+      } as PageState,
       forked: {
+        modelListPathParams: {
+          mode: 'my_fork',
+          current: 1,
+          page_size: 24,
+          total: 0
+        } as ModelListPathParams,
+        models: [],
+        modelTypes: [],
+        baseModelTypes: [],
         filterState: {
           keyword: '',
+          sort: 'Recently',
           model_types: [],
           base_models: [],
-          sort: 'Recently'
+          is_official: true
         }
-      }
-    } as MineState
+      } as PageState
+    },
+
+    get posts() {
+      return this.mine.posts
+    },
+    get forked() {
+      return this.mine.forked
+    }
   }),
   actions: {
-    // 设置指定页面的 modelTypes
     setModelTypes(page: 'mainContent' | 'quickStart' | 'workflows', types: CommonModelType[]) {
       if (this[page]) {
         this[page].modelTypes = types
       }
     },
 
-    // 设置指定页面的 baseModelTypes
     setBaseModelTypes(page: 'mainContent' | 'quickStart' | 'workflows', types: CommonModelType[]) {
       if (this[page]) {
         this[page].baseModelTypes = types
       }
     },
 
-    // 重置指定页面的状态
     resetPageState(page: 'mainContent' | 'quickStart' | 'workflows') {
       if (this[page]) {
         this[page] = {

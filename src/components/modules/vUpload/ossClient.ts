@@ -4,7 +4,7 @@ import { oss_sign } from '@/api/public'
 
 export async function creatClient(file: File | Blob) {
   const { sha256sum, md5Hash } = await calculateHash(file)
-  let { data } = await oss_sign(sha256sum)
+  const { data } = await oss_sign(sha256sum)
   if (data.file.id) {
     return {
       sha256sum,

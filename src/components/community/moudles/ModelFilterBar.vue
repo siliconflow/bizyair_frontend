@@ -20,7 +20,7 @@
 
   interface Props {
     showSortPopover: boolean
-    page: 'mainContent' | 'quickStart' | 'workflows'
+    page: string
   }
 
   interface Emits {
@@ -33,6 +33,7 @@
 
   const handleSortChange = (value: SortValue) => {
     store[props.page].filterState.sort = value
+    store[props.page].filterState.current = 1
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
@@ -41,6 +42,7 @@
     const types = [...store[props.page].filterState.model_types]
     const index = types.indexOf(type)
     index === -1 ? types.push(type) : types.splice(index, 1)
+    store[props.page].filterState.current = 1
     store[props.page].filterState.model_types = types
 
     emit('fetchData')
@@ -93,8 +95,18 @@
     }
   }
 
+  const getStoreRef = (path: string) => {
+    const parts = path.split('.')
+    let ref = store
+    for (const part of parts) {
+      ref = ref[part]
+    }
+    return ref
+  }
+
   const handleSearch = () => {
-    console.log('aa', store[props.page].filterState.keyword)
+    const storeRef = getStoreRef(props.page)
+    console.log('aa', storeRef.filterState.keyword)
     emit('fetchData')
     emit('update:showSortPopover', false)
   }

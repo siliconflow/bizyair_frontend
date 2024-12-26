@@ -1,40 +1,20 @@
 <script setup lang="ts">
   defineOptions({
-    name: 'QuickStartContent'
+    name: 'WorkflowsContent'
   })
 
   import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-  import ModelFilterBar from './moudles/ModelFilterBar.vue'
+  import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
-  import type { Model } from '@/types/model'
 
   import { get_model_list } from '@/api/model'
-  import { useToaster } from '../modules/toats'
+  import { useToaster } from '@/components/modules/toats'
+  // import vImage from '@/components/modules/vImage.vue'
 
   const communityStore = useCommunityStore()
 
-  const generateMockData = (startId: number, count: number): Model[] => {
-    return Array.from({ length: count }, (_, index) => ({
-      id: startId + index,
-      title: `模型 ${startId + index}`,
-      baseModel: ['LORA', 'Checkpoint', 'TextualInversion', 'Hypernetwork'][
-        Math.floor(Math.random() * 4)
-      ],
-      imageUrl:
-        'https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/138318f4-f874-4889-b764-8a83388017f1/original=true,quality=90/00024-2386950927.jpeg',
-      stats: {
-        downloads: `${Math.floor(Math.random() * 100)}.${Math.floor(Math.random() * 9)}k`,
-        likes: `${Math.floor(Math.random() * 100)}.${Math.floor(Math.random() * 9)}k`,
-        rating: `${Math.floor(Math.random() * 15 + 85)}`, // 85-99
-        views: `${Math.floor(Math.random() * 50)}.${Math.floor(Math.random() * 9)}k`
-      }
-    }))
-  }
+  const SCROLL_THRESHOLD = 100
 
-  const ITEMS_PER_PAGE = communityStore.workflows.modelListPathParams.page_size
-  const SCROLL_THRESHOLD = 100 
-
-  const models = ref<Model[]>(generateMockData(1, ITEMS_PER_PAGE))
   const loading = ref(false)
   const hasMore = ref(true)
   const hasPrevious = ref(false)
@@ -132,7 +112,7 @@
     }
   }, 1000)
 
-  const fetchData = async () => {
+  const fetchData = async (resetScroll: boolean = false) => {
     loading.value = true
     try {
       const response = await get_model_list(
@@ -145,6 +125,18 @@
         communityStore.workflows.models = response.data.list || []
         hasMore.value = communityStore.workflows.models.length < response.data.total
         hasPrevious.value = communityStore.workflows.modelListPathParams.current > 1
+
+        if (resetScroll) {
+          nextTick(() => {
+            const container = document.querySelector('.scroll-container')
+            if (container) {
+              container.scrollTo({
+                top: 0,
+                behavior: 'auto'
+              })
+            }
+          })
+        }
       } else {
         communityStore.workflows.modelListPathParams.total = 0
         communityStore.workflows.models = []
@@ -227,19 +219,35 @@
       }
     }, 500)
   }
+
+  const imageLoadStates = ref<Map<number | string, boolean>>(new Map())
+
+  const handleImageLoad = (_event: Event, modelId: number | string) => {
+    imageLoadStates.value.set(modelId, true)
+  }
+
+  const handleImageError = (_event: Event, modelId: number | string) => {
+    imageLoadStates.value.set(modelId, false)
+  }
+  const imageLoaded = (modelId: number | string) => imageLoadStates.value.get(modelId) ?? false
 </script>
 
 <template>
   <div class="flex flex-col h-screen">
-    <div class="px-6 pt-6 pb-0">
+    <div class="px-6 pt-6 pb-0 sticky top-0 z-20 bg-[#121212]">
       <ModelFilterBar
         v-model:show-sort-popover="showSortPopover"
         page="workflows"
-        @fetch-data="fetchData"
+        @fetch-data="
+          () => {
+            communityStore.workflows.modelListPathParams.current = 1
+            fetchData(true)
+          }
+        "
       />
     </div>
 
-    <div class="flex-1 px-6">
+    <div class="flex-1 px-6 relative">
       <div class="scroll-container overflow-y-auto">
         <div v-if="hasPrevious" class="text-center py-4">
           <div v-if="isLoadingPrevious" class="text-white/60">加载历史数据...</div>
@@ -250,7 +258,7 @@
 
         <div class="playground-container">
           <div
-            v-for="model in models"
+            v-for="model in communityStore.workflows.models"
             :key="model.id"
             class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
           >
@@ -260,7 +268,7 @@
               <div
                 class="absolute left-3 top-3 min-w-[100px] h-[34px] flex items-center justify-center z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-4 rounded-[6px] [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]"
               >
-                {{ model.baseModel }}
+                {{ model.type }}
               </div>
               <div
                 class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
@@ -285,17 +293,49 @@
                 </svg>
               </div>
               <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden">
+                <div
+                  class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"
+                  :class="{ 'opacity-0': imageLoaded(model.id) }"
+                ></div>
+                <div class="w-full h-0 pb-[150%]"></div>
                 <img
-                  :src="model.imageUrl"
-                  :alt="model.title"
-                  class="w-full h-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+                  :src="model.versions?.[0]?.cover_image"
+                  :alt="model.versions?.[0]?.version || model.name"
+                  class="absolute inset-0 w-full h-full object-cover transition-all duration-300"
+                  :class="{
+                    'opacity-0': !imageLoaded(model.id),
+                    'opacity-100 group-hover:scale-105': imageLoaded(model.id)
+                  }"
+                  @load="e => handleImageLoad(e, model.id)"
+                  @error="e => handleImageError(e, model.id)"
                 />
+                <div
+                  v-if="!imageLoaded(model.id)"
+                  class="absolute inset-0 flex items-center justify-center"
+                >
+                  <svg class="w-8 h-8 text-white/30 animate-spin" viewBox="0 0 24 24">
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                      fill="none"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                </div>
               </div>
 
               <div
                 class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
               >
-                <h3 class="text-base text-white font-medium mb-2">{{ model.title }}</h3>
+                <h3 class="text-base text-white font-medium mb-2">{{ model.name }}</h3>
                 <div class="flex items-center space-x-3 text-white/90 text-xs">
                   <span class="flex items-center space-x-1">
                     <svg
@@ -313,7 +353,9 @@
                       />
                     </svg>
 
-                    <span class="opacity-80">{{ model.stats.downloads }}</span>
+                    <span class="opacity-80">{{
+                      model.versions?.[0]?.counter?.downloads || 0
+                    }}</span>
                   </span>
                   <span class="flex items-center space-x-1">
                     <svg
@@ -335,7 +377,9 @@
                         </clipPath>
                       </defs>
                     </svg>
-                    <span class="opacity-80">{{ model.stats.likes }}</span>
+                    <span class="opacity-80">{{
+                      model.versions?.[0]?.counter?.liked_count || 0
+                    }}</span>
                   </span>
                   <span class="flex items-center space-x-1">
                     <svg
@@ -352,7 +396,9 @@
                         stroke-linejoin="round"
                       />
                     </svg>
-                    <span class="opacity-80">{{ model.stats.rating }}</span>
+                    <span class="opacity-80">{{
+                      model.versions?.[0]?.counter?.forked_count || 0
+                    }}</span>
                   </span>
                   <span class="flex items-center space-x-1">
                     <svg
@@ -369,7 +415,9 @@
                         stroke-linejoin="round"
                       />
                     </svg>
-                    <span class="opacity-80">{{ model.stats.views }}</span>
+                    <span class="opacity-80">{{
+                      model.versions?.[0]?.counter?.liked_count || 0
+                    }}</span>
                   </span>
                 </div>
               </div>
@@ -416,6 +464,7 @@
     position: relative;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    -webkit-overflow-scrolling: touch;
   }
 
   .scroll-container::-webkit-scrollbar {
@@ -480,7 +529,6 @@
     }
   }
 
-  /* 添加返回顶部按钮的动画 */
   .fixed {
     animation: fadeIn 0.3s ease-in-out;
   }
@@ -495,5 +543,33 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  img {
+    transition:
+      opacity 0.3s ease-in-out,
+      transform 0.3s ease-in-out;
+  }
+
+  .opacity-0 {
+    opacity: 0;
+  }
+
+  .opacity-100 {
+    opacity: 1;
   }
 </style>

@@ -10,9 +10,13 @@
   import type { Model, MineState } from '@/types/model'
 
   type TabType = 'posts' | 'forked'
+  type MineStateKey = keyof MineState
 
   const communityStore = useCommunityStore()
   const currentTab = ref<TabType>('posts')
+  const loadingRef = ref<HTMLDivElement | null>(null)
+  let observer: IntersectionObserver | null = null
+  const showSortPopover = ref(false)
 
   // 生成测试数据的函数
   const generateMockData = (startId: number, count: number): Model[] => {
@@ -33,68 +37,37 @@
     }))
   }
 
-  const models = ref<Model[]>(generateMockData(1, 12))
-  const loading = ref(false)
-  const hasMore = ref(true)
-  const loadingRef = ref<HTMLDivElement | null>(null)
-  let observer: IntersectionObserver | null = null
-
-  // 加载更多数据
   const loadMore = async () => {
-    if (loading.value || !hasMore.value) return
+    const currentState = communityStore.mine[currentTab.value as keyof MineState]
+    if (currentState.modelListPathParams.current >= 100) return
 
-    loading.value = true
     try {
-      const currentState = communityStore.mine[currentTab.value as keyof MineState]
-      const params = {
-        keyword: currentState.filterState.keyword,
-        model_types: currentState.filterState.model_types,
-        base_models: currentState.filterState.base_models,
-        sort: currentState.filterState.sort,
-        page: Math.ceil(models.value.length / 12) + 1,
-        pageSize: 12
-      }
-
-      const newData = generateMockData(models.value.length + 1, 12)
-      models.value.push(...newData)
-
-      if (models.value.length >= 100) {
-        hasMore.value = false
-      }
+      const newData = generateMockData(currentState.models.length + 1, 12)
+      currentState.models.push(...newData)
+      currentState.modelListPathParams.current++
     } catch (error) {
       console.error('加载数据失败:', error)
-    } finally {
-      loading.value = false
     }
   }
 
   const fetchData = async () => {
-    loading.value = true
-    models.value = []
+    const currentState = communityStore.mine[currentTab.value as keyof MineState]
+    currentState.models = []
+    currentState.modelListPathParams.current = 1
 
     try {
-      const currentState =
-        currentTab.value === 'posts' ? communityStore.mine.posts : communityStore.mine.forked
-      const params = {
-        keyword: currentState.filterState.keyword,
-        model_types: currentState.filterState.model_types,
-        base_models: currentState.filterState.base_models,
-        sort: currentState.filterState.sort,
-        tab: currentTab.value,
-        page: 1,
-        pageSize: 12
-      }
-
-      models.value = generateMockData(1, 12)
-      hasMore.value = true
+      currentState.models = generateMockData(1, 12)
     } catch (error) {
       console.error('加载数据失败:', error)
-    } finally {
-      loading.value = false
     }
   }
 
-  // 监听标签页变化
+  const switchTab = (tab: TabType) => {
+    console.log('switchTab', tab)
+    currentTab.value = tab
+    fetchData()
+  }
+
   watch(currentTab, () => {
     fetchData()
   })
@@ -123,17 +96,15 @@
       observer.disconnect()
     }
   })
-
-  const showSortPopover = ref(false)
 </script>
 
 <template>
   <div class="p-6 min-h-screen">
-    <MineTabs v-model="currentTab">
+    <MineTabs v-model="currentTab" @update:model-value="switchTab">
       <template #posts>
         <ModelFilterBar
           :show-sort-popover="showSortPopover"
-          page="mine.posts"
+          page="posts"
           @update:show-sort-popover="showSortPopover = $event"
         />
         <div class="flex justify-between items-center mb-4">
@@ -148,7 +119,7 @@
         </div>
         <div class="playground-container">
           <div
-            v-for="model in models"
+            v-for="model in communityStore.mine.posts.models"
             :key="model.id"
             class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
           >
@@ -196,12 +167,17 @@
       <template #forked>
         <ModelFilterBar
           :show-sort-popover="showSortPopover"
-          page="mine.forked"
+          page="forked"
           @update:show-sort-popover="showSortPopover = $event"
         />
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center">
+            <div class="text-white text-base font-medium">My Forked</div>
+          </div>
+        </div>
         <div class="playground-container">
           <div
-            v-for="model in models"
+            v-for="model in communityStore.mine.forked.models"
             :key="model.id"
             class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
           >
@@ -248,9 +224,10 @@
     </MineTabs>
     <!-- 加载更多指示器 -->
     <div ref="loadingRef" class="py-4 text-center">
-      <div v-if="loading" class="text-white/60">加载中...</div>
-      <div v-else-if="!hasMore" class="text-white/60">没有更多数据了</div>
-      <div v-else class="h-4"></div>
+      <!-- <div v-if="communityStore.mine[currentTab.value].modelListPathParams.current >= 100" class="text-white/60">
+        没有更多数据了
+      </div>
+      <div v-else class="h-4"></div> -->
     </div>
   </div>
 </template>
