@@ -11,7 +11,7 @@ export async function creatClient(file: File | Blob, type: string) {
       fileId: data.file.id
     }
   }
-  
+
   const accessKeyId = data.file.access_key_id
   const accessKeySecret = data.file.access_key_secret
   const bucket = data.storage.bucket

@@ -27,7 +27,9 @@
           v-model:model-value="formData.type"
           placeholder="Select Model Type"
         >
-          <SelectItem v-for="(e, i) in modelStoreObject.typeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
+          <SelectItem v-for="(e, i) in modelStoreObject.typeLis" :key="i" :value="e.value">{{
+            e.label
+          }}</SelectItem>
         </v-select>
       </v-item>
       <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
@@ -76,9 +78,12 @@
                 v-model:model-value="e.base_model"
                 placeholder="Select Base Model"
               >
-                <SelectItem v-for="(e, i) in modelStoreObject.baseTypeLis" :key="i" :value="e.value">{{
-                  e.label
-                }}</SelectItem>
+                <SelectItem
+                  v-for="(e, i) in modelStoreObject.baseTypeLis"
+                  :key="i"
+                  :value="e.value"
+                  >{{ e.label }}</SelectItem
+                >
               </v-select>
             </v-item>
             <v-item label="Upload Image">
