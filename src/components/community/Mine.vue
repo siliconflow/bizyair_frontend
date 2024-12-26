@@ -11,7 +11,6 @@
 
   type TabType = 'posts' | 'forked'
 
-
   const communityStore = useCommunityStore()
   const currentTab = ref<TabType>('posts')
   const loadingRef = ref<HTMLDivElement | null>(null)

@@ -46,7 +46,7 @@ export const useCommunityStore = defineStore('community', {
       filterState: {
         keyword: '',
         sort: 'Recently',
-        model_types: ['workflow'],
+        model_types: ['Workflow'],
         base_models: [],
       }
     } as PageState,
@@ -63,7 +63,7 @@ export const useCommunityStore = defineStore('community', {
       filterState: {
         keyword: '',
         sort: 'Recently',
-        model_types: [],
+        model_types: ['Workflow'],
         base_models: []
       }
     } as PageState,

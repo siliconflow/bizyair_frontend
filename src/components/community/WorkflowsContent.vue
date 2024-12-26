@@ -3,11 +3,11 @@
     name: 'WorkflowsContent'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, inject } from 'vue'
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
 
-  import { get_model_list } from '@/api/model'
+  import { get_model_list, get_workflow_json } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   // import vImage from '@/components/modules/vImage.vue'
 
@@ -230,6 +230,20 @@
     imageLoadStates.value.set(modelId, false)
   }
   const imageLoaded = (modelId: number | string) => imageLoadStates.value.get(modelId) ?? false
+
+  const handleLoadWorkflow = async (versions: any) => {
+    if (!versions || versions.length === 0){
+      useToaster.error('No workflow found')
+      return
+    }
+    const workflow = await get_workflow_json(versions[0].id, versions[0].sign)
+    const comfyUIApp: any = inject('comfyUIApp')
+    if(workflow && comfyUIApp && comfyUIApp.graph){
+      comfyUIApp.graph.clear()
+      await comfyUIApp.loadGraphData(workflow)
+    }
+    communityStore.showDialog = false
+  }
 </script>
 
 <template>
@@ -280,6 +294,7 @@
                   viewBox="0 0 24 24"
                   fill="none"
                   class="drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] hover:scale-110 transition-transform duration-200 cursor-pointer"
+                  @click="handleLoadWorkflow(model.versions)"
                 >
                   <path
                     d="M5 3L19 12L5 21V3Z"

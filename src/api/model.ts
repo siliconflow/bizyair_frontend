@@ -124,3 +124,16 @@ export const commit_file = (data: any) =>
     method: 'POST',
     body: JSON.stringify(data)
   })
+
+export const get_workflow_dowload_url= (model_version_id:any,sign:any) =>
+  customFetch(`/bizyair/community/models/versions/${model_version_id}/workflow_json/${sign}`, {
+    method: 'GET'
+  })
+
+export const get_workflow_json = async (model_version_id: any, sign: any) => {
+  const res = await get_workflow_dowload_url(model_version_id, sign)
+  const url = res.data.url
+  const response = await fetch(url)
+  const json = await response.json()
+  return json
+}
