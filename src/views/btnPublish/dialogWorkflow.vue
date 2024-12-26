@@ -270,7 +270,7 @@
         acActiveIndex.value = i
         break
       }
-      if (!e.imageDone) {
+      if (e.cover && !e.imageDone) {
         e.imageError = true
         useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
         acActiveIndex.value = i
@@ -283,7 +283,7 @@
         break
       }
     }
-    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign && e.imageDone)
+    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
   }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p
@@ -344,6 +344,7 @@
       showLayoutLoading.value = false
     }, 5000)
     const tempData = { ...formData.value }
+    delete tempData.nameError
     tempData.versions.forEach((e: any) => {
       delete e.baseModelError
       delete e.filePath
