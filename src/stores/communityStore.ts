@@ -30,7 +30,8 @@ export const useCommunityStore = defineStore('community', {
         keyword: '',
         sort: 'Recently',
         model_types: [],
-        base_models: []
+        base_models: [],
+        selected_model_types: []
       }
     } as PageState,
     quickStart: {
@@ -48,6 +49,7 @@ export const useCommunityStore = defineStore('community', {
         sort: 'Recently',
         model_types: ['Workflow'],
         base_models: [],
+        selected_model_types: []
       }
     } as PageState,
     workflows: {
@@ -64,7 +66,8 @@ export const useCommunityStore = defineStore('community', {
         keyword: '',
         sort: 'Recently',
         model_types: ['Workflow'],
-        base_models: []
+        base_models: [],
+        selected_model_types: []
       }
     } as PageState,
 
@@ -84,7 +87,7 @@ export const useCommunityStore = defineStore('community', {
           sort: 'Recently',
           model_types: [],
           base_models: [],
-          is_official: true
+          selected_model_types: []
         }
       } as PageState,
       forked: {
@@ -102,7 +105,7 @@ export const useCommunityStore = defineStore('community', {
           sort: 'Recently',
           model_types: [],
           base_models: [],
-          is_official: true
+          selected_model_types: []
         }
       } as PageState
     },
@@ -143,6 +146,7 @@ export const useCommunityStore = defineStore('community', {
             keyword: '',
             model_types: [],
             base_models: [],
+            selected_model_types: [],
             sort: 'Recently'
           }
         }
@@ -161,6 +165,7 @@ export const useCommunityStore = defineStore('community', {
             keyword: '',
             model_types: [],
             base_models: [],
+            selected_model_types: [],
             sort: 'Recently'
           }
         }

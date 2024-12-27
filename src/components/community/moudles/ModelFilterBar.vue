@@ -45,6 +45,7 @@
     index === -1 ? types.push(String(type)) : types.splice(index, 1)
     store[props.page].modelListPathParams.current = 1
     store[props.page].filterState.model_types = types
+    store[props.page].filterState.selected_model_types = types
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
@@ -71,6 +72,13 @@
 
       if (modelTypesResponse?.data) {
         store.setModelTypes(props.page as PageType, modelTypesResponse.data as CommonModelType[])
+        if(props.page === 'mainContent'){
+            if(store[props.page].filterState.selected_model_types.length === 0){
+              if (Array.isArray(store[props.page].modelTypes)) {
+                store[props.page].filterState.model_types = store[props.page].modelTypes.map(type => type.value)
+              } 
+          }
+        }
       }
 
       if (baseModelResponse?.data) {
@@ -99,7 +107,6 @@
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
-
   onMounted(async () => {
     if (!store[props.page]) {
       store.resetPageState(props.page)
@@ -256,7 +263,7 @@
                     variant="secondary"
                     :class="[
                       'cursor-pointer transition-colors duration-200',
-                      store[props.page].filterState.model_types.includes(type.value)
+                      store[props.page].filterState.selected_model_types.includes(type.value)
                         ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
                         : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"

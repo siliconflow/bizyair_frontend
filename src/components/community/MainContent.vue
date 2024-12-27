@@ -119,7 +119,7 @@
         communityStore.mainContent.modelListPathParams,
         communityStore.mainContent.filterState
       )
-
+    
       if (response?.data) {
         communityStore.mainContent.modelListPathParams.total = response.data.total || 0
         communityStore.mainContent.models = response.data.list || []
@@ -299,7 +299,7 @@
                 ></div>
                 <div class="w-full h-0 pb-[150%]"></div>
                 <img
-                  :src="model.versions?.[0]?.cover_image"
+                  :src="model.versions?.[0]?.cover_urls"
                   :alt="model.versions?.[0]?.version || model.name"
                   class="absolute inset-0 w-full h-full object-cover transition-all duration-300"
                   :class="{
