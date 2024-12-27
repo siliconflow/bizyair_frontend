@@ -353,7 +353,7 @@
       delete e.speed
       delete e.fileName
       delete e.imageError
-      delete e.hideUpload
+      // delete e.hideUpload
       delete e.showUpload
       delete e.imageDone
     })
@@ -363,7 +363,7 @@
     } else {
       await create_models(tempData)
     }
-    useToaster.success('Model published successfully')
+    useToaster.success('published successfully')
     onDialogClose()
   }
   const onDialogClose = () => {

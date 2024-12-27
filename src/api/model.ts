@@ -129,11 +129,3 @@ export const get_workflow_dowload_url= (model_version_id:any,sign:any) =>
   customFetch(`/bizyair/community/models/versions/${model_version_id}/workflow_json/${sign}`, {
     method: 'GET'
   })
-
-export const get_workflow_json = async (model_version_id: any, sign: any) => {
-  const res = await get_workflow_dowload_url(model_version_id, sign)
-
-  const response = await fetch(res.data)
-  const json = await response.json()
-  return json
-}
