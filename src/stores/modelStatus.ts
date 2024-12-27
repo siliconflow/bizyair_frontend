@@ -26,7 +26,7 @@ interface ModelVersion {
   speed?: string
   fileName?: string
   ref?: string
-  cover?: string
+  cover_urls?: string
   hideUpload?: boolean
   imageDone?: boolean
   imageError?: boolean
@@ -73,6 +73,7 @@ export const modelStore = defineStore('modelStore', {
       keyword: '',
       model_types: [],
       base_models: [],
+      selected_model_types: [],
       sort: 'Recently'
     } as FilterState,
     typeLis: [{ value: '', label: '' }],
@@ -147,6 +148,7 @@ export const modelStore = defineStore('modelStore', {
         keyword: '',
         model_types: [],
         base_models: [],
+        selected_model_types: [],
         sort: 'Recently'
       }
     },

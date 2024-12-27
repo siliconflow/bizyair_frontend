@@ -1,7 +1,7 @@
 <template>
   <div
     class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3"
-    @click="showDialog = true"
+    @click="handleMenuClick"
   >
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
@@ -14,7 +14,7 @@
     <span class="block leading h-full leading-8 text-sm">Community</span>
   </div>
   <v-dialog
-    v-model:open="showDialog"
+    v-model:open="communityStore.showDialog"
     class="px-0 overflow-hidden pb-0 z-9000 max-w-[90%] bg-[#353535]"
     layout-class="z-9000"
     content-class=" max-h-[80vh]   w-full rounded-tl-lg rounded-tr-lg custom-shadow"
@@ -23,9 +23,16 @@
   </v-dialog>
 </template>
 <script setup lang="ts">
-  import { ref } from 'vue'
   import vDialog from '@/components/modules/vDialog.vue'
   import Community from '@/components/community/Index.vue'
-  const showDialog = ref(false)
+  import {useCommunityStore} from '@/stores/communityStore'   
+  const communityStore = useCommunityStore()
+  
+  const handleMenuClick = () => {
+    communityStore.showDialog= true
+  }
+
+
 </script>
 <style scoped></style>
+

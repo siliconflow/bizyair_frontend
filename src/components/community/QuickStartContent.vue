@@ -9,6 +9,7 @@
 
   import { get_model_list, get_workflow_dowload_url } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
+  import { Model } from '@/types/model'
   // import vImage from '@/components/modules/vImage.vue'
   const comfyUIApp: any = inject('comfyUIApp')
   const communityStore = useCommunityStore()
@@ -245,6 +246,14 @@
     }
     communityStore.showDialog = false
   }
+
+  const showCommunityDetail = ref(false)
+  const currentModel = ref<Model>()
+
+  const handleCommunityDetail = (model: Model) => {
+    currentModel.value = model
+    showCommunityDetail.value = true
+  }
 </script>
 
 <template>
@@ -265,12 +274,11 @@
     <div class="flex-1 px-6 relative">
       <div class="scroll-container overflow-y-auto">
         <div v-if="hasPrevious" class="text-center py-4">
-          <div v-if="isLoadingPrevious" class="text-white/60">加载历史数据...</div>
+          <div v-if="isLoadingPrevious" class="text-white/60">Loading historical data...</div>
           <div v-else class="text-white/60 cursor-pointer hover:text-white" @click="loadPrevious">
-            ↑ 加载更早的内容
+            ↑ Load earlier content
           </div>
         </div>
-
         <div class="playground-container">
           <div
             v-for="model in communityStore.quickStart.models"
@@ -308,7 +316,7 @@
                   />
                 </svg>
               </div>
-              <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden">
+              <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden" @click="handleCommunityDetail(model)">
                 <div
                   class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"
                   :class="{ 'opacity-0': imageLoaded(model.id) }"
@@ -442,8 +450,8 @@
         </div>
 
         <div ref="loadingRef" class="py-4 text-center mt-8">
-          <div v-if="loading" class="text-white/60">加载中...</div>
-          <div v-else-if="!hasMore" class="text-white/60">没有更多数据了</div>
+          <div v-if="loading" class="text-white/60">loading...</div>
+          <div v-else-if="!hasMore" class="text-white/60">No more data</div>
           <div v-else class="h-8"></div>
         </div>
       </div>
@@ -470,6 +478,17 @@
         </svg>
       </div>
     </div>
+
+    <v-dialog
+      v-if="currentModel && currentModel?.versions?.[0] && showCommunityDetail"
+      v-model:open="showCommunityDetail"
+      class="px-6 overflow-hidden pb-6 z-10000 max-w-[90%] bg-[#353535]"
+      layout-class="z-10000"
+      content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+      :title="currentModel?.name"
+    >
+      <ModelDetail :model-id="currentModel?.id" :version="currentModel?.versions?.[0]" mode="publicity" />
+    </v-dialog>
   </div>
 </template>
 

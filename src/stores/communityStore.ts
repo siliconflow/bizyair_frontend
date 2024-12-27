@@ -149,6 +149,7 @@ export const useCommunityStore = defineStore('community', {
             selected_model_types: [],
             sort: 'Recently'
           }
+          
         }
       } else if (this[page]) {
         this[page] = {

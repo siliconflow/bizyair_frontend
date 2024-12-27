@@ -9,6 +9,9 @@
 
   import { get_model_list } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
+  import { Model } from '@/types/model'
+  import vDialog from '@/components/modules/vDialog.vue'
+  import  ModelDetail  from '@/components/community/detail/Index.vue'
   // import vImage from '@/components/modules/vImage.vue'
 
   const communityStore = useCommunityStore()
@@ -19,6 +22,8 @@
   const hasMore = ref(true)
   const hasPrevious = ref(false)
   const isLoadingPrevious = ref(false)
+
+  const filterDataReady = ref(false)
 
   const loadMore = async () => {
     if (loading.value || !hasMore.value) return
@@ -113,6 +118,16 @@
   }, 1000)
 
   const fetchData = async (resetScroll: boolean = false) => {
+    if (!filterDataReady.value) {
+      loading.value = true
+      try {
+        await nextTick()
+        await new Promise(resolve => setTimeout(resolve, 100))
+      } catch (error) {
+        console.error('等待filter数据时出错:', error)
+      }
+    }
+
     loading.value = true
     try {
       const response = await get_model_list(
@@ -157,8 +172,10 @@
   const loadingRef = ref<HTMLDivElement | null>(null)
   let observer: IntersectionObserver | null = null
 
-  onMounted(() => {
-    fetchData()
+  
+
+  onMounted(async () => {
+    await fetchData()
     observer = new IntersectionObserver(
       throttle((entries: IntersectionObserverEntry[]) => {
         if (entries[0].isIntersecting) {
@@ -230,6 +247,16 @@
     imageLoadStates.value.set(modelId, false)
   }
   const imageLoaded = (modelId: number | string) => imageLoadStates.value.get(modelId) ?? false
+
+  const showCommunityDetail = ref(false)
+
+  const currentModel = ref<Model>()
+  
+
+  const handleCommunityDetail = (model: Model) => {
+    currentModel.value = model
+    showCommunityDetail.value = true
+  }
 </script>
 
 <template>
@@ -238,6 +265,7 @@
       <ModelFilterBar
         v-model:show-sort-popover="showSortPopover"
         page="mainContent"
+        @filter-data-ready="filterDataReady = true"
         @fetch-data="
           () => {
             communityStore.mainContent.modelListPathParams.current = 1
@@ -250,9 +278,9 @@
     <div class="flex-1 px-6 relative">
       <div class="scroll-container overflow-y-auto">
         <div v-if="hasPrevious" class="text-center py-4">
-          <div v-if="isLoadingPrevious" class="text-white/60">加载历史数据...</div>
+          <div v-if="isLoadingPrevious" class="text-white/60">Loading historical data...</div>
           <div v-else class="text-white/60 cursor-pointer hover:text-white" @click="loadPrevious">
-            ↑ 加载更早的内容
+            ↑ Load earlier content
           </div>
         </div>
 
@@ -273,7 +301,7 @@
               <div
                 class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
               >
-                <svg
+                <!-- <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -290,12 +318,13 @@
                     class="group-hover:stroke-[#7C3AEDCC] transition-colors duration-200"
                     filter="drop-shadow(0 1px 2px rgb(0 0 0 / 0.5))"
                   />
-                </svg>
+                </svg> -->
               </div>
-              <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden">
+              <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"  @click="handleCommunityDetail(model)">
                 <div
                   class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"
                   :class="{ 'opacity-0': imageLoaded(model.id) }"
+                 
                 ></div>
                 <div class="w-full h-0 pb-[150%]"></div>
                 <img
@@ -306,6 +335,7 @@
                     'opacity-0': !imageLoaded(model.id),
                     'opacity-100 group-hover:scale-105': imageLoaded(model.id)
                   }"
+                
                   @load="e => handleImageLoad(e, model.id)"
                   @error="e => handleImageError(e, model.id)"
                 />
@@ -426,8 +456,8 @@
         </div>
 
         <div ref="loadingRef" class="py-4 text-center mt-8">
-          <div v-if="loading" class="text-white/60">加载中...</div>
-          <div v-else-if="!hasMore" class="text-white/60">没有更多数据了</div>
+          <div v-if="loading" class="text-white/60">loading...</div>
+          <div v-else-if="!hasMore" class="text-white/60">No more data</div>
           <div v-else class="h-8"></div>
         </div>
       </div>
@@ -455,6 +485,16 @@
       </div>
     </div>
   </div>
+  <v-dialog
+    v-if="currentModel && currentModel?.versions?.[0] && showCommunityDetail"
+    v-model:open="showCommunityDetail"
+    class="px-6 overflow-hidden pb-6 z-10000 max-w-[90%]   bg-[#353535]"
+    layout-class="z-10000"
+    content-class="custom-scrollbar max-h-[80vh]  overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+    :title="currentModel?.name"
+  >
+    <ModelDetail  :model-id="currentModel?.id" :version="currentModel?.versions?.[0]" mode="publicity" />
+  </v-dialog>
 </template>
 
 <style scoped>
