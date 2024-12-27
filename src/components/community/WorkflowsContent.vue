@@ -7,9 +7,10 @@
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
 
-  import { get_model_list, get_workflow_json } from '@/api/model'
+  import { get_model_list, get_workflow_dowload_url } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   // import vImage from '@/components/modules/vImage.vue'
+  const comfyUIApp: any = inject('comfyUIApp')
 
   const communityStore = useCommunityStore()
 
@@ -236,11 +237,12 @@
       useToaster.error('No workflow found')
       return
     }
-    const workflow = await get_workflow_json(versions[0].id, versions[0].sign)
-    const comfyUIApp: any = inject('comfyUIApp')
-    if(workflow && comfyUIApp && comfyUIApp.graph){
+    
+    const workflow = await get_workflow_dowload_url(versions[0].id, versions[0].sign)
+    
+    if(workflow.data && comfyUIApp && comfyUIApp.graph){
       comfyUIApp.graph.clear()
-      await comfyUIApp.loadGraphData(workflow)
+      await comfyUIApp.loadGraphData(JSON.stringify(workflow.data))
     }
     communityStore.showDialog = false
   }
