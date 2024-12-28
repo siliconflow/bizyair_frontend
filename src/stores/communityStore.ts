@@ -11,6 +11,7 @@ export const useCommunityStore = defineStore('community', {
   state: () => ({
     isLoading: false,
     showDialog: false,
+    showCommunityDetail: false,
     reloadModelSelectList: false,
     closeModelSelectDialog: false,
     closeModelDetailDialog: false,

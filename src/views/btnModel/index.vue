@@ -96,7 +96,7 @@
               </v-select>
             </v-item>
             <v-item label="Upload Image">
-              <vUploadImage v-model.modelValue="e.cover" />{{ e.cover }}
+              <vUploadImage v-model.modelValue="e.cover_urls" />{{ e.cover_urls }}
             </v-item>
             <v-item label="Introduction">
               <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />

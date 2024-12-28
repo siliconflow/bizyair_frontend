@@ -40,12 +40,12 @@
     emit('update:showSortPopover', false)
   }
 
-  const handleModelTypeChange = (type: string) => {
+  const handleModelTypeChange = async (type: string) => {
     const types = [...store[props.page].filterState.selected_model_types]
     const index = types.indexOf(String(type))
     index === -1 ? types.push(String(type)) : types.splice(index, 1)
     store[props.page].modelListPathParams.current = 1
-    if(props.page === 'mainContent' && store[props.page].filterState.selected_model_types.length === 0){
+    if(props.page === 'mainContent' &&  types.length === 0){
       store[props.page].filterState.model_types = store[props.page].modelTypes.map(type => type.value)
     }
     else{
@@ -53,7 +53,6 @@
     }
     store[props.page].filterState.selected_model_types = types
     
-    console.log('store[props.page].filterState',store[props.page].filterState)
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
@@ -85,7 +84,7 @@
               if (Array.isArray(store[props.page].modelTypes)) {
                 store[props.page].filterState.model_types = store[props.page].modelTypes.map(type => type.value)
               } 
-          }
+            }
         }
         if(props.page === 'posts' || props.page === 'forked'){
           const hasWorkflow = store[props.page].modelTypes.some(type => type.value === 'Workflow')
@@ -100,11 +99,6 @@
       }
 
       emit('filterDataReady')
-
-      console.log('Final store state:', {
-        modelTypes: store[props.page].modelTypes,
-        baseModelTypes: store[props.page].baseModelTypes
-      })
     } catch (error) {
       console.error('Error in getFilterData:', error)
       useToaster.error(`Failed to fetch model types: ${error}`)

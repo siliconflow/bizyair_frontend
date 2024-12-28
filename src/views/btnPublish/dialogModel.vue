@@ -88,9 +88,9 @@
             </v-item>
             <v-item label="Upload Image">
               <vUploadImage 
-                :previewPrc="e.cover"
+                :previewPrc="e.cover_urls"
                 :className="e.imageError ? 'border-red-500' : ''"
-                v-model.modelValue="e.cover" 
+                v-model.modelValue="e.cover_urls" 
                 @done="imageUploadDone(i)" />
             </v-item>
             <v-item label="Introduction">

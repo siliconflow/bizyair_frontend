@@ -34,7 +34,7 @@
         communityStore.workflows.filterState
       )
 
-      if (response?.data) {
+      if (response?.data?.list) {
         communityStore.workflows.models = [
           ...communityStore.workflows.models,
           ...response.data.list
@@ -42,8 +42,11 @@
         communityStore.workflows.modelListPathParams.total = response.data.total
         hasMore.value = communityStore.workflows.models.length < response.data.total
       }
+      else{
+        hasMore.value=false
+      }
     } catch (error) {
-      console.error('加载数据失败:', error)
+      console.error('fetch data error:', error)
       useToaster.error(`Failed to load more data: ${error}`)
     } finally {
       loading.value = false
@@ -70,7 +73,7 @@
         communityStore.workflows.filterState
       )
 
-      if (response?.data) {
+      if (response?.data?.list) {
         communityStore.workflows.models = [
           ...response.data.list,
           ...communityStore.workflows.models
@@ -239,12 +242,12 @@
     }
     
     const workflow = await get_workflow_dowload_url(versions[0].id, versions[0].sign)
-    
+    communityStore.showDialog = false
     if(workflow.data && comfyUIApp && comfyUIApp.graph){
       comfyUIApp.graph.clear()
-      await comfyUIApp.loadGraphData(JSON.stringify(workflow.data))
+      await comfyUIApp.loadGraphData(workflow.data)
     }
-    communityStore.showDialog = false
+   
   }
 
   import vDialog from '@/components/modules/vDialog.vue'
@@ -253,16 +256,22 @@
 
   const showCommunityDetail = ref(false)
   const currentModel = ref<Model>()
+  const dialogLoading = ref(true)
 
   const handleCommunityDetail = (model: Model) => {
+    dialogLoading.value = true
     currentModel.value = model
     showCommunityDetail.value = true
+  }
+
+  const handleLoaded = () => {
+    dialogLoading.value = false
   }
 </script>
 
 <template>
   <div class="flex flex-col h-screen">
-    <div class="px-6 pt-6 pb-0 sticky top-0 z-20 bg-[#121212]">
+    <div class="px-6 pt-6 pb-0 sticky top-0 z-20 ">
       <ModelFilterBar
         v-model:show-sort-popover="showSortPopover"
         page="workflows"
@@ -407,10 +416,10 @@
                       </defs>
                     </svg>
                     <span class="opacity-80">{{
-                      model.versions?.[0]?.counter?.liked_count || 0
+                      model.versions?.[0]?.counter?.forked_count || 0
                     }}</span>
                   </span>
-                  <span class="flex items-center space-x-1">
+                  <!-- <span class="flex items-center space-x-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="15"
@@ -428,7 +437,7 @@
                     <span class="opacity-80">{{
                       model.versions?.[0]?.counter?.forked_count || 0
                     }}</span>
-                  </span>
+                  </span> -->
                   <span class="flex items-center space-x-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -485,14 +494,24 @@
     </div>
 
     <v-dialog
-      v-if="currentModel && currentModel?.versions?.[0] && showCommunityDetail"
+      v-if="currentModel && currentModel?.versions?.[0]"
       v-model:open="showCommunityDetail"
       class="px-6 overflow-hidden pb-6 z-10000 max-w-[90%] bg-[#353535]"
       layout-class="z-10000"
       content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
       :title="currentModel?.name"
     >
-      <ModelDetail :model-id="currentModel?.id" :version="currentModel?.versions?.[0]" mode="publicity" />
+      <div v-show="!dialogLoading">
+        <ModelDetail 
+          :model-id="currentModel?.id" 
+          :version="currentModel?.versions?.[0]" 
+          mode="publicity"
+          @loaded="handleLoaded" 
+        />
+      </div>
+      <div v-show="dialogLoading" class="flex justify-center items-center min-h-[300px]">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+      </div>
     </v-dialog>
   </div>
 </template>
@@ -531,6 +550,7 @@
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 12px;
     padding-right: 12px;
+    padding-bottom: 20px;
   }
 
   @media screen and (max-width: 767px) {

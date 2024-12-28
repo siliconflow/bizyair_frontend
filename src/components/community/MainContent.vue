@@ -38,13 +38,16 @@
         communityStore.mainContent.filterState
       )
 
-      if (response?.data) {
+      if (response?.data?.list) {
         communityStore.mainContent.models = [
           ...communityStore.mainContent.models,
           ...response.data.list
         ]
         communityStore.mainContent.modelListPathParams.total = response.data.total
         hasMore.value = communityStore.mainContent.models.length < response.data.total
+      }
+      else{
+        hasMore.value = false
       }
     } catch (error) {
       console.error('加载数据失败:', error)
@@ -74,7 +77,7 @@
         communityStore.mainContent.filterState
       )
 
-      if (response?.data) {
+      if (response?.data?.list) {
         communityStore.mainContent.models = [
           ...response.data.list,
           ...communityStore.mainContent.models
@@ -124,7 +127,7 @@
         await nextTick()
         await new Promise(resolve => setTimeout(resolve, 100))
       } catch (error) {
-        console.error('等待filter数据时出错:', error)
+        console.error('fetch data error:', error)
       }
     }
 
@@ -135,7 +138,7 @@
         communityStore.mainContent.filterState
       )
     
-      if (response?.data) {
+      if (response?.data?.list) {
         communityStore.mainContent.modelListPathParams.total = response.data.total || 0
         communityStore.mainContent.models = response.data.list || []
         hasMore.value = communityStore.mainContent.models.length < response.data.total
@@ -253,15 +256,22 @@
   const currentModel = ref<Model>()
   
 
+  const dialogLoading = ref(true)
+
   const handleCommunityDetail = (model: Model) => {
+    dialogLoading.value = true
     currentModel.value = model
     showCommunityDetail.value = true
+  }
+
+  const handleLoaded = () => {
+    dialogLoading.value = false
   }
 </script>
 
 <template>
   <div class="flex flex-col h-screen">
-    <div class="px-6 pt-6 pb-0 sticky top-0 z-20 bg-[#121212]">
+    <div class="px-6 pt-6 pb-0 sticky top-0 z-20 ">
       <ModelFilterBar
         v-model:show-sort-popover="showSortPopover"
         page="mainContent"
@@ -388,6 +398,15 @@
                     }}</span>
                   </span>
                   <span class="flex items-center space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M3.33325 2L12.6666 8L3.33325 14V2Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span class="opacity-80">
+                      {{
+                      model.versions?.[0]?.counter?.used_count || 0
+                    }}</span>
+                  </span>
+                  <span class="flex items-center space-x-1">
                     <svg
                       width="14"
                       height="14"
@@ -408,10 +427,10 @@
                       </defs>
                     </svg>
                     <span class="opacity-80">{{
-                      model.versions?.[0]?.counter?.liked_count || 0
+                      model.versions?.[0]?.counter?.forked_count || 0
                     }}</span>
                   </span>
-                  <span class="flex items-center space-x-1">
+                  <!-- <span class="flex items-center space-x-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="15"
@@ -429,7 +448,7 @@
                     <span class="opacity-80">{{
                       model.versions?.[0]?.counter?.forked_count || 0
                     }}</span>
-                  </span>
+                  </span> -->
                   <span class="flex items-center space-x-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -486,14 +505,24 @@
     </div>
   </div>
   <v-dialog
-    v-if="currentModel && currentModel?.versions?.[0] && showCommunityDetail"
+    v-if="currentModel && currentModel?.versions?.[0]"
     v-model:open="showCommunityDetail"
-    class="px-6 overflow-hidden pb-6 z-10000 max-w-[90%]   bg-[#353535]"
+    class="px-6 overflow-hidden pb-6 z-10000 max-w-[90%] bg-[#353535]"
     layout-class="z-10000"
-    content-class="custom-scrollbar max-h-[80vh]  overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+    content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
     :title="currentModel?.name"
   >
-    <ModelDetail  :model-id="currentModel?.id" :version="currentModel?.versions?.[0]" mode="publicity" />
+    <div v-show="!dialogLoading">
+      <ModelDetail 
+        :model-id="currentModel?.id" 
+        :version="currentModel?.versions?.[0]" 
+        mode="publicity"
+        @loaded="handleLoaded" 
+      />
+    </div>
+    <div v-show="dialogLoading" class="flex justify-center items-center min-h-[300px]">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+    </div>
   </v-dialog>
 </template>
 
@@ -531,6 +560,7 @@
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 12px;
     padding-right: 12px;
+    padding-bottom: 20px;
   }
 
   @media screen and (max-width: 767px) {

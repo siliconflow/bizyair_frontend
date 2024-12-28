@@ -47,13 +47,16 @@
         currentState.filterState
       )
 
-      if (response?.data) {
+      if (response?.data?.list) {
         currentState.models = [...currentState.models, ...response.data.list]
         currentState.modelListPathParams.total = response.data.total
         hasMore.value = currentState.models.length < response.data.total
       }
+      else{
+        hasMore.value = false
+      }
     } catch (error) {
-      console.error('加载数据失败:', error)
+      console.error('fetch data error:', error)
       useToaster.error(`Failed to load more data: ${error}`)
     } finally {
       loading.value = false
@@ -85,7 +88,7 @@
         currentState.filterState
       )
 
-      if (response?.data) {
+      if (response?.data?.list) {
         currentState.models = [...response.data.list, ...currentState.models]
         currentState.modelListPathParams.total = response.data.total
         hasPrevious.value = prevPage > 1
@@ -138,7 +141,7 @@
         currentState.filterState
       )
 
-      if (response?.data) {
+      if (response?.data?.list) {
         currentState.modelListPathParams.total = response.data.total || 0
         currentState.models = response.data.list || []
         hasMore.value = currentState.models.length < response.data.total
@@ -219,10 +222,16 @@
 
   const showCommunityDetail = ref(false)
   const currentModel = ref<Model>()
+  const dialogLoading = ref(true)
 
   const handleCommunityDetail = (model: Model) => {
+    dialogLoading.value = true
     currentModel.value = model
     showCommunityDetail.value = true
+  }
+
+  const handleLoaded = () => {
+    dialogLoading.value = false
   }
 
   onMounted(() => {
@@ -263,7 +272,7 @@
 
 <template>
   <div class="flex flex-col h-screen">
-    <div class="px-6 pt-6 pb-0 sticky top-0 z-20 bg-[#121212]">
+    <div class="px-6 pt-6 pb-0 sticky top-0 z-20 ">
       <MineTabs v-model="currentTab" @update:model-value="switchTab">
         <template #posts>
           <ModelFilterBar
@@ -276,6 +285,17 @@
               }
             "
           />
+          <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center">
+            <div class="text-white text-base font-medium">
+              My Posts
+            </div>
+
+          </div>
+          <button class="flex items-center px-4 py-2 bg-[#7C3AED] rounded-lg text-white text-sm font-medium">
+            + New Post
+          </button>
+        </div>
         </template>
 
         <template #forked>
@@ -502,26 +522,37 @@
     </div>
 
     <v-dialog
-      v-if="currentModel && currentModel?.versions?.[0] && showCommunityDetail"
+      v-if="currentModel && currentModel?.versions?.[0]"
       v-model:open="showCommunityDetail"
       class="px-6 overflow-hidden pb-6 z-10000 max-w-[90%] bg-[#353535]"
       layout-class="z-10000"
       content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
       :title="currentModel?.name"
     >
-      <ModelDetail :model-id="currentModel?.id" :version="currentModel?.versions?.[0]" mode="publicity" />
+      <div v-show="!dialogLoading">
+        <ModelDetail 
+          :model-id="currentModel?.id" 
+          :version="currentModel?.versions?.[0]" 
+          mode="publicity"
+          @loaded="handleLoaded" 
+        />
+      </div>
+      <div v-show="dialogLoading" class="flex justify-center items-center min-h-[300px]">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+      </div>
     </v-dialog>
   </div>
 </template>
 
 <style scoped>
   .scroll-container {
-    height: calc(100vh - 140px);
+    max-height: calc(100vh - 180px);
     margin-top: 1rem;
     position: relative;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
     -webkit-overflow-scrolling: touch;
+    padding-bottom: 40px;
   }
 
   .scroll-container::-webkit-scrollbar {
@@ -543,13 +574,47 @@
     background-color: rgba(255, 255, 255, 0.5);
   }
 
-  /* 保持原有的响应��布局样式 */
   .playground-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 12px;
     padding-right: 12px;
+    margin-bottom: 20px;
   }
 
-  /* 保持原有的媒体查询样式 */
+  @media screen and (max-width: 767px) {
+    .playground-container {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+
+  @media screen and (min-width: 768px) and (max-width: 1023px) {
+    .playground-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (min-width: 1024px) and (max-width: 1359px) {
+    .playground-container {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media screen and (min-width: 1360px) and (max-width: 1919px) {
+    .playground-container {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  @media screen and (min-width: 1920px) and (max-width: 2559px) {
+    .playground-container {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  @media screen and (min-width: 2560px) {
+    .playground-container {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
 </style>
