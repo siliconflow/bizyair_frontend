@@ -7,16 +7,23 @@
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import MineTabs from '@/components/community/moudles/MineTabs.vue'
   import { useCommunityStore } from '@/stores/communityStore'
+ import { modelStore } from '@/stores/modelStatus'
 
   import { get_model_list } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import vDialog from '@/components/modules/vDialog.vue'
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { Model } from '@/types/model'
+  import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from '@/components/ui/popover'
 
   type TabType = 'posts' | 'forked'
 
   const communityStore = useCommunityStore()
+  const useModelStore = modelStore()
   const currentTab = ref<TabType>('posts')
   const loadingRef = ref<HTMLDivElement | null>(null)
   let observer: IntersectionObserver | null = null
@@ -234,6 +241,17 @@
     dialogLoading.value = false
   }
 
+  const handleNewModel = () => {
+    useModelStore.setDialogStatus(true)
+    communityStore.showDialog = false
+
+  }
+
+  const handleNewWorkflow = () => {
+    useModelStore.setDialogStatusWorkflow(true)
+    communityStore.showDialog = false
+  }
+
   onMounted(() => {
     fetchData()
     observer = new IntersectionObserver(
@@ -285,17 +303,51 @@
               }
             "
           />
-          <div class="flex justify-between items-center mb-4">
-          <div class="flex items-center">
-            <div class="text-white text-base font-medium">
-              My Posts
+          <div class="flex justify-between items-center ">
+            <div class="flex items-center">
+              <div class="text-white text-base font-medium">
+                My Posts
+              </div>
             </div>
-
+            <Popover   class="bg-[#353535]">
+              <PopoverTrigger class="bg-transparent">
+                <Button class="bg-[#7C3AED] hover:bg-[#7C3AED]/90 cursor-pointer flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium">
+                  + New Post
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent 
+              side="bottom"
+              align="end"
+              class="w-40 p-1 bg-[#353535] border border-[#4e4e4e] z-11000 rounded-lg shadow-lg">
+                  <Command>
+                    <CommandList>
+                      <CommandGroup class="flex flex-col gap-1">
+                        <CommandItem
+                          value="Model"
+                          :class="[
+                            'px-2 py-1.5 text-[#F9FAFB] cursor-pointer block w-30',
+                            '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]'
+                          ]"
+                          @click="handleNewModel"
+                        >
+                          Model
+                        </CommandItem>
+                        <CommandItem
+                          value="Workflow"
+                          :class="[
+                            'px-2 py-1.5 text-[#F9FAFB] cursor-pointer block w-30',
+                            '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]'
+                          ]"
+                          @click="handleNewWorkflow"
+                        >
+                          Workflow
+                        </CommandItem>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+              </PopoverContent>
+            </Popover>
           </div>
-          <button class="flex items-center px-4 py-2 bg-[#7C3AED] rounded-lg text-white text-sm font-medium">
-            + New Post
-          </button>
-        </div>
         </template>
 
         <template #forked>
@@ -324,7 +376,7 @@
 
         <div class="playground-container">
           <div
-            v-for="model in communityStore.mine[currentTab].models"
+            v-for="model in communityStore.mine[currentTab]?.models"
             :key="model.id"
             class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
           >
