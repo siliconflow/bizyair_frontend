@@ -3,7 +3,7 @@
     name: 'Mine'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import MineTabs from '@/components/community/moudles/MineTabs.vue'
   import { useCommunityStore } from '@/stores/communityStore'
@@ -19,6 +19,10 @@
     PopoverContent,
     PopoverTrigger,
   } from '@/components/ui/popover'
+  import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
+  import { Button } from '@/components/ui/button'
+
+  
 
   type TabType = 'posts' | 'forked'
 
@@ -227,14 +231,14 @@
   }
   const imageLoaded = (modelId: number | string) => imageLoadStates.value.get(modelId) ?? false
 
-  const showCommunityDetail = ref(false)
+
   const currentModel = ref<Model>()
   const dialogLoading = ref(true)
 
   const handleCommunityDetail = (model: Model) => {
     dialogLoading.value = true
     currentModel.value = model
-    showCommunityDetail.value = true
+    communityStore.showCommunityDetail = true
   }
 
   const handleLoaded = () => {
@@ -250,7 +254,7 @@
   const handleNewWorkflow = () => {
     useModelStore.setDialogStatusWorkflow(true)
     communityStore.showDialog = false
-  }
+    }
 
   onMounted(() => {
     fetchData()
@@ -286,6 +290,16 @@
       container.removeEventListener('scroll', handleScroll)
     }
   })
+
+  watch(
+    () => communityStore.reload,
+    async (newVal: number, oldVal: number) => {
+      if (newVal !== oldVal) {
+        await fetchData()
+      }
+    },
+    { deep: true }
+  )
 </script>
 
 <template>
@@ -318,7 +332,7 @@
               <PopoverContent 
               side="bottom"
               align="end"
-              class="w-40 p-1 bg-[#353535] border border-[#4e4e4e] z-11000 rounded-lg shadow-lg">
+              class="w-40 p-1 bg-[#0e0e0e] border border-[#4e4e4e] z-11000 rounded-lg shadow-lg">
                   <Command>
                     <CommandList>
                       <CommandGroup class="flex flex-col gap-1">
@@ -475,7 +489,7 @@
                       model.versions?.[0]?.counter?.downloads || 0
                     }}</span>
                   </span>
-                  <span class="flex items-center space-x-1">
+                  <!-- <span class="flex items-center space-x-1">
                     <svg
                       width="14"
                       height="14"
@@ -498,21 +512,35 @@
                     <span class="opacity-80">{{
                       model.versions?.[0]?.counter?.liked_count || 0
                     }}</span>
+                  </span> -->
+                  <span class="flex items-center space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M3.33325 2L12.6666 8L3.33325 14V2Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span class="opacity-80">
+                      {{
+                      model.versions?.[0]?.counter?.used_count || 0
+                    }}</span>
                   </span>
                   <span class="flex items-center space-x-1">
                     <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="15"
+                      width="14"
                       height="14"
-                      viewBox="0 0 15 14"
+                      viewBox="0 0 14 14"
                       fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      <path
-                        d="M5.51083 7.88079L9.495 10.2025M9.48917 3.79746L5.51083 6.11913M12.75 2.91663C12.75 3.88312 11.9665 4.66663 11 4.66663C10.0335 4.66663 9.25 3.88312 9.25 2.91663C9.25 1.95013 10.0335 1.16663 11 1.16663C11.9665 1.16663 12.75 1.95013 12.75 2.91663ZM5.75 6.99996C5.75 7.96646 4.9665 8.74996 4 8.74996C3.0335 8.74996 2.25 7.96646 2.25 6.99996C2.25 6.03346 3.0335 5.24996 4 5.24996C4.9665 5.24996 5.75 6.03346 5.75 6.99996ZM12.75 11.0833C12.75 12.0498 11.9665 12.8333 11 12.8333C10.0335 12.8333 9.25 12.0498 9.25 11.0833C9.25 10.1168 10.0335 9.33329 11 9.33329C11.9665 9.33329 12.75 10.1168 12.75 11.0833Z"
-                        stroke="#E5E7EB"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
+                      <g clip-path="url(#clip0_1021_3310)">
+                        <path
+                          d="M9.09948 0.538851L9.09948 0.538843C9.10201 0.523701 9.09385 0.508778 9.07973 0.502729L9.09948 0.538851ZM9.09948 0.538851L8.13633 6.31781L8.03929 6.90001M9.09948 0.538851L8.03929 6.90001M8.03929 6.90001H8.62952M8.03929 6.90001H8.62952M8.62952 6.90001H13.3333C13.3459 6.90001 13.3575 6.90717 13.3631 6.91844L13.3631 6.91846M8.62952 6.90001L13.3631 6.91846M13.3631 6.91846C13.3687 6.92969 13.3675 6.94313 13.36 6.95323L13.3599 6.95335M13.3631 6.91846L13.3599 6.95335M13.3599 6.95335L6.95994 15.4867C6.95084 15.4988 6.93448 15.5033 6.9202 15.4973C6.90603 15.4913 6.89788 15.4763 6.9004 15.4612L7.86356 9.6822L7.96059 9.1M13.3599 6.95335L7.96059 9.1M7.96059 9.1H7.37037M7.96059 9.1H7.37037M7.37037 9.1H2.66663M7.37037 9.1H2.66663M2.66663 9.1C2.65402 9.1 2.64248 9.09288 2.63683 9.08159L2.66663 9.1ZM3.3333 8.23334L2.7333 9.03334L7.97452 6.9549C7.97451 6.95489 7.9745 6.95488 7.97449 6.95487C7.96816 6.94738 7.96546 6.93752 7.96707 6.92789L7.96707 6.92786L8.67416 2.68531L7.78097 2.30311L3.3333 8.23334ZM2.63682 9.08157C2.63117 9.07026 2.6324 9.05675 2.63997 9.04666L9.03994 0.513374C9.04916 0.501082 9.06559 0.496684 9.07972 0.502726L2.63682 9.08157Z"
+                          stroke="#E5E7EB"
+                        />
+                      </g>
+                      <defs>
+                        <clipPath id="clip0_1021_3310">
+                          <rect width="14" height="14" fill="white" />
+                        </clipPath>
+                      </defs>
                     </svg>
                     <span class="opacity-80">{{
                       model.versions?.[0]?.counter?.forked_count || 0
@@ -575,7 +603,7 @@
 
     <v-dialog
       v-if="currentModel && currentModel?.versions?.[0]"
-      v-model:open="showCommunityDetail"
+      v-model:open="communityStore.showCommunityDetail"
       class="px-6 overflow-hidden pb-6 z-10000 max-w-[90%] bg-[#353535]"
       layout-class="z-10000"
       content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
@@ -585,7 +613,8 @@
         <ModelDetail 
           :model-id="currentModel?.id" 
           :version="currentModel?.versions?.[0]" 
-          mode="publicity"
+          mode="my"
+          :current-tab="currentTab"
           @loaded="handleLoaded" 
         />
       </div>
@@ -631,6 +660,7 @@
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 12px;
     padding-right: 12px;
+    padding-bottom: 40px;
     margin-bottom: 20px;
   }
 

@@ -3,7 +3,7 @@
     name: 'WorkflowsContent'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick, inject } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, inject, watch } from 'vue'
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
 
@@ -254,19 +254,27 @@
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { Model } from '@/types/model'
 
-  const showCommunityDetail = ref(false)
   const currentModel = ref<Model>()
   const dialogLoading = ref(true)
 
   const handleCommunityDetail = (model: Model) => {
     dialogLoading.value = true
     currentModel.value = model
-    showCommunityDetail.value = true
+    communityStore.showCommunityDetail = true
   }
 
   const handleLoaded = () => {
     dialogLoading.value = false
   }
+  watch(
+    () => communityStore.reload,
+    async (newVal: number, oldVal: number) => {
+      if (newVal !== oldVal) {
+        await fetchData()
+      }
+    },
+    { deep: true }
+  )
 </script>
 
 <template>
@@ -495,7 +503,7 @@
 
     <v-dialog
       v-if="currentModel && currentModel?.versions?.[0]"
-      v-model:open="showCommunityDetail"
+      v-model:open="communityStore.showCommunityDetail"
       class="px-6 overflow-hidden pb-6 z-10000 max-w-[90%] bg-[#353535]"
       layout-class="z-10000"
       content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"

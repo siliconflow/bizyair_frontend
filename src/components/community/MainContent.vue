@@ -3,7 +3,7 @@
     name: 'MainContent'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
 
@@ -267,6 +267,17 @@
   const handleLoaded = () => {
     dialogLoading.value = false
   }
+
+  watch(
+    () => communityStore.reload,
+    async (newVal: number, oldVal: number) => {
+      if (newVal !== oldVal) {
+        await fetchData()
+      }
+    },
+    { deep: true }
+  )
+ 
 </script>
 
 <template>
@@ -506,7 +517,7 @@
   </div>
   <v-dialog
     v-if="currentModel && currentModel?.versions?.[0]"
-    v-model:open="showCommunityDetail"
+    v-model:open="communityStore.showCommunityDetail"
     class="px-6 overflow-hidden pb-6 z-10000 max-w-[90%] bg-[#353535]"
     layout-class="z-10000"
     content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"

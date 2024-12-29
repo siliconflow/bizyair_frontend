@@ -21,7 +21,7 @@
 
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { MdPreview } from 'md-editor-v3'
-
+ import { modelStore } from '@/stores/modelStatus'
   import { Model, ModelVersion } from '@/types/model'
   import { model_detail, like_model, fork_model, remove_model, get_workflow_dowload_url } from '@/api/model'
   import { useToaster } from '@/components/modules/toats/index'
@@ -32,11 +32,13 @@
   const currentVersion = ref<ModelVersion>()
   const downloadOpen = ref(false)
   const scrollViewportRef = ref<any | null>(null)
+  const modelStoreInstance = modelStore()
 
   const props = defineProps<{
     modelId: string |number
     version: ModelVersion
     mode: string
+    currentTab?: string
   }>()
 
   const emit = defineEmits<{
@@ -151,9 +153,11 @@
 
   const handleModelOperation = async (type: 'edit' | 'remove', id: string | number) => {
     if (type === 'edit') {
-      // modelStoreInstance.setModelDetail(model)
-      // modelStoreInstance.setDialogStatus(true, Number(currentVersion.value?.id))
+      modelStoreInstance.setModelDetail(model)
+      modelStoreInstance.setDialogStatus(true, Number(currentVersion.value?.id))
       downloadOpen.value = false
+      communityStore.showCommunityDetail=false
+      communityStore.reload++
     }
     if (type === 'remove') {
       downloadOpen.value = false
@@ -162,7 +166,7 @@
         desc: 'This action cannot be undone.',
         cancel: 'No, Keep It',
         continue: 'Yes, Delete It',
-        z: 'z-10001'
+        z: 'z-12000'
       })
       if (!res) return
 
@@ -181,7 +185,8 @@
     try {
       await remove_model(id)
       useToaster.success('Model removed successfully.')
-      // modelStoreInstance.reload += 1
+      communityStore.showCommunityDetail=false
+      communityStore.reload++
     } catch (error) {
       useToaster.error('Failed to remove model.')
       console.error('Error removing model:', error)
@@ -389,9 +394,8 @@
               </clipPath>
             </defs>
           </svg>
-
           <Popover
-            v-if="mode === 'my' || mode === 'my_fork'"
+            v-if="currentTab === 'posts' || currentTab === 'forked'"
             class="bg-[#353535]"
             :open="downloadOpen"
             @update:open="handleDownload"
@@ -436,7 +440,8 @@
                 <CommandList>
                   <CommandGroup>
                     <CommandItem
-                      value="edit"
+                      v-if="currentTab === 'posts'"
+                       value="edit"
                       class="px-2 py-1.5 mb-1 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]"
                       @click="handleModelOperation('edit', model?.id)"
                     >
@@ -508,7 +513,6 @@
             class="flex flex-row gap-1.5 items-start justify-start self-stretch shrink-0 relative"
           >
             <Button
-              v-if="mode === 'publicity'"
               variant="default"
               class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
               :disabled="currentVersion?.forked"
