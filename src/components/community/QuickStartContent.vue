@@ -10,6 +10,7 @@
   import { get_model_list, get_workflow_dowload_url } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import { Model } from '@/types/model'
+  import vDialog from '@/components/modules/vDialog.vue'
   // import vImage from '@/components/modules/vImage.vue'
   const comfyUIApp: any = inject('comfyUIApp')
   const communityStore = useCommunityStore()
@@ -34,13 +35,15 @@
         communityStore.quickStart.filterState
       )
 
-      if (response?.data?.list) {
+      if (response?.data?.list?.length > 0) {
         communityStore.quickStart.models = [
           ...communityStore.quickStart.models,
           ...response.data.list
         ]
         communityStore.quickStart.modelListPathParams.total = response.data.total
-        hasMore.value = communityStore.quickStart.models.length < response.data.total
+        hasMore.value = communityStore.quickStart.modelListPathParams.current * 
+                        communityStore.quickStart.modelListPathParams.page_size < 
+                        response.data.total
       } else {
         hasMore.value = false
       }
@@ -124,9 +127,10 @@
       )
 
       if (response?.data?.list) {
+        const list = response.data.list || []
         communityStore.quickStart.modelListPathParams.total = response.data.total || 0
-        communityStore.quickStart.models = response.data.list || []
-        hasMore.value = communityStore.quickStart.models.length < response.data.total
+        communityStore.quickStart.models = list
+        hasMore.value = list.length > 0
         hasPrevious.value = communityStore.quickStart.modelListPathParams.current > 1
 
         if (resetScroll) {
@@ -164,13 +168,13 @@
     fetchData()
     observer = new IntersectionObserver(
       throttle((entries: IntersectionObserverEntry[]) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && !loading.value && hasMore.value) {
           loadMore()
         }
       }, 800),
       {
         threshold: 0.1,
-        rootMargin: '500px 0px',
+        rootMargin: '100px 0px',
         root: document.querySelector('.scroll-container')
       }
     )
@@ -471,7 +475,10 @@
 
         <div ref="loadingRef" class="py-4 text-center mt-8">
           <div v-if="loading" class="text-white/60">loading...</div>
-          <!-- <div v-else-if="!hasMore" class="text-white/60">No more data</div> -->
+          <div v-else-if="!hasMore && communityStore.quickStart.models.length === 0" class="text-white/60">
+            No more data
+          </div>
+          
           <div v-else class="h-8"></div>
         </div>
       </div>

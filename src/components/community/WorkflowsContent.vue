@@ -474,7 +474,7 @@
 
         <div ref="loadingRef" class="py-4 text-center mt-8">
           <div v-if="loading" class="text-white/60">loading...</div>
-          <div v-else-if="!hasMore" class="text-white/60">No more data</div>
+          <div v-else-if="!hasMore && communityStore.workflows.models.length === 0" class="text-white/60">No more data</div>
           <div v-else class="h-8"></div>
         </div>
       </div>

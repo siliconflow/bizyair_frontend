@@ -3,7 +3,7 @@
     name: 'MainContent'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, watch, onActivated } from 'vue'
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
 
@@ -16,7 +16,7 @@
 
   const communityStore = useCommunityStore()
 
-  const SCROLL_THRESHOLD = 100
+  const SCROLL_THRESHOLD = 30
 
   const loading = ref(false)
   const hasMore = ref(true)
@@ -273,6 +273,37 @@
     },
     { deep: true }
   )
+
+  const resetState = () => {
+    const container = document.querySelector('.scroll-container')
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'auto' })
+    }
+    // 重置相关状态
+    hasPrevious.value = false
+    communityStore.mainContent.modelListPathParams.current = 1
+    loading.value = true
+    
+    // 重新获取数据
+    nextTick(async () => {
+      try {
+        await fetchData()
+        hasMore.value = true
+      } catch (error) {
+        console.error('Reset state error:', error)
+      } finally {
+        loading.value = false
+      }
+    })
+  }
+
+  onActivated(() => {
+    console.log('onActivated')
+    resetState()
+  })
+
+
+
 </script>
 
 <template>
@@ -493,7 +524,7 @@
 
         <div ref="loadingRef" class="py-4 text-center mt-8">
           <div v-if="loading" class="text-white/60">loading...</div>
-          <div v-else-if="!hasMore" class="text-white/60">No more data</div>
+          <div v-else-if="!hasMore && communityStore.mainContent.models.length === 0" class="text-white/60">No more data</div>
           <div v-else class="h-8"></div>
         </div>
       </div>
