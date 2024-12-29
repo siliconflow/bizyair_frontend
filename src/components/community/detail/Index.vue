@@ -21,9 +21,15 @@
 
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { MdPreview } from 'md-editor-v3'
- import { modelStore } from '@/stores/modelStatus'
+  import { modelStore } from '@/stores/modelStatus'
   import { Model, ModelVersion } from '@/types/model'
-  import { model_detail, like_model, fork_model, remove_model, get_workflow_dowload_url } from '@/api/model'
+  import {
+    model_detail,
+    like_model,
+    fork_model,
+    remove_model,
+    get_workflow_dowload_url
+  } from '@/api/model'
   import { useToaster } from '@/components/modules/toats/index'
   import 'md-editor-v3/lib/style.css'
   const communityStore = useCommunityStore()
@@ -35,7 +41,7 @@
   const modelStoreInstance = modelStore()
 
   const props = defineProps<{
-    modelId: string |number
+    modelId: string | number
     version: ModelVersion
     mode: string
     currentTab?: string
@@ -156,7 +162,7 @@
       modelStoreInstance.setModelDetail(model)
       modelStoreInstance.setDialogStatus(true, Number(currentVersion.value?.id))
       downloadOpen.value = false
-      communityStore.showCommunityDetail=false
+      communityStore.showCommunityDetail = false
       communityStore.reload++
     }
     if (type === 'remove') {
@@ -185,7 +191,7 @@
     try {
       await remove_model(id)
       useToaster.success('Model removed successfully.')
-      communityStore.showCommunityDetail=false
+      communityStore.showCommunityDetail = false
       communityStore.reload++
     } catch (error) {
       useToaster.error('Failed to remove model.')
@@ -218,18 +224,24 @@
   }
 
   const handleLoadWorkflow = async () => {
-    const workflow = await get_workflow_dowload_url(currentVersion.value?.id, currentVersion.value?.sign)
-    if(workflow?.data?.data && comfyUIApp && comfyUIApp.graph){
+    const workflow = await get_workflow_dowload_url(
+      currentVersion.value?.id,
+      currentVersion.value?.sign
+    )
+    if (workflow?.data?.data && comfyUIApp && comfyUIApp.graph) {
       comfyUIApp.graph.clear()
       await comfyUIApp.loadGraphData(workflow.data.data)
     }
     communityStore.showDialog = false
-    communityStore.showCommunityDetail=false
+    communityStore.showCommunityDetail = false
   }
 
   const handleDownloadWorkFlow = async () => {
-    const workflow = await get_workflow_dowload_url(currentVersion.value?.id, currentVersion.value?.sign)
-    if(workflow?.data){
+    const workflow = await get_workflow_dowload_url(
+      currentVersion.value?.id,
+      currentVersion.value?.sign
+    )
+    if (workflow?.data) {
       const jsonString = JSON.stringify(workflow.data, null, 2)
       const blob = new Blob([jsonString], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
@@ -238,8 +250,7 @@
       a.download = `${model.value?.name}-${currentVersion.value?.version}.json`
       a.click()
       URL.revokeObjectURL(url)
-    }
-    else{
+    } else {
       useToaster.error('Failed to download workflow.')
     }
   }
@@ -260,7 +271,7 @@
         </div>
         <div class="flex flex-row gap-1 items-start justify-start shrink-0 relative">
           <div
-          v-if="model?.type!=='Workflow'"
+            v-if="model?.type !== 'Workflow'"
             class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
           >
             <svg
@@ -441,7 +452,7 @@
                   <CommandGroup>
                     <CommandItem
                       v-if="currentTab === 'posts'"
-                       value="edit"
+                      value="edit"
                       class="px-2 py-1.5 mb-1 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]"
                       @click="handleModelOperation('edit', model?.id)"
                     >
@@ -732,9 +743,24 @@
             {{ currentVersion?.file_name ? sliceString(currentVersion?.file_name, 20) : '' }} ({{
               formatSize(currentVersion?.file_size)
             }})
-            <span v-if="model?.type === 'Workflow'" class="cursor-pointer ml-2 hover:opacity-80" @click="handleDownloadWorkFlow">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"/>
+            <span
+              v-if="model?.type === 'Workflow'"
+              class="cursor-pointer ml-2 hover:opacity-80"
+              @click="handleDownloadWorkFlow"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+              >
+                <path
+                  d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2"
+                  stroke="#F9FAFB"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </span>
           </div>

@@ -1,9 +1,5 @@
 import { defineStore } from 'pinia'
-import {
-  CommonModelType,
-  Model,
-  ModelListPathParams
-} from '@/types/model'
+import { CommonModelType, Model, ModelListPathParams } from '@/types/model'
 
 import { PageType, PageState } from '@/types/model'
 
@@ -150,7 +146,6 @@ export const useCommunityStore = defineStore('community', {
             selected_model_types: [],
             sort: 'Recently'
           }
-          
         }
       } else if (this[page]) {
         this[page] = {

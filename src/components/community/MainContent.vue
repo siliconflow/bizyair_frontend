@@ -11,7 +11,7 @@
   import { useToaster } from '@/components/modules/toats'
   import { Model } from '@/types/model'
   import vDialog from '@/components/modules/vDialog.vue'
-  import  ModelDetail  from '@/components/community/detail/Index.vue'
+  import ModelDetail from '@/components/community/detail/Index.vue'
   // import vImage from '@/components/modules/vImage.vue'
 
   const communityStore = useCommunityStore()
@@ -45,8 +45,7 @@
         ]
         communityStore.mainContent.modelListPathParams.total = response.data.total
         hasMore.value = communityStore.mainContent.models.length < response.data.total
-      }
-      else{
+      } else {
         hasMore.value = false
       }
     } catch (error) {
@@ -137,7 +136,7 @@
         communityStore.mainContent.modelListPathParams,
         communityStore.mainContent.filterState
       )
-    
+
       if (response?.data?.list) {
         communityStore.mainContent.modelListPathParams.total = response.data.total || 0
         communityStore.mainContent.models = response.data.list || []
@@ -174,8 +173,6 @@
 
   const loadingRef = ref<HTMLDivElement | null>(null)
   let observer: IntersectionObserver | null = null
-
-  
 
   onMounted(async () => {
     await fetchData()
@@ -254,7 +251,6 @@
   const showCommunityDetail = ref(false)
 
   const currentModel = ref<Model>()
-  
 
   const dialogLoading = ref(true)
 
@@ -277,12 +273,11 @@
     },
     { deep: true }
   )
- 
 </script>
 
 <template>
   <div class="flex flex-col h-screen">
-    <div class="px-6 pt-6 pb-0 sticky top-0 z-20 ">
+    <div class="px-6 pt-6 pb-0 sticky top-0 z-20">
       <ModelFilterBar
         v-model:show-sort-popover="showSortPopover"
         page="mainContent"
@@ -341,11 +336,13 @@
                   />
                 </svg> -->
               </div>
-              <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"  @click="handleCommunityDetail(model)">
+              <div
+                class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
+                @click="handleCommunityDetail(model)"
+              >
                 <div
                   class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"
                   :class="{ 'opacity-0': imageLoaded(model.id) }"
-                 
                 ></div>
                 <div class="w-full h-0 pb-[150%]"></div>
                 <img
@@ -356,7 +353,6 @@
                     'opacity-0': !imageLoaded(model.id),
                     'opacity-100 group-hover:scale-105': imageLoaded(model.id)
                   }"
-                
                   @load="e => handleImageLoad(e, model.id)"
                   @error="e => handleImageError(e, model.id)"
                 />
@@ -409,13 +405,23 @@
                     }}</span>
                   </span>
                   <span class="flex items-center space-x-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <path d="M3.33325 2L12.6666 8L3.33325 14V2Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <span class="opacity-80">
-                      {{
-                      model.versions?.[0]?.counter?.used_count || 0
-                    }}</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                    >
+                      <path
+                        d="M3.33325 2L12.6666 8L3.33325 14V2Z"
+                        stroke="#F9FAFB"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                    <span class="opacity-80">
+                      {{ model.versions?.[0]?.counter?.used_count || 0 }}</span
+                    >
                   </span>
                   <span class="flex items-center space-x-1">
                     <svg
@@ -524,11 +530,11 @@
     :title="currentModel?.name"
   >
     <div v-show="!dialogLoading">
-      <ModelDetail 
-        :model-id="currentModel?.id" 
-        :version="currentModel?.versions?.[0]" 
+      <ModelDetail
+        :model-id="currentModel?.id"
+        :version="currentModel?.versions?.[0]"
         mode="publicity"
-        @loaded="handleLoaded" 
+        @loaded="handleLoaded"
       />
     </div>
     <div v-show="dialogLoading" class="flex justify-center items-center min-h-[300px]">

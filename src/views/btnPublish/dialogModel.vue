@@ -87,11 +87,12 @@
               </v-select>
             </v-item>
             <v-item label="Upload Image">
-              <vUploadImage 
+              <vUploadImage
                 :previewPrc="e.cover_urls"
                 :className="e.imageError ? 'border-red-500' : ''"
-                v-model.modelValue="e.cover_urls" 
-                @done="imageUploadDone(i)" />
+                v-model.modelValue="e.cover_urls"
+                @done="imageUploadDone(i)"
+              />
             </v-item>
             <v-item label="Introduction">
               <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />

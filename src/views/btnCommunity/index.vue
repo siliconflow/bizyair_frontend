@@ -25,14 +25,11 @@
 <script setup lang="ts">
   import vDialog from '@/components/modules/vDialog.vue'
   import Community from '@/components/community/Index.vue'
-  import {useCommunityStore} from '@/stores/communityStore'   
+  import { useCommunityStore } from '@/stores/communityStore'
   const communityStore = useCommunityStore()
-  
+
   const handleMenuClick = () => {
-    communityStore.showDialog= true
+    communityStore.showDialog = true
   }
-
-
 </script>
 <style scoped></style>
-

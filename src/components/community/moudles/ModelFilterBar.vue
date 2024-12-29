@@ -18,7 +18,6 @@
 
   const store = useCommunityStore()
 
- 
   interface Props {
     showSortPopover: boolean
     page: PageType
@@ -45,14 +44,15 @@
     const index = types.indexOf(String(type))
     index === -1 ? types.push(String(type)) : types.splice(index, 1)
     store[props.page].modelListPathParams.current = 1
-    if(props.page === 'mainContent' &&  types.length === 0){
-      store[props.page].filterState.model_types = store[props.page].modelTypes.map(type => type.value)
-    }
-    else{
+    if (props.page === 'mainContent' && types.length === 0) {
+      store[props.page].filterState.model_types = store[props.page].modelTypes.map(
+        type => type.value
+      )
+    } else {
       store[props.page].filterState.model_types = types
     }
     store[props.page].filterState.selected_model_types = types
-    
+
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
@@ -79,17 +79,19 @@
 
       if (modelTypesResponse?.data) {
         store.setModelTypes(props.page as PageType, modelTypesResponse.data as CommonModelType[])
-        if(props.page === 'mainContent'){
-            if(store[props.page].filterState.selected_model_types.length === 0){
-              if (Array.isArray(store[props.page].modelTypes)) {
-                store[props.page].filterState.model_types = store[props.page].modelTypes.map(type => type.value)
-              } 
+        if (props.page === 'mainContent') {
+          if (store[props.page].filterState.selected_model_types.length === 0) {
+            if (Array.isArray(store[props.page].modelTypes)) {
+              store[props.page].filterState.model_types = store[props.page].modelTypes.map(
+                type => type.value
+              )
             }
+          }
         }
-        if(props.page === 'posts' || props.page === 'forked'){
+        if (props.page === 'posts' || props.page === 'forked') {
           const hasWorkflow = store[props.page].modelTypes.some(type => type.value === 'Workflow')
           if (!hasWorkflow) {
-            store[props.page].modelTypes.push({label: 'Workflow', value: 'Workflow'})
+            store[props.page].modelTypes.push({ label: 'Workflow', value: 'Workflow' })
           }
         }
       }

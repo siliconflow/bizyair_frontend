@@ -184,7 +184,10 @@
       content: 'In hash calculation',
       z: 'z-12000'
     })
-    const { oss, objectKey, md5Hash, sha256sum, fileId } = await creatClient(file, props.modelType as string)
+    const { oss, objectKey, md5Hash, sha256sum, fileId } = await creatClient(
+      file,
+      props.modelType as string
+    )
     calculatingDialog.close()
     if (fileId) {
       emit('success', { sha256sum, path: file.name })

@@ -7,22 +7,16 @@
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import MineTabs from '@/components/community/moudles/MineTabs.vue'
   import { useCommunityStore } from '@/stores/communityStore'
- import { modelStore } from '@/stores/modelStatus'
+  import { modelStore } from '@/stores/modelStatus'
 
   import { get_model_list } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import vDialog from '@/components/modules/vDialog.vue'
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { Model } from '@/types/model'
-  import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-  } from '@/components/ui/popover'
+  import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
   import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
   import { Button } from '@/components/ui/button'
-
-  
 
   type TabType = 'posts' | 'forked'
 
@@ -62,8 +56,7 @@
         currentState.models = [...currentState.models, ...response.data.list]
         currentState.modelListPathParams.total = response.data.total
         hasMore.value = currentState.models.length < response.data.total
-      }
-      else{
+      } else {
         hasMore.value = false
       }
     } catch (error) {
@@ -219,7 +212,6 @@
     }, 500)
   }
 
-  
   const imageLoadStates = ref<Map<number | string, boolean>>(new Map())
 
   const handleImageLoad = (_event: Event, modelId: number | string) => {
@@ -230,7 +222,6 @@
     imageLoadStates.value.set(modelId, false)
   }
   const imageLoaded = (modelId: number | string) => imageLoadStates.value.get(modelId) ?? false
-
 
   const currentModel = ref<Model>()
   const dialogLoading = ref(true)
@@ -248,13 +239,12 @@
   const handleNewModel = () => {
     useModelStore.setDialogStatus(true)
     communityStore.showDialog = false
-
   }
 
   const handleNewWorkflow = () => {
     useModelStore.setDialogStatusWorkflow(true)
     communityStore.showDialog = false
-    }
+  }
 
   onMounted(() => {
     fetchData()
@@ -304,7 +294,7 @@
 
 <template>
   <div class="flex flex-col h-screen">
-    <div class="px-6 pt-6 pb-0 sticky top-0 z-20 ">
+    <div class="px-6 pt-6 pb-0 sticky top-0 z-20">
       <MineTabs v-model="currentTab" @update:model-value="switchTab">
         <template #posts>
           <ModelFilterBar
@@ -317,48 +307,49 @@
               }
             "
           />
-          <div class="flex justify-between items-center ">
+          <div class="flex justify-between items-center">
             <div class="flex items-center">
-              <div class="text-white text-base font-medium">
-                My Posts
-              </div>
+              <div class="text-white text-base font-medium">My Posts</div>
             </div>
-            <Popover   class="bg-[#353535]">
+            <Popover class="bg-[#353535]">
               <PopoverTrigger class="bg-transparent">
-                <Button class="bg-[#7C3AED] hover:bg-[#7C3AED]/90 cursor-pointer flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium">
+                <Button
+                  class="bg-[#7C3AED] hover:bg-[#7C3AED]/90 cursor-pointer flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium"
+                >
                   + New Post
                 </Button>
               </PopoverTrigger>
-              <PopoverContent 
-              side="bottom"
-              align="end"
-              class="w-40 p-1 bg-[#0e0e0e] border border-[#4e4e4e] z-11000 rounded-lg shadow-lg">
-                  <Command>
-                    <CommandList>
-                      <CommandGroup class="flex flex-col gap-1">
-                        <CommandItem
-                          value="Model"
-                          :class="[
-                            'px-2 py-1.5 text-[#F9FAFB] cursor-pointer block w-30',
-                            '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]'
-                          ]"
-                          @click="handleNewModel"
-                        >
-                          Model
-                        </CommandItem>
-                        <CommandItem
-                          value="Workflow"
-                          :class="[
-                            'px-2 py-1.5 text-[#F9FAFB] cursor-pointer block w-30',
-                            '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]'
-                          ]"
-                          @click="handleNewWorkflow"
-                        >
-                          Workflow
-                        </CommandItem>
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
+              <PopoverContent
+                side="bottom"
+                align="end"
+                class="w-40 p-1 bg-[#0e0e0e] border border-[#4e4e4e] z-11000 rounded-lg shadow-lg"
+              >
+                <Command>
+                  <CommandList>
+                    <CommandGroup class="flex flex-col gap-1">
+                      <CommandItem
+                        value="Model"
+                        :class="[
+                          'px-2 py-1.5 text-[#F9FAFB] cursor-pointer block w-30',
+                          '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]'
+                        ]"
+                        @click="handleNewModel"
+                      >
+                        Model
+                      </CommandItem>
+                      <CommandItem
+                        value="Workflow"
+                        :class="[
+                          'px-2 py-1.5 text-[#F9FAFB] cursor-pointer block w-30',
+                          '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]'
+                        ]"
+                        @click="handleNewWorkflow"
+                      >
+                        Workflow
+                      </CommandItem>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
               </PopoverContent>
             </Popover>
           </div>
@@ -394,7 +385,7 @@
             :key="model.id"
             class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
           >
-          <div
+            <div
               class="relative flex flex-col flex-1 rounded-lg cursor-pointer overflow-hidden bg-[#1a1a1a]"
             >
               <div
@@ -424,7 +415,10 @@
                   />
                 </svg> -->
               </div>
-              <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden" @click="handleCommunityDetail(model)">
+              <div
+                class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
+                @click="handleCommunityDetail(model)"
+              >
                 <div
                   class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"
                   :class="{ 'opacity-0': imageLoaded(model.id) }"
@@ -514,13 +508,23 @@
                     }}</span>
                   </span> -->
                   <span class="flex items-center space-x-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <path d="M3.33325 2L12.6666 8L3.33325 14V2Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <span class="opacity-80">
-                      {{
-                      model.versions?.[0]?.counter?.used_count || 0
-                    }}</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                    >
+                      <path
+                        d="M3.33325 2L12.6666 8L3.33325 14V2Z"
+                        stroke="#F9FAFB"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                    <span class="opacity-80">
+                      {{ model.versions?.[0]?.counter?.used_count || 0 }}</span
+                    >
                   </span>
                   <span class="flex items-center space-x-1">
                     <svg
@@ -610,12 +614,12 @@
       :title="currentModel?.name"
     >
       <div v-show="!dialogLoading">
-        <ModelDetail 
-          :model-id="currentModel?.id" 
-          :version="currentModel?.versions?.[0]" 
+        <ModelDetail
+          :model-id="currentModel?.id"
+          :version="currentModel?.versions?.[0]"
           mode="my"
           :current-tab="currentTab"
-          @loaded="handleLoaded" 
+          @loaded="handleLoaded"
         />
       </div>
       <div v-show="dialogLoading" class="flex justify-center items-center min-h-[300px]">

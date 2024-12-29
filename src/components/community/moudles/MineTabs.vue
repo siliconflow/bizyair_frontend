@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { watch } from 'vue';
+  import { watch } from 'vue'
 
   type TabType = 'posts' | 'forked'
 

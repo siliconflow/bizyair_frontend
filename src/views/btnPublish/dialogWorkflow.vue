@@ -77,11 +77,12 @@
               </v-select>
             </v-item>
             <v-item label="Upload Image">
-              <vUploadImage 
+              <vUploadImage
                 v-model.modelValue="e.cover_urls"
                 :preview-prc="e.cover_urls"
-                :class-name="e.imageError ? 'border-red-500' : ''" 
-                @done="imageUploadDone(i)" />
+                :class-name="e.imageError ? 'border-red-500' : ''"
+                @done="imageUploadDone(i)"
+              />
             </v-item>
             <v-item label="Introduction">
               <Markdown v-model.modelValue="e.intro" :editor-id="`myeditor${i}`" />
@@ -113,8 +114,10 @@
                   </p>
                 </div>
                 <Button v-if="e.hideUpload" class="ml-2" @click="cancelFile">cancel</Button>
-                <div v-if="!e.hideUpload" :class="{ 'w-full' : !e.progress }">
-                  <Button v-if="!e.progress" class="w-full my-2" @click="loadWorkflow()">Load from current workspace</Button>
+                <div v-if="!e.hideUpload" :class="{ 'w-full': !e.progress }">
+                  <Button v-if="!e.progress" class="w-full my-2" @click="loadWorkflow()"
+                    >Load from current workspace</Button
+                  >
                   <vUpload
                     :ref="e.ref"
                     model-type="ComfyUI"
@@ -166,10 +169,10 @@
   import vUpload from '@/components/modules/vUpload/index.vue'
   import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import Markdown from '@/components/markdown/Index.vue'
-  import { uploadFile } from "@/components/modules/vUpload/virtualUpload"
+  import { uploadFile } from '@/components/modules/vUpload/virtualUpload'
 
   const comfyUIApp: any = inject('comfyUIApp')
-  
+
   const modelStoreObject = modelStore()
   const modelBox = ref(true)
   const formData = ref({ ...modelStoreObject.modelDetail })
@@ -324,9 +327,13 @@
     // })
     const graph = await comfyUIApp.graphToPrompt()
     console.log(JSON.stringify(graph.workflow))
-    const file = new File([JSON.stringify(graph.workflow)], `${formData.value.name}-workflow.json`, {
-      type: 'application/json'
-    })
+    const file = new File(
+      [JSON.stringify(graph.workflow)],
+      `${formData.value.name}-workflow.json`,
+      {
+        type: 'application/json'
+      }
+    )
     uploadFile(file, 'Workflow', (sha256sum: string) => {
       formData.value.versions[0].progress = 100
       formData.value.versions[0].fileName = `${formData.value.name}-workflow.json`

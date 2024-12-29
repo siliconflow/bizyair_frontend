@@ -41,9 +41,8 @@
         ]
         communityStore.workflows.modelListPathParams.total = response.data.total
         hasMore.value = communityStore.workflows.models.length < response.data.total
-      }
-      else{
-        hasMore.value=false
+      } else {
+        hasMore.value = false
       }
     } catch (error) {
       console.error('fetch data error:', error)
@@ -236,18 +235,17 @@
   const imageLoaded = (modelId: number | string) => imageLoadStates.value.get(modelId) ?? false
 
   const handleLoadWorkflow = async (versions: any) => {
-    if (!versions || versions.length === 0){
+    if (!versions || versions.length === 0) {
       useToaster.error('No workflow found')
       return
     }
-    
+
     const workflow = await get_workflow_dowload_url(versions[0].id, versions[0].sign)
     communityStore.showDialog = false
-    if(workflow.data && comfyUIApp && comfyUIApp.graph){
+    if (workflow.data && comfyUIApp && comfyUIApp.graph) {
       comfyUIApp.graph.clear()
       await comfyUIApp.loadGraphData(workflow.data)
     }
-   
   }
 
   import vDialog from '@/components/modules/vDialog.vue'
@@ -279,7 +277,7 @@
 
 <template>
   <div class="flex flex-col h-screen">
-    <div class="px-6 pt-6 pb-0 sticky top-0 z-20 ">
+    <div class="px-6 pt-6 pb-0 sticky top-0 z-20">
       <ModelFilterBar
         v-model:show-sort-popover="showSortPopover"
         page="workflows"
@@ -338,7 +336,10 @@
                   />
                 </svg>
               </div>
-              <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden" @click="handleCommunityDetail(model)">
+              <div
+                class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
+                @click="handleCommunityDetail(model)"
+              >
                 <div
                   class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"
                   :class="{ 'opacity-0': imageLoaded(model.id) }"
@@ -510,11 +511,11 @@
       :title="currentModel?.name"
     >
       <div v-show="!dialogLoading">
-        <ModelDetail 
-          :model-id="currentModel?.id" 
-          :version="currentModel?.versions?.[0]" 
+        <ModelDetail
+          :model-id="currentModel?.id"
+          :version="currentModel?.versions?.[0]"
           mode="publicity"
-          @loaded="handleLoaded" 
+          @loaded="handleLoaded"
         />
       </div>
       <div v-show="dialogLoading" class="flex justify-center items-center min-h-[300px]">

@@ -14,5 +14,7 @@ export const oss_sign = (sha256: string, type: string) => {
 }
 
 export const oss_upload_token = (filename: string, type: string) => {
-  return customFetch(`/bizyair/community/upload_token?filename=${filename}&type=${type}`, { method: 'GET' })
+  return customFetch(`/bizyair/community/upload_token?filename=${filename}&type=${type}`, {
+    method: 'GET'
+  })
 }

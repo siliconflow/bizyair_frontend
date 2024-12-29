@@ -1,20 +1,17 @@
-
 import { commit_file } from '@/api/model'
 import { creatClient } from './ossClient'
 import { useShadet } from '@/components/modules/vShadet/index'
 
-
 let calculatingDialog: any
 
 export async function uploadFile(file: File, modelType: string, fn: (sha256sum: string) => void) {
-
   calculatingDialog = useShadet({
     content: 'In hash calculation',
     z: 'z-12000'
   })
   const { oss, objectKey, md5Hash, sha256sum, fileId } = await creatClient(file, modelType)
   calculatingDialog.close()
-  
+
   if (fileId) {
     fn(sha256sum)
     return
@@ -56,7 +53,7 @@ export async function uploadFile(file: File, modelType: string, fn: (sha256sum: 
     md5Hash,
     sha256sum,
     object_key: objectKey,
-    type: modelType,
+    type: modelType
   })
   fn(sha256sum)
   return completeResult

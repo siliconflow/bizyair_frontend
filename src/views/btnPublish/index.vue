@@ -22,9 +22,9 @@
     Model: () => {
       modelStoreObject.setDialogStatus(true)
     },
-    'Workflow': () => {
+    Workflow: () => {
       modelStoreObject.setDialogStatusWorkflow(true)
-    },
+    }
   })
 
   onMounted(() => {
