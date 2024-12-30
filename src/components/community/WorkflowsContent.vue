@@ -533,7 +533,7 @@
 
 <style scoped>
   .scroll-container {
-    height: calc(100vh - 140px);
+    height: calc(80vh - 140px);
     margin-top: 1rem;
     position: relative;
     scrollbar-width: thin;

@@ -310,7 +310,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col h-screen">
+  <div class="flex flex-col h-full">
     <div class="px-6 pt-6 pb-0 sticky top-0 z-20">
       <ModelFilterBar
         v-model:show-sort-popover="showSortPopover"
@@ -581,7 +581,7 @@
 
 <style scoped>
   .scroll-container {
-    height: calc(100vh - 140px);
+    height: calc(80vh - 140px);
     margin-top: 1rem;
     position: relative;
     scrollbar-width: thin;

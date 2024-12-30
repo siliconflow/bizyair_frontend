@@ -13,7 +13,7 @@
 </script>
 
 <template>
-  <div class="flex w-full h-screen overflow-hidden">
+  <div class="flex w-full h-full overflow-hidden">
     <div class="w-64 flex-shrink-0">
       <Sidebar :current-path="communityStore.currentPath" @menu-click="handleMenuClick" />
     </div>
