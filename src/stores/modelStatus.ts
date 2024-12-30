@@ -101,7 +101,7 @@ export const modelStore = defineStore('modelStore', {
     },
     setDialogStatusWorkflow(status: boolean, versionId?: number) {
       this.showWorkflowDialog = status
-      this.showWorkflowVersionId = versionId
+      this.showVersionId = versionId
     },
     uploadModelDone() {
       this.reload += 1

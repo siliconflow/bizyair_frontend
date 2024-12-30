@@ -161,7 +161,11 @@
   const handleModelOperation = async (type: 'edit' | 'remove', id: string | number) => {
     if (type === 'edit') {
       modelStoreInstance.setModelDetail(model)
-      modelStoreInstance.setDialogStatus(true, Number(currentVersion.value?.id))
+      if (model.value?.type === 'Workflow') {
+        modelStoreInstance.setDialogStatusWorkflow(true, Number(currentVersion.value?.id))
+      } else {
+        modelStoreInstance.setDialogStatus(true, Number(currentVersion.value?.id))
+      }
       downloadOpen.value = false
       communityStore.showCommunityDetail = false
       communityStore.reload++
