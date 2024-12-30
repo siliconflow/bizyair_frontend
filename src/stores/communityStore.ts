@@ -30,7 +30,8 @@ export const useCommunityStore = defineStore('community', {
         model_types: [],
         base_models: [],
         selected_model_types: []
-      }
+      },
+      scrollPosition: 0
     } as PageState,
     quickStart: {
       modelListPathParams: {
@@ -48,7 +49,8 @@ export const useCommunityStore = defineStore('community', {
         model_types: ['Workflow'],
         base_models: [],
         selected_model_types: []
-      }
+      },
+      scrollPosition: 0
     } as PageState,
     workflows: {
       modelListPathParams: {
@@ -66,7 +68,8 @@ export const useCommunityStore = defineStore('community', {
         model_types: ['Workflow'],
         base_models: [],
         selected_model_types: []
-      }
+      },
+      scrollPosition: 0
     } as PageState,
 
     mine: {
@@ -86,7 +89,8 @@ export const useCommunityStore = defineStore('community', {
           model_types: [],
           base_models: [],
           selected_model_types: []
-        }
+        },
+        scrollPosition: 0
       } as PageState,
       forked: {
         modelListPathParams: {
@@ -104,7 +108,8 @@ export const useCommunityStore = defineStore('community', {
           model_types: [],
           base_models: [],
           selected_model_types: []
-        }
+        },
+        scrollPosition: 0
       } as PageState
     },
 
@@ -146,7 +151,8 @@ export const useCommunityStore = defineStore('community', {
             base_models: [],
             selected_model_types: [],
             sort: 'Recently'
-          }
+          },
+          scrollPosition: 0
         }
       } else if (this[page]) {
         this[page] = {
@@ -165,7 +171,8 @@ export const useCommunityStore = defineStore('community', {
             base_models: [],
             selected_model_types: [],
             sort: 'Recently'
-          }
+          },
+          scrollPosition: 0
         }
       }
     }

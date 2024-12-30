@@ -78,5 +78,6 @@ export interface PageState {
   filterState: FilterState
   modelListPathParams: ModelListPathParams
   models: Model[]
+  scrollPosition: number
 }
 

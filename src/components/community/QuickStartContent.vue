@@ -23,18 +23,36 @@
   const hasMore = ref(true)
   const hasPrevious = ref(false)
   const isLoadingPrevious = ref(false)
+  const lastVisiblePage = ref(1)
+  const maxVisiblePages = 2 // 最大可见页数
+  const itemsPerPage = ref(0) // 每页项目数，将在首次加载时设置
+
+  const loadedPages = ref(new Set<number>())
 
   const loadMore = async () => {
     if (loading.value || !hasMore.value) return
     loading.value = true
 
     try {
-      if (communityStore.quickStart.models.length >= communityStore.quickStart.modelListPathParams.total) {
+      const currentPage = communityStore.quickStart.modelListPathParams.current
+      const pageSize = communityStore.quickStart.modelListPathParams.page_size
+      const total = communityStore.quickStart.modelListPathParams.total
+
+      // 检查是否还有更多数据
+      if (currentPage * pageSize >= total) {
         hasMore.value = false
+        loading.value = false
         return
       }
 
-      const nextPage = communityStore.quickStart.modelListPathParams.current + 1
+      const nextPage = currentPage + 1
+      
+      // 检查是否已加载
+      if (loadedPages.value.has(nextPage)) {
+        loading.value = false
+        return
+      }
+
       communityStore.quickStart.modelListPathParams.current = nextPage
 
       const response = await get_model_list(
@@ -43,58 +61,136 @@
       )
 
       if (response?.data?.list?.length > 0) {
+        loadedPages.value.add(nextPage)
+        
+        // 保留最近的页面数据
+        const startPage = Math.max(1, nextPage - maxVisiblePages + 1)
+        
+        // 移除不需要的页面
+        for (const page of loadedPages.value) {
+          if (page < startPage) {
+            loadedPages.value.delete(page)
+          }
+        }
+
+        // 更新数据，保留最近几页的数据
         communityStore.quickStart.models = [
-          ...communityStore.quickStart.models,
+          ...communityStore.quickStart.models.slice(-((maxVisiblePages - 1) * pageSize)),
           ...response.data.list
         ]
+        
+        // 更新总数
         communityStore.quickStart.modelListPathParams.total = response.data.total
         
-        hasMore.value = communityStore.quickStart.models.length < response.data.total
+        // 更新是否还有更多数据
+        hasMore.value = nextPage * pageSize < response.data.total
       } else {
         hasMore.value = false
       }
     } catch (error) {
       console.error('fetch data error:', error)
       useToaster.error(`Failed to load more data: ${error}`)
+      hasMore.value = false
     } finally {
       loading.value = false
     }
   }
 
-  const loadPrevious = async () => {
+  const debounce = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
+    let timeoutId: number | null = null
+    return (...args: Parameters<T>) => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId)
+      }
+      timeoutId = window.setTimeout(() => {
+        fn(...args)
+        timeoutId = null
+      }, delay)
+    }
+  }
+
+  const loadPrevious = debounce(async () => {
     if (isLoadingPrevious.value || !hasPrevious.value) return
     const container = document.querySelector('.scroll-container')
-    if (!container || container.scrollTop > SCROLL_THRESHOLD) return
+    if (!container) return
 
     isLoadingPrevious.value = true
 
     try {
-      const prevPage = communityStore.quickStart.modelListPathParams.current - 1
+      const currentPage = communityStore.quickStart.modelListPathParams.current
+      const prevPage = currentPage - 1
+
+      // 基础检查
       if (prevPage < 1) {
         hasPrevious.value = false
+        isLoadingPrevious.value = false
         return
       }
 
+      // 检查是否已经加载过这一页
+      if (loadedPages.value.has(prevPage)) {
+        isLoadingPrevious.value = false
+        return
+      }
+
+      const oldScrollHeight = container.scrollHeight
+      const oldScrollTop = container.scrollTop
+
+      // 更新当前页码
       communityStore.quickStart.modelListPathParams.current = prevPage
+
       const response = await get_model_list(
         communityStore.quickStart.modelListPathParams,
         communityStore.quickStart.filterState
       )
 
       if (response?.data?.list) {
-        communityStore.quickStart.models = [
-          ...response.data.list,
-          ...communityStore.quickStart.models
-        ]
-        communityStore.quickStart.modelListPathParams.total = response.data.total
-        hasPrevious.value = prevPage > 1
-        hasMore.value = communityStore.quickStart.models.length < response.data.total
+        const newData = response.data.list
+        const currentData = communityStore.quickStart.models
 
+        // 确保没有重复数据
+        const newDataIds = new Set(newData.map(item => item.id))
+        const filteredCurrentData = currentData.filter(item => !newDataIds.has(item.id))
+
+        // 更新数据，新数据在前
+        communityStore.quickStart.models = [
+          ...newData,
+          ...filteredCurrentData
+        ]
+
+        // 记录已加载的页面
+        loadedPages.value.add(prevPage)
+        
+        // 更新总数
+        communityStore.quickStart.modelListPathParams.total = response.data.total
+
+        // 更新状态
+        hasPrevious.value = prevPage > 1
+        hasMore.value = true
+
+        // 调整滚动位置
         await nextTick()
-        const firstNewItem = container.querySelector('.playground-container > div')
-        if (firstNewItem) {
-          firstNewItem.scrollIntoView({ behavior: 'auto', block: 'start' })
-          container.scrollBy(0, 10)
+        const newScrollHeight = container.scrollHeight
+        const heightDiff = newScrollHeight - oldScrollHeight
+        
+        if (heightDiff > 0) {
+          // 使用 requestAnimationFrame 确保平滑滚动
+          requestAnimationFrame(() => {
+            container.scrollTop = heightDiff + oldScrollTop
+            communityStore.quickStart.scrollPosition = container.scrollTop
+          })
+        }
+
+        // 如果数据超过最大显示页数，则裁剪
+        if (communityStore.quickStart.models.length > maxVisiblePages * itemsPerPage.value) {
+          communityStore.quickStart.models = communityStore.quickStart.models.slice(
+            0,
+            maxVisiblePages * itemsPerPage.value
+          )
+
+          // 更新已加载页面记录
+          const keepPages = new Set([prevPage, currentPage])
+          loadedPages.value = new Set([...loadedPages.value].filter(page => keepPages.has(page)))
         }
       }
     } catch (error) {
@@ -102,7 +198,7 @@
     } finally {
       isLoadingPrevious.value = false
     }
-  }
+  }, 300)
 
   const throttle = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
     let timer: number | null = null
@@ -118,11 +214,13 @@
   const handleScroll = throttle((e: Event) => {
     const container = e.target as HTMLElement
     showBackToTop.value = container.scrollTop > 500
+    communityStore.quickStart.scrollPosition = container.scrollTop
 
-    if (container.scrollTop < SCROLL_THRESHOLD && hasPrevious.value && !isLoadingPrevious.value) {
+    // 只在真正接近顶部时触发加载
+    if (container.scrollTop <= SCROLL_THRESHOLD && hasPrevious.value && !isLoadingPrevious.value) {
       loadPrevious()
     }
-  }, 1000)
+  }, 200)
 
   const fetchData = async (resetScroll: boolean = false) => {
     loading.value = true
@@ -134,10 +232,24 @@
 
       if (response?.data?.list) {
         const list = response.data.list || []
-        communityStore.quickStart.modelListPathParams.total = response.data.total || 0
+        const total = response.data.total || 0
+        communityStore.quickStart.modelListPathParams.total = total
+        
+        // 使用 store 中定义的 page_size
+        itemsPerPage.value = communityStore.quickStart.modelListPathParams.page_size
+
+        // 重置页面记录
+        loadedPages.value.clear()
+        loadedPages.value.add(communityStore.quickStart.modelListPathParams.current)
+
         communityStore.quickStart.models = list
-        hasMore.value = list.length > 0
-        hasPrevious.value = communityStore.quickStart.modelListPathParams.current > 1
+        
+        // 计算是否有更多数据
+        const currentPage = communityStore.quickStart.modelListPathParams.current
+        const pageSize = communityStore.quickStart.modelListPathParams.page_size
+        
+        hasMore.value = currentPage * pageSize < total
+        hasPrevious.value = resetScroll ? false : currentPage > 1
 
         if (resetScroll) {
           nextTick(() => {
@@ -155,6 +267,7 @@
         communityStore.quickStart.models = []
         hasMore.value = false
         hasPrevious.value = false
+        loadedPages.value.clear()
       }
     } catch (error) {
       useToaster.error(`Failed to fetch model list: ${error}`)
@@ -162,6 +275,7 @@
       communityStore.quickStart.models = []
       hasMore.value = false
       hasPrevious.value = false
+      loadedPages.value.clear()
     } finally {
       loading.value = false
     }
@@ -171,7 +285,16 @@
   let observer: IntersectionObserver | null = null
 
   onMounted(() => {
-    fetchData()
+    fetchData().then(() => {
+      nextTick(() => {
+        const container = document.querySelector('.scroll-container')
+        if (container) {
+          requestAnimationFrame(() => {
+            container.scrollTop = communityStore.quickStart.scrollPosition
+          })
+        }
+      })
+    })
     observer = new IntersectionObserver(
       throttle((entries: IntersectionObserverEntry[]) => {
         if (entries[0].isIntersecting && !loading.value && hasMore.value) {
@@ -291,6 +414,25 @@
     },
     { deep: true }
   )
+
+  watch(
+    () => communityStore.showDialog,
+    (newVal) => {
+      if (!newVal) {
+        const container = document.querySelector('.scroll-container')
+        if (container) {
+          communityStore.quickStart.scrollPosition = container.scrollTop
+        }
+      } else {
+        nextTick(() => {
+          const container = document.querySelector('.scroll-container')
+          if (container) {
+            container.scrollTop = communityStore.quickStart.scrollPosition
+          }
+        })
+      }
+    }
+  )
 </script>
 
 <template>
@@ -311,9 +453,15 @@
     <div class="flex-1 px-6 relative">
       <div class="scroll-container overflow-y-auto">
         <div v-if="hasPrevious" class="text-center py-4">
-          <div v-if="isLoadingPrevious" class="text-white/60">Loading historical data...</div>
+          <div v-if="isLoadingPrevious" class="text-white/60">
+            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto mb-2"></div>
+            Loading previous data...
+          </div>
           <div v-else class="text-white/60 cursor-pointer hover:text-white" @click="loadPrevious">
-            ↑ Load earlier content
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+            Load previous content
           </div>
         </div>
         <div class="playground-container">
