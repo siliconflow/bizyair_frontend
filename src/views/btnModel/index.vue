@@ -1,7 +1,7 @@
 <template>
   <div
-    @click="modelStoreObject.setDialogStatus(true)"
     class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3"
+    @click="modelStoreObject.setDialogStatus(true)"
   >
     <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
@@ -14,12 +14,12 @@
     <span class="block leading h-full leading-8 text-sm">PublishModel</span>
   </div>
   <v-dialog
-    v-model:open="modelStoreObject.showDialog"
-    @onClose="onDialogClose"
-    class="px-0 overflow-hidden pb-0 z-9000"
     v-if="modelStoreObject.showDialog"
-    layoutClass="z-9000"
-    contentClass="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+    v-model:open="modelStoreObject.showDialog"
+    class="px-0 overflow-hidden pb-0 z-9000"
+    layout-class="z-9000"
+    content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+    @on-close="onDialogClose"
   >
     <template #title
       ><span class="px-6 cursor-pointer" @click="handleToggleTitle">Publish a Model</span></template
@@ -27,26 +27,26 @@
     <div v-show="modelBox" class="px-6 pb-6">
       <v-item label="Model Name">
         <Input
-          @change="formData.nameError = false"
+          v-model:model-value="formData.name"
           :class="{ 'border-red-500': formData.nameError }"
           type="text"
           placeholder="Enter Model Name"
-          v-model:model-value="formData.name"
+          @change="formData.nameError = false"
         />
       </v-item>
       <v-item label="Model Type">
         <v-select
-          @update:open="formData.typeError = false"
-          :class="{ 'border-red-500': formData.typeError }"
           v-model:model-value="formData.type"
+          :class="{ 'border-red-500': formData.typeError }"
           placeholder="Select Model Type"
+          @update:open="formData.typeError = false"
         >
           <SelectItem v-for="(e, i) in typeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
         </v-select>
       </v-item>
       <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
     </div>
-    <vCustomAccordion :multiple="true" :activeIndex="acActiveIndex">
+    <vCustomAccordion :multiple="true" :active-index="acActiveIndex">
       <vCustomAccordionItem
         v-for="(e, i) in formData.versions"
         :key="i"
@@ -61,8 +61,8 @@
             <span v-else>Add Version</span>
             <Trash2
               v-if="formData.versions.length !== 1"
-              class="w-4 h-4"
               #icon
+              class="w-4 h-4"
               @click.capture.stop="delVersion(i)"
             />
             <Progress
@@ -76,19 +76,19 @@
           <div class="bg-[#353535] px-6 pb-4">
             <v-item label="Version Name">
               <Input
-                @change="e.versionError = false"
+                v-model:model-value="e.version"
                 :class="{ 'border-red-500': e.versionError }"
                 type="text"
                 placeholder="Version Name"
-                v-model:model-value="e.version"
+                @change="e.versionError = false"
               />
             </v-item>
             <v-item label="Base Model">
               <v-select
-                @update:open="e.baseModelError = false"
-                :class="{ 'border-red-500': e.baseModelError }"
                 v-model:model-value="e.base_model"
+                :class="{ 'border-red-500': e.baseModelError }"
                 placeholder="Select Base Model"
+                @update:open="e.baseModelError = false"
               >
                 <SelectItem v-for="(e, i) in baseTypeLis" :key="i" :value="e.value">{{
                   e.label
@@ -99,7 +99,7 @@
               <vUploadImage v-model.modelValue="e.cover_urls" />{{ e.cover_urls }}
             </v-item>
             <v-item label="Introduction">
-              <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />
+              <Markdown v-model.modelValue="e.intro" :editor-id="`myeditor${i}`" />
             </v-item>
             <v-item label="">
               <div class="flex items-center space-x-2 mt-2">
@@ -115,7 +115,7 @@
                 <Label for="airplane-mode">Publicly Visible</Label>
               </div>
             </v-item>
-            <v-item label="File" v-show="!e.showUpload">
+            <v-item v-show="!e.showUpload" label="File">
               <div class="flex h-28 items-center justify-end relative">
                 <p v-if="e.progress && e.fileName" class="absolute top-2 left-1 text-xs">
                   {{ e.fileName }}
@@ -124,18 +124,18 @@
                   <Progress :model-value="e.progress" class="mt-4 h-3" />
                   <p class="text-center pt-2">
                     {{ e.progress }}% Uploaded
-                    <span class="pl-2" v-if="e.speed">Speed: {{ e.speed }}</span>
+                    <span v-if="e.speed" class="pl-2">Speed: {{ e.speed }}</span>
                   </p>
                 </div>
                 <vUpload
-                  :modelType="formData.type"
                   :ref="e.ref"
+                  :model-type="formData.type"
                   :class="{ 'border-red-500': e.filePathError }"
                   @path="path => handlePath(path, i)"
                   @start="() => startUpload(i)"
                   @success="data => successUpload(data, i)"
                   @error="() => errorUpload(i)"
-                  @uploadInfo="data => handleUploadInfo(data, i)"
+                  @upload-info="data => handleUploadInfo(data, i)"
                   @progress="p => fnProgress(p, i)"
                 />
               </div>
@@ -144,7 +144,7 @@
         </template>
       </vCustomAccordionItem>
     </vCustomAccordion>
-    <template #foot v-if="!modelBox">
+    <template v-if="!modelBox" #foot>
       <div
         class="bg-[#353535] px-6 w-full h-14 rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px] flex justify-between items-center -mt-4"
       >
