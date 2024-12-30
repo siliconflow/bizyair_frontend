@@ -12,10 +12,11 @@
   import { Model } from '@/types/model'
   import vDialog from '@/components/modules/vDialog.vue'
   import vDefaultPic from '@/components/modules/vDefaultPic.vue'
+  import { modelStore } from '@/stores/modelStatus'
   // import vImage from '@/components/modules/vImage.vue'
   const comfyUIApp: any = inject('comfyUIApp')
   const communityStore = useCommunityStore()
-
+  const modelStoreInstance = modelStore()
   const SCROLL_THRESHOLD = 100
 
   const loading = ref(false)
@@ -273,6 +274,16 @@
 
   watch(
     () => communityStore.reload,
+    async (newVal: number, oldVal: number) => {
+      if (newVal !== oldVal) {
+        await fetchData()
+      }
+    },
+    { deep: true }
+  )
+
+  watch(
+    () => modelStoreInstance.reload,
     async (newVal: number, oldVal: number) => {
       if (newVal !== oldVal) {
         await fetchData()

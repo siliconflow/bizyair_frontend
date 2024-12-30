@@ -6,7 +6,7 @@
   import { ref, onMounted, onUnmounted, nextTick, watch, onActivated } from 'vue'
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
-
+  import { modelStore } from '@/stores/modelStatus'
   import { get_model_list } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import { Model } from '@/types/model'
@@ -16,7 +16,7 @@
   // import vImage from '@/components/modules/vImage.vue'
 
   const communityStore = useCommunityStore()
-
+  const modelStoreInstance = modelStore()
   const SCROLL_THRESHOLD = 30
 
   const loading = ref(false)
@@ -270,6 +270,16 @@
 
   watch(
     () => communityStore.reload,
+    async (newVal: number, oldVal: number) => {
+      if (newVal !== oldVal) {
+        await fetchData()
+      }
+    },
+    { deep: true }
+  )
+
+  watch(
+    () => modelStoreInstance.reload,
     async (newVal: number, oldVal: number) => {
       if (newVal !== oldVal) {
         await fetchData()

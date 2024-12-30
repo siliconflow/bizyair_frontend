@@ -295,6 +295,16 @@
     },
     { deep: true }
   )
+
+  watch(
+    () => useModelStore.reload,
+    async (newVal: number, oldVal: number) => {
+      if (newVal !== oldVal) {
+        await fetchData()
+      }
+    },
+    { deep: true }
+  )
 </script>
 
 <template>
