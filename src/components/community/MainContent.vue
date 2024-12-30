@@ -252,7 +252,6 @@
   }
   const imageLoaded = (modelId: number | string) => imageLoadStates.value.get(modelId) ?? false
 
-  const showCommunityDetail = ref(false)
 
   const currentModel = ref<Model>()
 
@@ -261,7 +260,7 @@
   const handleCommunityDetail = (model: Model) => {
     dialogLoading.value = true
     currentModel.value = model
-    showCommunityDetail.value = true
+    communityStore.showCommunityDetail = true
   }
 
   const handleLoaded = () => {

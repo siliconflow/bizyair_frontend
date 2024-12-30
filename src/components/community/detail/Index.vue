@@ -39,6 +39,7 @@
   const downloadOpen = ref(false)
   const scrollViewportRef = ref<any | null>(null)
   const modelStoreInstance = modelStore()
+  const isLoading = ref(false)
 
   const props = defineProps<{
     modelId: string | number
@@ -224,16 +225,23 @@
   }
 
   const handleLoadWorkflow = async () => {
-    const workflow = await get_workflow_dowload_url(
-      currentVersion.value?.id,
-      currentVersion.value?.sign
-    )
-    if (workflow.data && comfyUIApp && comfyUIApp.graph) {
-      comfyUIApp.graph.clear()
-      await comfyUIApp.loadGraphData(workflow.data)
+    try {
+      isLoading.value = true
+      const workflow = await get_workflow_dowload_url(
+        currentVersion.value?.id,
+        currentVersion.value?.sign
+      )
+      if (workflow.data && comfyUIApp && comfyUIApp.graph) {
+        comfyUIApp.graph.clear()
+        await comfyUIApp.loadGraphData(workflow.data)
+      }
+      communityStore.showDialog = false
+      communityStore.showCommunityDetail = false
+    } catch (error) {
+      useToaster.error('Failed to load workflow')
+    } finally {
+      isLoading.value = false
     }
-    communityStore.showDialog = false
-    communityStore.showCommunityDetail = false
   }
 
   const handleDownloadWorkFlow = async () => {
@@ -554,23 +562,50 @@
             <Button
               v-if="model?.type === 'Workflow'"
               class="flex w-[170px] px-8 py-2 justify-center items-center gap-2 bg-[#F43F5E] hover:bg-[#F43F5E]/90 rounded-[6px]"
+              :disabled="isLoading"
               @click="handleLoadWorkflow"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="17"
-                height="16"
-                viewBox="0 0 17 16"
-                fill="none"
-              >
-                <path
-                  d="M6.49988 7.9999L7.83322 9.33324L10.4999 6.66657M3.06655 5.74657C2.96925 5.30825 2.98419 4.85246 3.10999 4.42146C3.23579 3.99046 3.46838 3.5982 3.7862 3.28105C4.10401 2.9639 4.49676 2.73213 4.92802 2.60723C5.35929 2.48233 5.81511 2.46835 6.25322 2.56657C6.49436 2.18944 6.82655 1.87907 7.21919 1.66409C7.61182 1.44911 8.05225 1.33643 8.49988 1.33643C8.94752 1.33643 9.38795 1.44911 9.78058 1.66409C10.1732 1.87907 10.5054 2.18944 10.7466 2.56657C11.1853 2.46792 11.6419 2.48184 12.0739 2.60704C12.5058 2.73225 12.8991 2.96466 13.2171 3.28267C13.5351 3.60068 13.7675 3.99395 13.8927 4.4259C14.0179 4.85786 14.0319 5.31446 13.9332 5.75324C14.3104 5.99437 14.6207 6.32657 14.8357 6.7192C15.0507 7.11183 15.1634 7.55227 15.1634 7.9999C15.1634 8.44754 15.0507 8.88797 14.8357 9.2806C14.6207 9.67323 14.3104 10.0054 13.9332 10.2466C14.0314 10.6847 14.0175 11.1405 13.8926 11.5718C13.7677 12.003 13.5359 12.3958 13.2187 12.7136C12.9016 13.0314 12.5093 13.264 12.0783 13.3898C11.6473 13.5156 11.1915 13.5305 10.7532 13.4332C10.5124 13.8118 10.1799 14.1235 9.78663 14.3394C9.39333 14.5554 8.9519 14.6686 8.50322 14.6686C8.05453 14.6686 7.6131 14.5554 7.2198 14.3394C6.8265 14.1235 6.49404 13.8118 6.25322 13.4332C5.81511 13.5315 5.35929 13.5175 4.92802 13.3926C4.49676 13.2677 4.10401 13.0359 3.7862 12.7188C3.46838 12.4016 3.23579 12.0093 3.10999 11.5783C2.98419 11.1473 2.96925 10.6916 3.06655 10.2532C2.68652 10.0127 2.37349 9.68002 2.15658 9.28605C1.93967 8.89207 1.82593 8.44964 1.82593 7.9999C1.82593 7.55016 1.93967 7.10773 2.15658 6.71376C2.37349 6.31979 2.68652 5.98707 3.06655 5.74657Z"
-                  stroke="#F9FAFB"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                /></svg
-              >Load</Button
-            >
+              <template v-if="isLoading">
+                <svg 
+                  class="animate-spin h-4 w-4" 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24"
+                >
+                  <circle 
+                    class="opacity-25" 
+                    cx="12" 
+                    cy="12" 
+                    r="10" 
+                    stroke="currentColor" 
+                    stroke-width="4"
+                  />
+                  <path 
+                    class="opacity-75" 
+                    fill="currentColor" 
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                <span class="ml-1">Loading...</span>
+              </template>
+              <template v-else>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="17"
+                  height="16"
+                  viewBox="0 0 17 16"
+                  fill="none"
+                >
+                  <path
+                    d="M6.49988 7.9999L7.83322 9.33324L10.4999 6.66657M3.06655 5.74657C2.96925 5.30825 2.98419 4.85246 3.10999 4.42146C3.23579 3.99046 3.46838 3.5982 3.7862 3.28105C4.10401 2.9639 4.49676 2.73213 4.92802 2.60723C5.35929 2.48233 5.81511 2.46835 6.25322 2.56657C6.49436 2.18944 6.82655 1.87907 7.21919 1.66409C7.61182 1.44911 8.05225 1.33643 8.49988 1.33643C8.94752 1.33643 9.38795 1.44911 9.78058 1.66409C10.1732 1.87907 10.5054 2.18944 10.7466 2.56657C11.1853 2.46792 11.6419 2.48184 12.0739 2.60704C12.5058 2.73225 12.8991 2.96466 13.2171 3.28267C13.5351 3.60068 13.7675 3.99395 13.8927 4.4259C14.0179 4.85786 14.0319 5.31446 13.9332 5.75324C14.3104 5.99437 14.6207 6.32657 14.8357 6.7192C15.0507 7.11183 15.1634 7.55227 15.1634 7.9999C15.1634 8.44754 15.0507 8.88797 14.8357 9.2806C14.6207 9.67323 14.3104 10.0054 13.9332 10.2466C14.0314 10.6847 14.0175 11.1405 13.8926 11.5718C13.7677 12.003 13.5359 12.3958 13.2187 12.7136C12.9016 13.0314 12.5093 13.264 12.0783 13.3898C11.6473 13.5156 11.1915 13.5305 10.7532 13.4332C10.5124 13.8118 10.1799 14.1235 9.78663 14.3394C9.39333 14.5554 8.9519 14.6686 8.50322 14.6686C8.05453 14.6686 7.6131 14.5554 7.2198 14.3394C6.8265 14.1235 6.49404 13.8118 6.25322 13.4332C5.81511 13.5315 5.35929 13.5175 4.92802 13.3926C4.49676 13.2677 4.10401 13.0359 3.7862 12.7188C3.46838 12.4016 3.23579 12.0093 3.10999 11.5783C2.98419 11.1473 2.96925 10.6916 3.06655 10.2532C2.68652 10.0127 2.37349 9.68002 2.15658 9.28605C1.93967 8.89207 1.82593 8.44964 1.82593 7.9999C1.82593 7.55016 1.93967 7.10773 2.15658 6.71376C2.37349 6.31979 2.68652 5.98707 3.06655 5.74657Z"
+                    stroke="#F9FAFB"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                Load
+              </template>
+            </Button>
           </div>
         </div>
         <div
