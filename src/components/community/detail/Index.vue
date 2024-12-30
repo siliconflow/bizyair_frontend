@@ -228,9 +228,9 @@
       currentVersion.value?.id,
       currentVersion.value?.sign
     )
-    if (workflow?.data?.data && comfyUIApp && comfyUIApp.graph) {
+    if (workflow.data && comfyUIApp && comfyUIApp.graph) {
       comfyUIApp.graph.clear()
-      await comfyUIApp.loadGraphData(workflow.data.data)
+      await comfyUIApp.loadGraphData(workflow.data)
     }
     communityStore.showDialog = false
     communityStore.showCommunityDetail = false
