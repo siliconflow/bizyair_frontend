@@ -39,6 +39,10 @@
     loading.value = true
 
     try {
+      if (communityStore.mine[currentTab.value]?.models.length >= communityStore.mine[currentTab.value]?.modelListPathParams.total) {
+        hasMore.value = false
+        return
+      }
       const currentState = communityStore.mine[currentTab.value]
       const nextPage = currentState.modelListPathParams.current + 1
       currentState.modelListPathParams.current = nextPage

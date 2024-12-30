@@ -30,6 +30,10 @@
     loading.value = true
 
     try {
+      if (communityStore.mainContent.models.length >= communityStore.mainContent.modelListPathParams.total) {
+        hasMore.value = false
+        return
+      }
       const nextPage = communityStore.mainContent.modelListPathParams.current + 1
       communityStore.mainContent.modelListPathParams.current = nextPage
 
@@ -298,7 +302,6 @@
   }
 
   onActivated(() => {
-    console.log('onActivated')
     resetState()
   })
 

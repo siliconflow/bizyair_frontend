@@ -27,6 +27,11 @@
     loading.value = true
 
     try {
+      if (communityStore.quickStart.models.length >= communityStore.quickStart.modelListPathParams.total) {
+        hasMore.value = false
+        return
+      }
+
       const nextPage = communityStore.quickStart.modelListPathParams.current + 1
       communityStore.quickStart.modelListPathParams.current = nextPage
 
@@ -41,9 +46,8 @@
           ...response.data.list
         ]
         communityStore.quickStart.modelListPathParams.total = response.data.total
-        hasMore.value = communityStore.quickStart.modelListPathParams.current * 
-                        communityStore.quickStart.modelListPathParams.page_size < 
-                        response.data.total
+        
+        hasMore.value = communityStore.quickStart.models.length < response.data.total
       } else {
         hasMore.value = false
       }

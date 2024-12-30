@@ -26,6 +26,10 @@
     loading.value = true
 
     try {
+      if (communityStore.workflows.models.length >= communityStore.workflows.modelListPathParams.total) {
+        hasMore.value = false
+        return
+      }
       const nextPage = communityStore.workflows.modelListPathParams.current + 1
       communityStore.workflows.modelListPathParams.current = nextPage
 
