@@ -4,18 +4,20 @@
     variant="outline"
     class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
-      <g
-        fill="none"
-        stroke="#ddd"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="1.5"
-      >
-        <circle cx="12" cy="8" r="5" />
-        <path d="M20 21a8 8 0 1 0-16 0m16 0a8 8 0 1 0-16 0" />
-      </g>
-    </svg>
+    <span class="mr-1">
+      <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
+        <g
+          fill="none"
+          stroke="#ddd"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+        >
+          <circle cx="12" cy="8" r="5" />
+          <path d="M20 21a8 8 0 1 0-16 0m16 0a8 8 0 1 0-16 0" />
+        </g>
+      </svg>
+    </span>
     <span class="block leading h-full leading-8 text-sm">Profile</span>
   </div>
   <vDrawer v-model:open="showDrawer">
