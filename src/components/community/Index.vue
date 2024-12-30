@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
   import Sidebar from '@/components/community/Sidebar.vue'
   import MainContent from '@/components/community/MainContent.vue'
   import QuickStartContent from '@/components/community/QuickStartContent.vue'
