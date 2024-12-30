@@ -31,7 +31,14 @@ export const useCommunityStore = defineStore('community', {
         base_models: [],
         selected_model_types: []
       },
-      scrollPosition: 0
+      scrollPosition: 0,
+      lastState: {
+        currentPage: 1,
+        hasMore: true,
+        hasPrevious: false,
+        loadedPages: [],
+        scrollRatio: 0
+      }
     } as PageState,
     quickStart: {
       modelListPathParams: {
@@ -50,7 +57,14 @@ export const useCommunityStore = defineStore('community', {
         base_models: [],
         selected_model_types: []
       },
-      scrollPosition: 0
+      scrollPosition: 0,
+      lastState: {
+        currentPage: 1,
+        hasMore: true,
+        hasPrevious: false,
+        loadedPages: [],
+        scrollRatio: 0
+      }
     } as PageState,
     workflows: {
       modelListPathParams: {
@@ -69,7 +83,14 @@ export const useCommunityStore = defineStore('community', {
         base_models: [],
         selected_model_types: []
       },
-      scrollPosition: 0
+      scrollPosition: 0,
+      lastState: {
+        currentPage: 1,
+        hasMore: true,
+        hasPrevious: false,
+        loadedPages: [],
+        scrollRatio: 0
+      }
     } as PageState,
 
     mine: {
@@ -90,7 +111,14 @@ export const useCommunityStore = defineStore('community', {
           base_models: [],
           selected_model_types: []
         },
-        scrollPosition: 0
+        scrollPosition: 0,
+        lastState: {
+          currentPage: 1,
+          hasMore: true,
+          hasPrevious: false,
+          loadedPages: [],
+          scrollRatio: 0
+        }
       } as PageState,
       forked: {
         modelListPathParams: {
@@ -109,7 +137,14 @@ export const useCommunityStore = defineStore('community', {
           base_models: [],
           selected_model_types: []
         },
-        scrollPosition: 0
+        scrollPosition: 0,
+        lastState: {
+          currentPage: 1,
+          hasMore: true,
+          hasPrevious: false,
+          loadedPages: [],
+          scrollRatio: 0
+        }
       } as PageState
     },
 

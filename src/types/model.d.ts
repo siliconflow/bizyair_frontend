@@ -79,5 +79,12 @@ export interface PageState {
   modelListPathParams: ModelListPathParams
   models: Model[]
   scrollPosition: number
+  lastState?: {
+    currentPage: number;
+    hasMore: boolean;
+    hasPrevious: boolean;
+    loadedPages: number[];
+    scrollRatio: number;
+  };
 }
 

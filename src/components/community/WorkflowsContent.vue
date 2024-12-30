@@ -22,6 +22,10 @@
   const hasPrevious = ref(false)
   const isLoadingPrevious = ref(false)
 
+  const scrollRatio = ref(0)
+
+  const loadedPages = ref(new Set<number>())
+
   const loadMore = async () => {
     if (loading.value || !hasMore.value) return
     loading.value = true
@@ -286,6 +290,49 @@
       }
     },
     { deep: true }
+  )
+
+  watch(
+    () => communityStore.showDialog,
+    (newVal) => {
+      if (!newVal) {
+        const container = document.querySelector('.scroll-container')
+        if (container) {
+          const maxScroll = container.scrollHeight - container.clientHeight
+          if (maxScroll > 0) {
+            scrollRatio.value = Math.min(0.7, container.scrollTop / maxScroll)
+          }
+          
+          communityStore.workflows.lastState = {
+            currentPage: communityStore.workflows.modelListPathParams.current,
+            hasMore: hasMore.value,
+            hasPrevious: hasPrevious.value,
+            loadedPages: Array.from(loadedPages.value),
+            scrollRatio: scrollRatio.value
+          }
+        }
+      } else {
+        nextTick(() => {
+          const container = document.querySelector('.scroll-container')
+          if (container && communityStore.workflows.lastState) {
+            communityStore.workflows.modelListPathParams.current = communityStore.workflows.lastState.currentPage
+            hasMore.value = communityStore.workflows.lastState.hasMore
+            hasPrevious.value = communityStore.workflows.lastState.hasPrevious
+            loadedPages.value = new Set(communityStore.workflows.lastState.loadedPages)
+            scrollRatio.value = communityStore.workflows.lastState.scrollRatio || 0
+
+            requestAnimationFrame(() => {
+              const maxScroll = container.scrollHeight - container.clientHeight
+              const targetScroll = Math.max(0, Math.min(
+                maxScroll * scrollRatio.value,
+                maxScroll * 0.7
+              ))
+              container.scrollTop = targetScroll
+            })
+          }
+        })
+      }
+    }
   )
 </script>
 

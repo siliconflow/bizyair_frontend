@@ -23,11 +23,12 @@
   const hasMore = ref(true)
   const hasPrevious = ref(false)
   const isLoadingPrevious = ref(false)
-  const lastVisiblePage = ref(1)
   const maxVisiblePages = 2 // 最大可见页数
   const itemsPerPage = ref(0) // 每页项目数，将在首次加载时设置
 
   const loadedPages = ref(new Set<number>())
+
+  const scrollRatio = ref(0)
 
   const loadMore = async () => {
     if (loading.value || !hasMore.value) return
@@ -38,8 +39,8 @@
       const pageSize = communityStore.quickStart.modelListPathParams.page_size
       const total = communityStore.quickStart.modelListPathParams.total
 
-      // 检查是否还有更多数据
-      if (currentPage * pageSize >= total) {
+      // 更严格的检查
+      if (currentPage * pageSize >= total || !hasMore.value) {
         hasMore.value = false
         loading.value = false
         return
@@ -63,23 +64,12 @@
       if (response?.data?.list?.length > 0) {
         loadedPages.value.add(nextPage)
         
-        // 保留最近的页面数据
-        const startPage = Math.max(1, nextPage - maxVisiblePages + 1)
-        
-        // 移除不需要的页面
-        for (const page of loadedPages.value) {
-          if (page < startPage) {
-            loadedPages.value.delete(page)
-          }
-        }
-
         // 更新数据，保留最近几页的数据
         communityStore.quickStart.models = [
           ...communityStore.quickStart.models.slice(-((maxVisiblePages - 1) * pageSize)),
           ...response.data.list
         ]
         
-        // 更新总数
         communityStore.quickStart.modelListPathParams.total = response.data.total
         
         // 更新是否还有更多数据
@@ -149,8 +139,8 @@
         const currentData = communityStore.quickStart.models
 
         // 确保没有重复数据
-        const newDataIds = new Set(newData.map(item => item.id))
-        const filteredCurrentData = currentData.filter(item => !newDataIds.has(item.id))
+        const newDataIds = new Set(newData.map((item: Model) => item.id))
+        const filteredCurrentData = currentData.filter((item: Model) => !newDataIds.has(item.id))
 
         // 更新数据，新数据在前
         communityStore.quickStart.models = [
@@ -211,12 +201,19 @@
     }
   }
 
+
+
   const handleScroll = throttle((e: Event) => {
     const container = e.target as HTMLElement
     showBackToTop.value = container.scrollTop > 500
-    communityStore.quickStart.scrollPosition = container.scrollTop
+    
+    // 计算滚动比例
+    const maxScroll = container.scrollHeight - container.clientHeight
+    if (maxScroll > 0) {
+      scrollRatio.value = container.scrollTop / maxScroll
+    }
 
-    // 只在真正接近顶部时触发加载
+    // 向上加载的逻辑
     if (container.scrollTop <= SCROLL_THRESHOLD && hasPrevious.value && !isLoadingPrevious.value) {
       loadPrevious()
     }
@@ -288,9 +285,14 @@
     fetchData().then(() => {
       nextTick(() => {
         const container = document.querySelector('.scroll-container')
-        if (container) {
+        if (container && communityStore.quickStart.lastState?.scrollRatio) {
           requestAnimationFrame(() => {
-            container.scrollTop = communityStore.quickStart.scrollPosition
+            const maxScroll = container.scrollHeight - container.clientHeight
+            const targetScroll = Math.max(0, Math.min(
+              maxScroll * (communityStore.quickStart.lastState?.scrollRatio ?? 0),
+              maxScroll * 0.7
+            ))
+            container.scrollTop = targetScroll
           })
         }
       })
@@ -419,15 +421,46 @@
     () => communityStore.showDialog,
     (newVal) => {
       if (!newVal) {
+        // 关闭对话框时，保存当前状态
         const container = document.querySelector('.scroll-container')
         if (container) {
-          communityStore.quickStart.scrollPosition = container.scrollTop
+          // 保存滚动比例
+          const maxScroll = container.scrollHeight - container.clientHeight
+          if (maxScroll > 0) {
+            scrollRatio.value = Math.min(0.7, container.scrollTop / maxScroll) // 限制最大比例为 70%
+          }
+          
+          // 保存其他状态
+          communityStore.quickStart.lastState = {
+            currentPage: communityStore.quickStart.modelListPathParams.current,
+            hasMore: hasMore.value,
+            hasPrevious: hasPrevious.value,
+            loadedPages: Array.from(loadedPages.value),
+            scrollRatio: scrollRatio.value
+          }
         }
       } else {
+        // 打开对话框时，恢复之前的状态
         nextTick(() => {
           const container = document.querySelector('.scroll-container')
-          if (container) {
-            container.scrollTop = communityStore.quickStart.scrollPosition
+          if (container && communityStore.quickStart.lastState) {
+            // 恢复页码相关状态
+            communityStore.quickStart.modelListPathParams.current = communityStore.quickStart.lastState.currentPage
+            hasMore.value = communityStore.quickStart.lastState.hasMore
+            hasPrevious.value = communityStore.quickStart.lastState.hasPrevious
+            loadedPages.value = new Set(communityStore.quickStart.lastState.loadedPages)
+            scrollRatio.value = communityStore.quickStart.lastState.scrollRatio || 0
+
+            // 等待内容完全渲染
+            requestAnimationFrame(() => {
+              // 根据保存的比例计算新的滚动位置
+              const maxScroll = container.scrollHeight - container.clientHeight
+              const targetScroll = Math.max(0, Math.min(
+                maxScroll * scrollRatio.value,
+                maxScroll * 0.7 // 确保不会滚动到太靠近底部
+              ))
+              container.scrollTop = targetScroll
+            })
           }
         })
       }

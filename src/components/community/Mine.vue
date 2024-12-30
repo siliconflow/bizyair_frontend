@@ -295,20 +295,10 @@
     },
     { deep: true }
   )
-
-  watch(
-    () => useModelStore.reload,
-    async (newVal: number, oldVal: number) => {
-      if (newVal !== oldVal) {
-        await fetchData()
-      }
-    },
-    { deep: true }
-  )
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-screen">
     <div class="px-6 pt-6 pb-0 sticky top-0 z-20">
       <MineTabs v-model="currentTab" @update:model-value="switchTab">
         <template #posts>
@@ -647,7 +637,7 @@
 
 <style scoped>
   .scroll-container {
-    max-height: calc(80vh - 180px);
+    max-height: calc(100vh - 180px);
     margin-top: 1rem;
     position: relative;
     scrollbar-width: thin;

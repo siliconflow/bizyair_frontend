@@ -26,16 +26,32 @@
 
   const filterDataReady = ref(false)
 
+  const scrollRatio = ref(0)
+  const maxVisiblePages = 2
+  const loadedPages = ref(new Set<number>())
+
   const loadMore = async () => {
     if (loading.value || !hasMore.value) return
     loading.value = true
 
     try {
-      if (communityStore.mainContent.models.length >= communityStore.mainContent.modelListPathParams.total) {
+      const currentPage = communityStore.mainContent.modelListPathParams.current
+      const pageSize = communityStore.mainContent.modelListPathParams.page_size
+      const total = communityStore.mainContent.modelListPathParams.total
+
+      if (currentPage * pageSize >= total || !hasMore.value) {
         hasMore.value = false
+        loading.value = false
         return
       }
-      const nextPage = communityStore.mainContent.modelListPathParams.current + 1
+
+      const nextPage = currentPage + 1
+      
+      if (loadedPages.value.has(nextPage)) {
+        loading.value = false
+        return
+      }
+
       communityStore.mainContent.modelListPathParams.current = nextPage
 
       const response = await get_model_list(
@@ -43,19 +59,23 @@
         communityStore.mainContent.filterState
       )
 
-      if (response?.data?.list) {
+      if (response?.data?.list?.length > 0) {
+        loadedPages.value.add(nextPage)
+        
         communityStore.mainContent.models = [
-          ...communityStore.mainContent.models,
+          ...communityStore.mainContent.models.slice(-((maxVisiblePages - 1) * pageSize)),
           ...response.data.list
         ]
+        
         communityStore.mainContent.modelListPathParams.total = response.data.total
-        hasMore.value = communityStore.mainContent.models.length < response.data.total
+        hasMore.value = nextPage * pageSize < response.data.total
       } else {
         hasMore.value = false
       }
     } catch (error) {
-      console.error('加载数据失败:', error)
+      console.error('fetch data error:', error)
       useToaster.error(`Failed to load more data: ${error}`)
+      hasMore.value = false
     } finally {
       loading.value = false
     }
@@ -118,11 +138,16 @@
   const handleScroll = throttle((e: Event) => {
     const container = e.target as HTMLElement
     showBackToTop.value = container.scrollTop > 500
+    
+    const maxScroll = container.scrollHeight - container.clientHeight
+    if (maxScroll > 0) {
+      scrollRatio.value = container.scrollTop / maxScroll
+    }
 
-    if (container.scrollTop < SCROLL_THRESHOLD && hasPrevious.value && !isLoadingPrevious.value) {
+    if (container.scrollTop <= SCROLL_THRESHOLD && hasPrevious.value && !isLoadingPrevious.value) {
       loadPrevious()
     }
-  }, 1000)
+  }, 200)
 
   const fetchData = async (resetScroll: boolean = false) => {
     if (!filterDataReady.value) {
@@ -145,25 +170,52 @@
       if (response?.data?.list) {
         communityStore.mainContent.modelListPathParams.total = response.data.total || 0
         communityStore.mainContent.models = response.data.list || []
-        hasMore.value = communityStore.mainContent.models.length < response.data.total
-        hasPrevious.value = communityStore.mainContent.modelListPathParams.current > 1
-
-        if (resetScroll) {
+        
+        // 如果不是重置滚动，且有保存的状态，则恢复状态
+        if (!resetScroll && communityStore.mainContent.lastState) {
+          hasMore.value = communityStore.mainContent.lastState.hasMore
+          hasPrevious.value = communityStore.mainContent.lastState.hasPrevious
+          loadedPages.value = new Set(communityStore.mainContent.lastState.loadedPages)
+          
+          // 恢复滚动位置
           nextTick(() => {
             const container = document.querySelector('.scroll-container')
             if (container) {
-              container.scrollTo({
-                top: 0,
-                behavior: 'auto'
+              requestAnimationFrame(() => {
+                const maxScroll = container.scrollHeight - container.clientHeight
+                const targetScroll = Math.max(0, Math.min(
+                  maxScroll * (communityStore.mainContent.lastState?.scrollRatio ?? 0),
+                  maxScroll * 0.7
+                ))
+                container.scrollTop = targetScroll
               })
             }
           })
+        } else {
+          // 重置状态
+          hasMore.value = communityStore.mainContent.models.length < response.data.total
+          hasPrevious.value = communityStore.mainContent.modelListPathParams.current > 1
+          loadedPages.value.clear()
+          loadedPages.value.add(communityStore.mainContent.modelListPathParams.current)
+
+          if (resetScroll) {
+            nextTick(() => {
+              const container = document.querySelector('.scroll-container')
+              if (container) {
+                container.scrollTo({
+                  top: 0,
+                  behavior: 'auto'
+                })
+              }
+            })
+          }
         }
       } else {
         communityStore.mainContent.modelListPathParams.total = 0
         communityStore.mainContent.models = []
         hasMore.value = false
         hasPrevious.value = false
+        loadedPages.value.clear()
       }
     } catch (error) {
       useToaster.error(`Failed to fetch model list: ${error}`)
@@ -171,6 +223,7 @@
       communityStore.mainContent.models = []
       hasMore.value = false
       hasPrevious.value = false
+      loadedPages.value.clear()
     } finally {
       loading.value = false
     }
@@ -289,31 +342,80 @@
   )
 
   const resetState = () => {
-    const container = document.querySelector('.scroll-container')
-    if (container) {
-      container.scrollTo({ top: 0, behavior: 'auto' })
-    }
-    // 重置相关状态
-    hasPrevious.value = false
-    communityStore.mainContent.modelListPathParams.current = 1
-    loading.value = true
-    
-    // 重新获取数据
-    nextTick(async () => {
-      try {
-        await fetchData()
-        hasMore.value = true
-      } catch (error) {
-        console.error('Reset state error:', error)
-      } finally {
-        loading.value = false
+    // 只有在没有保存状态时才重置
+    if (!communityStore.mainContent.lastState) {
+      const container = document.querySelector('.scroll-container')
+      if (container) {
+        container.scrollTo({ top: 0, behavior: 'auto' })
       }
-    })
+      // 重置相关状态
+      hasPrevious.value = false
+      communityStore.mainContent.modelListPathParams.current = 1
+      loading.value = true
+      
+      // 重新获取数据
+      nextTick(async () => {
+        try {
+          await fetchData(true)
+          hasMore.value = true
+        } catch (error) {
+          console.error('Reset state error:', error)
+        } finally {
+          loading.value = false
+        }
+      })
+    } else {
+      // 有保存的状态时，恢复数据
+      fetchData(false)
+    }
   }
 
   onActivated(() => {
     resetState()
   })
+
+  watch(
+    () => communityStore.showDialog,
+    (newVal) => {
+      if (!newVal) {
+        const container = document.querySelector('.scroll-container')
+        if (container) {
+          const maxScroll = container.scrollHeight - container.clientHeight
+          if (maxScroll > 0) {
+            scrollRatio.value = Math.min(0.7, container.scrollTop / maxScroll)
+          }
+          
+          communityStore.mainContent.lastState = {
+            currentPage: communityStore.mainContent.modelListPathParams.current,
+            hasMore: hasMore.value,
+            hasPrevious: hasPrevious.value,
+            loadedPages: Array.from(loadedPages.value),
+            scrollRatio: scrollRatio.value
+          }
+        }
+      } else {
+        nextTick(() => {
+          const container = document.querySelector('.scroll-container')
+          if (container && communityStore.mainContent.lastState) {
+            communityStore.mainContent.modelListPathParams.current = communityStore.mainContent.lastState.currentPage
+            hasMore.value = communityStore.mainContent.lastState.hasMore
+            hasPrevious.value = communityStore.mainContent.lastState.hasPrevious
+            loadedPages.value = new Set(communityStore.mainContent.lastState.loadedPages)
+            scrollRatio.value = communityStore.mainContent.lastState.scrollRatio || 0
+
+            requestAnimationFrame(() => {
+              const maxScroll = container.scrollHeight - container.clientHeight
+              const targetScroll = Math.max(0, Math.min(
+                maxScroll * scrollRatio.value,
+                maxScroll * 0.7
+              ))
+              container.scrollTop = targetScroll
+            })
+          }
+        })
+      }
+    }
+  )
 
 
 
