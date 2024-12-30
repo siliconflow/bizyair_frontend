@@ -8,6 +8,7 @@ export const useCommunityStore = defineStore('community', {
     isLoading: false,
     showDialog: false,
     showCommunityDetail: false,
+    currentPath: '/quick-start',
     reloadModelSelectList: false,
     closeModelSelectDialog: false,
     closeModelDetailDialog: false,
