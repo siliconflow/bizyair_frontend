@@ -44,7 +44,7 @@ export const useCommunityStore = defineStore('community', {
       modelListPathParams: {
         mode: 'official',
         current: 1,
-        page_size: 24,
+        page_size: 50,
         total: 0
       } as ModelListPathParams,
       models: [],
@@ -70,7 +70,7 @@ export const useCommunityStore = defineStore('community', {
       modelListPathParams: {
         mode: 'publicity',
         current: 1,
-        page_size: 24,
+        page_size: 50,
         total: 0
       } as ModelListPathParams,
       models: [],
@@ -98,7 +98,7 @@ export const useCommunityStore = defineStore('community', {
         modelListPathParams: {
           mode: 'my',
           current: 1,
-          page_size: 24,
+          page_size: 50,
           total: 0
         } as ModelListPathParams,
         models: [],
@@ -124,7 +124,7 @@ export const useCommunityStore = defineStore('community', {
         modelListPathParams: {
           mode: 'my_fork',
           current: 1,
-          page_size: 24,
+          page_size: 50,
           total: 0
         } as ModelListPathParams,
         models: [],
@@ -177,7 +177,7 @@ export const useCommunityStore = defineStore('community', {
           modelListPathParams: {
             mode: page === 'posts' ? 'my' : 'my_fork',
             current: 1,
-            page_size: 5,
+            page_size: 50,
             total: 0
           },
           filterState: {
@@ -197,7 +197,7 @@ export const useCommunityStore = defineStore('community', {
           modelListPathParams: {
             mode: 'my',
             current: 1,
-            page_size: 5,
+            page_size: 50,
             total: 0
           },
           filterState: {

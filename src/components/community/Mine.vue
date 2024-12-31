@@ -3,13 +3,13 @@
     name: 'Mine'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, watch, inject } from 'vue'
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import MineTabs from '@/components/community/moudles/MineTabs.vue'
   import { useCommunityStore } from '@/stores/communityStore'
   import { modelStore } from '@/stores/modelStatus'
 
-  import { get_model_list } from '@/api/model'
+  import { get_model_list, get_workflow_dowload_url } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import vDialog from '@/components/modules/vDialog.vue'
   import ModelDetail from '@/components/community/detail/Index.vue'
@@ -251,6 +251,79 @@
     communityStore.showDialog = false
   }
 
+  const comfyUIApp: any = inject('comfyUIApp')
+  if (!comfyUIApp) {
+    console.error('comfyUIApp is not properly injected')
+  }
+
+  const handleLoadWorkflowOrAddNode = (model: Model) => {
+    if (model.type === 'Workflow') {
+      handleLoadWorkflow(model.versions)
+    } else {
+      handleAddNode(model)
+    }
+  }
+  const handleLoadWorkflow = async (versions: any) => {
+    if (!versions || versions.length === 0) {
+      useToaster.error('No workflow found')
+      return
+    }
+    const workflow = await get_workflow_dowload_url(versions[0].id, versions[0].sign)
+
+    if (workflow.data && comfyUIApp && comfyUIApp.graph) {
+      comfyUIApp.graph.clear()
+      await comfyUIApp.loadGraphData(workflow.data)
+    }
+    communityStore.showDialog = false
+  }
+  const handleAddNode = async (model: Model) => {
+    try {
+      if (!comfyUIApp) {
+        throw new Error('comfyUIApp is not initialized')
+      }
+
+      const randomOffset = () => Math.floor(Math.random() * 200 - 100)
+      const baseX = 100
+      const baseY = 100
+      const pos = [baseX + randomOffset(), baseY + randomOffset()]
+
+      const currentConfig = comfyUIApp.graph.serialize()
+      
+      const newNode = {
+        "type": model.type==="LoRA" ? "BizyAir_LoraLoader" : "BizyAir_ControlNetLoader",
+        "id": Date.now(),
+        "pos": pos,  
+        "size": { "0": 300, "1": 100 },
+        "flags": {},
+        "order": currentConfig.nodes.length,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [],
+        "title": model.type==="LoRA" ? "☁️BizyAir Load Lora" : "☁️BizyAir Load ControlNet Model",
+        "properties": {
+          "Node name for S&R": model.type==="LoRA" ? "BizyAir_LoraLoader" : "BizyAir_ControlNetLoader",
+        },
+        "widgets_values": model.type==="LoRA" ? [
+          model.name,
+          1.0,
+          1.0,
+          model.versions?.[0]?.id || "",
+        ] : [
+          model.name,
+          model.versions?.[0]?.id || "",
+        ]
+      }
+      currentConfig.nodes.push(newNode)
+      await comfyUIApp.loadGraphData(currentConfig)
+      communityStore.showDialog=false
+      useToaster.success('Node added successfully')
+    } catch (error) {
+      console.error('Failed to add node:', error)
+      useToaster.error(`Failed to add node: ${error}`)
+    }
+  }
+
+
   onMounted(() => {
     fetchData()
     observer = new IntersectionObserver(
@@ -400,8 +473,9 @@
               </div>
               <div
                 class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
+                @click="handleLoadWorkflowOrAddNode(model)"
               >
-                <!-- <svg
+                <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -418,7 +492,7 @@
                     class="group-hover:stroke-[#7C3AEDCC] transition-colors duration-200"
                     filter="drop-shadow(0 1px 2px rgb(0 0 0 / 0.5))"
                   />
-                </svg> -->
+                </svg>
               </div>
               <div
                 class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"

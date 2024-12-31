@@ -248,6 +248,53 @@
     }
   }
 
+  const handleAddNode = async () => {
+    try {
+      if (!comfyUIApp) {
+        throw new Error('comfyUIApp is not initialized')
+      }
+
+      const randomOffset = () => Math.floor(Math.random() * 200 - 100)
+      const baseX = 100
+      const baseY = 100
+      const pos = [baseX + randomOffset(), baseY + randomOffset()]
+
+      const currentConfig = comfyUIApp.graph.serialize()
+      
+      const newNode = {
+        "type": model.value?.type==="LoRA" ? "BizyAir_LoraLoader" : "BizyAir_ControlNetLoader",
+        "id": Date.now(),
+        "pos": pos,  
+        "size": { "0": 300, "1": 100 },
+        "flags": {},
+        "order": currentConfig.nodes.length,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [],
+        "title": model.value?.type==="LoRA" ? "☁️BizyAir Load Lora" : "☁️BizyAir Load ControlNet Model",
+        "properties": {
+          "Node name for S&R": model.value?.type==="LoRA" ? "BizyAir_LoraLoader" : "BizyAir_ControlNetLoader",
+        },
+        "widgets_values": model.value?.type==="LoRA" ? [
+          model.value?.name,
+          1.0,
+          1.0,
+          model.value?.versions?.[0]?.id || "",
+        ] : [
+          model.value?.name,
+          model.value?.versions?.[0]?.id || "",
+        ]
+      }
+      currentConfig.nodes.push(newNode)
+      await comfyUIApp.loadGraphData(currentConfig)
+      communityStore.showDialog=false
+      useToaster.success('Node added successfully')
+    } catch (error) {
+      console.error('Failed to add node:', error)
+      useToaster.error(`Failed to add node: ${error}`)
+    }
+  }
+
   const handleDownloadWorkFlow = async () => {
     const workflow = await get_workflow_dowload_url(
       currentVersion.value?.id,
@@ -543,9 +590,10 @@
             >
               {{ currentVersion?.forked ? 'Forked' : 'Fork' }}
             </Button>
-            <!-- <Button
+            <Button
+              v-if="model?.type !== 'Workflow'"
               class="flex w-[170px] px-8 py-2 justify-center items-center gap-2 bg-[#F43F5E] hover:bg-[#F43F5E]/90 rounded-[6px]"
-              @click="handleApply"
+              @click="handleAddNode"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -560,8 +608,8 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 /></svg
-              >Apply</Button
-            > -->
+              >Add Node</Button
+            >
 
             <Button
               v-if="model?.type === 'Workflow'"

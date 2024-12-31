@@ -3,7 +3,7 @@
     name: 'MainContent'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick, watch, onActivated } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, watch, onActivated, inject } from 'vue'
   import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
   import { modelStore } from '@/stores/modelStatus'
@@ -18,7 +18,10 @@
   const communityStore = useCommunityStore()
   const modelStoreInstance = modelStore()
   const SCROLL_THRESHOLD = 30
-
+  const comfyUIApp: any = inject('comfyUIApp')
+  if (!comfyUIApp) {
+    console.error('comfyUIApp is not properly injected')
+  }
   const loading = ref(false)
   const hasMore = ref(true)
   const hasPrevious = ref(false)
@@ -231,6 +234,54 @@
 
   const loadingRef = ref<HTMLDivElement | null>(null)
   let observer: IntersectionObserver | null = null
+
+
+  const handleAddNode = async (model: Model) => {
+    try {
+      if (!comfyUIApp) {
+        throw new Error('comfyUIApp is not initialized')
+      }
+
+      const randomOffset = () => Math.floor(Math.random() * 200 - 100)
+      const baseX = 100
+      const baseY = 100
+      const pos = [baseX + randomOffset(), baseY + randomOffset()]
+
+      const currentConfig = comfyUIApp.graph.serialize()
+      
+      const newNode = {
+        "type": model.type==="LoRA" ? "BizyAir_LoraLoader" : "BizyAir_ControlNetLoader",
+        "id": Date.now(),
+        "pos": pos,  
+        "size": { "0": 300, "1": 100 },
+        "flags": {},
+        "order": currentConfig.nodes.length,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [],
+        "title": model.type==="LoRA" ? "☁️BizyAir Load Lora" : "☁️BizyAir Load ControlNet Model",
+        "properties": {
+          "Node name for S&R": model.type==="LoRA" ? "BizyAir_LoraLoader" : "BizyAir_ControlNetLoader",
+        },
+        "widgets_values": model.type==="LoRA" ? [
+          model.name,
+          1.0,
+          1.0,
+          model.versions?.[0]?.id || "",
+        ] : [
+          model.name,
+          model.versions?.[0]?.id || "",
+        ]
+      }
+      currentConfig.nodes.push(newNode)
+      await comfyUIApp.loadGraphData(currentConfig)
+      communityStore.showDialog=false
+      useToaster.success('Node added successfully')
+    } catch (error) {
+      console.error('Failed to add node:', error)
+      useToaster.error(`Failed to add node: ${error}`)
+    }
+  }
 
   onMounted(async () => {
     await fetchData()
@@ -461,9 +512,10 @@
                 {{ model.type }}
               </div>
               <div
-                class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
+               class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
+              @click="handleAddNode(model)"
               >
-                <!-- <svg
+                <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -479,8 +531,9 @@
                     stroke-linejoin="round"
                     class="group-hover:stroke-[#7C3AEDCC] transition-colors duration-200"
                     filter="drop-shadow(0 1px 2px rgb(0 0 0 / 0.5))"
+                   
                   />
-                </svg> -->
+                </svg>
               </div>
               <div
                 class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
