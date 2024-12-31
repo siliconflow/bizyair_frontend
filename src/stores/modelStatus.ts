@@ -26,7 +26,7 @@ interface ModelVersion {
   speed?: string
   fileName?: string
   ref?: string
-  cover_urls?: string
+  cover_urls?: string[]
   hideUpload?: boolean
   imageDone?: boolean
   imageError?: boolean

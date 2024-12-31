@@ -4,8 +4,6 @@
   import { Trash2 } from 'lucide-vue-next'
   import { formatToWebp, imageToOss } from './imageToOss'
   import { cn } from '@/lib/utils'
-  // import { calculateHash } from './computeHash'
-  // import { commit_file } from '@/api/model'
   const imageSrc = ref('')
   const fileInput = ref<any>()
   const emit = defineEmits(['update:modelValue', 'done', 'change'])
@@ -24,15 +22,6 @@
       emit('update:modelValue', imageSrc.value)
       const { file } = await formatToWebp(files[0])
       const { url } = await imageToOss(file)
-      // const { sha256sum, md5Hash } = await calculateHash(file)
-      // console.log(md5Hash, sha256sum, ossTokenFile.object_key)
-      // await commit_file({
-      //   md5_hash: md5Hash,
-      //   md5Hash,
-      //   sha256sum,
-      //   object_key: ossTokenFile.object_key,
-      //   type: 'image',
-      // })
       imageSrc.value = url
       emit('update:modelValue', imageSrc.value)
       emit('done')

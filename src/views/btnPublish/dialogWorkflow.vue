@@ -79,7 +79,7 @@
             <v-item label="Upload Image">
               <vUploadImage
                 v-model.modelValue="e.cover_urls"
-                :preview-prc="e.cover_urls"
+                :previewPrc="e.cover_urls ? e.cover_urls[0] : ''"
                 :class-name="e.imageError ? 'border-red-500' : ''"
                 @done="imageUploadDone(i)"
               />
