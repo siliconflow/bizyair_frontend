@@ -102,7 +102,6 @@
 
       emit('filterDataReady')
     } catch (error) {
-      console.error('Error in getFilterData:', error)
       useToaster.error(`Failed to fetch model types: ${error}`)
       store.setModelTypes(props.page, [])
       store.setBaseModelTypes(props.page, [])

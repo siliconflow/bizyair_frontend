@@ -29,7 +29,6 @@
   if (!comfyUIApp) {
     console.error('comfyUIApp is not properly injected')
   }
-  console.log('[comfyUIApp]', comfyUIApp)
   const loading = ref(false)
   const hasMore = ref(true)
   const hasPrevious = ref(false)

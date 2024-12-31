@@ -12,15 +12,7 @@
     (e: 'update:modelValue', value: TabType): void
   }>()
 
-  watch(
-    () => props.modelValue,
-    newVal => {
-      console.log('MineTabs modelValue changed:', newVal)
-    }
-  )
-
   const handleTabChange = (value: string) => {
-    console.log('Tab clicked:', value)
     emit('update:modelValue', value as TabType)
   }
 
