@@ -23,8 +23,8 @@
   const hasMore = ref(true)
   const hasPrevious = ref(false)
   const isLoadingPrevious = ref(false)
-  const maxVisiblePages = 2 
-  const itemsPerPage = ref(0) 
+  const maxVisiblePages = 2
+  const itemsPerPage = ref(0)
   const loadedPages = ref(new Set<number>())
 
   const scrollRatio = ref(0)
@@ -423,10 +423,7 @@
               const maxScroll = container.scrollHeight - container.clientHeight
               const targetScroll = Math.max(
                 0,
-                Math.min(
-                  maxScroll * scrollRatio.value,
-                  maxScroll * 0.7 
-                )
+                Math.min(maxScroll * scrollRatio.value, maxScroll * 0.7)
               )
               container.scrollTop = targetScroll
             })
