@@ -287,7 +287,9 @@
         break
       }
     }
-    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign && !(e.cover_urls && !e.imageDone))
+    return tempData.versions.every(
+      (e: any) => e.version && e.base_model && e.sign && !(e.cover_urls && !e.imageDone)
+    )
   }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p

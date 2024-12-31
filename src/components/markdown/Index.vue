@@ -185,7 +185,6 @@
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 
   const uploadWithRetry = async (fileBlob, retryCount = 0) => {
-
     const { file } = await formatToWebp(fileBlob)
     const { url } = await imageToOss(file)
     return url
