@@ -23,9 +23,8 @@
   const hasMore = ref(true)
   const hasPrevious = ref(false)
   const isLoadingPrevious = ref(false)
-  const maxVisiblePages = 2 // 最大可见页数
-  const itemsPerPage = ref(0) // 每页项目数，将在首次加载时设置
-
+  const maxVisiblePages = 2
+  const itemsPerPage = ref(0)
   const loadedPages = ref(new Set<number>())
 
   const scrollRatio = ref(0)
@@ -38,8 +37,6 @@
       const currentPage = communityStore.quickStart.modelListPathParams.current
       const pageSize = communityStore.quickStart.modelListPathParams.page_size
       const total = communityStore.quickStart.modelListPathParams.total
-
-      // 更严格的检查
       if (currentPage * pageSize >= total || !hasMore.value) {
         hasMore.value = false
         loading.value = false
@@ -48,7 +45,6 @@
 
       const nextPage = currentPage + 1
 
-      // 检查是否已加载
       if (loadedPages.value.has(nextPage)) {
         loading.value = false
         return
@@ -64,15 +60,11 @@
       if (response?.data?.list?.length > 0) {
         loadedPages.value.add(nextPage)
 
-        // 更新数据，保留最近几页的数据
         communityStore.quickStart.models = [
           ...communityStore.quickStart.models.slice(-((maxVisiblePages - 1) * pageSize)),
           ...response.data.list
         ]
-
         communityStore.quickStart.modelListPathParams.total = response.data.total
-
-        // 更新是否还有更多数据
         hasMore.value = nextPage * pageSize < response.data.total
       } else {
         hasMore.value = false
@@ -110,14 +102,12 @@
       const currentPage = communityStore.quickStart.modelListPathParams.current
       const prevPage = currentPage - 1
 
-      // 基础检查
       if (prevPage < 1) {
         hasPrevious.value = false
         isLoadingPrevious.value = false
         return
       }
 
-      // 检查是否已经加载过这一页
       if (loadedPages.value.has(prevPage)) {
         isLoadingPrevious.value = false
         return
@@ -126,7 +116,6 @@
       const oldScrollHeight = container.scrollHeight
       const oldScrollTop = container.scrollTop
 
-      // 更新当前页码
       communityStore.quickStart.modelListPathParams.current = prevPage
 
       const response = await get_model_list(
@@ -138,44 +127,34 @@
         const newData = response.data.list
         const currentData = communityStore.quickStart.models
 
-        // 确保没有重复数据
         const newDataIds = new Set(newData.map((item: Model) => item.id))
         const filteredCurrentData = currentData.filter((item: Model) => !newDataIds.has(item.id))
 
-        // 更新数据，新数据在前
         communityStore.quickStart.models = [...newData, ...filteredCurrentData]
 
-        // 记录已加载的页面
         loadedPages.value.add(prevPage)
 
-        // 更新总数
         communityStore.quickStart.modelListPathParams.total = response.data.total
 
-        // 更新状态
         hasPrevious.value = prevPage > 1
         hasMore.value = true
 
-        // 调整滚动位置
         await nextTick()
         const newScrollHeight = container.scrollHeight
         const heightDiff = newScrollHeight - oldScrollHeight
 
         if (heightDiff > 0) {
-          // 使用 requestAnimationFrame 确保平滑滚动
           requestAnimationFrame(() => {
             container.scrollTop = heightDiff + oldScrollTop
             communityStore.quickStart.scrollPosition = container.scrollTop
           })
         }
 
-        // 如果数据超过最大显示页数，则裁剪
         if (communityStore.quickStart.models.length > maxVisiblePages * itemsPerPage.value) {
           communityStore.quickStart.models = communityStore.quickStart.models.slice(
             0,
             maxVisiblePages * itemsPerPage.value
           )
-
-          // 更新已加载页面记录
           const keepPages = new Set([prevPage, currentPage])
           loadedPages.value = new Set([...loadedPages.value].filter(page => keepPages.has(page)))
         }
@@ -202,13 +181,11 @@
     const container = e.target as HTMLElement
     showBackToTop.value = container.scrollTop > 500
 
-    // 计算滚动比例
     const maxScroll = container.scrollHeight - container.clientHeight
     if (maxScroll > 0) {
       scrollRatio.value = container.scrollTop / maxScroll
     }
 
-    // 向上加载的逻辑
     if (container.scrollTop <= SCROLL_THRESHOLD && hasPrevious.value && !isLoadingPrevious.value) {
       loadPrevious()
     }
@@ -227,16 +204,13 @@
         const total = response.data.total || 0
         communityStore.quickStart.modelListPathParams.total = total
 
-        // 使用 store 中定义的 page_size
         itemsPerPage.value = communityStore.quickStart.modelListPathParams.page_size
 
-        // 重置页面记录
         loadedPages.value.clear()
         loadedPages.value.add(communityStore.quickStart.modelListPathParams.current)
 
         communityStore.quickStart.models = list
 
-        // 计算是否有更多数据
         const currentPage = communityStore.quickStart.modelListPathParams.current
         const pageSize = communityStore.quickStart.modelListPathParams.page_size
 
@@ -419,16 +393,13 @@
     () => communityStore.showDialog,
     newVal => {
       if (!newVal) {
-        // 关闭对话框时，保存当前状态
         const container = document.querySelector('.scroll-container')
         if (container) {
-          // 保存滚动比例
           const maxScroll = container.scrollHeight - container.clientHeight
           if (maxScroll > 0) {
             scrollRatio.value = Math.min(0.7, container.scrollTop / maxScroll) // 限制最大比例为 70%
           }
 
-          // 保存其他状态
           communityStore.quickStart.lastState = {
             currentPage: communityStore.quickStart.modelListPathParams.current,
             hasMore: hasMore.value,
@@ -438,11 +409,9 @@
           }
         }
       } else {
-        // 打开对话框时，恢复之前的状态
         nextTick(() => {
           const container = document.querySelector('.scroll-container')
           if (container && communityStore.quickStart.lastState) {
-            // 恢复页码相关状态
             communityStore.quickStart.modelListPathParams.current =
               communityStore.quickStart.lastState.currentPage
             hasMore.value = communityStore.quickStart.lastState.hasMore
@@ -450,16 +419,11 @@
             loadedPages.value = new Set(communityStore.quickStart.lastState.loadedPages)
             scrollRatio.value = communityStore.quickStart.lastState.scrollRatio || 0
 
-            // 等待内容完全渲染
             requestAnimationFrame(() => {
-              // 根据保存的比例计算新的滚动位置
               const maxScroll = container.scrollHeight - container.clientHeight
               const targetScroll = Math.max(
                 0,
-                Math.min(
-                  maxScroll * scrollRatio.value,
-                  maxScroll * 0.7 // 确保不会滚动到太靠近底部
-                )
+                Math.min(maxScroll * scrollRatio.value, maxScroll * 0.7)
               )
               container.scrollTop = targetScroll
             })
