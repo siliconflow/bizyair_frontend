@@ -133,7 +133,7 @@ import { expect, test } from "@playwright/test";
       ".comfy-vue-node-search-container .p-autocomplete-list",
     );
     // TODO: sometimes the input search box never shows up?
-    await input.waitFor({ state: "visible", timeout: 20000 });
+    await input.waitFor({ state: "visible" });
     await input.fill(nodeName);
     await dropdown.waitFor({ state: "visible" });
     // Wait for some time for the auto complete list to update.
