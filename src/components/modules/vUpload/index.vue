@@ -249,7 +249,6 @@
     if (props.accept) {
       ALLOW_UPLOADABLE_EXT_NAMES.value = props.accept
     }
-    console.log('props.fileName', props.fileName)
     if (props.fileName) {
       emit('progress', 100)
     }
