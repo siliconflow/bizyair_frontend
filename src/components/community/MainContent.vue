@@ -164,7 +164,7 @@
       loading.value = true
       try {
         await nextTick()
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // await new Promise(resolve => setTimeout(resolve, 100))
       } catch (error) {
         console.error('fetch data error:', error)
       }
@@ -181,13 +181,11 @@
         communityStore.mainContent.modelListPathParams.total = response.data.total || 0
         communityStore.mainContent.models = response.data.list || []
 
-        // 如果不是重置滚动，且有保存的状态，则恢复状态
         if (!resetScroll && communityStore.mainContent.lastState) {
           hasMore.value = communityStore.mainContent.lastState.hasMore
           hasPrevious.value = communityStore.mainContent.lastState.hasPrevious
           loadedPages.value = new Set(communityStore.mainContent.lastState.loadedPages)
 
-          // 恢复滚动位置
           nextTick(() => {
             const container = document.querySelector('.scroll-container')
             if (container) {
@@ -205,7 +203,6 @@
             }
           })
         } else {
-          // 重置状态
           hasMore.value = communityStore.mainContent.models.length < response.data.total
           hasPrevious.value = communityStore.mainContent.modelListPathParams.current > 1
           loadedPages.value.clear()
@@ -398,7 +395,6 @@
   )
 
   const resetState = () => {
-    // 只有在没有保存状态时才重置
     if (!communityStore.mainContent.lastState) {
       const container = document.querySelector('.scroll-container')
       if (container) {
