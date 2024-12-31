@@ -31,7 +31,9 @@
     loading.value = true
 
     try {
-      if (communityStore.workflows.models.length >= communityStore.workflows.modelListPathParams.total) {
+      if (
+        communityStore.workflows.models.length >= communityStore.workflows.modelListPathParams.total
+      ) {
         hasMore.value = false
         return
       }
@@ -294,7 +296,7 @@
 
   watch(
     () => communityStore.showDialog,
-    (newVal) => {
+    newVal => {
       if (!newVal) {
         const container = document.querySelector('.scroll-container')
         if (container) {
@@ -302,7 +304,7 @@
           if (maxScroll > 0) {
             scrollRatio.value = Math.min(0.7, container.scrollTop / maxScroll)
           }
-          
+
           communityStore.workflows.lastState = {
             currentPage: communityStore.workflows.modelListPathParams.current,
             hasMore: hasMore.value,
@@ -315,7 +317,8 @@
         nextTick(() => {
           const container = document.querySelector('.scroll-container')
           if (container && communityStore.workflows.lastState) {
-            communityStore.workflows.modelListPathParams.current = communityStore.workflows.lastState.currentPage
+            communityStore.workflows.modelListPathParams.current =
+              communityStore.workflows.lastState.currentPage
             hasMore.value = communityStore.workflows.lastState.hasMore
             hasPrevious.value = communityStore.workflows.lastState.hasPrevious
             loadedPages.value = new Set(communityStore.workflows.lastState.loadedPages)
@@ -323,10 +326,10 @@
 
             requestAnimationFrame(() => {
               const maxScroll = container.scrollHeight - container.clientHeight
-              const targetScroll = Math.max(0, Math.min(
-                maxScroll * scrollRatio.value,
-                maxScroll * 0.7
-              ))
+              const targetScroll = Math.max(
+                0,
+                Math.min(maxScroll * scrollRatio.value, maxScroll * 0.7)
+              )
               container.scrollTop = targetScroll
             })
           }
@@ -536,7 +539,12 @@
 
         <div ref="loadingRef" class="py-4 text-center mt-8">
           <div v-if="loading" class="text-white/60">loading...</div>
-          <div v-else-if="!hasMore && communityStore.workflows.models.length === 0" class="text-white/60">No more data</div>
+          <div
+            v-else-if="!hasMore && communityStore.workflows.models.length === 0"
+            class="text-white/60"
+          >
+            No more data
+          </div>
           <div v-else class="h-8"></div>
         </div>
       </div>

@@ -102,7 +102,7 @@
   }
 </script>
 <style scoped>
-.underline{
-  text-decoration: underline;
-}
+  .underline {
+    text-decoration: underline;
+  }
 </style>

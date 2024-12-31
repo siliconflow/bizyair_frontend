@@ -249,55 +249,48 @@
   }
 
   const handleAddNode = async (model: Model) => {
-  try {
-    let nodeID = model.type === "LoRA" ? "BizyAir_LoraLoader" : "BizyAir_ControlNetLoader"
-    let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
-    const canvas = window.LGraphCanvas?.active_canvas
+    try {
+      let nodeID = model.type === 'LoRA' ? 'BizyAir_LoraLoader' : 'BizyAir_ControlNetLoader'
+      let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
+      const canvas = window.LGraphCanvas?.active_canvas
 
-    loraLoaderNode.title = model.type === "LoRA" ? "☁️BizyAir Load Lora" : "☁️BizyAir Load ControlNet Model"
-    loraLoaderNode.color = "#7C3AED"
-    
-    const widgetValues = model.type === "LoRA" ? [
-      model.name,
-      1.0,
-      1.0,
-      model.versions?.[0]?.id || ""
-    ] : [
-      model.name,
-      model.versions?.[0]?.id || ""
-    ]
-    
-    loraLoaderNode.widgets_values = widgetValues
-    if (loraLoaderNode.widgets) {
-      loraLoaderNode.widgets.forEach((widget: any, index: number) => {
-        if (widget && widgetValues[index] !== undefined) {
-          widget.value = widgetValues[index]
-        }
-      })
+      loraLoaderNode.title =
+        model.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
+      loraLoaderNode.color = '#7C3AED'
+
+      const widgetValues =
+        model.type === 'LoRA'
+          ? [model.name, 1.0, 1.0, model.versions?.[0]?.id || '']
+          : [model.name, model.versions?.[0]?.id || '']
+
+      loraLoaderNode.widgets_values = widgetValues
+      if (loraLoaderNode.widgets) {
+        loraLoaderNode.widgets.forEach((widget: any, index: number) => {
+          if (widget && widgetValues[index] !== undefined) {
+            widget.value = widgetValues[index]
+          }
+        })
+      }
+
+      const currentConfig = canvas.graph.serialize()
+      const nodeCount = currentConfig.nodes?.length || 0
+
+      const visibleRect = canvas.visible_area
+      const offsetX = (nodeCount % 3) * 30
+      const offsetY = Math.floor(nodeCount / 3) * 25
+      const baseX = visibleRect ? visibleRect[0] + 100 : 100
+      const baseY = visibleRect ? visibleRect[1] + 100 : 100
+
+      loraLoaderNode.pos = [baseX + offsetX, baseY + offsetY]
+
+      canvas.graph.add(loraLoaderNode)
+      communityStore.showDialog = false
+      useToaster.success('Node added successfully')
+    } catch (error) {
+      console.error('Failed to add node:', error)
+      useToaster.error(`Failed to add node: ${error}`)
     }
-
-    const currentConfig = canvas.graph.serialize()
-    const nodeCount = currentConfig.nodes?.length || 0
-    
-    const visibleRect = canvas.visible_area
-    const offsetX = (nodeCount % 3) * 30  
-    const offsetY = Math.floor(nodeCount / 3) * 25      
-    const baseX = visibleRect ? visibleRect[0] + 100 : 100
-    const baseY = visibleRect ? visibleRect[1] + 100 : 100
-    
-    loraLoaderNode.pos = [
-      baseX + offsetX,
-      baseY + offsetY
-    ]
-
-    canvas.graph.add(loraLoaderNode)
-    communityStore.showDialog = false
-    useToaster.success('Node added successfully')
-  } catch (error) {
-    console.error('Failed to add node:', error)
-    useToaster.error(`Failed to add node: ${error}`)
   }
-}
 
   const handleDownloadWorkFlow = async () => {
     const workflow = await get_workflow_dowload_url(
@@ -622,23 +615,23 @@
               @click="handleLoadWorkflow"
             >
               <template v-if="isLoading">
-                <svg 
-                  class="animate-spin h-4 w-4" 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  fill="none" 
+                <svg
+                  class="animate-spin h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <circle 
-                    class="opacity-25" 
-                    cx="12" 
-                    cy="12" 
-                    r="10" 
-                    stroke="currentColor" 
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
                     stroke-width="4"
                   />
-                  <path 
-                    class="opacity-75" 
-                    fill="currentColor" 
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>

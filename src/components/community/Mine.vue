@@ -40,7 +40,10 @@
     loading.value = true
 
     try {
-      if (communityStore.mine[currentTab.value]?.models.length >= communityStore.mine[currentTab.value]?.modelListPathParams.total) {
+      if (
+        communityStore.mine[currentTab.value]?.models.length >=
+        communityStore.mine[currentTab.value]?.modelListPathParams.total
+      ) {
         hasMore.value = false
         return
       }
@@ -277,56 +280,48 @@
     communityStore.showDialog = false
   }
   const handleAddNode = async (model: Model) => {
-  try {
-    let nodeID = model.type === "LoRA" ? "BizyAir_LoraLoader" : "BizyAir_ControlNetLoader"
-    let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
-    const canvas = window.LGraphCanvas?.active_canvas
+    try {
+      let nodeID = model.type === 'LoRA' ? 'BizyAir_LoraLoader' : 'BizyAir_ControlNetLoader'
+      let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
+      const canvas = window.LGraphCanvas?.active_canvas
 
-    loraLoaderNode.title = model.type === "LoRA" ? "☁️BizyAir Load Lora" : "☁️BizyAir Load ControlNet Model"
-    loraLoaderNode.color = "#7C3AED"
-    
-    const widgetValues = model.type === "LoRA" ? [
-      model.name,
-      1.0,
-      1.0,
-      model.versions?.[0]?.id || ""
-    ] : [
-      model.name,
-      model.versions?.[0]?.id || ""
-    ]
-    
-    loraLoaderNode.widgets_values = widgetValues
-    if (loraLoaderNode.widgets) {
-      loraLoaderNode.widgets.forEach((widget: any, index: number) => {
-        if (widget && widgetValues[index] !== undefined) {
-          widget.value = widgetValues[index]
-        }
-      })
+      loraLoaderNode.title =
+        model.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
+      loraLoaderNode.color = '#7C3AED'
+
+      const widgetValues =
+        model.type === 'LoRA'
+          ? [model.name, 1.0, 1.0, model.versions?.[0]?.id || '']
+          : [model.name, model.versions?.[0]?.id || '']
+
+      loraLoaderNode.widgets_values = widgetValues
+      if (loraLoaderNode.widgets) {
+        loraLoaderNode.widgets.forEach((widget: any, index: number) => {
+          if (widget && widgetValues[index] !== undefined) {
+            widget.value = widgetValues[index]
+          }
+        })
+      }
+
+      const currentConfig = canvas.graph.serialize()
+      const nodeCount = currentConfig.nodes?.length || 0
+
+      const visibleRect = canvas.visible_area
+      const offsetX = (nodeCount % 3) * 30
+      const offsetY = Math.floor(nodeCount / 3) * 25
+      const baseX = visibleRect ? visibleRect[0] + 100 : 100
+      const baseY = visibleRect ? visibleRect[1] + 100 : 100
+
+      loraLoaderNode.pos = [baseX + offsetX, baseY + offsetY]
+
+      canvas.graph.add(loraLoaderNode)
+      communityStore.showDialog = false
+      useToaster.success('Node added successfully')
+    } catch (error) {
+      console.error('Failed to add node:', error)
+      useToaster.error(`Failed to add node: ${error}`)
     }
-
-    const currentConfig = canvas.graph.serialize()
-    const nodeCount = currentConfig.nodes?.length || 0
-    
-    const visibleRect = canvas.visible_area
-    const offsetX = (nodeCount % 3) * 30  
-    const offsetY = Math.floor(nodeCount / 3) * 25      
-    const baseX = visibleRect ? visibleRect[0] + 100 : 100
-    const baseY = visibleRect ? visibleRect[1] + 100 : 100
-    
-    loraLoaderNode.pos = [
-      baseX + offsetX,
-      baseY + offsetY
-    ]
-
-    canvas.graph.add(loraLoaderNode)
-    communityStore.showDialog = false
-    useToaster.success('Node added successfully')
-  } catch (error) {
-    console.error('Failed to add node:', error)
-    useToaster.error(`Failed to add node: ${error}`)
   }
-}
-
 
   onMounted(() => {
     fetchData()
@@ -661,7 +656,12 @@
 
         <div ref="loadingRef" class="py-4 text-center mt-8">
           <div v-if="loading" class="text-white/60">loading...</div>
-          <div v-else-if="!hasMore && communityStore.mine[currentTab]?.models.length === 0" class="text-white/60">No more data</div>
+          <div
+            v-else-if="!hasMore && communityStore.mine[currentTab]?.models.length === 0"
+            class="text-white/60"
+          >
+            No more data
+          </div>
           <div v-else class="h-8"></div>
         </div>
       </div>

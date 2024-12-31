@@ -6,7 +6,7 @@
   import Mine from '@/components/community/Mine.vue'
   import { useCommunityStore } from '@/stores/communityStore'
 
-  const communityStore = useCommunityStore()  
+  const communityStore = useCommunityStore()
   const handleMenuClick = (item: { path: string }) => {
     communityStore.currentPath = item.path
   }
@@ -21,7 +21,7 @@
       <keep-alive>
         <component
           :is="
-          communityStore.currentPath === '/models'
+            communityStore.currentPath === '/models'
               ? MainContent
               : communityStore.currentPath === '/quick-start'
                 ? QuickStartContent

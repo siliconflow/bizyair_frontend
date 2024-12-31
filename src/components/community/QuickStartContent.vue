@@ -47,7 +47,7 @@
       }
 
       const nextPage = currentPage + 1
-      
+
       // 检查是否已加载
       if (loadedPages.value.has(nextPage)) {
         loading.value = false
@@ -63,15 +63,15 @@
 
       if (response?.data?.list?.length > 0) {
         loadedPages.value.add(nextPage)
-        
+
         // 更新数据，保留最近几页的数据
         communityStore.quickStart.models = [
           ...communityStore.quickStart.models.slice(-((maxVisiblePages - 1) * pageSize)),
           ...response.data.list
         ]
-        
+
         communityStore.quickStart.modelListPathParams.total = response.data.total
-        
+
         // 更新是否还有更多数据
         hasMore.value = nextPage * pageSize < response.data.total
       } else {
@@ -143,14 +143,11 @@
         const filteredCurrentData = currentData.filter((item: Model) => !newDataIds.has(item.id))
 
         // 更新数据，新数据在前
-        communityStore.quickStart.models = [
-          ...newData,
-          ...filteredCurrentData
-        ]
+        communityStore.quickStart.models = [...newData, ...filteredCurrentData]
 
         // 记录已加载的页面
         loadedPages.value.add(prevPage)
-        
+
         // 更新总数
         communityStore.quickStart.modelListPathParams.total = response.data.total
 
@@ -162,7 +159,7 @@
         await nextTick()
         const newScrollHeight = container.scrollHeight
         const heightDiff = newScrollHeight - oldScrollHeight
-        
+
         if (heightDiff > 0) {
           // 使用 requestAnimationFrame 确保平滑滚动
           requestAnimationFrame(() => {
@@ -201,12 +198,10 @@
     }
   }
 
-
-
   const handleScroll = throttle((e: Event) => {
     const container = e.target as HTMLElement
     showBackToTop.value = container.scrollTop > 500
-    
+
     // 计算滚动比例
     const maxScroll = container.scrollHeight - container.clientHeight
     if (maxScroll > 0) {
@@ -231,7 +226,7 @@
         const list = response.data.list || []
         const total = response.data.total || 0
         communityStore.quickStart.modelListPathParams.total = total
-        
+
         // 使用 store 中定义的 page_size
         itemsPerPage.value = communityStore.quickStart.modelListPathParams.page_size
 
@@ -240,11 +235,11 @@
         loadedPages.value.add(communityStore.quickStart.modelListPathParams.current)
 
         communityStore.quickStart.models = list
-        
+
         // 计算是否有更多数据
         const currentPage = communityStore.quickStart.modelListPathParams.current
         const pageSize = communityStore.quickStart.modelListPathParams.page_size
-        
+
         hasMore.value = currentPage * pageSize < total
         hasPrevious.value = resetScroll ? false : currentPage > 1
 
@@ -288,10 +283,13 @@
         if (container && communityStore.quickStart.lastState?.scrollRatio) {
           requestAnimationFrame(() => {
             const maxScroll = container.scrollHeight - container.clientHeight
-            const targetScroll = Math.max(0, Math.min(
-              maxScroll * (communityStore.quickStart.lastState?.scrollRatio ?? 0),
-              maxScroll * 0.7
-            ))
+            const targetScroll = Math.max(
+              0,
+              Math.min(
+                maxScroll * (communityStore.quickStart.lastState?.scrollRatio ?? 0),
+                maxScroll * 0.7
+              )
+            )
             container.scrollTop = targetScroll
           })
         }
@@ -419,7 +417,7 @@
 
   watch(
     () => communityStore.showDialog,
-    (newVal) => {
+    newVal => {
       if (!newVal) {
         // 关闭对话框时，保存当前状态
         const container = document.querySelector('.scroll-container')
@@ -429,7 +427,7 @@
           if (maxScroll > 0) {
             scrollRatio.value = Math.min(0.7, container.scrollTop / maxScroll) // 限制最大比例为 70%
           }
-          
+
           // 保存其他状态
           communityStore.quickStart.lastState = {
             currentPage: communityStore.quickStart.modelListPathParams.current,
@@ -445,7 +443,8 @@
           const container = document.querySelector('.scroll-container')
           if (container && communityStore.quickStart.lastState) {
             // 恢复页码相关状态
-            communityStore.quickStart.modelListPathParams.current = communityStore.quickStart.lastState.currentPage
+            communityStore.quickStart.modelListPathParams.current =
+              communityStore.quickStart.lastState.currentPage
             hasMore.value = communityStore.quickStart.lastState.hasMore
             hasPrevious.value = communityStore.quickStart.lastState.hasPrevious
             loadedPages.value = new Set(communityStore.quickStart.lastState.loadedPages)
@@ -455,10 +454,13 @@
             requestAnimationFrame(() => {
               // 根据保存的比例计算新的滚动位置
               const maxScroll = container.scrollHeight - container.clientHeight
-              const targetScroll = Math.max(0, Math.min(
-                maxScroll * scrollRatio.value,
-                maxScroll * 0.7 // 确保不会滚动到太靠近底部
-              ))
+              const targetScroll = Math.max(
+                0,
+                Math.min(
+                  maxScroll * scrollRatio.value,
+                  maxScroll * 0.7 // 确保不会滚动到太靠近底部
+                )
+              )
               container.scrollTop = targetScroll
             })
           }
@@ -487,12 +489,25 @@
       <div class="scroll-container overflow-y-auto">
         <div v-if="hasPrevious" class="text-center py-4">
           <div v-if="isLoadingPrevious" class="text-white/60">
-            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto mb-2"></div>
+            <div
+              class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto mb-2"
+            ></div>
             Loading previous data...
           </div>
           <div v-else class="text-white/60 cursor-pointer hover:text-white" @click="loadPrevious">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mx-auto mb-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 10l7-7m0 0l7 7m-7-7v18"
+              />
             </svg>
             Load previous content
           </div>
@@ -574,7 +589,7 @@
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg> -->
-                  
+
                   <vDefaultPic />
                 </div>
               </div>
@@ -674,10 +689,13 @@
 
         <div ref="loadingRef" class="py-4 text-center mt-8">
           <div v-if="loading" class="text-white/60">loading...</div>
-          <div v-else-if="!hasMore && communityStore.quickStart.models.length === 0" class="text-white/60">
+          <div
+            v-else-if="!hasMore && communityStore.quickStart.models.length === 0"
+            class="text-white/60"
+          >
             No more data
           </div>
-          
+
           <div v-else class="h-8"></div>
         </div>
       </div>
