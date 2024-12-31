@@ -28,7 +28,9 @@
           />
         </svg>
       </div>
-      <p class="text-[rgba(156, 163, 175, 1)] text-center">Click or drag file to this area to upload</p>
+      <p class="text-[rgba(156, 163, 175, 1)] text-center">
+        Click or drag file to this area to upload
+      </p>
       <input
         :accept="ALLOW_UPLOADABLE_EXT_NAMES"
         class="cursor-pointer opacity-0 w-full h-full absolute left-0 top-0"
