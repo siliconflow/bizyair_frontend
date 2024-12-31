@@ -56,7 +56,7 @@
     } else {
       models.splice(modelIndex, 1)
     }
-
+    modelStoreInstance.modelListPathParams.current = 1
     modelStoreInstance.filterState.base_models = models
     emit('fetchData')
     emit('update:showSortPopover', false)

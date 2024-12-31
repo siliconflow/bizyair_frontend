@@ -28,17 +28,20 @@
           />
         </svg>
       </div>
-      <p class="text-[rgba(156, 163, 175, 1)] text-center">{{ uploadText }}</p>
+      <p class="text-[rgba(156, 163, 175, 1)] text-center">
+        Click or drag file to this area to upload
+      </p>
       <input
         :accept="ALLOW_UPLOADABLE_EXT_NAMES"
         class="cursor-pointer opacity-0 w-full h-full absolute left-0 top-0"
         type="file"
+        ref="fileInput"
         @change="handleFileChange"
       />
     </div>
     <div v-if="disableUpload" class="pl-2">
       <Button class="" @click="interrupt()" v-if="!uploadSuccessful">interrupt</Button>
-      <Button class="" @click="interrupt()" v-else>cancel</Button>
+      <Button class="" @click="cancel()" v-else>cancel</Button>
     </div>
   </div>
 </template>
@@ -53,6 +56,7 @@
 
   const props = defineProps({
     modelType: String,
+    fileName: String,
     accept: {
       type: String,
       default: '.safetensors, .pth, .bin, .pt, .ckpt, .gguf, .sft'
@@ -60,12 +64,12 @@
   })
 
   let calculatingDialog: any
-  const uploadText = ref('Click or drag file to this area to upload')
-  const disableUpload = ref(false)
+  // const uploadText = ref('Click or drag file to this area to upload')
+  const disableUpload = ref(!!props.fileName)
   const ALLOW_UPLOADABLE_EXT_NAMES = ref('.safetensors, .pth, .bin, .pt, .ckpt, .gguf, .sft')
-
+  const fileInput = ref<HTMLInputElement | null>(null)
   const isHighlighted = ref(false)
-  const uploadSuccessful = ref(false)
+  const uploadSuccessful = ref(!!props.fileName)
 
   function preventDefaults(e: Event) {
     e.preventDefault()
@@ -167,12 +171,18 @@
     await client?.cancel()
     disableUpload.value = false
     uploadSuccessful.value = false
-    uploadText.value = 'Click or drag file to this area to upload'
-    emit('progress', '')
+    fileInput.value?.value && (fileInput.value.value = '')
+    emit('progress', 0)
+  }
+  const cancel = () => {
+    disableUpload.value = false
+    uploadSuccessful.value = false
+    fileInput.value?.value && (fileInput.value.value = '')
+    emit('progress', 0)
   }
 
   async function uploadFile(file: File) {
-    uploadText.value = file.name
+    // uploadText.value = file.name
     const fileExtension = file.name.split('.').pop()
     if (fileExtension && ALLOW_UPLOADABLE_EXT_NAMES.value.search(fileExtension) === -1) {
       useToaster.error('Invalid file format.')
@@ -238,6 +248,9 @@
   onMounted(() => {
     if (props.accept) {
       ALLOW_UPLOADABLE_EXT_NAMES.value = props.accept
+    }
+    if (props.fileName) {
+      emit('progress', 100)
     }
   })
 </script>

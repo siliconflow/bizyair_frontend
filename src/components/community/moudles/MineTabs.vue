@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
-
   type TabType = 'posts' | 'forked'
 
   const { modelValue } = defineProps<{

@@ -20,6 +20,7 @@
           placeholder="Enter Model Name"
           @change="formData.nameError = false"
         />
+        {{ formData }}
       </v-item>
       <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
     </div>
@@ -122,6 +123,7 @@
                     :ref="e.ref"
                     model-type="ComfyUI"
                     accept=".json"
+                    :file-name="e.file_name"
                     :class="{ 'border-red-500': e.filePathError }"
                     @path="path => handlePath(path, i)"
                     @start="() => startUpload(i)"
@@ -273,12 +275,12 @@
         acActiveIndex.value = i
         break
       }
-      if (e.cover_urls && !e.imageDone) {
-        e.imageError = true
-        useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
-        acActiveIndex.value = i
-        break
-      }
+      // if (e.cover_urls && !e.imageDone) {
+      //   e.imageError = true
+      //   useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
+      //   acActiveIndex.value = i
+      //   break
+      // }
       if (!e.sign) {
         e.filePathError = true
         useToaster.error(`Please enter the file path for version ${i + 1}`)
@@ -363,7 +365,10 @@
       // delete e.hideUpload
       delete e.showUpload
       delete e.imageDone
-      e.cover_urls = [e.cover_urls]
+      if (typeof e.cover_urls === 'string') {
+        e.cover_urls = [e.cover_urls]
+      }
+      // e.cover_urls = [e.cover_urls]
     })
     tempData.type = 'Workflow'
     if (tempData.id) {
@@ -387,6 +392,15 @@
     () => modelStoreObject.modelDetail,
     (val: any) => {
       formData.value = val
+      if (formData.value.versions && formData.value.versions.length) {
+        formData.value.versions.forEach((e: any) => {
+          if (e.file_name) {
+            e.fileName = e.file_name
+            // e.progress = 100
+            // delete e.file_name
+          }
+        })
+      }
     },
     {
       deep: true
