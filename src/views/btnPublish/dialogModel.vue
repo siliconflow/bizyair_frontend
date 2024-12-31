@@ -334,8 +334,10 @@
       delete e.fileName
       delete e.imageError
       delete e.imageDone
-
-      e.cover_urls = [e.cover_urls]
+      if (typeof e.cover_urls === 'string') {
+        e.cover_urls = [e.cover_urls]
+      }
+      // e.cover_urls = [e.cover_urls]
     })
     if (tempData.id) {
       await put_model(tempData)
