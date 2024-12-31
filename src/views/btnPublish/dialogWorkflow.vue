@@ -20,6 +20,7 @@
           placeholder="Enter Model Name"
           @change="formData.nameError = false"
         />
+        {{ formData }}
       </v-item>
       <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
     </div>
@@ -122,6 +123,7 @@
                     :ref="e.ref"
                     model-type="ComfyUI"
                     accept=".json"
+                    :file-name="e.file_name"
                     :class="{ 'border-red-500': e.filePathError }"
                     @path="path => handlePath(path, i)"
                     @start="() => startUpload(i)"
@@ -387,6 +389,15 @@
     () => modelStoreObject.modelDetail,
     (val: any) => {
       formData.value = val
+      if (formData.value.versions && formData.value.versions.length) {
+        formData.value.versions.forEach((e: any) => {
+          if (e.file_name) {
+            e.fileName = e.file_name
+            // e.progress = 100
+            // delete e.file_name
+          }
+        })
+      }
     },
     {
       deep: true
