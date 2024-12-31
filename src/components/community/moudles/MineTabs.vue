@@ -1,12 +1,7 @@
 <script setup lang="ts">
   import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-  import { watch } from 'vue'
 
   type TabType = 'posts' | 'forked'
-
-  const props = defineProps<{
-    modelValue: TabType
-  }>()
 
   const emit = defineEmits<{
     (e: 'update:modelValue', value: TabType): void
