@@ -20,9 +20,6 @@
 
 <template>
   <div :class="`w-full h-full relative ${src ? 'bg-black' : ''} overflow-hidden image-box`">
-    <!-- <div class="absolute bg-slate-600 w-full h-full">
-            <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">loadding</span>
-        </div> -->
     <img
       :src="src"
       :alt="alt"

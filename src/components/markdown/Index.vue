@@ -180,31 +180,15 @@
     document.removeEventListener('keydown', handleKeydown, true)
   }
 
-  const MAX_SIZE = 20 * 1024 * 1024 // 20MB
+  const MAX_SIZE = 20 * 1024 * 1024
   const MAX_RETRIES = 3
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 
   const uploadWithRetry = async (fileBlob, retryCount = 0) => {
-    // formatToWebp
-    // imageToOss
+
     const { file } = await formatToWebp(fileBlob)
     const { url } = await imageToOss(file)
-
     return url
-    // try {
-    //   const res = await upload_image(file)
-    //   if (!res.data?.url) {
-    //     throw new Error('Upload response missing URL')
-    //   }
-    //   return res.data.url
-    // } catch (error) {
-    //   console.error(`Upload attempt ${retryCount + 1} failed:`, error)
-    //   if (retryCount < MAX_RETRIES) {
-    //     await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)))
-    //     return uploadWithRetry(file, retryCount + 1)
-    //   }
-    //   throw error
-    // }
   }
 
   const uploadImg = async e => {

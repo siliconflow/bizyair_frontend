@@ -20,7 +20,6 @@
           placeholder="Enter Model Name"
           @change="formData.nameError = false"
         />
-        {{ formData }}
       </v-item>
       <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
     </div>
@@ -105,7 +104,7 @@
             <v-item v-show="!e.showUpload" label="File">
               <div class="flex h-32 items-center justify-end relative">
                 <p v-if="e.progress && e.fileName" class="absolute top-2 left-1 text-xs">
-                  e.fileName{{ e.fileName }}
+                  {{ e.fileName }}
                 </p>
                 <div v-if="e.progress" class="flex-1">
                   <Progress :model-value="e.progress" class="mt-4 h-3" />
@@ -275,12 +274,12 @@
         acActiveIndex.value = i
         break
       }
-      // if (e.cover_urls && !e.imageDone) {
-      //   e.imageError = true
-      //   useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
-      //   acActiveIndex.value = i
-      //   break
-      // }
+      if (e.cover_urls && !e.imageDone) {
+        e.imageError = true
+        useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
+        acActiveIndex.value = i
+        break
+      }
       if (!e.sign) {
         e.filePathError = true
         useToaster.error(`Please enter the file path for version ${i + 1}`)
@@ -288,7 +287,7 @@
         break
       }
     }
-    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
+    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign && !(e.cover_urls && !e.imageDone))
   }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p
@@ -320,15 +319,7 @@
     formData.value.versions[0].path = ''
   }
   const loadWorkflow = async () => {
-    // const tempData = { ...formData.value }
-    // formData.value.versions[0].progress = 100
-    // formData.value.versions[0].fileName = `${formData.value.name}-workflow.json`
-    // formData.value.versions[0].hideUpload = true
-    // app.graphToPrompt().then(e => {
-    //   console.log(e.workflow)
-    // })
     const graph = await comfyUIApp.graphToPrompt()
-    console.log(JSON.stringify(graph.workflow))
     const file = new File(
       [JSON.stringify(graph.workflow)],
       `${formData.value.name}-workflow.json`,
@@ -362,13 +353,11 @@
       delete e.speed
       delete e.fileName
       delete e.imageError
-      // delete e.hideUpload
       delete e.showUpload
       delete e.imageDone
       if (typeof e.cover_urls === 'string') {
         e.cover_urls = [e.cover_urls]
       }
-      // e.cover_urls = [e.cover_urls]
     })
     tempData.type = 'Workflow'
     if (tempData.id) {
@@ -396,8 +385,6 @@
         formData.value.versions.forEach((e: any) => {
           if (e.file_name) {
             e.fileName = e.file_name
-            // e.progress = 100
-            // delete e.file_name
           }
         })
       }
