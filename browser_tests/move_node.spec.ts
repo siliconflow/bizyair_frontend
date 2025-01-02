@@ -125,6 +125,11 @@ import { expect, test } from "@playwright/test";
     const dropdown = page.locator(
       ".comfy-vue-node-search-container .p-autocomplete-list",
     );
+
+    // TODO: sometimes the input search box never shows up?
+    await input.waitFor({ state: "visible" });
+    await input.fill(nodeName);
+    await dropdown.waitFor({ state: "visible" });
     await expect(async() => {
       await page.locator("#graph-canvas").dblclick({
         position: {
@@ -137,7 +142,6 @@ import { expect, test } from "@playwright/test";
       await page.waitForTimeout(500);
       await dropdown.waitFor({ state: "visible" , timeout: 1000});
     }).toPass({timeout: test.info().timeout})
-
     // Wait for some time for the auto complete list to update.
     // The auto complete list is debounced and may take some time to update.
     await dropdown.locator("li").nth(0).click();

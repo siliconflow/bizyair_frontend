@@ -28,38 +28,48 @@
           />
         </svg>
       </div>
-      <p class="text-[rgba(156, 163, 175, 1)] text-center">{{ uploadText }}</p>
+      <p class="text-[rgba(156, 163, 175, 1)] text-center">
+        Click or drag file to this area to upload
+      </p>
       <input
         :accept="ALLOW_UPLOADABLE_EXT_NAMES"
         class="cursor-pointer opacity-0 w-full h-full absolute left-0 top-0"
         type="file"
+        ref="fileInput"
         @change="handleFileChange"
       />
     </div>
     <div v-if="disableUpload" class="pl-2">
       <Button class="" @click="interrupt()" v-if="!uploadSuccessful">interrupt</Button>
-      <Button class="" @click="interrupt()" v-else>cancel</Button>
+      <Button class="" @click="cancel()" v-else>cancel</Button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
   import { useToaster } from '@/components/modules/toats/index'
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { useShadet } from '@/components/modules/vShadet/index'
   import { Button } from '@/components/ui/button'
-  import { calculateHash } from './computeHash'
-  import OSS from 'ali-oss'
-  import { oss_sign } from '@/api/public'
   import { commit_file } from '@/api/model'
+  import { creatClient } from './ossClient'
+
+  const props = defineProps({
+    modelType: String,
+    fileName: String,
+    accept: {
+      type: String,
+      default: '.safetensors, .pth, .bin, .pt, .ckpt, .gguf, .sft'
+    }
+  })
 
   let calculatingDialog: any
-  const uploadText = ref('Click or drag file to this area to upload')
-  const disableUpload = ref(false)
+  // const uploadText = ref('Click or drag file to this area to upload')
+  const disableUpload = ref(!!props.fileName)
   const ALLOW_UPLOADABLE_EXT_NAMES = ref('.safetensors, .pth, .bin, .pt, .ckpt, .gguf, .sft')
-
+  const fileInput = ref<HTMLInputElement | null>(null)
   const isHighlighted = ref(false)
-  const uploadSuccessful = ref(false)
+  const uploadSuccessful = ref(!!props.fileName)
 
   function preventDefaults(e: Event) {
     e.preventDefault()
@@ -161,27 +171,18 @@
     await client?.cancel()
     disableUpload.value = false
     uploadSuccessful.value = false
-    uploadText.value = 'Click or drag file to this area to upload'
-    emit('progress', '')
+    fileInput.value?.value && (fileInput.value.value = '')
+    emit('progress', 0)
   }
-  function creatClient(accessFile: any) {
-    const accessKeyId = accessFile.file.access_key_id
-    const accessKeySecret = accessFile.file.access_key_secret
-    const bucket = accessFile.storage.bucket
-    const stsToken = accessFile.file.security_token
-    const region = accessFile.storage.region
+  const cancel = () => {
+    disableUpload.value = false
+    uploadSuccessful.value = false
+    fileInput.value?.value && (fileInput.value.value = '')
+    emit('progress', 0)
+  }
 
-    return new OSS({
-      accessKeyId,
-      accessKeySecret,
-      stsToken,
-      bucket,
-      region,
-      secure: true
-    })
-  }
   async function uploadFile(file: File) {
-    uploadText.value = file.name
+    // uploadText.value = file.name
     const fileExtension = file.name.split('.').pop()
     if (fileExtension && ALLOW_UPLOADABLE_EXT_NAMES.value.search(fileExtension) === -1) {
       useToaster.error('Invalid file format.')
@@ -193,10 +194,12 @@
       content: 'In hash calculation',
       z: 'z-12000'
     })
-    const { sha256sum, md5Hash } = await calculateHash(file)
+    const { oss, objectKey, md5Hash, sha256sum, fileId } = await creatClient(
+      file,
+      props.modelType as string
+    )
     calculatingDialog.close()
-    let ossData = await oss_sign(sha256sum)
-    if (ossData.data.file.id) {
+    if (fileId) {
       emit('success', { sha256sum, path: file.name })
       emit('uploadInfo', {
         fileName: file.name
@@ -206,13 +209,13 @@
       // disableUpload.value = false
       return
     }
-    const accessFile = ossData.data
-    client = creatClient(accessFile)
+
+    client = oss
     emit('start')
     const result = await doUpload({
       client,
       file,
-      objectKey: accessFile.file.object_key,
+      objectKey,
       md5Hash,
       sha256sum
     })
@@ -223,10 +226,11 @@
         md5_hash: md5Hash,
         md5Hash,
         sha256sum,
-        object_key: accessFile.file.object_key
+        object_key: objectKey,
+        type: props.modelType
       })
       // disableUpload.value = false
-      emit('success', { sha256sum, object_key: accessFile.file.object_key })
+      emit('success', { sha256sum, object_key: objectKey })
       uploadSuccessful.value = true
       emit('uploadInfo', {
         fileName: file.name,
@@ -241,6 +245,14 @@
       throw new Error(`Upload to OSS failed: ${result.res.statusText}`)
     }
   }
+  onMounted(() => {
+    if (props.accept) {
+      ALLOW_UPLOADABLE_EXT_NAMES.value = props.accept
+    }
+    if (props.fileName) {
+      emit('progress', 100)
+    }
+  })
 </script>
 
 <style scoped>
