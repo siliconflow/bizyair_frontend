@@ -89,6 +89,7 @@ jobs:
           git checkout -f -b update_snapshots origin/update_snapshots
           git rm -r "**/*.png"
           git commit -m "rm for regen"
+          git push
           git checkout ${{ github.ref_name }}
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
 
@@ -97,6 +98,7 @@ jobs:
           BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
           COMFY_PATH: "../../../.."
         run: |
+          rm -r **/*.png
           npx playwright test --update-snapshots --workers=2 --trace on
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
