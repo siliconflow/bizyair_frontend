@@ -21,7 +21,8 @@
   import ModelDetail from '@/components/community/detail/Index.vue'
   import vDefaultPic from '@/components/modules/vDefaultPic.vue'
   // import vImage from '@/components/modules/vImage.vue'
-
+  import vTooltips from '@/components/modules/v-tooltip.vue'
+  import { sliceString, formatNumber } from '@/utils/tool'
   const communityStore = useCommunityStore()
   const modelStoreInstance = modelStore()
   const SCROLL_THRESHOLD = 30
@@ -577,13 +578,14 @@
                   <vDefaultPic />
                 </div>
               </div>
-
               <div
                 class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
               >
-                <h3 class="text-base text-white font-medium mb-2">{{ model.name }}</h3>
+                <vTooltips :tips="model.name">
+                  <h3 class="text-base text-white font-medium mb-2 truncate">{{ sliceString(model.name, 24) }}</h3>
+                </vTooltips>
                 <div class="flex items-center space-x-3 text-white/90 text-xs">
-                  <span class="flex items-center space-x-1">
+                  <!-- <span class="flex items-center space-x-1">
                     <svg
                       width="14"
                       height="14"
@@ -600,9 +602,9 @@
                     </svg>
 
                     <span class="opacity-80">{{
-                      model.versions?.[0]?.counter?.downloads || 0
+                      formatNumber(model.versions?.[0]?.counter?.downloads)
                     }}</span>
-                  </span>
+                  </span> -->
                   <span class="flex items-center space-x-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -619,7 +621,7 @@
                       />
                     </svg>
                     <span class="opacity-80">
-                      {{ model.versions?.[0]?.counter?.used_count || 0 }}</span
+                      {{ formatNumber(model?.counter?.used_count) }}</span
                     >
                   </span>
                   <span class="flex items-center space-x-1">
@@ -643,7 +645,7 @@
                       </defs>
                     </svg>
                     <span class="opacity-80">{{
-                      model.versions?.[0]?.counter?.forked_count || 0
+                      formatNumber(model?.counter?.forked_count)
                     }}</span>
                   </span>
                   <!-- <span class="flex items-center space-x-1">
@@ -681,7 +683,7 @@
                       />
                     </svg>
                     <span class="opacity-80">{{
-                      model.versions?.[0]?.counter?.liked_count || 0
+                      formatNumber(model?.counter?.liked_count)
                     }}</span>
                   </span>
                 </div>
@@ -728,7 +730,7 @@
   <v-dialog
     v-if="currentModel && currentModel?.versions?.[0]"
     v-model:open="communityStore.showCommunityDetail"
-    class="px-6 overflow-hidden pb-6 z-10000 max-w-[90%] bg-[#353535]"
+    class="px-6 overflow-visible pb-6 z-10000 max-w-[90%] bg-[#353535]"
     layout-class="z-10000"
     content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
     :title="currentModel?.name"

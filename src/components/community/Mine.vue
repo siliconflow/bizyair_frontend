@@ -8,7 +8,8 @@
   import MineTabs from '@/components/community/moudles/MineTabs.vue'
   import { useCommunityStore } from '@/stores/communityStore'
   import { modelStore } from '@/stores/modelStatus'
-
+  import vTooltips from '@/components/modules/v-tooltip.vue'
+  import { sliceString, formatNumber } from '@/utils/tool'
   import { get_model_list, get_workflow_dowload_url } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import vDialog from '@/components/modules/vDialog.vue'
@@ -540,9 +541,13 @@
               <div
                 class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
               >
-                <h3 class="text-base text-white font-medium mb-2">{{ model.name }}</h3>
+                <vTooltips :tips="model.name">
+                  <h3 class="text-base text-white font-medium mb-2">{{ sliceString(model.name, 24) }}</h3>
+                </vTooltips>
                 <div class="flex items-center space-x-3 text-white/90 text-xs">
-                  <span class="flex items-center space-x-1">
+                  <span 
+                  v-if="model?.type === 'Workflow'"
+                  class="flex items-center space-x-1">
                     <svg
                       width="14"
                       height="14"
@@ -559,7 +564,7 @@
                     </svg>
 
                     <span class="opacity-80">{{
-                      model.versions?.[0]?.counter?.downloads || 0
+                      formatNumber(model?.counter?.downloaded_count)
                     }}</span>
                   </span>
                   <!-- <span class="flex items-center space-x-1">
@@ -586,7 +591,9 @@
                       model.versions?.[0]?.counter?.liked_count || 0
                     }}</span>
                   </span> -->
-                  <span class="flex items-center space-x-1">
+                  <span 
+                  v-if="model?.type !== 'Workflow'"
+                  class="flex items-center space-x-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="14"
@@ -602,7 +609,7 @@
                       />
                     </svg>
                     <span class="opacity-80">
-                      {{ model.versions?.[0]?.counter?.used_count || 0 }}</span
+                      {{ formatNumber(model?.counter?.used_count) }}</span
                     >
                   </span>
                   <span class="flex items-center space-x-1">
@@ -626,7 +633,7 @@
                       </defs>
                     </svg>
                     <span class="opacity-80">{{
-                      model.versions?.[0]?.counter?.forked_count || 0
+                      formatNumber(model?.counter?.forked_count)
                     }}</span>
                   </span>
                   <span class="flex items-center space-x-1">
@@ -645,7 +652,7 @@
                       />
                     </svg>
                     <span class="opacity-80">{{
-                      model.versions?.[0]?.counter?.liked_count || 0
+                      formatNumber(model?.counter?.liked_count)
                     }}</span>
                   </span>
                 </div>

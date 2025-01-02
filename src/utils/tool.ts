@@ -2,8 +2,25 @@ export const objectToArray = (obj: any) => {
   return Object.keys(obj).map(key => ({ name: key, value: obj[key] }))
 }
 
-export const sliceString = (str: string, length: number) => {
-  return str.length > length ? str.slice(0, length) + '...' : str
+export function sliceString(str: string, maxWidth: number): string {
+  if (!str) return '';
+  
+  let width = 0;
+  let result = '';
+  
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    const charWidth = /[\u4e00-\u9fa5\uFF00-\uFFFF]/.test(char) ? 2 : 1;
+    
+    if (width + charWidth > maxWidth) {
+      return result + '...';
+    }
+    
+    width += charWidth;
+    result += char;
+  }
+  
+  return result;
 }
 
 export const formatNumber = (num: number | undefined) => {
@@ -13,7 +30,10 @@ export const formatNumber = (num: number | undefined) => {
   if (num < 1000) {
     return num.toString()
   }
-  return (num / 1000).toFixed(1) + 'k'
+  if (num < 10000) {
+    return (num / 1000).toFixed(1) + 'k'
+  }
+  return (num / 10000).toFixed(1) + 'w'
 }
 
 export const formatSize = (size: number | undefined) => {
