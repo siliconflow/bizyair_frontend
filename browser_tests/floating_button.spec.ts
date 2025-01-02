@@ -67,6 +67,7 @@ test.describe('Floating Button', () => {
   // #4 Try setting an invalid api key after profile is set
   test('set invalid api key after', async ({ page }, testInfo) => {
     await page.getByText('Profile', { exact: true }).locator('..').click()
+    await page.locator('.bizyair-profile-primary').waitFor({ state: 'visible', timeout: 1000 })
     await page
       .locator('//span[@id="bizyair-profile-password"]/following-sibling::*[1]/child::*[1]')
       .click()
