@@ -3,24 +3,24 @@ export const objectToArray = (obj: any) => {
 }
 
 export function sliceString(str: string, maxWidth: number): string {
-  if (!str) return '';
-  
-  let width = 0;
-  let result = '';
-  
+  if (!str) return ''
+
+  let width = 0
+  let result = ''
+
   for (let i = 0; i < str.length; i++) {
-    const char = str[i];
-    const charWidth = /[\u4e00-\u9fa5\uFF00-\uFFFF]/.test(char) ? 2 : 1;
-    
+    const char = str[i]
+    const charWidth = /[\u4e00-\u9fa5\uFF00-\uFFFF]/.test(char) ? 2 : 1
+
     if (width + charWidth > maxWidth) {
-      return result + '...';
+      return result + '...'
     }
-    
-    width += charWidth;
-    result += char;
+
+    width += charWidth
+    result += char
   }
-  
-  return result;
+
+  return result
 }
 
 export const formatNumber = (num: number | undefined) => {

@@ -10,7 +10,7 @@
   import { get_model_list, get_workflow_dowload_url } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import vDefaultPic from '@/components/modules/vDefaultPic.vue'
-   import vTooltips from '@/components/modules/v-tooltip.vue'
+  import vTooltips from '@/components/modules/v-tooltip.vue'
   import { sliceString, formatNumber } from '@/utils/tool'
   // import vImage from '@/components/modules/vImage.vue'
   const comfyUIApp: any = inject('comfyUIApp')
@@ -449,8 +449,10 @@
               <div
                 class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
               >
-              <vTooltips :tips="model.name">
-                  <h3 class="text-base text-white font-medium mb-2">{{ sliceString(model.name, 24) }}</h3>
+                <vTooltips :tips="model.name">
+                  <h3 class="text-base text-white font-medium mb-2">
+                    {{ sliceString(model.name, 24) }}
+                  </h3>
                 </vTooltips>
                 <div class="flex items-center space-x-3 text-white/90 text-xs">
                   <span class="flex items-center space-x-1">
@@ -493,9 +495,7 @@
                         </clipPath>
                       </defs>
                     </svg>
-                    <span class="opacity-80">{{
-                      formatNumber(model?.counter?.forked_count)
-                    }}</span>
+                    <span class="opacity-80">{{ formatNumber(model?.counter?.forked_count) }}</span>
                   </span>
                   <!-- <span class="flex items-center space-x-1">
                     <svg
@@ -531,9 +531,7 @@
                         stroke-linejoin="round"
                       />
                     </svg>
-                    <span class="opacity-80">{{
-                      formatNumber(model?.counter?.liked_count)
-                    }}</span>
+                    <span class="opacity-80">{{ formatNumber(model?.counter?.liked_count) }}</span>
                   </span>
                 </div>
               </div>

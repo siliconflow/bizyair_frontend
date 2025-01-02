@@ -542,12 +542,12 @@
                 class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
               >
                 <vTooltips :tips="model.name">
-                  <h3 class="text-base text-white font-medium mb-2">{{ sliceString(model.name, 24) }}</h3>
+                  <h3 class="text-base text-white font-medium mb-2">
+                    {{ sliceString(model.name, 24) }}
+                  </h3>
                 </vTooltips>
                 <div class="flex items-center space-x-3 text-white/90 text-xs">
-                  <span 
-                  v-if="model?.type === 'Workflow'"
-                  class="flex items-center space-x-1">
+                  <span v-if="model?.type === 'Workflow'" class="flex items-center space-x-1">
                     <svg
                       width="14"
                       height="14"
@@ -591,9 +591,7 @@
                       model.versions?.[0]?.counter?.liked_count || 0
                     }}</span>
                   </span> -->
-                  <span 
-                  v-if="model?.type !== 'Workflow'"
-                  class="flex items-center space-x-1">
+                  <span v-if="model?.type !== 'Workflow'" class="flex items-center space-x-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="14"
@@ -608,9 +606,7 @@
                         stroke-linejoin="round"
                       />
                     </svg>
-                    <span class="opacity-80">
-                      {{ formatNumber(model?.counter?.used_count) }}</span
-                    >
+                    <span class="opacity-80"> {{ formatNumber(model?.counter?.used_count) }}</span>
                   </span>
                   <span class="flex items-center space-x-1">
                     <svg
@@ -632,9 +628,7 @@
                         </clipPath>
                       </defs>
                     </svg>
-                    <span class="opacity-80">{{
-                      formatNumber(model?.counter?.forked_count)
-                    }}</span>
+                    <span class="opacity-80">{{ formatNumber(model?.counter?.forked_count) }}</span>
                   </span>
                   <span class="flex items-center space-x-1">
                     <svg
@@ -651,9 +645,7 @@
                         stroke-linejoin="round"
                       />
                     </svg>
-                    <span class="opacity-80">{{
-                      formatNumber(model?.counter?.liked_count)
-                    }}</span>
+                    <span class="opacity-80">{{ formatNumber(model?.counter?.liked_count) }}</span>
                   </span>
                 </div>
               </div>

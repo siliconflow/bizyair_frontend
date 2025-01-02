@@ -6,7 +6,7 @@
           <slot />
         </span>
       </TooltipTrigger>
-      <TooltipContent  class="z-12000">
+      <TooltipContent class="z-12000">
         <span>{{ tips }}</span>
       </TooltipContent>
     </Tooltip>
