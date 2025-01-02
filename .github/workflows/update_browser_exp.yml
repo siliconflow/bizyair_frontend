@@ -86,7 +86,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git fetch origin update_snapshots
-          git checkout -b update_snapshots origin/update_snapshots
+          git checkout -f -b update_snapshots origin/update_snapshots
           git rm -r "**/*.png"
           git commit -m "rm for regen"
           git checkout ${{ github.ref_name }}
