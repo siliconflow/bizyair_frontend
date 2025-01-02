@@ -1,33 +1,25 @@
 <template>
-  <!-- <btnMenu :show_cases="show_cases" buttonText="Examples" icon="book-open" :isJson="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
-      <path fill="none" stroke="#ddd" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 16.008V7.99a1.98 1.98 0 0 0-1-1.717l-7-4.008a2.02 2.02 0 0 0-2 0L4 6.273c-.619.355-1 1.01-1 1.718v8.018c0 .709.381 1.363 1 1.717l7 4.008a2.02 2.02 0 0 0 2 0l7-4.008c.619-.355 1-1.01 1-1.718M12 22V12m0 0l8.73-5.04m-17.46 0L12 12" />
-    </svg>
-  </btnMenu> -->
-  <!-- <Form as="" :validation-schema="formSchema"> -->
   <div
-    @click="modelStoreObject.setDialogStatus(true)"
     class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3"
+    @click="modelStoreObject.setDialogStatus(true)"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
+    <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
-        fill="none"
-        stroke="#ddd"
+        d="M9.44255 10.6667L10.7759 12L13.4425 9.33335M12.7759 6.66668V5.33335C12.7756 5.09953 12.7139 4.86989 12.5969 4.66746C12.4799 4.46503 12.3117 4.29692 12.1092 4.18002L7.44255 1.51335C7.23985 1.39633 7.00993 1.33472 6.77588 1.33472C6.54183 1.33472 6.3119 1.39633 6.10921 1.51335L1.44255 4.18002C1.24005 4.29692 1.07187 4.46503 0.954853 4.66746C0.837841 4.86989 0.776119 5.09953 0.775879 5.33335V10.6667C0.776119 10.9005 0.837841 11.1301 0.954853 11.3326C1.07187 11.535 1.24005 11.7031 1.44255 11.82L6.10921 14.4867C6.3119 14.6037 6.54183 14.6653 6.77588 14.6653C7.00993 14.6653 7.23985 14.6037 7.44255 14.4867L8.77588 13.7267M9.77588 6.26668L3.80921 2.82668M0.969212 4.66668L6.77588 8.00002M6.77588 8.00002L12.5825 4.66668M6.77588 8.00002V14.6667"
+        stroke="#F9FAFB"
         stroke-linecap="round"
         stroke-linejoin="round"
-        stroke-width="1.5"
-        d="M21 16.008V7.99a1.98 1.98 0 0 0-1-1.717l-7-4.008a2.02 2.02 0 0 0-2 0L4 6.273c-.619.355-1 1.01-1 1.718v8.018c0 .709.381 1.363 1 1.717l7 4.008a2.02 2.02 0 0 0 2 0l7-4.008c.619-.355 1-1.01 1-1.718M12 22V12m0 0l8.73-5.04m-17.46 0L12 12"
       />
     </svg>
-    <span class="block leading h-full leading-8 text-sm">Publish</span>
+    <span class="block leading h-full leading-8 text-sm">PublishModel</span>
   </div>
   <v-dialog
-    v-model:open="modelStoreObject.showDialog"
-    @onClose="onDialogClose"
-    class="px-0 overflow-hidden pb-0 z-9000"
     v-if="modelStoreObject.showDialog"
-    layoutClass="z-9000"
-    contentClass="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+    v-model:open="modelStoreObject.showDialog"
+    class="px-0 overflow-hidden pb-0 z-9000"
+    layout-class="z-9000"
+    content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+    @on-close="onDialogClose"
   >
     <template #title
       ><span class="px-6 cursor-pointer" @click="handleToggleTitle">Publish a Model</span></template
@@ -35,26 +27,26 @@
     <div v-show="modelBox" class="px-6 pb-6">
       <v-item label="Model Name">
         <Input
-          @change="formData.nameError = false"
+          v-model:model-value="formData.name"
           :class="{ 'border-red-500': formData.nameError }"
           type="text"
           placeholder="Enter Model Name"
-          v-model:model-value="formData.name"
+          @change="formData.nameError = false"
         />
       </v-item>
       <v-item label="Model Type">
         <v-select
-          @update:open="formData.typeError = false"
-          :class="{ 'border-red-500': formData.typeError }"
           v-model:model-value="formData.type"
+          :class="{ 'border-red-500': formData.typeError }"
           placeholder="Select Model Type"
+          @update:open="formData.typeError = false"
         >
           <SelectItem v-for="(e, i) in typeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
         </v-select>
       </v-item>
       <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
     </div>
-    <vCustomAccordion :multiple="true" :activeIndex="acActiveIndex">
+    <vCustomAccordion :multiple="true" :active-index="acActiveIndex">
       <vCustomAccordionItem
         v-for="(e, i) in formData.versions"
         :key="i"
@@ -69,8 +61,8 @@
             <span v-else>Add Version</span>
             <Trash2
               v-if="formData.versions.length !== 1"
-              class="w-4 h-4"
               #icon
+              class="w-4 h-4"
               @click.capture.stop="delVersion(i)"
             />
             <Progress
@@ -84,27 +76,30 @@
           <div class="bg-[#353535] px-6 pb-4">
             <v-item label="Version Name">
               <Input
-                @change="e.versionError = false"
+                v-model:model-value="e.version"
                 :class="{ 'border-red-500': e.versionError }"
                 type="text"
                 placeholder="Version Name"
-                v-model:model-value="e.version"
+                @change="e.versionError = false"
               />
             </v-item>
             <v-item label="Base Model">
               <v-select
-                @update:open="e.baseModelError = false"
-                :class="{ 'border-red-500': e.baseModelError }"
                 v-model:model-value="e.base_model"
+                :class="{ 'border-red-500': e.baseModelError }"
                 placeholder="Select Base Model"
+                @update:open="e.baseModelError = false"
               >
                 <SelectItem v-for="(e, i) in baseTypeLis" :key="i" :value="e.value">{{
                   e.label
                 }}</SelectItem>
               </v-select>
             </v-item>
+            <v-item label="Upload Image">
+              <vUploadImage v-model.modelValue="e.cover_urls" />{{ e.cover_urls }}
+            </v-item>
             <v-item label="Introduction">
-              <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />
+              <Markdown v-model.modelValue="e.intro" :editor-id="`myeditor${i}`" />
             </v-item>
             <v-item label="">
               <div class="flex items-center space-x-2 mt-2">
@@ -120,7 +115,7 @@
                 <Label for="airplane-mode">Publicly Visible</Label>
               </div>
             </v-item>
-            <v-item label="File" v-show="!e.showUpload">
+            <v-item v-show="!e.showUpload" label="File">
               <div class="flex h-28 items-center justify-end relative">
                 <p v-if="e.progress && e.fileName" class="absolute top-2 left-1 text-xs">
                   {{ e.fileName }}
@@ -129,19 +124,18 @@
                   <Progress :model-value="e.progress" class="mt-4 h-3" />
                   <p class="text-center pt-2">
                     {{ e.progress }}% Uploaded
-                    <span class="pl-2" v-if="e.speed">Speed: {{ e.speed }}</span>
+                    <span v-if="e.speed" class="pl-2">Speed: {{ e.speed }}</span>
                   </p>
                 </div>
                 <vUpload
-                  :parallel="1"
                   :ref="e.ref"
-                  :chunkSize="1"
+                  :model-type="formData.type"
                   :class="{ 'border-red-500': e.filePathError }"
                   @path="path => handlePath(path, i)"
                   @start="() => startUpload(i)"
                   @success="data => successUpload(data, i)"
                   @error="() => errorUpload(i)"
-                  @uploadInfo="data => handleUploadInfo(data, i)"
+                  @upload-info="data => handleUploadInfo(data, i)"
                   @progress="p => fnProgress(p, i)"
                 />
               </div>
@@ -150,7 +144,7 @@
         </template>
       </vCustomAccordionItem>
     </vCustomAccordion>
-    <template #foot v-if="!modelBox">
+    <template v-if="!modelBox" #foot>
       <div
         class="bg-[#353535] px-6 w-full h-14 rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px] flex justify-between items-center -mt-4"
       >
@@ -164,53 +158,43 @@
 <script setup lang="ts">
   import { useToaster } from '@/components/modules/toats/index'
   import { computed, ref, watch } from 'vue'
-  // import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion'
   import { SelectItem } from '@/components/ui/select'
   import { Input } from '@/components/ui/input'
   import { Button } from '@/components/ui/button'
   import { Label } from '@/components/ui/label'
   import { Switch } from '@/components/ui/switch'
   import { Progress } from '@/components/ui/progress'
-  import vDialog from '@/components/modules/vDialog.vue'
-  import vSelect from '@/components/modules/vSelect.vue'
-  import vItem from '@/components/modules/vItem.vue'
-  // import vAccordionTrigger from '@/components/modules/vAccordionTrigger.vue'
-  import vCustomAccordion from '@/components/modules/vCustomAccordion.vue'
-  import vCustomAccordionItem from '@/components/modules/vCustomAccordionItem.vue'
-  import vUpload from './upload.vue'
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
-  // import { useShadet } from '@/components/modules/vShadet/index'
-
-  import { useStatusStore } from '@/stores/userStatus'
   import { modelStore } from '@/stores/modelStatus'
-  import Markdown from '@/components/markdown/Index.vue'
-  // check_local_file, submit_upload, interrupt_upload
   import { create_models, model_types, base_model_types, put_model } from '@/api/model'
   import { onMounted } from 'vue'
   import { Trash2 } from 'lucide-vue-next'
+  import vDialog from '@/components/modules/vDialog.vue'
+  import vSelect from '@/components/modules/vSelect.vue'
+  import vItem from '@/components/modules/vItem.vue'
+  import vCustomAccordion from '@/components/modules/vCustomAccordion.vue'
+  import vCustomAccordionItem from '@/components/modules/vCustomAccordionItem.vue'
+  import vUpload from '@/components/modules/vUpload/index.vue'
+  import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
+  import Markdown from '@/components/markdown/Index.vue'
 
-  const statusStore = useStatusStore()
   const modelStoreObject = modelStore()
   const modelBox = ref(true)
-  // const versionIndex = ref(0);
   const typeLis = ref([{ value: '', label: '' }])
   const baseTypeLis = ref([{ value: '', label: '' }])
   const formData = ref({ ...modelStoreObject.modelDetail })
   const acActiveIndex = ref(-1)
   const showLayoutLoading = ref(false)
-
   const handleToggle = (i: number) => {
     acActiveIndex.value = i
     if (modelBox.value) {
       modelBox.value = false
     }
   }
-
   const handleToggleTitle = () => {
     acActiveIndex.value = -1
     modelBox.value = true
   }
-
   const disabledPublish = computed(() => {
     const progress = formData.value.versions
       .map(e => e.progress)
@@ -223,21 +207,6 @@
       formData.value.versions[index].public = val
     }
   }
-  let calculating: { close: any }
-  // async function checkFile(val: string, index: number) {
-  //   const res = await check_local_file({ absolute_path: val })
-  //   formData.value.versions[index].file_upload_id = res.data.upload_id
-  //   formData.value.versions[index].filePathError = false
-  //   versionIndex.value = index
-  //   await submit_upload({ upload_id: res.data.upload_id })
-  //   asdasd = new Date().getTime()
-  //   formData.value.versions[index].progress = 0.1
-  //   calculating = useShadet({
-  //     content: 'Start calculating the file hash',
-  //     z: 'z-12000'
-  //   })
-
-  // }
   async function delVersion(index: number) {
     const res = await useAlertDialog({
       title: 'Are you sure you want to delete this version?',
@@ -277,7 +246,6 @@
     modelBox.value = false
     acActiveIndex.value = tempData.versions.length - 1
   }
-
   function nextStep() {
     if (!formData.value.name) {
       useToaster.error('Please enter the model name')
@@ -296,7 +264,6 @@
       addVersions()
     }
   }
-
   function verifyVersion() {
     const tempData = { ...formData.value }
     tempData.versions = tempData.versions || []
@@ -323,12 +290,6 @@
     }
     return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
   }
-
-  // async function interrupt ({ file_upload_id }: any) {
-
-  //   await interrupt_upload({ upload_id: file_upload_id })
-
-  // }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p
   }
@@ -374,15 +335,8 @@
       await create_models(tempData)
     }
     useToaster.success('Model published successfully')
-
     onDialogClose()
   }
-
-  // const acActiveFn = () => {
-  //   if (modelBox.value) {
-  //     modelBox.value = false
-  //   }
-  // }
   const onDialogClose = () => {
     modelStoreObject.setDialogStatus(false, 0)
     modelStoreObject.clearModelDetail()
@@ -390,59 +344,6 @@
     showLayoutLoading.value = false
     modelStoreObject.uploadModelDone()
   }
-  watch(
-    () => statusStore.socketMessage,
-    (val: any) => {
-      if (val.type == 'progress') {
-        const i = formData.value.versions.findIndex(
-          (e: any) => e.file_upload_id == val.data.upload_id
-        )
-        formData.value.versions[i].progress = Number(val.data.progress.replace('%', ''))
-      }
-      if (val.type == 'status' && val.data.status == 'finish') {
-        const i = formData.value.versions.findIndex(
-          (e: any) => e.file_upload_id == val.data.upload_id
-        )
-        if (formData.value.versions[i]) {
-          formData.value.versions[i].path = val.data.model_files[0].path
-          formData.value.versions[i].sign = val.data.model_files[0].sign
-        }
-      }
-      if (val.type == 'interrupted') {
-        useToaster.success('Upload interrupted')
-        const i = formData.value.versions.findIndex(
-          (e: any) => e.file_upload_id == val.data.upload_id
-        )
-        delete formData.value.versions[i].progress
-        formData.value.versions[i].filePath = ''
-      }
-      if (val.type == 'error') {
-        useToaster.error(val.data.message)
-        const i = formData.value.versions.findIndex(
-          (e: any) => e.file_upload_id == val.data.upload_id
-        )
-        delete formData.value.versions[i].progress
-        formData.value.versions[i].filePath = ''
-      }
-      if (val.type == 'prepared') {
-        calculating.close()
-      }
-      if (val.type === 'errors' && val.data && val.data.code === 500101) {
-        calculating.close()
-        useToaster.error(val.data.message)
-        const i = formData.value.versions.findIndex(
-          (e: any) => e.file_upload_id == val.data.data.upload_id
-        )
-        if (formData.value.versions[i].progress) {
-          delete formData.value.versions[i].progress
-        }
-        formData.value.versions[i].filePath = ''
-      }
-    },
-    {
-      deep: true
-    }
-  )
   watch(
     () => modelStoreObject.modelDetail,
     (val: any) => {

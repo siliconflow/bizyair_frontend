@@ -302,6 +302,7 @@
                   <TabsList class="inline-flex h-12 bg-transparent text-sm text-white w-auto">
                     <TabsTrigger
                       v-for="version in model?.versions"
+                      :key="version.id"
                       :value="version.id"
                       @click="handleTabChange(version.id)"
                       :class="['version-tab', `version-tab-${version.id}`]"

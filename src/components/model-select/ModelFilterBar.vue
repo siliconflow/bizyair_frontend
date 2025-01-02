@@ -188,7 +188,7 @@
           variant="default"
           class="w-[44px] h-[44px] hover:border-2 hover:border-white cursor-pointer"
         >
-          <svg
+          <!-- <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
             height="16"
@@ -198,6 +198,21 @@
           >
             <path
               d="M14.6666 2H1.33325L6.66658 8.30667V12.6667L9.33325 14V8.30667L14.6666 2Z"
+              stroke="#F9FAFB"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg> -->
+
+          <svg
+            width="16"
+            height="14"
+            viewBox="0 0 16 14"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M14.6666 1H1.33325L6.66658 7.30667V11.6667L9.33325 13V7.30667L14.6666 1Z"
               stroke="#F9FAFB"
               stroke-linecap="round"
               stroke-linejoin="round"

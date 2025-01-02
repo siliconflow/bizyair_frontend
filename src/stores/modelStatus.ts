@@ -5,6 +5,7 @@ import {
   ModelListPathParams,
   ModelVersion as ModelVersionType
 } from '@/types/model'
+import { model_types, base_model_types } from '@/api/model'
 import { defineStore } from 'pinia'
 interface ModelVersion {
   id?: number
@@ -25,6 +26,10 @@ interface ModelVersion {
   speed?: string
   fileName?: string
   ref?: string
+  cover_urls?: string[]
+  hideUpload?: boolean
+  imageDone?: boolean
+  imageError?: boolean
 }
 interface ModelDetail {
   name: string
@@ -48,6 +53,8 @@ export const modelStore = defineStore('modelStore', {
     closeModelSelectDialog: false,
     closeModelDetailDialog: false,
     showVersionId: 0 as ShowVersionId,
+    showWorkflowDialog: false,
+    showWorkflowVersionId: 0 as ShowVersionId,
     mode: 'my' as 'my' | 'my_fork' | 'publicity',
     applyObject: { version: {} as ModelVersionType, model: {} as Model },
     reload: 0,
@@ -66,8 +73,11 @@ export const modelStore = defineStore('modelStore', {
       keyword: '',
       model_types: [],
       base_models: [],
+      selected_model_types: [],
       sort: 'Recently'
-    } as FilterState
+    } as FilterState,
+    typeLis: [{ value: '', label: '' }],
+    baseTypeLis: [{ value: '', label: '' }]
   }),
   actions: {
     setModelDetail(data: any) {
@@ -87,6 +97,10 @@ export const modelStore = defineStore('modelStore', {
     },
     setDialogStatus(status: boolean, versionId?: number) {
       this.showDialog = status
+      this.showVersionId = versionId
+    },
+    setDialogStatusWorkflow(status: boolean, versionId?: number) {
+      this.showWorkflowDialog = status
       this.showVersionId = versionId
     },
     uploadModelDone() {
@@ -134,11 +148,18 @@ export const modelStore = defineStore('modelStore', {
         keyword: '',
         model_types: [],
         base_models: [],
+        selected_model_types: [],
         sort: 'Recently'
       }
     },
     updatePagination(page: number) {
       this.modelListPathParams.current = page
+    },
+    async getModelTypes() {
+      const mt = await model_types()
+      const bmt = await base_model_types()
+      this.typeLis = mt.data
+      this.baseTypeLis = bmt.data
     }
   }
 })
