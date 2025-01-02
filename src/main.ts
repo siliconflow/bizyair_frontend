@@ -64,6 +64,25 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
 
 const app = createApp(App)
 app.use(createPinia())
+app.directive('debounce', {
+  mounted(el, binding) {
+    let timer: any = null
+    el.addEventListener('keyup', () => {
+      if (timer) clearTimeout(timer)
+      timer = setTimeout(
+        () => {
+          binding.value()
+        },
+        (binding.arg as unknown as number) || 500
+      )
+    })
+  },
+  unmounted(el, binding) {
+    if (binding) {
+      el.removeEventListener('keyup', binding.value)
+    }
+  }
+})
 export function mount(container: string | Element, comfyUIApp?: any) {
   app.provide('comfyUIApp', comfyUIApp)
 

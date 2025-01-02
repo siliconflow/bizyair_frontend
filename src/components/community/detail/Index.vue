@@ -12,41 +12,64 @@
   } from '@/components/ui/command'
 
   import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-  import { modelStore } from '@/stores/modelStatus'
+  import { useCommunityStore } from '@/stores/communityStore'
 
   import { sliceString, formatSize, formatNumber } from '@/utils/tool'
   import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
   import { Button } from '@/components/ui/button'
-  import { ref, onMounted, nextTick } from 'vue'
+  import { ref, onMounted, nextTick, inject } from 'vue'
 
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { MdPreview } from 'md-editor-v3'
-
+  import { modelStore } from '@/stores/modelStatus'
   import { Model, ModelVersion } from '@/types/model'
-  import { model_detail, like_model, fork_model, remove_model } from '@/api/model'
+  import {
+    model_detail,
+    like_model,
+    fork_model,
+    remove_model,
+    get_workflow_dowload_url
+  } from '@/api/model'
   import { useToaster } from '@/components/modules/toats/index'
   import 'md-editor-v3/lib/style.css'
-  const modelStoreInstance = modelStore()
+  const communityStore = useCommunityStore()
 
   const model = ref<Model>()
   const currentVersion = ref<ModelVersion>()
   const downloadOpen = ref(false)
   const scrollViewportRef = ref<any | null>(null)
+  const modelStoreInstance = modelStore()
+  const isLoading = ref(false)
 
   const props = defineProps<{
-    modelId: string
+    modelId: string | number
     version: ModelVersion
+    mode: string
+    currentTab?: string
   }>()
 
+  const emit = defineEmits<{
+    (e: 'loaded'): void
+  }>()
+
+  const comfyUIApp: any = inject('comfyUIApp')
+
   const fetchModelDetail = async () => {
-    const res = await model_detail({ id: props.modelId, source: modelStoreInstance.mode })
-    if (!res.data) {
-      useToaster.error('Model not found.')
-      modelStoreInstance.closeAndReload()
-      return
+    try {
+      const res = await model_detail({ id: props.modelId, source: props.mode })
+      if (!res.data) {
+        useToaster.error('Model not found.')
+        return
+      }
+      model.value = res.data
+      initializeScroll()
+      nextTick(() => {
+        emit('loaded')
+      })
+    } catch (error) {
+      useToaster.error('Failed to fetch model details')
+      emit('loaded')
     }
-    model.value = res.data
-    initializeScroll()
   }
 
   const initializeScroll = () => {
@@ -138,8 +161,14 @@
   const handleModelOperation = async (type: 'edit' | 'remove', id: string | number) => {
     if (type === 'edit') {
       modelStoreInstance.setModelDetail(model)
-      modelStoreInstance.setDialogStatus(true, Number(currentVersion.value?.id))
+      if (model.value?.type === 'Workflow') {
+        modelStoreInstance.setDialogStatusWorkflow(true, Number(currentVersion.value?.id))
+      } else {
+        modelStoreInstance.setDialogStatus(true, Number(currentVersion.value?.id))
+      }
       downloadOpen.value = false
+      communityStore.showCommunityDetail = false
+      communityStore.reload++
     }
     if (type === 'remove') {
       downloadOpen.value = false
@@ -148,7 +177,7 @@
         desc: 'This action cannot be undone.',
         cancel: 'No, Keep It',
         continue: 'Yes, Delete It',
-        z: 'z-9000'
+        z: 'z-12000'
       })
       if (!res) return
 
@@ -167,18 +196,19 @@
     try {
       await remove_model(id)
       useToaster.success('Model removed successfully.')
-      modelStoreInstance.reload += 1
+      communityStore.showCommunityDetail = false
+      communityStore.reload++
     } catch (error) {
       useToaster.error('Failed to remove model.')
       console.error('Error removing model:', error)
     }
   }
 
-  const handleApply = () => {
-    if (currentVersion.value && model.value) {
-      modelStoreInstance.setApplyObject(currentVersion.value, model.value)
-    }
-  }
+  // const handleApply = () => {
+  //   if (currentVersion.value && model.value) {
+  //      modelStoreInstance.setApplyObject(currentVersion.value, model.value)
+  //   }
+  // }
 
   const handleCopy = async (sign: string) => {
     try {
@@ -195,6 +225,89 @@
       }
     } catch (err) {
       useToaster.error('Copy failed.')
+    }
+  }
+
+  const handleLoadWorkflow = async () => {
+    try {
+      isLoading.value = true
+      const workflow = await get_workflow_dowload_url(
+        currentVersion.value?.id,
+        currentVersion.value?.sign
+      )
+      if (workflow.data && comfyUIApp && comfyUIApp.graph) {
+        comfyUIApp.graph.clear()
+        await comfyUIApp.loadGraphData(workflow.data)
+      }
+      communityStore.showDialog = false
+      communityStore.showCommunityDetail = false
+    } catch (error) {
+      useToaster.error('Failed to load workflow')
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const handleAddNode = async (model: Model) => {
+    try {
+      let nodeID = model.type === 'LoRA' ? 'BizyAir_LoraLoader' : 'BizyAir_ControlNetLoader'
+      let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
+      const canvas = window.LGraphCanvas?.active_canvas
+
+      loraLoaderNode.title =
+        model.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
+      loraLoaderNode.color = '#7C3AED'
+
+      const widgetValues =
+        model.type === 'LoRA'
+          ? [model.name, 1.0, 1.0, model.versions?.[0]?.id || '']
+          : [model.name, model.versions?.[0]?.id || '']
+
+      loraLoaderNode.widgets_values = widgetValues
+      if (loraLoaderNode.widgets) {
+        loraLoaderNode.widgets.forEach((widget: any, index: number) => {
+          if (widget && widgetValues[index] !== undefined) {
+            widget.value = widgetValues[index]
+          }
+        })
+      }
+
+      const currentConfig = canvas.graph.serialize()
+      const nodeCount = currentConfig.nodes?.length || 0
+
+      const visibleRect = canvas.visible_area
+      const offsetX = (nodeCount % 3) * 30
+      const offsetY = Math.floor(nodeCount / 3) * 25
+      const baseX = visibleRect ? visibleRect[0] + 100 : 100
+      const baseY = visibleRect ? visibleRect[1] + 100 : 100
+
+      loraLoaderNode.pos = [baseX + offsetX, baseY + offsetY]
+
+      canvas.graph.add(loraLoaderNode)
+      communityStore.showDialog = false
+      useToaster.success('Node added successfully')
+    } catch (error) {
+      console.error('Failed to add node:', error)
+      useToaster.error(`Failed to add node: ${error}`)
+    }
+  }
+
+  const handleDownloadWorkFlow = async () => {
+    const workflow = await get_workflow_dowload_url(
+      currentVersion.value?.id,
+      currentVersion.value?.sign
+    )
+    if (workflow?.data) {
+      const jsonString = JSON.stringify(workflow.data, null, 2)
+      const blob = new Blob([jsonString], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${model.value?.name}-${currentVersion.value?.version}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } else {
+      useToaster.error('Failed to download workflow.')
     }
   }
 </script>
@@ -214,6 +327,7 @@
         </div>
         <div class="flex flex-row gap-1 items-start justify-start shrink-0 relative">
           <div
+            v-if="model?.type !== 'Workflow'"
             class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
           >
             <svg
@@ -298,15 +412,15 @@
           <div class="min-w-[200px] max-w-[600px]">
             <ScrollArea ref="scrollViewportRef" class="rounded-md w-full">
               <div class="whitespace-nowrap">
-                <Tabs :defaultValue="currentVersion?.id" :value="currentVersion?.id">
+                <Tabs :default-value="currentVersion?.id" :value="currentVersion?.id">
                   <TabsList class="inline-flex h-12 bg-transparent text-sm text-white w-auto">
                     <TabsTrigger
                       v-for="version in model?.versions"
                       :key="version.id"
                       :value="version.id"
-                      @click="handleTabChange(version.id)"
                       :class="['version-tab', `version-tab-${version.id}`]"
                       class="text-sm t bg-[#9CA3AF] data-[state=active]:bg-[#7C3AED] h-10 px-3 py-2 mx-1"
+                      @click="handleTabChange(version.id)"
                     >
                       {{ version.version }}
                     </TabsTrigger>
@@ -328,11 +442,11 @@
             viewBox="0 0 16 16"
             fill="none"
             class="cursor-pointer"
-            @click="handleLike"
             :style="{
               stroke: currentVersion?.liked ? '#6D28D9' : '#F9FAFB',
               fill: currentVersion?.liked ? '#6D28D9' : 'none'
             }"
+            @click="handleLike"
           >
             <g clip-path="url(#clip0_440_1289)">
               <path
@@ -347,9 +461,8 @@
               </clipPath>
             </defs>
           </svg>
-
           <Popover
-            v-if="modelStoreInstance.mode === 'my' || modelStoreInstance.mode === 'my_fork'"
+            v-if="currentTab === 'posts' || currentTab === 'forked'"
             class="bg-[#353535]"
             :open="downloadOpen"
             @update:open="handleDownload"
@@ -394,17 +507,18 @@
                 <CommandList>
                   <CommandGroup>
                     <CommandItem
+                      v-if="currentTab === 'posts'"
                       value="edit"
-                      @click="handleModelOperation('edit', model?.id)"
                       class="px-2 py-1.5 mb-1 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]"
+                      @click="handleModelOperation('edit', model?.id)"
                     >
                       Edit
                     </CommandItem>
                     <CommandSeparator />
                     <CommandItem
                       value="remove"
-                      @click="handleModelOperation('remove', model?.id)"
                       class="px-2 py-1.5 mb-1 mt-1 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]"
+                      @click="handleModelOperation('remove', model?.id)"
                     >
                       Remove
                     </CommandItem>
@@ -436,8 +550,8 @@
           <MdPreview
             v-if="currentVersion?.intro"
             id="previewRef"
-            :modelValue="currentVersion?.intro"
-            :noImgZoomIn="true"
+            :model-value="currentVersion?.intro"
+            :no-img-zoom-in="true"
             :preview="true"
             theme="dark"
             class="bg-[#353535] w-full min-h-[80vh]"
@@ -467,16 +581,16 @@
           >
             <Button
               variant="default"
-              v-if="modelStoreInstance.mode === 'publicity'"
               class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
-              @click="handleFork"
               :disabled="currentVersion?.forked"
+              @click="handleFork"
             >
               {{ currentVersion?.forked ? 'Forked' : 'Fork' }}
             </Button>
             <Button
-              @click="handleApply"
+              v-if="model?.type !== 'Workflow'"
               class="flex w-[170px] px-8 py-2 justify-center items-center gap-2 bg-[#F43F5E] hover:bg-[#F43F5E]/90 rounded-[6px]"
+              @click="handleAddNode"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -491,8 +605,56 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 /></svg
-              >Apply</Button
+              >Add Node</Button
             >
+
+            <Button
+              v-if="model?.type === 'Workflow'"
+              class="flex w-[170px] px-8 py-2 justify-center items-center gap-2 bg-[#F43F5E] hover:bg-[#F43F5E]/90 rounded-[6px]"
+              :disabled="isLoading"
+              @click="handleLoadWorkflow"
+            >
+              <template v-if="isLoading">
+                <svg
+                  class="animate-spin h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  />
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                <span class="ml-1">Loading...</span>
+              </template>
+              <template v-else>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="17"
+                  height="16"
+                  viewBox="0 0 17 16"
+                  fill="none"
+                >
+                  <path
+                    d="M6.49988 7.9999L7.83322 9.33324L10.4999 6.66657M3.06655 5.74657C2.96925 5.30825 2.98419 4.85246 3.10999 4.42146C3.23579 3.99046 3.46838 3.5982 3.7862 3.28105C4.10401 2.9639 4.49676 2.73213 4.92802 2.60723C5.35929 2.48233 5.81511 2.46835 6.25322 2.56657C6.49436 2.18944 6.82655 1.87907 7.21919 1.66409C7.61182 1.44911 8.05225 1.33643 8.49988 1.33643C8.94752 1.33643 9.38795 1.44911 9.78058 1.66409C10.1732 1.87907 10.5054 2.18944 10.7466 2.56657C11.1853 2.46792 11.6419 2.48184 12.0739 2.60704C12.5058 2.73225 12.8991 2.96466 13.2171 3.28267C13.5351 3.60068 13.7675 3.99395 13.8927 4.4259C14.0179 4.85786 14.0319 5.31446 13.9332 5.75324C14.3104 5.99437 14.6207 6.32657 14.8357 6.7192C15.0507 7.11183 15.1634 7.55227 15.1634 7.9999C15.1634 8.44754 15.0507 8.88797 14.8357 9.2806C14.6207 9.67323 14.3104 10.0054 13.9332 10.2466C14.0314 10.6847 14.0175 11.1405 13.8926 11.5718C13.7677 12.003 13.5359 12.3958 13.2187 12.7136C12.9016 13.0314 12.5093 13.264 12.0783 13.3898C11.6473 13.5156 11.1915 13.5305 10.7532 13.4332C10.5124 13.8118 10.1799 14.1235 9.78663 14.3394C9.39333 14.5554 8.9519 14.6686 8.50322 14.6686C8.05453 14.6686 7.6131 14.5554 7.2198 14.3394C6.8265 14.1235 6.49404 13.8118 6.25322 13.4332C5.81511 13.5315 5.35929 13.5175 4.92802 13.3926C4.49676 13.2677 4.10401 13.0359 3.7862 12.7188C3.46838 12.4016 3.23579 12.0093 3.10999 11.5783C2.98419 11.1473 2.96925 10.6916 3.06655 10.2532C2.68652 10.0127 2.37349 9.68002 2.15658 9.28605C1.93967 8.89207 1.82593 8.44964 1.82593 7.9999C1.82593 7.55016 1.93967 7.10773 2.15658 6.71376C2.37349 6.31979 2.68652 5.98707 3.06655 5.74657Z"
+                    stroke="#F9FAFB"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                Load
+              </template>
+            </Button>
           </div>
         </div>
         <div
@@ -539,8 +701,8 @@
                 {{ currentVersion?.sign ? sliceString(currentVersion?.sign, 15) : '' }}
               </span>
               <svg
-                xmlns="http://www.w3.org/2000/svg"
                 v-if="currentVersion?.sign"
+                xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
                 viewBox="0 0 16 16"
@@ -572,6 +734,7 @@
             </div>
             <div className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)] flex flex-row gap-2">
               <div
+                v-if="model?.type !== 'Workflow'"
                 class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
               >
                 <svg
@@ -664,6 +827,26 @@
             {{ currentVersion?.file_name ? sliceString(currentVersion?.file_name, 20) : '' }} ({{
               formatSize(currentVersion?.file_size)
             }})
+            <span
+              v-if="model?.type === 'Workflow'"
+              class="cursor-pointer ml-2 hover:opacity-80"
+              @click="handleDownloadWorkFlow"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+              >
+                <path
+                  d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2"
+                  stroke="#F9FAFB"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
           </div>
         </div>
       </div>

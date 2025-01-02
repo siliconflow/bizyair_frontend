@@ -1,28 +1,15 @@
 <template>
-  <div
-    class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3"
-    @click="modelStoreObject.setDialogStatus(true)"
-  >
-    <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M9.44255 10.6667L10.7759 12L13.4425 9.33335M12.7759 6.66668V5.33335C12.7756 5.09953 12.7139 4.86989 12.5969 4.66746C12.4799 4.46503 12.3117 4.29692 12.1092 4.18002L7.44255 1.51335C7.23985 1.39633 7.00993 1.33472 6.77588 1.33472C6.54183 1.33472 6.3119 1.39633 6.10921 1.51335L1.44255 4.18002C1.24005 4.29692 1.07187 4.46503 0.954853 4.66746C0.837841 4.86989 0.776119 5.09953 0.775879 5.33335V10.6667C0.776119 10.9005 0.837841 11.1301 0.954853 11.3326C1.07187 11.535 1.24005 11.7031 1.44255 11.82L6.10921 14.4867C6.3119 14.6037 6.54183 14.6653 6.77588 14.6653C7.00993 14.6653 7.23985 14.6037 7.44255 14.4867L8.77588 13.7267M9.77588 6.26668L3.80921 2.82668M0.969212 4.66668L6.77588 8.00002M6.77588 8.00002L12.5825 4.66668M6.77588 8.00002V14.6667"
-        stroke="#F9FAFB"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-    <span class="block leading h-full leading-8 text-sm">PublishModel</span>
-  </div>
   <v-dialog
-    v-if="modelStoreObject.showDialog"
-    v-model:open="modelStoreObject.showDialog"
+    v-model:open="modelStoreObject.showWorkflowDialog"
     class="px-0 overflow-hidden pb-0 z-9000"
     layout-class="z-9000"
     content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
     @on-close="onDialogClose"
   >
     <template #title
-      ><span class="px-6 cursor-pointer" @click="handleToggleTitle">Publish a Model</span></template
+      ><span class="px-6 cursor-pointer" @click="handleToggleTitle"
+        >Publish a Workflow</span
+      ></template
     >
     <div v-show="modelBox" class="px-6 pb-6">
       <v-item label="Model Name">
@@ -34,18 +21,9 @@
           @change="formData.nameError = false"
         />
       </v-item>
-      <v-item label="Model Type">
-        <v-select
-          v-model:model-value="formData.type"
-          :class="{ 'border-red-500': formData.typeError }"
-          placeholder="Select Model Type"
-          @update:open="formData.typeError = false"
-        >
-          <SelectItem v-for="(e, i) in typeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
-        </v-select>
-      </v-item>
       <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
     </div>
+
     <vCustomAccordion :multiple="true" :active-index="acActiveIndex">
       <vCustomAccordionItem
         v-for="(e, i) in formData.versions"
@@ -90,13 +68,21 @@
                 placeholder="Select Base Model"
                 @update:open="e.baseModelError = false"
               >
-                <SelectItem v-for="(e, i) in baseTypeLis" :key="i" :value="e.value">{{
-                  e.label
-                }}</SelectItem>
+                <SelectItem
+                  v-for="(e, i) in modelStoreObject.baseTypeLis"
+                  :key="i"
+                  :value="e.value"
+                  >{{ e.label }}</SelectItem
+                >
               </v-select>
             </v-item>
             <v-item label="Upload Image">
-              <vUploadImage v-model.modelValue="e.cover_urls" />{{ e.cover_urls }}
+              <vUploadImage
+                v-model.modelValue="e.cover_urls"
+                :previewPrc="e.cover_urls ? e.cover_urls[0] : ''"
+                :class-name="e.imageError ? 'border-red-500' : ''"
+                @done="imageUploadDone(i)"
+              />
             </v-item>
             <v-item label="Introduction">
               <Markdown v-model.modelValue="e.intro" :editor-id="`myeditor${i}`" />
@@ -116,7 +102,7 @@
               </div>
             </v-item>
             <v-item v-show="!e.showUpload" label="File">
-              <div class="flex h-28 items-center justify-end relative">
+              <div class="flex h-32 items-center justify-end relative">
                 <p v-if="e.progress && e.fileName" class="absolute top-2 left-1 text-xs">
                   {{ e.fileName }}
                 </p>
@@ -127,17 +113,25 @@
                     <span v-if="e.speed" class="pl-2">Speed: {{ e.speed }}</span>
                   </p>
                 </div>
-                <vUpload
-                  :ref="e.ref"
-                  :model-type="formData.type"
-                  :class="{ 'border-red-500': e.filePathError }"
-                  @path="path => handlePath(path, i)"
-                  @start="() => startUpload(i)"
-                  @success="data => successUpload(data, i)"
-                  @error="() => errorUpload(i)"
-                  @upload-info="data => handleUploadInfo(data, i)"
-                  @progress="p => fnProgress(p, i)"
-                />
+                <Button v-if="e.hideUpload" class="ml-2" @click="cancelFile">cancel</Button>
+                <div v-if="!e.hideUpload" :class="{ 'w-full': !e.progress }">
+                  <Button v-if="!e.progress" class="w-full my-2" @click="loadWorkflow()"
+                    >Load from current workspace</Button
+                  >
+                  <vUpload
+                    :ref="e.ref"
+                    model-type="ComfyUI"
+                    accept=".json"
+                    :file-name="e.file_name"
+                    :class="{ 'border-red-500': e.filePathError }"
+                    @path="path => handlePath(path, i)"
+                    @start="() => startUpload(i)"
+                    @success="data => successUpload(data, i)"
+                    @error="() => errorUpload(i)"
+                    @upload-info="data => handleUploadInfo(data, i)"
+                    @progress="p => fnProgress(p, i)"
+                  />
+                </div>
               </div>
             </v-item>
           </div>
@@ -157,7 +151,7 @@
 </template>
 <script setup lang="ts">
   import { useToaster } from '@/components/modules/toats/index'
-  import { computed, ref, watch } from 'vue'
+  import { computed, inject, ref, watch } from 'vue'
   import { SelectItem } from '@/components/ui/select'
   import { Input } from '@/components/ui/input'
   import { Button } from '@/components/ui/button'
@@ -166,8 +160,7 @@
   import { Progress } from '@/components/ui/progress'
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { modelStore } from '@/stores/modelStatus'
-  import { create_models, model_types, base_model_types, put_model } from '@/api/model'
-  import { onMounted } from 'vue'
+  import { create_models, put_model } from '@/api/model'
   import { Trash2 } from 'lucide-vue-next'
   import vDialog from '@/components/modules/vDialog.vue'
   import vSelect from '@/components/modules/vSelect.vue'
@@ -177,11 +170,12 @@
   import vUpload from '@/components/modules/vUpload/index.vue'
   import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import Markdown from '@/components/markdown/Index.vue'
+  import { uploadFile } from '@/components/modules/vUpload/virtualUpload'
+
+  const comfyUIApp: any = inject('comfyUIApp')
 
   const modelStoreObject = modelStore()
   const modelBox = ref(true)
-  const typeLis = ref([{ value: '', label: '' }])
-  const baseTypeLis = ref([{ value: '', label: '' }])
   const formData = ref({ ...modelStoreObject.modelDetail })
   const acActiveIndex = ref(-1)
   const showLayoutLoading = ref(false)
@@ -252,17 +246,16 @@
       formData.value.nameError = true
       return
     }
-    if (!formData.value.type) {
-      useToaster.error('Please select the model type')
-      formData.value.typeError = true
-      return
-    }
     if (formData.value.versions.length) {
       acActiveIndex.value = 0
       modelBox.value = false
     } else {
       addVersions()
     }
+  }
+  function imageUploadDone(i: number) {
+    formData.value.versions[i].imageDone = true
+    formData.value.versions[i].imageError = false
   }
   function verifyVersion() {
     const tempData = { ...formData.value }
@@ -281,6 +274,12 @@
         acActiveIndex.value = i
         break
       }
+      if (e.cover_urls && !e.imageDone) {
+        e.imageError = true
+        useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
+        acActiveIndex.value = i
+        break
+      }
       if (!e.sign) {
         e.filePathError = true
         useToaster.error(`Please enter the file path for version ${i + 1}`)
@@ -288,7 +287,9 @@
         break
       }
     }
-    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
+    return tempData.versions.every(
+      (e: any) => e.version && e.base_model && e.sign && !(e.cover_urls && !e.imageDone)
+    )
   }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p
@@ -312,6 +313,30 @@
     data.speed && (formData.value.versions[i].speed = data.speed)
     data.fileName && (formData.value.versions[i].fileName = data.fileName)
   }
+  const cancelFile = () => {
+    formData.value.versions[0].progress = 0
+    formData.value.versions[0].fileName = ''
+    formData.value.versions[0].hideUpload = false
+    formData.value.versions[0].sign = ''
+    formData.value.versions[0].path = ''
+  }
+  const loadWorkflow = async () => {
+    const graph = await comfyUIApp.graphToPrompt()
+    const file = new File(
+      [JSON.stringify(graph.workflow)],
+      `${formData.value.name}-workflow.json`,
+      {
+        type: 'application/json'
+      }
+    )
+    uploadFile(file, 'Workflow', (sha256sum: string) => {
+      formData.value.versions[0].progress = 100
+      formData.value.versions[0].fileName = `${formData.value.name}-workflow.json`
+      formData.value.versions[0].hideUpload = true
+      formData.value.versions[0].sign = sha256sum
+      formData.value.versions[0].path = `${formData.value.name}-workflow.json`
+    })
+  }
   async function submit() {
     if (!verifyVersion()) {
       return
@@ -321,6 +346,7 @@
       showLayoutLoading.value = false
     }, 5000)
     const tempData = { ...formData.value }
+    delete tempData.nameError
     tempData.versions.forEach((e: any) => {
       delete e.baseModelError
       delete e.filePath
@@ -328,19 +354,28 @@
       delete e.versionError
       delete e.speed
       delete e.fileName
+      delete e.imageError
+      delete e.showUpload
+      delete e.imageDone
+      if (typeof e.cover_urls === 'string') {
+        e.cover_urls = [e.cover_urls]
+      }
     })
+    tempData.type = 'Workflow'
     if (tempData.id) {
       await put_model(tempData)
     } else {
       await create_models(tempData)
     }
-    useToaster.success('Model published successfully')
+
+    useToaster.success('published successfully')
     onDialogClose()
   }
   const onDialogClose = () => {
-    modelStoreObject.setDialogStatus(false, 0)
+    modelStoreObject.setDialogStatusWorkflow(false, 0)
     modelStoreObject.clearModelDetail()
     modelBox.value = true
+    acActiveIndex.value = -1
     showLayoutLoading.value = false
     modelStoreObject.uploadModelDone()
   }
@@ -348,6 +383,13 @@
     () => modelStoreObject.modelDetail,
     (val: any) => {
       formData.value = val
+      if (formData.value.versions && formData.value.versions.length) {
+        formData.value.versions.forEach((e: any) => {
+          if (e.file_name) {
+            e.fileName = e.file_name
+          }
+        })
+      }
     },
     {
       deep: true
@@ -368,11 +410,5 @@
       deep: true
     }
   )
-  onMounted(async () => {
-    const mt = await model_types()
-    typeLis.value = mt.data
-    const bmt = await base_model_types()
-    baseTypeLis.value = bmt.data
-  })
 </script>
 <style scoped></style>

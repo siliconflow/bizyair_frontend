@@ -25,6 +25,7 @@ export interface ModelVersion {
   created_at: string
   file_name: string
   file_size:number
+  cover_urls:string
   id:number
   public:boolean
   updated_at:string
@@ -43,6 +44,7 @@ export interface FilterState {
   keyword: string
   model_types: string[]
   base_models: string[]
+  selected_model_types: string[]
   sort:'Recently' | 'Most Forked' | 'Most Used'
 }
 
@@ -50,3 +52,39 @@ export interface CommonModelType {
   label: string
   value: string
 }
+
+export interface FilterState {
+  keyword: string
+  model_types: string[]
+  base_models: string[]
+  sort: SortValue
+}
+
+
+export interface MineState {
+  posts: {
+    filterState: FilterState
+  }
+  forked: {
+    filterState: FilterState
+  }
+}
+
+export type PageType = 'mainContent' | 'quickStart' | 'workflows' | 'posts' | 'forked'
+
+export interface PageState {
+  modelTypes: CommonModelType[]
+  baseModelTypes: CommonModelType[]
+  filterState: FilterState
+  modelListPathParams: ModelListPathParams
+  models: Model[]
+  scrollPosition: number
+  lastState?: {
+    currentPage: number;
+    hasMore: boolean;
+    hasPrevious: boolean;
+    loadedPages: number[];
+    scrollRatio: number;
+  };
+}
+
