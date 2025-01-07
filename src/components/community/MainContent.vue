@@ -30,11 +30,31 @@ const comfyUIApp: any = inject('comfyUIApp')
 if (!comfyUIApp) {
   console.error('comfyUIApp is not properly injected')
 }
+const loadingStates = ref({
+  isLoading: false,
+  isLoadingMore: false, 
+  isGridLoading: false,
+  isManualLoading: false,
+  isScrolling: false,
+  dialogLoading: true
+})
+
+const scrollState = ref({
+  ratio: 0,
+  showBackToTop: false,
+  timer: null as number | null
+})
+
+const cacheState = ref({
+  key: 0,
+  grid: new Map(),
+  loadedPages: new Set<number>(),
+  imageLoadStates: new Map<number | string, boolean>()
+})
+
 const loading = ref(false)
 const hasMore = ref(true)
 const isLoadingMore = ref(false)
-
-const filterDataReady = ref(false)
 
 const scrollRatio = ref(0)
 const loadedPages = ref(new Set<number>())
@@ -127,37 +147,37 @@ const throttle = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
 }
 
 const handleScroll = throttle((e: Event) => {
-  if (shouldRestoreScroll.value || isManualLoading.value) return
+  if (loadingStates.value.isManualLoading) return
   
   const container = e.target as HTMLElement
-  showBackToTop.value = container.scrollTop > 500
+  scrollState.value.showBackToTop = container.scrollTop > 500
 
   const maxScroll = container.scrollHeight - container.clientHeight
   if (maxScroll > 0) {
-    scrollRatio.value = container.scrollTop / maxScroll
+    scrollState.value.ratio = container.scrollTop / maxScroll
     communityStore.mainContent.lastState = {
       currentPage: lastLoadedPage.value,
       hasMore: hasMore.value,
       hasPrevious: true,
-      loadedPages: Array.from(loadedPages.value),
-      scrollRatio: scrollRatio.value
+      loadedPages: Array.from(cacheState.value.loadedPages),
+      scrollRatio: scrollState.value.ratio
     }
   }
 
-  isScrolling.value = true
+  loadingStates.value.isScrolling = true
   
-  if (scrollTimer.value) {
-    window.clearTimeout(scrollTimer.value)
+  if (scrollState.value.timer) {
+    window.clearTimeout(scrollState.value.timer)
   }
   
-  scrollTimer.value = window.setTimeout(() => {
-    isScrolling.value = false
+  scrollState.value.timer = window.setTimeout(() => {
+    loadingStates.value.isScrolling = false
     
     if (maxScroll - container.scrollTop <= 1000) {
       const currentPage = communityStore.mainContent.modelListPathParams.current
       const targetPage = Math.ceil(container.scrollTop / (container.scrollHeight / currentPage))
       
-      if (targetPage > lastLoadedPage.value && !loading.value && !isLoadingMore.value && hasMore.value) {
+      if (targetPage > lastLoadedPage.value && !loadingStates.value.isLoading && !loadingStates.value.isLoadingMore && hasMore.value) {
         loadMore()
       }
     }
@@ -388,7 +408,6 @@ onUnmounted(() => {
 
 const showSortPopover = ref(false)
 
-const showBackToTop = ref(false)
 
 const scrollToTop = async () => {
   const container = document.querySelector('.scroll-container')
@@ -547,13 +566,6 @@ watch(
   }
 )
 
-watch(
-  () => communityStore.mainContent.models,
-  () => {
-    // 移除这里的滚动位置恢复逻辑
-  },
-  { deep: true }
-)
 </script>
 
 <template>
@@ -562,15 +574,14 @@ watch(
       <ModelFilterBar
         v-model:show-sort-popover="showSortPopover" 
         page="mainContent"
-        @filter-data-ready="filterDataReady = true" 
         @fetch-data="handleFilterChange"
       />
     </div>
 
     <div class="flex-1 px-6 relative">
-      <div class="scroll-container overflow-y-auto">
+      <div class="scroll-container overflow-y-auto px-2">
         <Transition name="fade">
-          <div v-if="isGridLoading" class="absolute inset-0 z-10 bg-black/20 backdrop-blur-sm">
+          <div v-if="isGridLoading" class="absolute inset-0 z-10  bg-black/20 backdrop-blur-sm">
             <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <div class="flex flex-col items-center space-y-4">
                 <div class="relative w-12 h-12">
@@ -633,7 +644,7 @@ watch(
                 :style="style">
                 <div class="relative flex flex-col flex-1 rounded-lg cursor-pointer overflow-hidden bg-[#1a1a1a]">
                   <div
-                    class="absolute left-3 top-3 min-w-[100px] h-[34px] flex items-center justify-center z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-4 rounded-[6px] [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]">
+                    class="absolute left-2 top-3 min-w-[100px] h-[34px] flex items-center justify-start z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-2 rounded-[6px] [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]">
                     {{ model.type }}
                   </div>
 
@@ -733,7 +744,7 @@ watch(
     </div>
 
     <div
-      v-show="showBackToTop"
+      v-show="scrollState.showBackToTop"
       class="fixed right-8 bottom-8 z-50 cursor-pointer transition-all duration-300 hover:scale-110"
       @click="scrollToTop">
       <div
