@@ -76,6 +76,8 @@ const lastLoadedPage = ref(1)
 
 const isInitialLoad = ref(true)
 
+const retryCountMap = ref(new Map<string, number>());
+
 const loadMore = async () => {
   if (loading.value || !hasMore.value || isLoadingMore.value || isScrolling.value) return
   isManualLoading.value = true
@@ -404,6 +406,7 @@ onUnmounted(() => {
   if (container) {
     container.removeEventListener('scroll', handleScroll)
   }
+  retryCountMap.value.clear();
 })
 
 const showSortPopover = ref(false)
@@ -427,9 +430,29 @@ const handleImageLoad = (_event: Event, modelId: number | string) => {
 
 const handleImageError = (event: Event, modelId: number | string) => {
   const img = event.target as HTMLImageElement;
-  if (typeof img.src === 'string' && img.src.startsWith('blob:')) {
+  const src = img.src;
+  
+  const retryCount = retryCountMap.value.get(src) || 0;
+  if (retryCount >= 2) {
     imageLoadStates.value.set(modelId, false);
-
+    retryCountMap.value.delete(src);
+    return;
+  }
+  
+  if (typeof src === 'string' && src.startsWith('blob:')) {
+    retryCountMap.value.set(src, retryCount + 1);
+    
+    fetch(src)
+      .then(response => response.blob())
+      .then(blob => {
+        const newUrl = URL.createObjectURL(blob);
+        img.src = newUrl;
+        URL.revokeObjectURL(src);
+      })
+      .catch(() => {
+        imageLoadStates.value.set(modelId, false);
+        retryCountMap.value.delete(src);
+      });
   } else {
     imageLoadStates.value.set(modelId, false);
   }
@@ -686,9 +709,7 @@ watch(
                         'opacity-100 group-hover:scale-105': imageLoaded(model.id)
                       }" 
                       @load="e => handleImageLoad(e, model.id)" 
-                      @error="e => {
-                        handleImageError(e, model.id);
-                      }" />
+                      @error="e => handleImageError(e, model.id)" />
                     <div v-if="!imageLoaded(model.id)" class="absolute inset-0 flex items-center justify-center">
                       <vDefaultPic />
                     </div>

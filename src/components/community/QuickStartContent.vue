@@ -3,7 +3,7 @@
     name: 'QuickStartContent'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick, watch, onActivated, inject, computed } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, watch, onActivated, inject } from 'vue'
   import ModelFilterBar from '@/components/community/modules/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
   import { modelStore } from '@/stores/modelStatus'
@@ -358,8 +358,6 @@
 
   const showSortPopover = ref(false)
 
-  const showBackToTop = computed(() => scrollState.value.showBackToTop)
-
   const scrollToTop = async () => {
     const container = document.querySelector('.scroll-container')
     if (!container) return
@@ -712,7 +710,7 @@ const resetState = async () => {
     </div>
 
     <div
-      v-show="showBackToTop"
+      v-show="scrollState.showBackToTop"
       class="fixed right-8 bottom-8 z-50 cursor-pointer transition-all duration-300 hover:scale-110"
       @click="scrollToTop"
     >
@@ -758,14 +756,13 @@ const resetState = async () => {
 
 <style scoped>
   .scroll-container {
-    height: calc(100vh - 160px);
+    height: calc(100vh - 140px);
     margin-top: 1rem;
-    padding-bottom: 120px;
     position: relative;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
     -webkit-overflow-scrolling: touch;
-    overflow-y: auto;
+    padding-bottom: 160px;
   }
 
   .scroll-container::-webkit-scrollbar {
@@ -875,18 +872,15 @@ const resetState = async () => {
     opacity: 1;
   }
 
-  .grid-container {
-    padding-bottom: 100px;
-    min-height: fit-content;
-  }
-
   .grid {
     display: grid;
     grid-gap: 20px;
     grid-template-columns: repeat(2, 1fr);
+    min-height: calc(100vh - 200px);
     position: relative;
     transition: opacity 0.3s ease-in-out;
-    min-height: fit-content;
+    padding-bottom: 60px;
+    margin-bottom: 40px;
   }
 
   @media (min-width: 768px) {
@@ -931,7 +925,11 @@ const resetState = async () => {
 
   .item {
     background-color: transparent;
-    aspect-ratio: 2/3;
+    min-height: 300px;
     text-align: center;
+  }
+
+  .grid-container {
+    padding-bottom: 40px;
   }
 </style>
