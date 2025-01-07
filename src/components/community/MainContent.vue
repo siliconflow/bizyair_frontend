@@ -42,8 +42,17 @@ const loadedPages = ref(new Set<number>())
 const cacheKey = ref(0)
 const gridCache = ref(new Map())
 
+const shouldRestoreScroll = ref(false)
+
+const isManualLoading = ref(false)
+
+const isFilterChange = ref(false)
+
+const isGridLoading = ref(false)
+
 const loadMore = async () => {
   if (loading.value || !hasMore.value || isLoadingMore.value) return
+  isManualLoading.value = true
   isLoadingMore.value = true
   loading.value = true
 
@@ -85,6 +94,7 @@ const loadMore = async () => {
     loading.value = false
     setTimeout(() => {
       isLoadingMore.value = false
+      isManualLoading.value = false
     }, 300)
   }
 }
@@ -101,6 +111,8 @@ const throttle = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
 }
 
 const handleScroll = throttle((e: Event) => {
+  if (shouldRestoreScroll.value || isManualLoading.value) return
+  
   const container = e.target as HTMLElement
   showBackToTop.value = container.scrollTop > 500
 
@@ -114,110 +126,121 @@ const handleScroll = throttle((e: Event) => {
   }
 }, 500)
 
-const isModelMatchFilter = (model: any, filterState: any) => {
-  const typeMatch = !filterState.model_types?.length || 
-    filterState.model_types.includes(model.type);
-  
-  console.log('Model:', model.type, 'FilterTypes:', filterState.model_types, 'Match:', typeMatch);
-  
-  return typeMatch;
-}
+
 
 const handleFilterChange = async () => {
-  const newCacheKey = cacheKey.value + 1;
+  const newCacheKey = cacheKey.value + 1
+  const container = document.querySelector('.scroll-container')
   
-  const container = document.querySelector('.scroll-container');
-  const scrollPosition = container?.scrollTop || 0;
+  shouldRestoreScroll.value = false
+  isFilterChange.value = true
+  isGridLoading.value = true
   
   try {
     const response = await get_model_list({
       ...communityStore.mainContent.modelListPathParams,
       current: 1
-    }, communityStore.mainContent.filterState);
+    }, communityStore.mainContent.filterState)
     
     if (response?.data?.list) {
-      communityStore.mainContent.modelListPathParams.total = response.data.total || 0;
+      communityStore.mainContent.modelListPathParams.total = response.data.total || 0
       
-      cacheKey.value = newCacheKey;
-      gridCache.value = new Map();
-      communityStore.mainContent.modelListPathParams.current = 1;
-      hasMore.value = true;
-
-      await nextTick();
+      await nextTick()
       
-      communityStore.mainContent.models = response.data.list;
+      setTimeout(() => {
+        cacheKey.value = newCacheKey
+        gridCache.value = new Map()
+        communityStore.mainContent.modelListPathParams.current = 1
+        hasMore.value = true
+        communityStore.mainContent.models = response.data.list
+        
+        if (container) {
+          requestAnimationFrame(() => {
+            container.scrollTop = 0
+          })
+        }
+        
+        setTimeout(() => {
+          isGridLoading.value = false
+        }, 300)
+      }, 300)
       
-      if (container) {
-        requestAnimationFrame(() => {
-          container.scrollTop = 0;
-        });
-      }
     } else {
-      communityStore.mainContent.models = [];
-      hasMore.value = false;
+      communityStore.mainContent.models = []
+      hasMore.value = false
+      isGridLoading.value = false
     }
   } catch (error) {
-    console.error('Filter change error:', error);
-    useToaster.error(`Failed to filter models: ${error}`);
+    console.error('Filter change error:', error)
+    useToaster.error(`Failed to filter models: ${error}`)
+    isGridLoading.value = false
+  } finally {
+    setTimeout(() => {
+      isFilterChange.value = false
+    }, 300)
   }
 }
 
 const fetchData = async (pageNumberOrResetScroll?: number | boolean, pageSize?: number): Promise<unknown[]> => {
-  return new Promise(async (resolve) => {
-    const isPageProvider = typeof pageNumberOrResetScroll === 'number'
-    
-    const filterKey = JSON.stringify({
-      ...communityStore.mainContent.filterState,
-      cacheKey: cacheKey.value
-    })
-    const cachePageKey = `${filterKey}-${pageNumberOrResetScroll}`
-    
-    if (isPageProvider && gridCache.value.has(cachePageKey)) {
-      resolve(gridCache.value.get(cachePageKey))
-      return
-    }
-
-    if (isPageProvider) {
-      communityStore.mainContent.modelListPathParams.current = (pageNumberOrResetScroll as number) + 1
-      if (pageSize) {
-        communityStore.mainContent.modelListPathParams.page_size = pageSize
+  return new Promise((resolve) => {
+    const doFetch = async () => {
+      const isPageProvider = typeof pageNumberOrResetScroll === 'number'
+      
+      const filterKey = JSON.stringify({
+        ...communityStore.mainContent.filterState,
+        cacheKey: cacheKey.value
+      })
+      const cachePageKey = `${filterKey}-${pageNumberOrResetScroll}`
+      
+      if (isPageProvider && gridCache.value.has(cachePageKey)) {
+        resolve(gridCache.value.get(cachePageKey))
+        return
       }
-    }
 
-    try {
-      const response = await get_model_list(
-        communityStore.mainContent.modelListPathParams,
-        communityStore.mainContent.filterState
-      )
-
-      if (response?.data?.list) {
-        communityStore.mainContent.modelListPathParams.total = response.data.total || 0
-        
-        if (isPageProvider) {
-          gridCache.value.set(cachePageKey, response.data.list)
-          if (pageNumberOrResetScroll === 0) {
-            communityStore.mainContent.models = response.data.list
-          } else {
-            communityStore.mainContent.models = [
-              ...communityStore.mainContent.models,
-              ...response.data.list
-            ]
-          }
+      if (isPageProvider) {
+        communityStore.mainContent.modelListPathParams.current = (pageNumberOrResetScroll as number) + 1
+        if (pageSize) {
+          communityStore.mainContent.modelListPathParams.page_size = pageSize
         }
-        resolve(response.data.list)
-      } else {
+      }
+
+      try {
+        const response = await get_model_list(
+          communityStore.mainContent.modelListPathParams,
+          communityStore.mainContent.filterState
+        )
+
+        if (response?.data?.list) {
+          communityStore.mainContent.modelListPathParams.total = response.data.total || 0
+          
+          if (isPageProvider) {
+            gridCache.value.set(cachePageKey, response.data.list)
+            if (pageNumberOrResetScroll === 0) {
+              communityStore.mainContent.models = response.data.list
+            } else {
+              communityStore.mainContent.models = [
+                ...communityStore.mainContent.models,
+                ...response.data.list
+              ]
+            }
+          }
+          resolve(response.data.list)
+        } else {
+          if (pageNumberOrResetScroll === 0) {
+            communityStore.mainContent.models = []
+          }
+          resolve([])
+        }
+      } catch (error) {
+        console.error(error)
         if (pageNumberOrResetScroll === 0) {
           communityStore.mainContent.models = []
         }
         resolve([])
       }
-    } catch (error) {
-      console.error(error)
-      if (pageNumberOrResetScroll === 0) {
-        communityStore.mainContent.models = []
-      }
-      resolve([])
     }
+
+    doFetch()
   })
 }
 
@@ -378,16 +401,17 @@ watch(
 )
 
 const setScrollPosition = (ratio: number) => {
+  if (!shouldRestoreScroll.value) return
+  
   nextTick(() => {
-    setTimeout(() => {
-      const container = document.querySelector('.scroll-container')
-      if (container) {
-        const maxScroll = container.scrollHeight - container.clientHeight
-        if (maxScroll > 0) {
-          container.scrollTop = maxScroll * ratio
-        }
+    const container = document.querySelector('.scroll-container')
+    if (container) {
+      const maxScroll = container.scrollHeight - container.clientHeight
+      if (maxScroll > 0) {
+        container.scrollTop = maxScroll * ratio
       }
-    }, 100)
+    }
+    shouldRestoreScroll.value = false
   })
 }
 
@@ -397,6 +421,7 @@ const resetState = () => {
     loadedPages.value = new Set(communityStore.mainContent.lastState?.loadedPages || [])
 
     if (communityStore.mainContent.lastState?.scrollRatio) {
+      shouldRestoreScroll.value = true
       setScrollPosition(communityStore.mainContent.lastState.scrollRatio)
     }
     return
@@ -426,9 +451,8 @@ const resetState = () => {
 onActivated(() => {
   resetState()
   if (communityStore.mainContent.lastState?.scrollRatio) {
-    setTimeout(() => {
-      setScrollPosition(communityStore.mainContent?.lastState?.scrollRatio || 0)
-    }, 200)
+    shouldRestoreScroll.value = true
+    setScrollPosition(communityStore.mainContent?.lastState?.scrollRatio || 0)
   }
 })
 
@@ -466,7 +490,11 @@ watch(
 watch(
   () => communityStore.mainContent.models,
   (newVal) => {
-    if (newVal?.length > 0 && communityStore.mainContent.lastState?.scrollRatio) {
+    if (!isManualLoading.value && 
+        !isFilterChange.value &&
+        newVal?.length > 0 && 
+        communityStore.mainContent.lastState?.scrollRatio) {
+      shouldRestoreScroll.value = true
       setScrollPosition(communityStore.mainContent.lastState.scrollRatio)
     }
   },
@@ -487,6 +515,20 @@ watch(
 
     <div class="flex-1 px-6 relative">
       <div class="scroll-container overflow-y-auto">
+        <Transition name="fade">
+          <div v-if="isGridLoading" class="absolute inset-0 z-10 bg-black/20 backdrop-blur-sm">
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+              <div class="flex flex-col items-center space-y-4">
+                <div class="relative w-12 h-12">
+                  <div class="absolute inset-0 rounded-full border-4 border-violet-500/30 animate-ping"></div>
+                  <div class="absolute inset-0 rounded-full border-4 border-t-violet-500 animate-spin"></div>
+                </div>
+                <span class="text-white/80 text-sm">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </Transition>
+
         <transition-group 
           name="grid"
           tag="div"
@@ -878,5 +920,15 @@ img {
   100% {
     background-position: 200% 0;
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
