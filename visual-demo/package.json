@@ -1,0 +1,77 @@
+{
+  "name": "vue-virtual-scroll-grid",
+  "author": "Roc Wong <roc@kiwiberry.nz> (https://kiwiberry.nz/)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rocwang/vue-virtual-scroll-grid.git"
+  },
+  "keywords": [
+    "vue",
+    "windowing",
+    "virtual scroll",
+    "grid"
+  ],
+  "bugs": {
+    "url": "https://github.com/rocwang/vue-virtual-scroll-grid/issues"
+  },
+  "homepage": "https://grid.kiwiberry.nz/",
+  "files": [
+    "dist"
+  ],
+  "module": "./dist/index.es.js",
+  "main": "./dist/index.umd.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "license": "MIT",
+  "scripts": {
+    "gen:types": "vue-tsc --declaration --emitDeclarationOnly --skipLibCheck",
+    "serve": "vite preview",
+    "build": "vite build && npm run gen:types",
+    "build:demo": "vite build --mode demo",
+    "dev": "vite",
+    "lint": "vue-tsc --noEmit --skipLibCheck",
+    "test": "jest",
+    "preversion": "npm run lint && npm test",
+    "version": "npm run build",
+    "postversion": "npm publish --dry-run",
+    "semantic-release": "semantic-release"
+  },
+  "peerDependencies": {
+    "vue": "^3.2.33"
+  },
+  "dependencies": {
+    "@vueuse/core": "^10.0.0",
+    "ramda": ">=0.28.0",
+    "rxjs": "^7.8.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@types/ramda": ">=0.28.23",
+    "@vitejs/plugin-vue": "^4.1.0",
+    "algoliasearch": "^4.16.0",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
+    "lodash-es": "^4.17.21",
+    "prettier": "^3.0.0",
+    "semantic-release": "^22.0.5",
+    "ts-jest": "^29.0.5",
+    "typescript": "^5.0.3",
+    "vite": "^4.2.3",
+    "vue": "^3.2.47",
+    "vue-tsc": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "volta": {
+    "node": "20.9.0",
+    "npm": "10.2.2"
+  }
+}

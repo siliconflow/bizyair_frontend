@@ -4,7 +4,7 @@
   })
 
   import { ref, onMounted, onUnmounted, nextTick, inject, watch } from 'vue'
-  import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
+  import ModelFilterBar from '@/components/community/modules/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
   import { modelStore } from '@/stores/modelStatus'
   import { get_model_list, get_workflow_dowload_url } from '@/api/model'

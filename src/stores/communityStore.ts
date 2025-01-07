@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
-import { CommonModelType, Model, ModelListPathParams } from '@/types/model'
+import { CommonModelType, Model, ModelListPathParams, PageType } from '@/types/model'
+import { model_types, base_model_types } from '@/api/model'
+import { useToaster } from '@/components/modules/toats'
 
-import { PageType, PageState } from '@/types/model'
+import { PageState } from '@/types/model'
 
 export const useCommunityStore = defineStore('community', {
   state: () => ({
@@ -153,7 +155,11 @@ export const useCommunityStore = defineStore('community', {
     },
     get forked() {
       return this.mine.forked
-    }
+    },
+
+    modelTypes: [] as CommonModelType[],
+    baseModelTypes: [] as CommonModelType[],
+    filterDataLoaded: false
   }),
   actions: {
     setModelTypes(page: PageType, types: CommonModelType[]) {
@@ -210,6 +216,56 @@ export const useCommunityStore = defineStore('community', {
           scrollPosition: 0
         }
       }
+    },
+
+    async loadFilterData() {
+      if (this.filterDataLoaded) return
+
+      try {
+        const [modelTypesResponse, baseModelResponse] = await Promise.all([
+          model_types(),
+          base_model_types()
+        ])
+
+        if (modelTypesResponse?.data) {
+          this.modelTypes = modelTypesResponse.data
+        }
+
+        if (baseModelResponse?.data) {
+          this.baseModelTypes = baseModelResponse.data
+        }
+
+        this.filterDataLoaded = true
+      } catch (error) {
+        useToaster.error(`Failed to fetch model types: ${error}`)
+        this.modelTypes = []
+        this.baseModelTypes = []
+      }
+    },
+
+    savePageState(page: PageType, state: {
+      currentPage: number;
+      hasMore: boolean;
+      hasPrevious: boolean;
+      loadedPages: number[];
+      scrollRatio: number;
+    }) {
+      if (this[page]) {
+        this[page].lastState = {
+          ...state,
+          loadedPages: [...state.loadedPages]
+        }
+      }
+    },
+
+    restorePageState(page: PageType) {
+      if (this[page] && this[page].lastState) {
+        return {
+          ...this[page].lastState,
+          loadedPages: [...this[page].lastState.loadedPages]
+        }
+      }
+      return null
     }
   }
 })

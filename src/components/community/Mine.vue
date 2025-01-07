@@ -4,8 +4,8 @@
   })
 
   import { ref, onMounted, onUnmounted, nextTick, watch, inject } from 'vue'
-  import ModelFilterBar from '@/components/community/moudles/ModelFilterBar.vue'
-  import MineTabs from '@/components/community/moudles/MineTabs.vue'
+  import ModelFilterBar from '@/components/community/modules/ModelFilterBar.vue'
+  import MineTabs from '@/components/community/modules/MineTabs.vue'
   import { useCommunityStore } from '@/stores/communityStore'
   import { modelStore } from '@/stores/modelStatus'
   import vTooltips from '@/components/modules/v-tooltip.vue'
