@@ -542,29 +542,25 @@ watch(
             :cache-size="1" 
             :scroll-behavior="'smooth'" 
             class="grid">
-            <!-- 加载探测器 -->
             <template #probe>
               <div class="item">
                 <div class="animate-pulse bg-gray-700 h-full w-full rounded-lg"></div>
               </div>
             </template>
 
-            <!-- 加载占位符 -->
             <template #placeholder="{ style }">
               <div 
                 class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300"
                 :style="style"
               >
                 <div class="relative flex flex-col flex-1 rounded-lg bg-[#1a1a1a]">
-                  <!-- 类型标签占位 -->
+
                   <div class="absolute left-3 top-3 w-[100px] h-[34px] bg-[#25252566] rounded-[6px] animate-pulse"></div>
                   
-                  <!-- 图片占位 -->
                   <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden">
                     <div class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"></div>
                   </div>
                   
-                  <!-- 底部信息占位 -->
                   <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30">
                     <div class="h-6 w-2/3 bg-[#25252566] rounded mb-2 animate-pulse"></div>
                     <div class="flex items-center space-x-3">
@@ -577,7 +573,6 @@ watch(
               </div>
             </template>
 
-            <!-- 实际内容 -->
             <template #default="{ item: model, style }">
               <div
                 class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
@@ -609,7 +604,6 @@ watch(
                     </svg>
                   </div>
 
-                  <!-- 图片容器 -->
                   <div
                     class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
                     @click="handleCommunityDetail(model)">
@@ -634,8 +628,6 @@ watch(
                       <vDefaultPic />
                     </div>
                   </div>
-
-                  <!-- 底部信息 -->
                   <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30">
                     <vTooltips :tips="model.name">
                       <h3 class="text-base text-white font-medium mb-2 truncate">
