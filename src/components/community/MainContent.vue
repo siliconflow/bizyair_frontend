@@ -50,8 +50,14 @@ const isFilterChange = ref(false)
 
 const isGridLoading = ref(false)
 
+const isScrolling = ref(false)
+const scrollTimer = ref<number | null>(null)
+const lastLoadedPage = ref(1)
+
+const isInitialLoad = ref(true)
+
 const loadMore = async () => {
-  if (loading.value || !hasMore.value || isLoadingMore.value) return
+  if (loading.value || !hasMore.value || isLoadingMore.value || isScrolling.value) return
   isManualLoading.value = true
   isLoadingMore.value = true
   loading.value = true
@@ -63,12 +69,13 @@ const loadMore = async () => {
 
     if (currentPage * pageSize >= total || !hasMore.value) {
       hasMore.value = false
-      loading.value = false
-      isLoadingMore.value = false
       return
     }
 
-    const nextPage = currentPage + 1
+    const nextPage = lastLoadedPage.value + 1
+    if (nextPage > currentPage + 1) {
+      return
+    }
 
     communityStore.mainContent.modelListPathParams.current = nextPage
 
@@ -83,6 +90,15 @@ const loadMore = async () => {
         ...response.data.list
       ]
       hasMore.value = nextPage * pageSize < communityStore.mainContent.modelListPathParams.total
+      lastLoadedPage.value = nextPage
+      
+      communityStore.mainContent.lastState = {
+        currentPage: nextPage,
+        hasMore: hasMore.value,
+        hasPrevious: true,
+        loadedPages: Array.from(loadedPages.value),
+        scrollRatio: scrollRatio.value
+      }
     } else {
       hasMore.value = false
     }
@@ -119,12 +135,34 @@ const handleScroll = throttle((e: Event) => {
   const maxScroll = container.scrollHeight - container.clientHeight
   if (maxScroll > 0) {
     scrollRatio.value = container.scrollTop / maxScroll
+    communityStore.mainContent.lastState = {
+      currentPage: lastLoadedPage.value,
+      hasMore: hasMore.value,
+      hasPrevious: true,
+      loadedPages: Array.from(loadedPages.value),
+      scrollRatio: scrollRatio.value
+    }
   }
 
-  if (maxScroll - container.scrollTop <= 1000 && !loading.value && !isLoadingMore.value && hasMore.value) {
-    loadMore()
+  isScrolling.value = true
+  
+  if (scrollTimer.value) {
+    window.clearTimeout(scrollTimer.value)
   }
-}, 500)
+  
+  scrollTimer.value = window.setTimeout(() => {
+    isScrolling.value = false
+    
+    if (maxScroll - container.scrollTop <= 1000) {
+      const currentPage = communityStore.mainContent.modelListPathParams.current
+      const targetPage = Math.ceil(container.scrollTop / (container.scrollHeight / currentPage))
+      
+      if (targetPage > lastLoadedPage.value && !loading.value && !isLoadingMore.value && hasMore.value) {
+        loadMore()
+      }
+    }
+  }, 150)
+}, 100)
 
 
 
@@ -135,6 +173,7 @@ const handleFilterChange = async () => {
   shouldRestoreScroll.value = false
   isFilterChange.value = true
   isGridLoading.value = true
+  isInitialLoad.value = true
   
   try {
     const response = await get_model_list({
@@ -151,6 +190,7 @@ const handleFilterChange = async () => {
         cacheKey.value = newCacheKey
         gridCache.value = new Map()
         communityStore.mainContent.modelListPathParams.current = 1
+        lastLoadedPage.value = 1
         hasMore.value = true
         communityStore.mainContent.models = response.data.list
         
@@ -297,8 +337,16 @@ onMounted(async () => {
   hasMore.value = true
   cacheKey.value = 0
   gridCache.value.clear()
+  
+  isGridLoading.value = true
 
-  await fetchData()
+  try {
+    await fetchData()
+  } finally {
+    setTimeout(() => {
+      isGridLoading.value = false
+    }, 300)
+  }
 
   nextTick(() => {
     const container = document.querySelector('.scroll-container')
@@ -328,6 +376,9 @@ onMounted(async () => {
 onUnmounted(() => {
   if (observer) {
     observer.disconnect()
+  }
+  if (scrollTimer.value) {
+    window.clearTimeout(scrollTimer.value)
   }
   const container = document.querySelector('.scroll-container')
   if (container) {
@@ -401,8 +452,6 @@ watch(
 )
 
 const setScrollPosition = (ratio: number) => {
-  if (!shouldRestoreScroll.value) return
-  
   nextTick(() => {
     const container = document.querySelector('.scroll-container')
     if (container) {
@@ -411,18 +460,35 @@ const setScrollPosition = (ratio: number) => {
         container.scrollTop = maxScroll * ratio
       }
     }
-    shouldRestoreScroll.value = false
   })
 }
 
-const resetState = () => {
-  if (communityStore.mainContent.models.length > 0) {
-    hasMore.value = true
-    loadedPages.value = new Set(communityStore.mainContent.lastState?.loadedPages || [])
+const resetState = async () => {
+  if (communityStore.mainContent.lastState?.currentPage) {
+    const targetPage = communityStore.mainContent.lastState.currentPage
+    const savedScrollRatio = communityStore.mainContent.lastState.scrollRatio
+    
+    communityStore.mainContent.modelListPathParams.current = targetPage
+    lastLoadedPage.value = targetPage
+    hasMore.value = communityStore.mainContent.lastState.hasMore
+    
+    try {
+      const response = await get_model_list({
+        ...communityStore.mainContent.modelListPathParams,
+        current: targetPage
+      }, communityStore.mainContent.filterState)
 
-    if (communityStore.mainContent.lastState?.scrollRatio) {
-      shouldRestoreScroll.value = true
-      setScrollPosition(communityStore.mainContent.lastState.scrollRatio)
+      if (response?.data?.list) {
+        communityStore.mainContent.models = response.data.list
+        
+        nextTick(() => {
+          setTimeout(() => {
+            setScrollPosition(savedScrollRatio)
+          }, 100)
+        })
+      }
+    } catch (error) {
+      console.error('Reset state error:', error)
     }
     return
   }
@@ -431,29 +497,23 @@ const resetState = () => {
   if (container) {
     container.scrollTo({ top: 0, behavior: 'auto' })
   }
-  hasMore.value = false
+  hasMore.value = true
   communityStore.mainContent.modelListPathParams.current = 1
   loading.value = true
 
-  nextTick(async () => {
-    try {
-      await fetchData(true)
-      hasMore.value = true
-      loadedPages.value.add(1)
-    } catch (error) {
-      console.error('Reset state error:', error)
-    } finally {
-      loading.value = false
-    }
-  })
+  try {
+    await fetchData(true)
+    loadedPages.value.add(1)
+  } catch (error) {
+    console.error('Reset state error:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
 onActivated(() => {
   resetState()
-  if (communityStore.mainContent.lastState?.scrollRatio) {
-    shouldRestoreScroll.value = true
-    setScrollPosition(communityStore.mainContent?.lastState?.scrollRatio || 0)
-  }
+  isInitialLoad.value = true
 })
 
 watch(
@@ -489,14 +549,8 @@ watch(
 
 watch(
   () => communityStore.mainContent.models,
-  (newVal) => {
-    if (!isManualLoading.value && 
-        !isFilterChange.value &&
-        newVal?.length > 0 && 
-        communityStore.mainContent.lastState?.scrollRatio) {
-      shouldRestoreScroll.value = true
-      setScrollPosition(communityStore.mainContent.lastState.scrollRatio)
-    }
+  () => {
+    // 移除这里的滚动位置恢复逻辑
   },
   { deep: true }
 )
