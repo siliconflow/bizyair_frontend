@@ -70,6 +70,8 @@
 
   const isInitialLoad = ref(true)
 
+  const retryCountMap = ref(new Map<string, number>());
+
   const loadMore = async () => {
     if (loading.value || !hasMore.value || isLoadingMore.value || isScrolling.value) return
     isManualLoading.value = true
@@ -354,6 +356,7 @@
     if (container) {
       container.removeEventListener('scroll', handleScroll)
     }
+    retryCountMap.value.clear();
   })
 
   const showSortPopover = ref(false)
@@ -387,8 +390,42 @@
     imageLoadStates.value.set(modelId, true)
   }
 
-  const handleImageError = (_event: Event, modelId: number | string) => {
-    imageLoadStates.value.set(modelId, false)
+  const handleImageError = (event: Event, modelId: number | string) => {
+    const img = event.target as HTMLImageElement;
+    const src = img.src;
+    
+    const retryCount = retryCountMap.value.get(src) || 0;
+    if (retryCount >= 2) {
+      imageLoadStates.value.set(modelId, false);
+      retryCountMap.value.delete(src);
+      return;
+    }
+    
+    if (typeof src === 'string' && src.startsWith('blob:')) {
+      retryCountMap.value.set(src, retryCount + 1);
+      
+      fetch(src)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.blob();
+        })
+        .then(blob => {
+          if (blob.size === 0) {
+            throw new Error('Empty blob');
+          }
+          const newUrl = URL.createObjectURL(blob);
+          img.src = newUrl;
+          URL.revokeObjectURL(src);
+        })
+        .catch(() => {
+          imageLoadStates.value.set(modelId, false);
+          retryCountMap.value.delete(src);
+        });
+    } else {
+      imageLoadStates.value.set(modelId, false);
+    }
   }
   const imageLoaded = (modelId: number | string) => imageLoadStates.value.get(modelId) ?? false
 
