@@ -965,15 +965,13 @@
 
 <style scoped>
   .scroll-container {
-    height: calc(100vh - 180px);
+    height: calc(80vh - 180px); 
     margin-top: 1rem;
     position: relative;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
     -webkit-overflow-scrolling: touch;
-    overflow-y: auto;
-    padding-right: 12px;
-    padding-bottom: 100px;
+    min-height: 400px;
   }
 
   .scroll-container::-webkit-scrollbar {
@@ -1004,8 +1002,10 @@
     transition: opacity 0.3s ease-in-out;
     align-items: start;
     height: auto;
-    padding-bottom: 20px;
-    margin-bottom: 40px;
+    /* 增加底部间距 */
+    padding-bottom: 40px;
+    /* 移除底部margin */
+    margin-bottom: 0;
   }
 
   @media (min-width: 768px) {
@@ -1072,14 +1072,17 @@
     position: relative;
     width: 100%;
     height: 100%;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
+    /* 增加底部padding */
+    padding-bottom: 40px;
+    /* 移除底部margin */
+    margin-bottom: 0;
   }
 
   .py-4.text-center.mt-8 {
     position: relative;
     z-index: 1;
-    margin-bottom: 20px;
-    padding-bottom: 20px;
+    /* 调整loading提示的位置 */
+    margin-bottom: 40px;
+    padding-bottom: 40px;
   }
 </style>
