@@ -15,7 +15,7 @@
   import vDefaultPic from '@/components/modules/vDefaultPic.vue'
   import vTooltips from '@/components/modules/v-tooltip.vue'
   import { sliceString, formatNumber } from '@/utils/tool'
-  import Grid from "vue-virtual-scroll-grid"
+  import Grid from 'vue-virtual-scroll-grid'
 
   const communityStore = useCommunityStore()
   const modelStoreInstance = modelStore()
@@ -26,7 +26,7 @@
 
   const loadingStates = ref({
     isLoading: false,
-    isLoadingMore: false, 
+    isLoadingMore: false,
     isGridLoading: false,
     isManualLoading: false,
     isScrolling: false,
@@ -70,7 +70,7 @@
 
   const isInitialLoad = ref(true)
 
-  const retryCountMap = ref(new Map<string, number>());
+  const retryCountMap = ref(new Map<string, number>())
 
   const loadMore = async () => {
     if (loading.value || !hasMore.value || isLoadingMore.value || isScrolling.value) return
@@ -107,7 +107,7 @@
         ]
         hasMore.value = nextPage * pageSize < communityStore.quickStart.modelListPathParams.total
         lastLoadedPage.value = nextPage
-        
+
         communityStore.quickStart.lastState = {
           currentPage: nextPage,
           hasMore: hasMore.value,
@@ -149,7 +149,7 @@
 
   const handleScroll = throttle((e: Event) => {
     if (loadingStates.value.isManualLoading) return
-    
+
     const container = e.target as HTMLElement
     scrollState.value.showBackToTop = container.scrollTop > 500
 
@@ -166,19 +166,24 @@
     }
 
     loadingStates.value.isScrolling = true
-    
+
     if (scrollState.value.timer) {
       window.clearTimeout(scrollState.value.timer)
     }
-    
+
     scrollState.value.timer = window.setTimeout(() => {
       loadingStates.value.isScrolling = false
-      
+
       if (maxScroll - container.scrollTop <= 1000) {
         const currentPage = communityStore.quickStart.modelListPathParams.current
         const targetPage = Math.ceil(container.scrollTop / (container.scrollHeight / currentPage))
-        
-        if (targetPage > lastLoadedPage.value && !loadingStates.value.isLoading && !loadingStates.value.isLoadingMore && hasMore.value) {
+
+        if (
+          targetPage > lastLoadedPage.value &&
+          !loadingStates.value.isLoading &&
+          !loadingStates.value.isLoadingMore &&
+          hasMore.value
+        ) {
           loadMore()
         }
       }
@@ -188,23 +193,26 @@
   const handleFilterChange = async () => {
     const newCacheKey = cacheKey.value + 1
     const container = document.querySelector('.scroll-container')
-    
+
     shouldRestoreScroll.value = false
     isFilterChange.value = true
     isGridLoading.value = true
     isInitialLoad.value = true
-    
+
     try {
-      const response = await get_model_list({
-        ...communityStore.quickStart.modelListPathParams,
-        current: 1
-      }, communityStore.quickStart.filterState)
-      
+      const response = await get_model_list(
+        {
+          ...communityStore.quickStart.modelListPathParams,
+          current: 1
+        },
+        communityStore.quickStart.filterState
+      )
+
       if (response?.data?.list) {
         communityStore.quickStart.modelListPathParams.total = response.data.total || 0
-        
+
         await nextTick()
-        
+
         setTimeout(() => {
           cacheKey.value = newCacheKey
           gridCache.value = new Map()
@@ -212,18 +220,17 @@
           lastLoadedPage.value = 1
           hasMore.value = true
           communityStore.quickStart.models = response.data.list
-          
+
           if (container) {
             requestAnimationFrame(() => {
               container.scrollTop = 0
             })
           }
-          
+
           setTimeout(() => {
             isGridLoading.value = false
           }, 300)
         }, 300)
-        
       } else {
         communityStore.quickStart.models = []
         hasMore.value = false
@@ -240,24 +247,28 @@
     }
   }
 
-  const fetchData = async (pageNumberOrResetScroll?: number | boolean, pageSize?: number): Promise<unknown[]> => {
-    return new Promise((resolve) => {
+  const fetchData = async (
+    pageNumberOrResetScroll?: number | boolean,
+    pageSize?: number
+  ): Promise<unknown[]> => {
+    return new Promise(resolve => {
       const doFetch = async () => {
         const isPageProvider = typeof pageNumberOrResetScroll === 'number'
-        
+
         const filterKey = JSON.stringify({
           ...communityStore.quickStart.filterState,
           cacheKey: cacheKey.value
         })
         const cachePageKey = `${filterKey}-${pageNumberOrResetScroll}`
-        
+
         if (isPageProvider && gridCache.value.has(cachePageKey)) {
           resolve(gridCache.value.get(cachePageKey))
           return
         }
 
         if (isPageProvider) {
-          communityStore.quickStart.modelListPathParams.current = (pageNumberOrResetScroll as number) + 1
+          communityStore.quickStart.modelListPathParams.current =
+            (pageNumberOrResetScroll as number) + 1
           if (pageSize) {
             communityStore.quickStart.modelListPathParams.page_size = pageSize
           }
@@ -271,7 +282,7 @@
 
           if (response?.data?.list) {
             communityStore.quickStart.modelListPathParams.total = response.data.total || 0
-            
+
             if (isPageProvider) {
               gridCache.value.set(cachePageKey, response.data.list)
               if (pageNumberOrResetScroll === 0) {
@@ -356,7 +367,7 @@
     if (container) {
       container.removeEventListener('scroll', handleScroll)
     }
-    retryCountMap.value.clear();
+    retryCountMap.value.clear()
   })
 
   const showSortPopover = ref(false)
@@ -391,40 +402,40 @@
   }
 
   const handleImageError = (event: Event, modelId: number | string) => {
-    const img = event.target as HTMLImageElement;
-    const src = img.src;
-    
-    const retryCount = retryCountMap.value.get(src) || 0;
+    const img = event.target as HTMLImageElement
+    const src = img.src
+
+    const retryCount = retryCountMap.value.get(src) || 0
     if (retryCount >= 2) {
-      imageLoadStates.value.set(modelId, false);
-      retryCountMap.value.delete(src);
-      return;
+      imageLoadStates.value.set(modelId, false)
+      retryCountMap.value.delete(src)
+      return
     }
-    
+
     if (typeof src === 'string' && src.startsWith('blob:')) {
-      retryCountMap.value.set(src, retryCount + 1);
-      
+      retryCountMap.value.set(src, retryCount + 1)
+
       fetch(src)
         .then(response => {
           if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error('Network response was not ok')
           }
-          return response.blob();
+          return response.blob()
         })
         .then(blob => {
           if (blob.size === 0) {
-            throw new Error('Empty blob');
+            throw new Error('Empty blob')
           }
-          const newUrl = URL.createObjectURL(blob);
-          img.src = newUrl;
-          URL.revokeObjectURL(src);
+          const newUrl = URL.createObjectURL(blob)
+          img.src = newUrl
+          URL.revokeObjectURL(src)
         })
         .catch(() => {
-          imageLoadStates.value.set(modelId, false);
-          retryCountMap.value.delete(src);
-        });
+          imageLoadStates.value.set(modelId, false)
+          retryCountMap.value.delete(src)
+        })
     } else {
-      imageLoadStates.value.set(modelId, false);
+      imageLoadStates.value.set(modelId, false)
     }
   }
   const imageLoaded = (modelId: number | string) => imageLoadStates.value.get(modelId) ?? false
@@ -432,15 +443,15 @@
   const handleLoadWorkflow = async (model: Model) => {
     try {
       if (!model.versions?.[0]) {
-      useToaster.error('No workflow found')
-      return
-    }
-      
+        useToaster.error('No workflow found')
+        return
+      }
+
       const workflow = await get_workflow_dowload_url(model.versions[0].id, model.versions[0].sign)
 
-    if (workflow.data && comfyUIApp && comfyUIApp.graph) {
-      comfyUIApp.graph.clear()
-      await comfyUIApp.loadGraphData(workflow.data)
+      if (workflow.data && comfyUIApp && comfyUIApp.graph) {
+        comfyUIApp.graph.clear()
+        await comfyUIApp.loadGraphData(workflow.data)
         communityStore.showDialog = false
         useToaster.success('Workflow loaded successfully')
       }
@@ -485,95 +496,98 @@
   )
 
   watch(
-  () => communityStore.showDialog,
-  newVal => {
-    if (!newVal) {
-      const container = document.querySelector('.scroll-container')
-      if (container) {
-        const maxScroll = container.scrollHeight - container.clientHeight
-        if (maxScroll > 0) {
-          scrollRatio.value = container.scrollTop / maxScroll
-        }
+    () => communityStore.showDialog,
+    newVal => {
+      if (!newVal) {
+        const container = document.querySelector('.scroll-container')
+        if (container) {
+          const maxScroll = container.scrollHeight - container.clientHeight
+          if (maxScroll > 0) {
+            scrollRatio.value = container.scrollTop / maxScroll
+          }
 
-        communityStore.quickStart.lastState = {
-          currentPage: communityStore.quickStart.modelListPathParams.current,
-          hasMore: hasMore.value,
-          hasPrevious: true,
-          loadedPages: Array.from(loadedPages.value),
-          scrollRatio: scrollRatio.value
+          communityStore.quickStart.lastState = {
+            currentPage: communityStore.quickStart.modelListPathParams.current,
+            hasMore: hasMore.value,
+            hasPrevious: true,
+            loadedPages: Array.from(loadedPages.value),
+            scrollRatio: scrollRatio.value
+          }
         }
-      }
-    } else {
-      const container = document.querySelector('.scroll-container')
-      if (container) {
-        const maxScroll = container.scrollHeight - container.clientHeight
-        if (maxScroll > 0) {
-          scrollRatio.value = container.scrollTop / maxScroll
+      } else {
+        const container = document.querySelector('.scroll-container')
+        if (container) {
+          const maxScroll = container.scrollHeight - container.clientHeight
+          if (maxScroll > 0) {
+            scrollRatio.value = container.scrollTop / maxScroll
+          }
         }
       }
     }
-  }
-)
+  )
 
-const setScrollPosition = (ratio: number) => {
-  nextTick(() => {
+  const setScrollPosition = (ratio: number) => {
+    nextTick(() => {
+      const container = document.querySelector('.scroll-container')
+      if (container) {
+        const maxScroll = container.scrollHeight - container.clientHeight
+        if (maxScroll > 0) {
+          container.scrollTop = maxScroll * ratio
+        }
+      }
+    })
+  }
+
+  const resetState = async () => {
+    if (communityStore.quickStart.lastState?.currentPage) {
+      const targetPage = communityStore.quickStart.lastState.currentPage
+      const savedScrollRatio = communityStore.quickStart.lastState.scrollRatio
+
+      communityStore.quickStart.modelListPathParams.current = targetPage
+      lastLoadedPage.value = targetPage
+      hasMore.value = communityStore.quickStart.lastState.hasMore
+
+      try {
+        const response = await get_model_list(
+          {
+            ...communityStore.quickStart.modelListPathParams,
+            current: targetPage
+          },
+          communityStore.quickStart.filterState
+        )
+
+        if (response?.data?.list) {
+          communityStore.quickStart.models = response.data.list
+
+          nextTick(() => {
+            setTimeout(() => {
+              setScrollPosition(savedScrollRatio)
+            }, 100)
+          })
+        }
+      } catch (error) {
+        console.error('Reset state error:', error)
+      }
+      return
+    }
+
     const container = document.querySelector('.scroll-container')
     if (container) {
-      const maxScroll = container.scrollHeight - container.clientHeight
-      if (maxScroll > 0) {
-        container.scrollTop = maxScroll * ratio
-      }
+      container.scrollTo({ top: 0, behavior: 'auto' })
     }
-  })
-}
+    hasMore.value = true
+    communityStore.quickStart.modelListPathParams.current = 1
+    loading.value = true
 
-const resetState = async () => {
-  if (communityStore.quickStart.lastState?.currentPage) {
-    const targetPage = communityStore.quickStart.lastState.currentPage
-    const savedScrollRatio = communityStore.quickStart.lastState.scrollRatio
-    
-    communityStore.quickStart.modelListPathParams.current = targetPage
-    lastLoadedPage.value = targetPage
-    hasMore.value = communityStore.quickStart.lastState.hasMore
-    
     try {
-      const response = await get_model_list({
-        ...communityStore.quickStart.modelListPathParams,
-        current: targetPage
-      }, communityStore.quickStart.filterState)
-
-      if (response?.data?.list) {
-        communityStore.quickStart.models = response.data.list
-        
-        nextTick(() => {
-          setTimeout(() => {
-            setScrollPosition(savedScrollRatio)
-          }, 100)
-        })
-      }
+      await fetchData(true)
+      loadedPages.value.add(1)
     } catch (error) {
       console.error('Reset state error:', error)
+    } finally {
+      loading.value = false
     }
-    return
   }
-
-  const container = document.querySelector('.scroll-container')
-  if (container) {
-    container.scrollTo({ top: 0, behavior: 'auto' })
-  }
-  hasMore.value = true
-  communityStore.quickStart.modelListPathParams.current = 1
-  loading.value = true
-
-  try {
-    await fetchData(true)
-    loadedPages.value.add(1)
-  } catch (error) {
-    console.error('Reset state error:', error)
-  } finally {
-    loading.value = false
-  }
-}
 </script>
 
 <template>
@@ -581,7 +595,7 @@ const resetState = async () => {
     <div class="px-6 pt-6 pb-0 sticky top-0 z-20">
       <ModelFilterBar
         v-model:show-sort-popover="showSortPopover"
-        page="quickStart" 
+        page="quickStart"
         @fetch-data="handleFilterChange"
       />
     </div>
@@ -593,8 +607,12 @@ const resetState = async () => {
             <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <div class="flex flex-col items-center space-y-4">
                 <div class="relative w-12 h-12">
-                  <div class="absolute inset-0 rounded-full border-4 border-violet-500/30 animate-ping"></div>
-                  <div class="absolute inset-0 rounded-full border-4 border-t-violet-500 animate-spin"></div>
+                  <div
+                    class="absolute inset-0 rounded-full border-4 border-violet-500/30 animate-ping"
+                  ></div>
+                  <div
+                    class="absolute inset-0 rounded-full border-4 border-t-violet-500 animate-spin"
+                  ></div>
                 </div>
                 <span class="text-white/80 text-sm">Loading...</span>
               </div>
@@ -602,27 +620,30 @@ const resetState = async () => {
           </div>
         </Transition>
 
-        <div 
-          v-if="!isGridLoading && (!communityStore.quickStart.models || communityStore.quickStart.models.length === 0)"
+        <div
+          v-if="
+            !isGridLoading &&
+            (!communityStore.quickStart.models || communityStore.quickStart.models.length === 0)
+          "
           class="flex flex-col items-center justify-center py-20 text-white/60"
         >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            class="h-16 w-16 mb-4 opacity-40" 
-            fill="none" 
-            viewBox="0 0 24 24" 
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-16 w-16 mb-4 opacity-40"
+            fill="none"
+            viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              stroke-width="1" 
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1"
               d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"
             />
-            <path 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              stroke-width="1" 
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1"
               d="M8 10h8M8 14h4"
             />
           </svg>
@@ -630,20 +651,16 @@ const resetState = async () => {
           <p class="text-sm mt-2">Try another Base Model or adjust your filters</p>
         </div>
 
-        <transition-group 
-          v-else
-          name="grid"
-          tag="div"
-          class="grid-container"
-        >
+        <transition-group v-else name="grid" tag="div" class="grid-container">
           <Grid
             :key="cacheKey"
             :length="communityStore.quickStart.modelListPathParams.total || 50"
-            :page-size="communityStore.quickStart.modelListPathParams.page_size" 
+            :page-size="communityStore.quickStart.modelListPathParams.page_size"
             :page-provider="fetchData"
-            :cache-size="1" 
-            :scroll-behavior="'smooth'" 
-            class="grid">
+            :cache-size="1"
+            :scroll-behavior="'smooth'"
+            class="grid"
+          >
             <template #probe>
               <div class="item">
                 <div class="animate-pulse bg-gray-700 h-full w-full rounded-lg"></div>
@@ -651,16 +668,24 @@ const resetState = async () => {
             </template>
 
             <template #placeholder="{ style }">
-              <div 
+              <div
                 class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300"
                 :style="style"
               >
                 <div class="relative flex flex-col flex-1 rounded-lg bg-[#1a1a1a]">
-                  <div class="absolute left-3 top-3 w-[100px] h-[34px] bg-[#25252566] rounded-[6px] animate-pulse"></div>
-                  <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"></div>
+                  <div
+                    class="absolute left-3 top-3 w-[100px] h-[34px] bg-[#25252566] rounded-[6px] animate-pulse"
+                  ></div>
+                  <div
+                    class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
+                  >
+                    <div
+                      class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"
+                    ></div>
                   </div>
-                  <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30">
+                  <div
+                    class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
+                  >
                     <div class="h-6 w-2/3 bg-[#25252566] rounded mb-2 animate-pulse"></div>
                     <div class="flex items-center space-x-3">
                       <div class="h-4 w-16 bg-[#25252566] rounded animate-pulse"></div>
@@ -675,57 +700,77 @@ const resetState = async () => {
             <template #default="{ item: model, style }">
               <div
                 class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
-                :style="style">
-                <div class="relative flex flex-col flex-1 rounded-lg cursor-pointer overflow-hidden bg-[#1a1a1a]">
+                :style="style"
+              >
+                <div
+                  class="relative flex flex-col flex-1 rounded-lg cursor-pointer overflow-hidden bg-[#1a1a1a]"
+                >
                   <div
-                    class="absolute left-2 top-3 min-w-[100px] h-[34px] flex items-center justify-start z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-2 rounded-[6px] [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]">
+                    class="absolute left-2 top-3 min-w-[100px] h-[34px] flex items-center justify-start z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-2 rounded-[6px] [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]"
+                  >
                     {{ model.type }}
                   </div>
 
                   <div
                     class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
-                    @click="handleLoadWorkflow(model)">
+                    @click="handleLoadWorkflow(model)"
+                  >
                     <svg
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="24" 
-                      height="24" 
-                      viewBox="0 0 24 24" 
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
                       fill="none"
-                      class="drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] hover:scale-110 transition-transform duration-200 cursor-pointer">
+                      class="drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] hover:scale-110 transition-transform duration-200 cursor-pointer"
+                    >
                       <path
-                        d="M5 3L19 12L5 21V3Z" 
-                        stroke="#F3F4F6" 
-                        stroke-width="2" 
+                        d="M5 3L19 12L5 21V3Z"
+                        stroke="#F3F4F6"
+                        stroke-width="2"
                         stroke-linecap="round"
-                        stroke-linejoin="round" 
+                        stroke-linejoin="round"
                         class="group-hover:stroke-[#7C3AEDCC] transition-colors duration-200"
-                        filter="drop-shadow(0 1px 2px rgb(0 0 0 / 0.5))" />
+                        filter="drop-shadow(0 1px 2px rgb(0 0 0 / 0.5))"
+                      />
                     </svg>
                   </div>
 
                   <div
                     class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
-                    @click="handleCommunityDetail(model)">
+                    @click="handleCommunityDetail(model)"
+                  >
                     <div
-                      class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] "
-                      :class="{ 'opacity-0': imageLoaded(model.id) }"></div>
+                      class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a]"
+                      :class="{ 'opacity-0': imageLoaded(model.id) }"
+                    ></div>
                     <div class="w-full h-0 pb-[150%]"></div>
                     <img
-                      :src="model.versions?.[0]?.cover_urls" 
+                      :src="model.versions?.[0]?.cover_urls"
                       :alt="model.versions?.[0]?.version || model.name"
-                      :crossorigin="typeof model.versions?.[0]?.cover_urls === 'string' && model.versions?.[0]?.cover_urls?.startsWith('blob:') ? 'anonymous' : undefined"
-                      class="absolute inset-0 w-full h-full object-cover transition-all duration-300" 
+                      :crossorigin="
+                        typeof model.versions?.[0]?.cover_urls === 'string' &&
+                        model.versions?.[0]?.cover_urls?.startsWith('blob:')
+                          ? 'anonymous'
+                          : undefined
+                      "
+                      class="absolute inset-0 w-full h-full object-cover transition-all duration-300"
                       :class="{
                         'opacity-0': !imageLoaded(model.id),
                         'opacity-100 group-hover:scale-105': imageLoaded(model.id)
-                      }" 
-                      @load="e => handleImageLoad(e, model.id)" 
-                      @error="e => handleImageError(e, model.id)" />
-                    <div v-if="!imageLoaded(model.id)" class="absolute inset-0 flex items-center justify-center">
+                      }"
+                      @load="e => handleImageLoad(e, model.id)"
+                      @error="e => handleImageError(e, model.id)"
+                    />
+                    <div
+                      v-if="!imageLoaded(model.id)"
+                      class="absolute inset-0 flex items-center justify-center"
+                    >
                       <vDefaultPic />
                     </div>
                   </div>
-                  <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30">
+                  <div
+                    class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
+                  >
                     <vTooltips :tips="model.name">
                       <h3 class="text-base text-white font-medium mb-2 truncate">
                         {{ sliceString(model.name, 24) }}
@@ -733,21 +778,37 @@ const resetState = async () => {
                     </vTooltips>
                     <div class="flex items-center space-x-3 text-white/90 text-xs">
                       <span class="flex items-center space-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                        >
                           <path
-                            d="M3.33325 2L12.6666 8L3.33325 14V2Z" 
-                            stroke="#F9FAFB" 
+                            d="M3.33325 2L12.6666 8L3.33325 14V2Z"
+                            stroke="#F9FAFB"
                             stroke-linecap="round"
-                            stroke-linejoin="round" />
+                            stroke-linejoin="round"
+                          />
                         </svg>
-                        <span class="opacity-80">{{ formatNumber(model?.counter?.used_count) }}</span>
+                        <span class="opacity-80">{{
+                          formatNumber(model?.counter?.used_count)
+                        }}</span>
                       </span>
                       <span class="flex items-center space-x-1">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <g clip-path="url(#clip0_1021_3310)">
                             <path
                               d="M9.09948 0.538851L9.09948 0.538843C9.10201 0.523701 9.09385 0.508778 9.07973 0.502729L9.09948 0.538851ZM9.09948 0.538851L8.13633 6.31781L8.03929 6.90001M9.09948 0.538851L8.03929 6.90001M8.03929 6.90001H8.62952M8.03929 6.90001H8.62952M8.62952 6.90001H13.3333C13.3459 6.90001 13.3575 6.90717 13.3631 6.91844L13.3631 6.91846M8.62952 6.90001L13.3631 6.91846M13.3631 6.91846C13.3687 6.92969 13.3675 6.94313 13.36 6.95323L13.3599 6.95335M13.3631 6.91846L13.3599 6.95335M13.3599 6.95335L6.95994 15.4867C6.95084 15.4988 6.93448 15.5033 6.9202 15.4973C6.90603 15.4913 6.89788 15.4763 6.9004 15.4612L7.86356 9.6822L7.96059 9.1M13.3599 6.95335L7.96059 9.1M7.96059 9.1H7.37037M7.96059 9.1H7.37037M7.37037 9.1H2.66663M7.37037 9.1H2.66663M2.66663 9.1C2.65402 9.1 2.64248 9.09288 2.63683 9.08159L2.66663 9.1ZM3.3333 8.23334L2.7333 9.03334L7.97452 6.9549C7.97451 6.95489 7.9745 6.95488 7.97449 6.95487C7.96816 6.94738 7.96546 6.93752 7.96707 6.92789L7.96707 6.92786L8.67416 2.68531L7.78097 2.30311L3.3333 8.23334ZM2.63682 9.08157C2.63117 9.07026 2.6324 9.05675 2.63997 9.04666L9.03994 0.513374C9.04916 0.501082 9.06559 0.496684 9.07972 0.502726L2.63682 9.08157Z"
-                              stroke="#E5E7EB" />
+                              stroke="#E5E7EB"
+                            />
                           </g>
                           <defs>
                             <clipPath id="clip0_1021_3310">
@@ -755,15 +816,28 @@ const resetState = async () => {
                             </clipPath>
                           </defs>
                         </svg>
-                        <span class="opacity-80">{{ formatNumber(model?.counter?.forked_count) }}</span>
+                        <span class="opacity-80">{{
+                          formatNumber(model?.counter?.forked_count)
+                        }}</span>
                       </span>
                       <span class="flex items-center space-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="14" viewBox="0 0 15 14" fill="none">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="15"
+                          height="14"
+                          viewBox="0 0 15 14"
+                          fill="none"
+                        >
                           <path
                             d="M4.58317 5.83329V12.8333M9.24984 3.42996L8.6665 5.83329H12.0673C12.2485 5.83329 12.4271 5.87546 12.5891 5.95646C12.7511 6.03746 12.892 6.15506 13.0007 6.29996C13.1093 6.44485 13.1828 6.61306 13.2152 6.79126C13.2476 6.96946 13.2381 7.15275 13.1873 7.32663L11.8282 11.9933C11.7575 12.2356 11.6101 12.4485 11.4082 12.6C11.2062 12.7514 10.9606 12.8333 10.7082 12.8333H2.83317C2.52375 12.8333 2.22701 12.7104 2.00821 12.4916C1.78942 12.2728 1.6665 11.976 1.6665 11.6666V6.99996C1.6665 6.69054 1.78942 6.39379 2.00821 6.175C2.22701 5.95621 2.52375 5.83329 2.83317 5.83329H4.44317C4.66022 5.83318 4.87293 5.77252 5.05739 5.65813C5.24186 5.54374 5.39075 5.38017 5.48734 5.18579L7.49984 1.16663C7.77492 1.17003 8.04568 1.23556 8.29189 1.35831C8.53809 1.48106 8.75338 1.65785 8.92166 1.87549C9.08993 2.09313 9.20686 2.34599 9.26368 2.61516C9.32051 2.88433 9.31578 3.16287 9.24984 3.42996Z"
-                            stroke="#E5E7EB" stroke-linecap="round" stroke-linejoin="round" />
+                            stroke="#E5E7EB"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
                         </svg>
-                        <span class="opacity-80">{{ formatNumber(model?.counter?.liked_count) }}</span>
+                        <span class="opacity-80">{{
+                          formatNumber(model?.counter?.liked_count)
+                        }}</span>
                       </span>
                     </div>
                   </div>

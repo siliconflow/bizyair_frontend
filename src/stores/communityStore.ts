@@ -243,13 +243,16 @@ export const useCommunityStore = defineStore('community', {
       }
     },
 
-    savePageState(page: PageType, state: {
-      currentPage: number;
-      hasMore: boolean;
-      hasPrevious: boolean;
-      loadedPages: number[];
-      scrollRatio: number;
-    }) {
+    savePageState(
+      page: PageType,
+      state: {
+        currentPage: number
+        hasMore: boolean
+        hasPrevious: boolean
+        loadedPages: number[]
+        scrollRatio: number
+      }
+    ) {
       if (this[page]) {
         this[page].lastState = {
           ...state,

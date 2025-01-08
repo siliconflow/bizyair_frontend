@@ -19,7 +19,7 @@
   import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
   import { Button } from '@/components/ui/button'
   import vDefaultPic from '@/components/modules/vDefaultPic.vue'
-  import Grid from "vue-virtual-scroll-grid"
+  import Grid from 'vue-virtual-scroll-grid'
 
   type TabType = 'posts' | 'forked'
 
@@ -39,7 +39,7 @@
 
   const loadingStates = ref({
     isLoading: false,
-    isLoadingMore: false, 
+    isLoadingMore: false,
     isGridLoading: false,
     isManualLoading: false,
     isScrolling: false,
@@ -161,7 +161,7 @@
 
   const handleScroll = throttle((e: Event) => {
     if (loadingStates.value.isManualLoading) return
-    
+
     const container = e.target as HTMLElement
     scrollState.value.showBackToTop = container.scrollTop > 500
     showBackToTop.value = scrollState.value.showBackToTop
@@ -180,14 +180,14 @@
     }
 
     loadingStates.value.isScrolling = true
-    
+
     if (scrollState.value.timer) {
       window.clearTimeout(scrollState.value.timer)
     }
-    
+
     scrollState.value.timer = window.setTimeout(() => {
       loadingStates.value.isScrolling = false
-      
+
       if (maxScroll - container.scrollTop <= 1000) {
         if (!loadingStates.value.isLoading && !loadingStates.value.isLoadingMore && hasMore.value) {
           loadMore()
@@ -200,23 +200,26 @@
     }, 150)
   }, 100)
 
-  const fetchData = async (pageNumberOrResetScroll?: number | boolean, pageSize?: number): Promise<unknown[]> => {
-    return new Promise((resolve) => {
+  const fetchData = async (
+    pageNumberOrResetScroll?: number | boolean,
+    pageSize?: number
+  ): Promise<unknown[]> => {
+    return new Promise(resolve => {
       const doFetch = async () => {
         if (typeof pageNumberOrResetScroll === 'boolean' && pageNumberOrResetScroll) {
           loadingStates.value.isGridLoading = true
         }
-        
+
         const isPageProvider = typeof pageNumberOrResetScroll === 'number'
         const mode = currentTab.value === 'posts' ? 'my' : 'my_fork'
-        
+
         const filterKey = JSON.stringify({
           ...communityStore.mine[currentTab.value].filterState,
           cacheKey: cacheKey.value,
           mode
         })
         const cachePageKey = `${filterKey}-${pageNumberOrResetScroll}`
-        
+
         if (gridCache.value.has(cachePageKey)) {
           resolve(gridCache.value.get(cachePageKey))
           return
@@ -241,17 +244,14 @@
 
           if (response?.data?.list) {
             currentState.modelListPathParams.total = response.data.total || 0
-            
+
             if (isPageProvider) {
               gridCache.value.set(cachePageKey, response.data.list)
               if (pageNumberOrResetScroll === 0) {
                 currentState.models = response.data.list
                 lastLoadedPage.value = 1
               } else {
-                currentState.models = [
-                  ...currentState.models,
-                  ...response.data.list
-                ]
+                currentState.models = [...currentState.models, ...response.data.list]
                 lastLoadedPage.value = (pageNumberOrResetScroll as number) + 1
               }
               hasMore.value = currentState.models.length < response.data.total
@@ -302,13 +302,13 @@
   const switchTab = async (tab: TabType) => {
     currentTab.value = tab
     const currentState = communityStore.mine[tab]
-    
+
     // 重置缓存状态
     cacheKey.value++
     gridCache.value.clear()
     cacheState.value.loadedPages.clear()
     cacheState.value.imageLoadStates.clear()
-    
+
     if (currentState.lastState) {
       // 恢复之前的状态
       lastLoadedPage.value = currentState.lastState.currentPage
@@ -462,25 +462,29 @@
     if (communityStore.mine && communityStore.mine[currentTab.value]?.lastState?.currentPage) {
       const targetPage = communityStore.mine[currentTab.value]?.lastState?.currentPage || 1
       const savedScrollRatio = communityStore.mine[currentTab.value]?.lastState?.scrollRatio || 0
-      
+
       if (communityStore.mine[currentTab.value]) {
         communityStore.mine[currentTab.value].modelListPathParams.current = targetPage
       }
       lastLoadedPage.value = targetPage
       hasMore.value = communityStore.mine[currentTab.value]?.lastState?.hasMore ?? true
-      
+
       try {
-        const response = await get_model_list({
-          ...communityStore.mine[currentTab.value]?.modelListPathParams,
-          mode: currentTab.value === 'posts' ? 'my' : 'my_fork'
-        }, communityStore.mine[currentTab.value]?.filterState)
+        const response = await get_model_list(
+          {
+            ...communityStore.mine[currentTab.value]?.modelListPathParams,
+            mode: currentTab.value === 'posts' ? 'my' : 'my_fork'
+          },
+          communityStore.mine[currentTab.value]?.filterState
+        )
 
         if (response?.data?.list) {
           if (communityStore.mine[currentTab.value]) {
             communityStore.mine[currentTab.value].models = response.data.list
-            communityStore.mine[currentTab.value].modelListPathParams.total = response.data.total || 0
+            communityStore.mine[currentTab.value].modelListPathParams.total =
+              response.data.total || 0
           }
-          
+
           nextTick(() => {
             setTimeout(() => {
               setScrollPosition(savedScrollRatio)
@@ -505,10 +509,13 @@
     loading.value = true
 
     try {
-      const response = await get_model_list({
-        ...communityStore.mine[currentTab.value]?.modelListPathParams,
-        mode: currentTab.value === 'posts' ? 'my' : 'my_fork'
-      }, communityStore.mine[currentTab.value]?.filterState)
+      const response = await get_model_list(
+        {
+          ...communityStore.mine[currentTab.value]?.modelListPathParams,
+          mode: currentTab.value === 'posts' ? 'my' : 'my_fork'
+        },
+        communityStore.mine[currentTab.value]?.filterState
+      )
 
       if (response?.data?.list) {
         if (communityStore.mine[currentTab.value]) {
@@ -532,7 +539,7 @@
     } finally {
       loadingStates.value.isGridLoading = false
     }
-    
+
     observer = new IntersectionObserver(
       throttle((entries: IntersectionObserverEntry[]) => {
         if (entries[0].isIntersecting) {
@@ -662,12 +669,19 @@
     <div class="flex-1 px-6 relative">
       <div class="scroll-container overflow-y-auto px-2" @scroll="handleScroll">
         <Transition name="fade">
-          <div v-if="loadingStates.isGridLoading" class="absolute inset-0 z-10 bg-black/20 backdrop-blur-sm">
+          <div
+            v-if="loadingStates.isGridLoading"
+            class="absolute inset-0 z-10 bg-black/20 backdrop-blur-sm"
+          >
             <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <div class="flex flex-col items-center space-y-4">
                 <div class="relative w-12 h-12">
-                  <div class="absolute inset-0 rounded-full border-4 border-violet-500/30 animate-ping"></div>
-                  <div class="absolute inset-0 rounded-full border-4 border-t-violet-500 animate-spin"></div>
+                  <div
+                    class="absolute inset-0 rounded-full border-4 border-violet-500/30 animate-ping"
+                  ></div>
+                  <div
+                    class="absolute inset-0 rounded-full border-4 border-t-violet-500 animate-spin"
+                  ></div>
                 </div>
                 <span class="text-white/80 text-sm">Loading...</span>
               </div>
@@ -675,27 +689,29 @@
           </div>
         </Transition>
 
-        <div 
-          v-if="!loadingStates.isGridLoading && communityStore.mine[currentTab]?.models?.length === 0"
+        <div
+          v-if="
+            !loadingStates.isGridLoading && communityStore.mine[currentTab]?.models?.length === 0
+          "
           class="flex flex-col items-center justify-center py-20 text-white/60"
         >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            class="h-16 w-16 mb-4 opacity-40" 
-            fill="none" 
-            viewBox="0 0 24 24" 
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-16 w-16 mb-4 opacity-40"
+            fill="none"
+            viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              stroke-width="1" 
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1"
               d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"
             />
-            <path 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              stroke-width="1" 
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1"
               d="M8 10h8M8 14h4"
             />
           </svg>
@@ -703,18 +719,20 @@
           <p class="text-sm mt-2">Try adjusting your filters</p>
         </div>
 
-        <transition-group 
-          v-else-if="!loadingStates.isGridLoading && communityStore.mine[currentTab]?.models?.length > 0"
-          name="grid" 
-          tag="div" 
+        <transition-group
+          v-else-if="
+            !loadingStates.isGridLoading && communityStore.mine[currentTab]?.models?.length > 0
+          "
+          name="grid"
+          tag="div"
           class="grid-container"
         >
           <Grid
             :key="cacheKey"
             :length="communityStore.mine[currentTab]?.modelListPathParams.total || 0"
-            :page-size="communityStore.mine[currentTab]?.modelListPathParams.page_size" 
+            :page-size="communityStore.mine[currentTab]?.modelListPathParams.page_size"
             :page-provider="fetchData"
-            :cache-size="1" 
+            :cache-size="1"
             :scroll-behavior="'smooth'"
             class="grid"
             @scroll="handleScroll"
@@ -726,16 +744,24 @@
             </template>
 
             <template #placeholder="{ style }">
-              <div 
+              <div
                 class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300"
                 :style="style"
               >
                 <div class="relative flex flex-col flex-1 rounded-lg bg-[#1a1a1a]">
-                  <div class="absolute left-3 top-3 w-[100px] h-[34px] bg-[#25252566] rounded-[6px] animate-pulse"></div>
-                  <div class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"></div>
+                  <div
+                    class="absolute left-3 top-3 w-[100px] h-[34px] bg-[#25252566] rounded-[6px] animate-pulse"
+                  ></div>
+                  <div
+                    class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
+                  >
+                    <div
+                      class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] animate-pulse"
+                    ></div>
                   </div>
-                  <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30">
+                  <div
+                    class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
+                  >
                     <div class="h-6 w-2/3 bg-[#25252566] rounded mb-2 animate-pulse"></div>
                     <div class="flex items-center space-x-3">
                       <div class="h-4 w-16 bg-[#25252566] rounded animate-pulse"></div>
@@ -855,7 +881,9 @@
                             stroke-linejoin="round"
                           />
                         </svg>
-                        <span class="opacity-80"> {{ formatNumber(model?.counter?.used_count) }}</span>
+                        <span class="opacity-80">
+                          {{ formatNumber(model?.counter?.used_count) }}</span
+                        >
                       </span>
                       <span class="flex items-center space-x-1">
                         <svg
@@ -877,7 +905,9 @@
                             </clipPath>
                           </defs>
                         </svg>
-                        <span class="opacity-80">{{ formatNumber(model?.counter?.forked_count) }}</span>
+                        <span class="opacity-80">{{
+                          formatNumber(model?.counter?.forked_count)
+                        }}</span>
                       </span>
                       <span class="flex items-center space-x-1">
                         <svg
@@ -894,7 +924,9 @@
                             stroke-linejoin="round"
                           />
                         </svg>
-                        <span class="opacity-80">{{ formatNumber(model?.counter?.liked_count) }}</span>
+                        <span class="opacity-80">{{
+                          formatNumber(model?.counter?.liked_count)
+                        }}</span>
                       </span>
                     </div>
                   </div>
@@ -965,7 +997,7 @@
 
 <style scoped>
   .scroll-container {
-    height: calc(80vh - 180px); 
+    height: calc(80vh - 180px);
     margin-top: 1rem;
     position: relative;
     scrollbar-width: thin;

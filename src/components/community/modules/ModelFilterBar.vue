@@ -43,7 +43,7 @@
     index === -1 ? types.push(String(type)) : types.splice(index, 1)
 
     store[props.page].filterState.selected_model_types = types
-    
+
     if (types.length === 0) {
       store[props.page].filterState.model_types = store.modelTypes.map(type => type.value)
     } else {
@@ -99,7 +99,10 @@
       }
     }
 
-    if (props.page === 'mainContent' && store[props.page].filterState.selected_model_types.length === 0) {
+    if (
+      props.page === 'mainContent' &&
+      store[props.page].filterState.selected_model_types.length === 0
+    ) {
       store[props.page].filterState.model_types = store.modelTypes.map(type => type.value)
     }
 
