@@ -822,6 +822,7 @@ watch(
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
   -webkit-overflow-scrolling: touch;
+  min-height: 400px;
 }
 
 .scroll-container::-webkit-scrollbar {
@@ -938,9 +939,11 @@ img {
   display: grid;
   grid-gap: 20px;
   grid-template-columns: repeat(2, 1fr);
-  min-height: 200px;
+  min-height: 300px;
   position: relative;
   transition: opacity 0.3s ease-in-out;
+  align-items: start;
+  height: auto;
 }
 
 @media (min-width: 768px) {
@@ -985,8 +988,12 @@ img {
 
 .item {
   background-color: transparent;
-  padding: 100px 0;
+  min-height: 300px;
+  height: 100%;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .animate-pulse {

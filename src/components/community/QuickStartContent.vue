@@ -793,13 +793,13 @@ const resetState = async () => {
 
 <style scoped>
   .scroll-container {
-    height: calc(100vh - 140px);
+    height: calc(80vh - 140px);
     margin-top: 1rem;
     position: relative;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 160px;
+    min-height: 400px;
   }
 
   .scroll-container::-webkit-scrollbar {
@@ -913,9 +913,11 @@ const resetState = async () => {
     display: grid;
     grid-gap: 20px;
     grid-template-columns: repeat(2, 1fr);
-    min-height: calc(100vh - 200px);
+    min-height: 300px;
     position: relative;
     transition: opacity 0.3s ease-in-out;
+    align-items: start;
+    height: auto;
     padding-bottom: 60px;
     margin-bottom: 40px;
   }
@@ -963,7 +965,11 @@ const resetState = async () => {
   .item {
     background-color: transparent;
     min-height: 300px;
+    height: 100%;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .grid-container {
