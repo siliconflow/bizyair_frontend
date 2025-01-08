@@ -443,8 +443,16 @@ const handleImageError = (event: Event, modelId: number | string) => {
     retryCountMap.value.set(src, retryCount + 1);
     
     fetch(src)
-      .then(response => response.blob())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.blob();
+      })
       .then(blob => {
+        if (blob.size === 0) {
+          throw new Error('Empty blob');
+        }
         const newUrl = URL.createObjectURL(blob);
         img.src = newUrl;
         URL.revokeObjectURL(src);
@@ -700,9 +708,10 @@ watch(
                       :class="{ 'opacity-0': imageLoaded(model.id) }"></div>
                     <div class="w-full h-0 pb-[150%]"></div>
                     <img
-                      :src="model.versions?.[0]?.cover_urls" 
+                      :src="Array.isArray(model.versions?.[0]?.cover_urls) ? model.versions?.[0]?.cover_urls[0] : model.versions?.[0]?.cover_urls" 
                       :alt="model.versions?.[0]?.version || model.name"
-                      :crossorigin="typeof model.versions?.[0]?.cover_urls === 'string' && model.versions?.[0]?.cover_urls?.startsWith('blob:') ? 'anonymous' : undefined"
+                      :crossorigin="typeof (Array.isArray(model.versions?.[0]?.cover_urls) ? model.versions?.[0]?.cover_urls[0] : model.versions?.[0]?.cover_urls) === 'string' && 
+                        (Array.isArray(model.versions?.[0]?.cover_urls) ? model.versions?.[0]?.cover_urls[0] : model.versions?.[0]?.cover_urls)?.startsWith('blob:') ? 'anonymous' : undefined"
                       class="absolute inset-0 w-full h-full object-cover transition-all duration-300" 
                       :class="{
                         'opacity-0': !imageLoaded(model.id),
