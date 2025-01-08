@@ -625,7 +625,36 @@ watch(
           </div>
         </Transition>
 
+        <div 
+          v-if="!loadingStates.isGridLoading && (!communityStore.mainContent.models || communityStore.mainContent.models.length === 0)"
+          class="flex flex-col items-center justify-center py-20 text-white/60"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            class="h-16 w-16 mb-4 opacity-40" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="1" 
+              d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"
+            />
+            <path 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="1" 
+              d="M8 10h8M8 14h4"
+            />
+          </svg>
+          <p class="text-lg font-medium">No Data Available</p>
+          <p class="text-sm mt-2">Try another Base Model or adjust your filters</p>
+        </div>
+
         <transition-group 
+          v-else
           name="grid"
           tag="div"
           class="grid-container"
