@@ -33,10 +33,10 @@ export interface ModelVersion {
 
 
 export interface ModelListPathParams {
-  current: number
-  page_size: number
-  mode: string
-  total:number
+  current: number 
+  page_size: number 
+  mode: string 
+  total:number 
 
 }
 
