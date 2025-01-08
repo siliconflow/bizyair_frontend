@@ -169,7 +169,6 @@
     const maxScroll = container.scrollHeight - container.clientHeight
     if (maxScroll > 0) {
       scrollState.value.ratio = container.scrollTop / maxScroll
-      // 保存滚动状态
       communityStore.mine[currentTab.value].lastState = {
         currentPage: lastLoadedPage.value,
         hasMore: hasMore.value,
@@ -374,6 +373,15 @@
     currentModel.value = model
     communityStore.showCommunityDetail = true
   }
+
+ 
+
+  watch(() => communityStore.showCommunityDetail, (newVal) => {
+    if (!newVal) {
+      currentModel.value = undefined
+      dialogLoading.value = true
+    }
+  })
 
   const handleLoaded = () => {
     dialogLoading.value = false
@@ -981,6 +989,7 @@
     >
       <div v-show="!dialogLoading">
         <ModelDetail
+          v-if="currentModel?.versions?.[0]"
           :model-id="currentModel?.id"
           :version="currentModel?.versions?.[0]"
           mode="my"

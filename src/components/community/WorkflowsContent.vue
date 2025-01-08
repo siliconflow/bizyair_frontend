@@ -336,6 +336,13 @@
     isInitialLoad.value = true
   })
 
+  watch(() => communityStore.showCommunityDetail, (newVal) => {
+    if (!newVal) {
+      currentModel.value = undefined
+      dialogLoading.value = true
+    }
+  })
+
   onMounted(async () => {
     loadingStates.value.isGridLoading = true
     try {

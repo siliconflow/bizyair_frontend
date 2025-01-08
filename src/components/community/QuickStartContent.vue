@@ -370,6 +370,13 @@
     retryCountMap.value.clear()
   })
 
+  watch(() => communityStore.showCommunityDetail, (newVal) => {
+    if (!newVal) {
+      currentModel.value = undefined
+      dialogLoading.value = true
+    }
+  })
+
   const showSortPopover = ref(false)
 
   const scrollToTop = async () => {

@@ -314,7 +314,7 @@
 
 <template>
   <div
-    v-if="model"
+    v-if="!isLoading &&model"
     class="p-6 pb-12 flex flex-col gap-4 items-start justify-start min-w-[1000px] relative shadow-[0px_20px_40px_0px_rgba(0,0,0,0.25)]"
   >
     <div class="flex flex-col gap-1.5 items-start justify-start self-stretch shrink-0 relative">

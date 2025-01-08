@@ -356,6 +356,13 @@
     }
   }
 
+  watch(() => communityStore.showCommunityDetail, (newVal) => {
+    if (!newVal) {
+      currentModel.value = undefined
+      dialogLoading.value = true
+    }
+  })
+
   onMounted(async () => {
     communityStore.mainContent.modelListPathParams.current = 1
     communityStore.mainContent.models = []
@@ -927,6 +934,7 @@
   >
     <div v-show="!dialogLoading">
       <ModelDetail
+        v-if="currentModel?.versions?.[0]"
         :model-id="currentModel?.id"
         :version="currentModel?.versions?.[0]"
         mode="publicity"
