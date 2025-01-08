@@ -24,6 +24,7 @@ import vDefaultPic from '@/components/modules/vDefaultPic.vue'
 import vTooltips from '@/components/modules/v-tooltip.vue'
 import { sliceString, formatNumber } from '@/utils/tool'
 import Grid from "vue-virtual-scroll-grid";
+
 const communityStore = useCommunityStore()
 const modelStoreInstance = modelStore()
 const comfyUIApp: any = inject('comfyUIApp')
@@ -208,36 +209,28 @@ const handleFilterChange = async () => {
       
       await nextTick()
       
-      setTimeout(() => {
-        cacheKey.value = newCacheKey
-        gridCache.value = new Map()
-        communityStore.mainContent.modelListPathParams.current = 1
-        lastLoadedPage.value = 1
-        hasMore.value = true
-        communityStore.mainContent.models = response.data.list
-        
-        if (container) {
-          requestAnimationFrame(() => {
-            container.scrollTop = 0
-          })
-        }
-        
-        setTimeout(() => {
-          isGridLoading.value = false
-        }, 300)
-      }, 300)
+      cacheKey.value = newCacheKey
+      gridCache.value = new Map()
+      communityStore.mainContent.modelListPathParams.current = 1
+      lastLoadedPage.value = 1
+      hasMore.value = true
+      communityStore.mainContent.models = response.data.list
       
+      if (container) {
+        requestAnimationFrame(() => {
+          container.scrollTop = 0
+        })
+      }
     } else {
       communityStore.mainContent.models = []
       hasMore.value = false
-      isGridLoading.value = false
     }
   } catch (error) {
     console.error('Filter change error:', error)
     useToaster.error(`Failed to filter models: ${error}`)
-    isGridLoading.value = false
   } finally {
     setTimeout(() => {
+      isGridLoading.value = false
       isFilterChange.value = false
     }, 300)
   }
@@ -501,6 +494,26 @@ watch(
   { deep: true }
 )
 
+watch(
+  () => communityStore.currentPath,
+  async () => {
+    isGridLoading.value = true
+    try {
+      communityStore.mainContent.modelListPathParams.current = 1
+      communityStore.mainContent.models = []
+      hasMore.value = true
+      cacheKey.value = 0
+      gridCache.value.clear()
+      
+      await fetchData()
+    } finally {
+      setTimeout(() => {
+        isGridLoading.value = false
+      }, 300)
+    }
+  }
+)
+
 const setScrollPosition = (ratio: number) => {
   nextTick(() => {
     const container = document.querySelector('.scroll-container')
@@ -514,15 +527,17 @@ const setScrollPosition = (ratio: number) => {
 }
 
 const resetState = async () => {
-  if (communityStore.mainContent.lastState?.currentPage) {
-    const targetPage = communityStore.mainContent.lastState.currentPage
-    const savedScrollRatio = communityStore.mainContent.lastState.scrollRatio
-    
-    communityStore.mainContent.modelListPathParams.current = targetPage
-    lastLoadedPage.value = targetPage
-    hasMore.value = communityStore.mainContent.lastState.hasMore
-    
-    try {
+  isGridLoading.value = true
+  
+  try {
+    if (communityStore.mainContent.lastState?.currentPage) {
+      const targetPage = communityStore.mainContent.lastState.currentPage
+      const savedScrollRatio = communityStore.mainContent.lastState.scrollRatio
+      
+      communityStore.mainContent.modelListPathParams.current = targetPage
+      lastLoadedPage.value = targetPage
+      hasMore.value = communityStore.mainContent.lastState.hasMore
+      
       const response = await get_model_list({
         ...communityStore.mainContent.modelListPathParams,
         current: targetPage
@@ -537,27 +552,26 @@ const resetState = async () => {
           }, 100)
         })
       }
-    } catch (error) {
-      console.error('Reset state error:', error)
+      return
     }
-    return
-  }
 
-  const container = document.querySelector('.scroll-container')
-  if (container) {
-    container.scrollTo({ top: 0, behavior: 'auto' })
-  }
-  hasMore.value = true
-  communityStore.mainContent.modelListPathParams.current = 1
-  loading.value = true
+    const container = document.querySelector('.scroll-container')
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'auto' })
+    }
+    hasMore.value = true
+    communityStore.mainContent.modelListPathParams.current = 1
+    loading.value = true
 
-  try {
     await fetchData(true)
     loadedPages.value.add(1)
   } catch (error) {
     console.error('Reset state error:', error)
   } finally {
-    loading.value = false
+    setTimeout(() => {
+      isGridLoading.value = false
+      loading.value = false
+    }, 300)
   }
 }
 
