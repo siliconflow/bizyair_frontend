@@ -3,7 +3,7 @@
     name: 'WorkflowsContent'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick, inject, watch } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, inject, watch, onActivated } from 'vue'
   import ModelFilterBar from '@/components/community/modules/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
   import { modelStore } from '@/stores/modelStatus'
@@ -26,6 +26,7 @@
   const isLoadingPrevious = ref(false)
 
   const scrollRatio = ref(0)
+  const loadedPages = ref(new Set<number>())
 
   const loadingStates = ref({
     isLoading: false,
@@ -231,10 +232,10 @@
     if (maxScroll > 0) {
       scrollState.value.ratio = container.scrollTop / maxScroll
       communityStore.workflows.lastState = {
-        currentPage: communityStore.workflows.modelListPathParams.current,
+        currentPage: lastLoadedPage.value,
         hasMore: hasMore.value,
         hasPrevious: hasPrevious.value,
-        loadedPages: Array.from(cacheState.value.loadedPages),
+        loadedPages: Array.from(loadedPages.value),
         scrollRatio: scrollState.value.ratio
       }
     }
@@ -263,6 +264,71 @@
   const loadingRef = ref<HTMLDivElement | null>(null)
   let observer: IntersectionObserver | null = null
 
+  const setScrollPosition = (ratio: number) => {
+    nextTick(() => {
+      const container = document.querySelector('.scroll-container')
+      if (container) {
+        const maxScroll = container.scrollHeight - container.clientHeight
+        if (maxScroll > 0) {
+          container.scrollTop = maxScroll * ratio
+        }
+      }
+    })
+  }
+
+  const resetState = async () => {
+    if (communityStore.workflows.lastState?.currentPage) {
+      const targetPage = communityStore.workflows.lastState.currentPage
+      const savedScrollRatio = communityStore.workflows.lastState.scrollRatio
+      
+      communityStore.workflows.modelListPathParams.current = targetPage
+      lastLoadedPage.value = targetPage
+      hasMore.value = communityStore.workflows.lastState.hasMore
+      
+      try {
+        const response = await get_model_list({
+          ...communityStore.workflows.modelListPathParams,
+          current: targetPage
+        }, communityStore.workflows.filterState)
+
+        if (response?.data?.list) {
+          communityStore.workflows.models = response.data.list
+          
+          nextTick(() => {
+            setTimeout(() => {
+              setScrollPosition(savedScrollRatio)
+            }, 100)
+          })
+        }
+      } catch (error) {
+        console.error('Reset state error:', error)
+      }
+      return
+    }
+
+    const container = document.querySelector('.scroll-container')
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'auto' })
+    }
+    hasMore.value = true
+    communityStore.workflows.modelListPathParams.current = 1
+    loading.value = true
+
+    try {
+      await fetchData(true)
+      loadedPages.value.add(1)
+    } catch (error) {
+      console.error('Reset state error:', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  onActivated(() => {
+    resetState()
+    isInitialLoad.value = true
+  })
+
   onMounted(async () => {
     loadingStates.value.isGridLoading = true
     try {
@@ -273,6 +339,23 @@
       }, 300)
     }
     
+    nextTick(() => {
+      const container = document.querySelector('.scroll-container')
+      if (container && communityStore.workflows.lastState?.scrollRatio) {
+        requestAnimationFrame(() => {
+          const maxScroll = container.scrollHeight - container.clientHeight
+          const targetScroll = Math.max(
+            0,
+            Math.min(
+              maxScroll * (communityStore.workflows.lastState?.scrollRatio ?? 0),
+              maxScroll * 0.7
+            )
+          )
+          container.scrollTop = targetScroll
+        })
+      }
+    })
+
     observer = new IntersectionObserver(
       throttle((entries: IntersectionObserverEntry[]) => {
         if (entries[0].isIntersecting) {
@@ -456,14 +539,14 @@
         if (container) {
           const maxScroll = container.scrollHeight - container.clientHeight
           if (maxScroll > 0) {
-            scrollRatio.value = Math.min(0.7, container.scrollTop / maxScroll)
+            scrollRatio.value = container.scrollTop / maxScroll
           }
 
           communityStore.workflows.lastState = {
             currentPage: communityStore.workflows.modelListPathParams.current,
             hasMore: hasMore.value,
             hasPrevious: hasPrevious.value,
-            loadedPages: Array.from(cacheState.value.loadedPages),
+            loadedPages: Array.from(loadedPages.value),
             scrollRatio: scrollRatio.value
           }
         }
@@ -811,6 +894,7 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
     -webkit-overflow-scrolling: touch;
+    min-height: 400px;
   }
 
   .scroll-container::-webkit-scrollbar {
@@ -893,16 +977,22 @@
   }
 
   .animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 25%,
+      rgba(255, 255, 255, 0.08) 37%,
+      rgba(255, 255, 255, 0.03) 63%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
   }
 
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
     }
-    50% {
-      opacity: 0.5;
+    100% {
+      background-position: 200% 0;
     }
   }
 

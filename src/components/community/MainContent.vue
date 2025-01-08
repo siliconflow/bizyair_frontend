@@ -626,7 +626,7 @@ watch(
         </Transition>
 
         <div 
-          v-if="!loadingStates.isGridLoading && (!communityStore.mainContent.models || communityStore.mainContent.models.length === 0)"
+          v-if="!isGridLoading && (!communityStore.mainContent.models || communityStore.mainContent.models.length === 0)"
           class="flex flex-col items-center justify-center py-20 text-white/60"
         >
           <svg 
