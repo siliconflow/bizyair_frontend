@@ -105,7 +105,6 @@
       store[props.page].filterState.model_types = store.modelTypes.map(type => type.value)
     }
     if ((props.page === 'posts' || props.page === 'forked') && store.modelTypes.length > 0) {
-     
       const hasWorkflow = store.modelTypes.some(type => type.value === 'Workflow')
       if (!hasWorkflow) {
         store.modelTypes.push({ label: 'Workflow', value: 'Workflow' })

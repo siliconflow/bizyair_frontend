@@ -1,87 +1,97 @@
 <script setup lang="ts">
-import { Model } from '@/types/model'
-import vDefaultPic from '@/components/modules/vDefaultPic.vue'
-import vTooltips from '@/components/modules/v-tooltip.vue'
-import vDialog from '@/components/modules/vDialog.vue'
-import ModelDetail from '@/components/community/detail/Index.vue'
-import { sliceString, formatNumber } from '@/utils/tool'
-import { useCommunityStore } from '@/stores/communityStore'
-import { ref, watch } from 'vue'
+  import { Model } from '@/types/model'
+  import vDefaultPic from '@/components/modules/vDefaultPic.vue'
+  import vTooltips from '@/components/modules/v-tooltip.vue'
+  import vDialog from '@/components/modules/vDialog.vue'
+  import ModelDetail from '@/components/community/detail/Index.vue'
+  import { sliceString, formatNumber } from '@/utils/tool'
+  import { useCommunityStore } from '@/stores/communityStore'
+  import { ref, watch } from 'vue'
 
-defineOptions({
-  name: 'ModelCard'
-})
+  defineOptions({
+    name: 'ModelCard'
+  })
 
-const communityStore = useCommunityStore()
-const dialogLoading = ref(true)
-const showDialog = ref(false)
+  const communityStore = useCommunityStore()
+  const dialogLoading = ref(true)
+  const showDialog = ref(false)
 
-const props = defineProps({
-  model: {
-    type: Object as () => Model | null,
-    default: null
-  },
-  mode: {
-    type: String,
-    default: 'publicity'
-  },
-  currentTab: {
-    type: String,
-    default: ''
-  },
-  loading: {
-    type: Boolean,
-    default: false
-  },
-  imageLoaded: {
-    type: Boolean,
-    default: false
+  const props = defineProps({
+    model: {
+      type: Object as () => Model | null,
+      default: null
+    },
+    mode: {
+      type: String,
+      default: 'publicity'
+    },
+    currentTab: {
+      type: String,
+      default: ''
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    imageLoaded: {
+      type: Boolean,
+      default: false
+    }
+  })
+
+  const emit = defineEmits(['action', 'image-load', 'image-error'])
+
+  const handleImageLoad = (e: Event) => {
+    emit('image-load', e)
   }
-})
 
-const emit = defineEmits(['action', 'image-load', 'image-error'])
-
-const handleImageLoad = (e: Event) => {
-  emit('image-load', e)
-}
-
-const handleImageError = (e: Event) => {
-  emit('image-error', e)
-}
-
-const handleDetail = () => {
-  dialogLoading.value = true
-  showDialog.value = true
-  communityStore.showCommunityDetail = true
-}
-
-const handleLoaded = () => {
-  dialogLoading.value = false
-}
-
-watch(() => communityStore.showCommunityDetail, (newVal) => {
-  if (!newVal) {
-    setTimeout(() => {
-      showDialog.value = false
-      dialogLoading.value = true
-    }, 300)
+  const handleImageError = (e: Event) => {
+    emit('image-error', e)
   }
-})
 
-watch(() => showDialog.value, (newVal) => {
-  if (!newVal) {
-    communityStore.showCommunityDetail = false
+  const handleDetail = () => {
+    dialogLoading.value = true
+    showDialog.value = true
+    communityStore.showCommunityDetail = true
   }
-})
+
+  const handleLoaded = () => {
+    dialogLoading.value = false
+  }
+
+  watch(
+    () => communityStore.showCommunityDetail,
+    newVal => {
+      if (!newVal) {
+        setTimeout(() => {
+          showDialog.value = false
+          dialogLoading.value = true
+        }, 300)
+      }
+    }
+  )
+
+  watch(
+    () => showDialog.value,
+    newVal => {
+      if (!newVal) {
+        communityStore.showCommunityDetail = false
+      }
+    }
+  )
 </script>
 
 <template>
-  <div 
+  <div
     class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
   >
-    <div class="relative flex flex-col flex-1 rounded-lg cursor-pointer overflow-hidden bg-[#1a1a1a]">
+    <div
+      class="relative flex flex-col flex-1 rounded-lg cursor-pointer overflow-hidden bg-[#1a1a1a]"
+    >
       <template v-if="!loading && model">
-        <div class="absolute left-2 top-3 min-w-[100px] h-[34px] flex items-center justify-start z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-2 rounded-[6px]">
+        <div
+          class="absolute left-2 top-3 min-w-[100px] h-[34px] flex items-center justify-start z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-2 rounded-[6px]"
+        >
           {{ model.type }}
         </div>
 
@@ -135,15 +145,14 @@ watch(() => showDialog.value, (newVal) => {
             @load="handleImageLoad"
             @error="handleImageError"
           />
-          <div
-            v-if="!props.imageLoaded"
-            class="absolute inset-0 flex items-center justify-center"
-          >
+          <div v-if="!props.imageLoaded" class="absolute inset-0 flex items-center justify-center">
             <vDefaultPic />
           </div>
         </div>
 
-        <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30">
+        <div
+          class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
+        >
           <vTooltips :tips="model.name">
             <h3 class="text-base text-white font-medium mb-2 truncate">
               {{ sliceString(model.name, 24) }}
@@ -253,20 +262,21 @@ watch(() => showDialog.value, (newVal) => {
 </template>
 
 <style scoped>
-.hover\:scale-102:hover {
-  transform: scale(1.02);
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
+  .hover\:scale-102:hover {
+    transform: scale(1.02);
   }
-  50% {
-    opacity: 0.5;
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
-}
-</style> 
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+</style>

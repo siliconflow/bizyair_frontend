@@ -1,5 +1,5 @@
 <template>
-  <div 
+  <div
     class="fixed right-8 bottom-8 z-50 cursor-pointer transition-all duration-300 hover:scale-110"
     @click="$emit('click')"
   >
@@ -22,21 +22,21 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({
-  name: 'BackToTop'
-})
+  defineOptions({
+    name: 'BackToTop'
+  })
 
-defineEmits(['click'])
+  defineEmits(['click'])
 </script>
 
 <style scoped>
-.hover\:scale-110:hover {
-  transform: scale(1.1);
-}
+  .hover\:scale-110:hover {
+    transform: scale(1.1);
+  }
 
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
-}
-</style> 
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+</style>

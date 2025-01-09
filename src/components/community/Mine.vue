@@ -24,7 +24,7 @@
   const loading = ref(false)
   const hasMore = ref(true)
   const hasPrevious = ref(false)
- 
+
   const showSortPopover = ref(false)
   const showBackToTop = ref(false)
 
@@ -93,8 +93,6 @@
       loading.value = false
     }
   }
-
-
 
   const throttle = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
     let timer: number | null = null
@@ -303,7 +301,6 @@
     }
   }
 
-
   const handleScrollToTop = async () => {
     const container = document.querySelector('.scroll-container')
     if (!container) return
@@ -464,7 +461,7 @@
   onMounted(async () => {
     loadingStates.value.isGridLoading = true
     try {
-      await resetState() 
+      await resetState()
     } finally {
       loadingStates.value.isGridLoading = false
     }
@@ -515,7 +512,7 @@
         cacheState.value.loadedPages.clear()
         cacheState.value.imageLoadStates.clear()
         communityStore.mine[currentTab.value].modelListPathParams.current = 1
-       await  fetchData(true)
+        await fetchData(true)
       }
     },
     { deep: true }
@@ -537,10 +534,7 @@
               }
             "
           />
-          <NewPostButton
-            @new-model="handleNewModel"
-            @new-workflow="handleNewWorkflow"
-          />
+          <NewPostButton @new-model="handleNewModel" @new-workflow="handleNewWorkflow" />
         </template>
 
         <template #forked>
@@ -571,7 +565,6 @@
       :on-image-error="handleImageError"
       :current-tab="currentTab"
       mode="my"
-    
       @scroll="handleScroll"
       @load-more="loadMore"
       @scroll-to-top="handleScrollToTop"
@@ -580,13 +573,12 @@
 </template>
 
 <style scoped>
-.scroll-container {
+  .scroll-container {
     height: calc(80vh - 220px);
     margin-top: 1rem;
     position: relative;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
     -webkit-overflow-scrolling: touch;
-  
   }
 </style>

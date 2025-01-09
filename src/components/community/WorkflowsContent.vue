@@ -1,249 +1,249 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, onActivated, inject } from 'vue'
-import BaseModelGrid from './modules/BaseModelGrid.vue'
-import ModelFilterBar from './modules/ModelFilterBar.vue'
-import { useCommunityStore } from '@/stores/communityStore'
-import { get_model_list, get_workflow_dowload_url } from '@/api/model'
-import { useToaster } from '@/components/modules/toats'
-import { Model } from '@/types/model'
+  import { ref, onMounted, nextTick, onActivated, inject } from 'vue'
+  import BaseModelGrid from './modules/BaseModelGrid.vue'
+  import ModelFilterBar from './modules/ModelFilterBar.vue'
+  import { useCommunityStore } from '@/stores/communityStore'
+  import { get_model_list, get_workflow_dowload_url } from '@/api/model'
+  import { useToaster } from '@/components/modules/toats'
+  import { Model } from '@/types/model'
 
-defineOptions({
-  name: 'WorkflowsContent'
-})
+  defineOptions({
+    name: 'WorkflowsContent'
+  })
 
-const communityStore = useCommunityStore()
-const comfyUIApp: any = inject('comfyUIApp')
+  const communityStore = useCommunityStore()
+  const comfyUIApp: any = inject('comfyUIApp')
 
-const loadingStates = ref({
-  isGridLoading: false,
-  isLoadingMore: false,
-  isLoading: false,
-  isManualLoading: false,
-  isScrolling: false
-})
+  const loadingStates = ref({
+    isGridLoading: false,
+    isLoadingMore: false,
+    isLoading: false,
+    isManualLoading: false,
+    isScrolling: false
+  })
 
-const cacheState = ref({
-  key: 0,
-  grid: new Map(),
-  loadedPages: new Set<number>(),
-  imageLoadStates: new Map<number | string, boolean>()
-})
+  const cacheState = ref({
+    key: 0,
+    grid: new Map(),
+    loadedPages: new Set<number>(),
+    imageLoadStates: new Map<number | string, boolean>()
+  })
 
-const hasMore = ref(true)
-const showSortPopover = ref(false)
+  const hasMore = ref(true)
+  const showSortPopover = ref(false)
 
-const retryCountMap = ref(new Map<string, number>())
-const MAX_RETRY_COUNT = 3
+  const retryCountMap = ref(new Map<string, number>())
+  const MAX_RETRY_COUNT = 3
 
-const handleLoadWorkflow = async (model: Model) => {
-  try {
-    if (!model.versions?.[0]) {
-      useToaster.error('No workflow found')
-      return
-    }
-
-    const workflow = await get_workflow_dowload_url(model.versions[0].id, model.versions[0].sign)
-
-    if (workflow.data && comfyUIApp && comfyUIApp.graph) {
-      comfyUIApp.graph.clear()
-      await comfyUIApp.loadGraphData(workflow.data)
-      communityStore.showDialog = false
-      useToaster.success('Workflow loaded successfully')
-    }
-  } catch (error) {
-    console.error('Failed to load workflow:', error)
-    useToaster.error(`Failed to load workflow: ${error}`)
-  }
-}
-
-const handleFilterChange = async () => {
-  loadingStates.value.isGridLoading = true
-  cacheState.value.key += 1
-  
-  try {
-    communityStore.workflows.modelListPathParams.current = 1
-    communityStore.workflows.models = []
-    hasMore.value = true
-    
-    await nextTick()
-    await new Promise(resolve => setTimeout(resolve, 100))
-    
-    await fetchData(0, communityStore.workflows.modelListPathParams.page_size)
-        } catch (error) {
-    console.error('Filter change error:', error)
-    useToaster.error(`Failed to filter models: ${error}`)
-        } finally {
-            setTimeout(() => {
-              loadingStates.value.isGridLoading = false
-            }, 300)
-          }
-}
-
-const handleScroll = (e: Event) => {
-  const container = e.target as HTMLElement
-  const maxScroll = container.scrollHeight - container.clientHeight
-  if (maxScroll > 0) {
-    communityStore.workflows.lastState = {
-      currentPage: communityStore.workflows.modelListPathParams.current,
-      hasMore: hasMore.value,
-      hasPrevious: true,
-      loadedPages: Array.from(cacheState.value.loadedPages),
-      scrollRatio: container.scrollTop / maxScroll,
-      totalItems: communityStore.workflows.modelListPathParams.total
-    }
-  }
-  }
-
-  const loadMore = async () => {
-  if (loadingStates.value.isLoadingMore || !hasMore.value) return
-  loadingStates.value.isLoadingMore = true
-
-  try {
-    const currentPage = communityStore.workflows.modelListPathParams.current
-    const pageSize = communityStore.workflows.modelListPathParams.page_size
-    const total = communityStore.workflows.modelListPathParams.total
-
-    if (currentPage * pageSize >= total) {
-        hasMore.value = false
+  const handleLoadWorkflow = async (model: Model) => {
+    try {
+      if (!model.versions?.[0]) {
+        useToaster.error('No workflow found')
         return
       }
 
-    communityStore.workflows.modelListPathParams.current = currentPage + 1
-    await fetchData(currentPage, pageSize)
-    
-    hasMore.value = (currentPage + 1) * pageSize < total
+      const workflow = await get_workflow_dowload_url(model.versions[0].id, model.versions[0].sign)
+
+      if (workflow.data && comfyUIApp && comfyUIApp.graph) {
+        comfyUIApp.graph.clear()
+        await comfyUIApp.loadGraphData(workflow.data)
+        communityStore.showDialog = false
+        useToaster.success('Workflow loaded successfully')
+      }
     } catch (error) {
-    console.error('Load more error:', error)
-    useToaster.error(`Failed to load more: ${error}`)
-    } finally {
-    loadingStates.value.isLoadingMore = false
+      console.error('Failed to load workflow:', error)
+      useToaster.error(`Failed to load workflow: ${error}`)
     }
   }
 
-const scrollToTop = () => {
-    const container = document.querySelector('.scroll-container')
-  if (container) {
-    container.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-}
-
-const fetchData = async (pageNumber: number, pageSize: number): Promise<unknown[]> => {
-      try {
-        const response = await get_model_list(
-          {
-            ...communityStore.workflows.modelListPathParams,
-        current: pageNumber + 1,
-        page_size: pageSize
-          },
-          communityStore.workflows.filterState
-        )
-
-        if (response?.data?.list) {
-      communityStore.workflows.modelListPathParams.total = response.data.total || 0
-      
-      if (pageNumber === 0) {
-          communityStore.workflows.models = response.data.list
-      } else {
-        communityStore.workflows.models = [
-          ...communityStore.workflows.models,
-          ...response.data.list
-        ]
-      }
-
-      return response.data.list
-    }
-    return []
-      } catch (error) {
-    console.error('Fetch data error:', error)
-    useToaster.error(`Failed to fetch data: ${error}`)
-    return []
-      }
-    }
-
-const restoreScrollPosition = () => {
-  const scrollRatio = communityStore.workflows?.lastState?.scrollRatio
-  if (typeof scrollRatio === 'number') {
-    nextTick(() => {
-      setTimeout(() => {
-    const container = document.querySelector('.scroll-container')
-    if (container) {
-          const maxScroll = container.scrollHeight - container.clientHeight
-          if (maxScroll > 0) {
-            container.scrollTop = maxScroll * scrollRatio
-            setTimeout(() => {
-              const newMaxScroll = container.scrollHeight - container.clientHeight
-              if (newMaxScroll !== maxScroll) {
-                container.scrollTop = newMaxScroll * scrollRatio
-              }
-            }, 200)
-          }
-        }
-      }, 300)
-    })
-  }
-}
-
-  onMounted(async () => {
+  const handleFilterChange = async () => {
     loadingStates.value.isGridLoading = true
+    cacheState.value.key += 1
+
     try {
-    communityStore.workflows.modelListPathParams.current = 1
-    await fetchData(0, communityStore.workflows.modelListPathParams.page_size)
-    await nextTick()
-    restoreScrollPosition()
+      communityStore.workflows.modelListPathParams.current = 1
+      communityStore.workflows.models = []
+      hasMore.value = true
+
+      await nextTick()
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      await fetchData(0, communityStore.workflows.modelListPathParams.page_size)
+    } catch (error) {
+      console.error('Filter change error:', error)
+      useToaster.error(`Failed to filter models: ${error}`)
     } finally {
       setTimeout(() => {
         loadingStates.value.isGridLoading = false
       }, 300)
-  }
-})
-
-onActivated(async () => {
-  if (communityStore.workflows?.lastState) {
-    loadingStates.value.isGridLoading = true
-    try {
-      const targetPage = communityStore.workflows.lastState.currentPage || 1
-      communityStore.workflows.modelListPathParams.current = targetPage
-      await fetchData(targetPage - 1, communityStore.workflows.modelListPathParams.page_size)
-      
-      await nextTick()
-      await new Promise<void>(resolve => {
-        setTimeout(() => {
-    const container = document.querySelector('.scroll-container')
-    if (container) {
-            const maxScroll = container.scrollHeight - container.clientHeight
-            const savedRatio = communityStore.workflows?.lastState?.scrollRatio ?? 0
-            if (maxScroll > 0 && typeof savedRatio === 'number') {
-              container.scrollTop = maxScroll * savedRatio
-            }
-          }
-          resolve()
-        }, 100)
-      })
-    } finally {
-      loadingStates.value.isGridLoading = false
     }
   }
-})
 
-const handleImageLoad = (_e: Event, modelId: number | string) => {
+  const handleScroll = (e: Event) => {
+    const container = e.target as HTMLElement
+    const maxScroll = container.scrollHeight - container.clientHeight
+    if (maxScroll > 0) {
+      communityStore.workflows.lastState = {
+        currentPage: communityStore.workflows.modelListPathParams.current,
+        hasMore: hasMore.value,
+        hasPrevious: true,
+        loadedPages: Array.from(cacheState.value.loadedPages),
+        scrollRatio: container.scrollTop / maxScroll,
+        totalItems: communityStore.workflows.modelListPathParams.total
+      }
+    }
+  }
+
+  const loadMore = async () => {
+    if (loadingStates.value.isLoadingMore || !hasMore.value) return
+    loadingStates.value.isLoadingMore = true
+
+    try {
+      const currentPage = communityStore.workflows.modelListPathParams.current
+      const pageSize = communityStore.workflows.modelListPathParams.page_size
+      const total = communityStore.workflows.modelListPathParams.total
+
+      if (currentPage * pageSize >= total) {
+        hasMore.value = false
+        return
+      }
+
+      communityStore.workflows.modelListPathParams.current = currentPage + 1
+      await fetchData(currentPage, pageSize)
+
+      hasMore.value = (currentPage + 1) * pageSize < total
+    } catch (error) {
+      console.error('Load more error:', error)
+      useToaster.error(`Failed to load more: ${error}`)
+    } finally {
+      loadingStates.value.isLoadingMore = false
+    }
+  }
+
+  const scrollToTop = () => {
+    const container = document.querySelector('.scroll-container')
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const fetchData = async (pageNumber: number, pageSize: number): Promise<unknown[]> => {
+    try {
+      const response = await get_model_list(
+        {
+          ...communityStore.workflows.modelListPathParams,
+          current: pageNumber + 1,
+          page_size: pageSize
+        },
+        communityStore.workflows.filterState
+      )
+
+      if (response?.data?.list) {
+        communityStore.workflows.modelListPathParams.total = response.data.total || 0
+
+        if (pageNumber === 0) {
+          communityStore.workflows.models = response.data.list
+        } else {
+          communityStore.workflows.models = [
+            ...communityStore.workflows.models,
+            ...response.data.list
+          ]
+        }
+
+        return response.data.list
+      }
+      return []
+    } catch (error) {
+      console.error('Fetch data error:', error)
+      useToaster.error(`Failed to fetch data: ${error}`)
+      return []
+    }
+  }
+
+  const restoreScrollPosition = () => {
+    const scrollRatio = communityStore.workflows?.lastState?.scrollRatio
+    if (typeof scrollRatio === 'number') {
+      nextTick(() => {
+        setTimeout(() => {
+          const container = document.querySelector('.scroll-container')
+          if (container) {
+            const maxScroll = container.scrollHeight - container.clientHeight
+            if (maxScroll > 0) {
+              container.scrollTop = maxScroll * scrollRatio
+              setTimeout(() => {
+                const newMaxScroll = container.scrollHeight - container.clientHeight
+                if (newMaxScroll !== maxScroll) {
+                  container.scrollTop = newMaxScroll * scrollRatio
+                }
+              }, 200)
+            }
+          }
+        }, 300)
+      })
+    }
+  }
+
+  onMounted(async () => {
+    loadingStates.value.isGridLoading = true
+    try {
+      communityStore.workflows.modelListPathParams.current = 1
+      await fetchData(0, communityStore.workflows.modelListPathParams.page_size)
+      await nextTick()
+      restoreScrollPosition()
+    } finally {
+      setTimeout(() => {
+        loadingStates.value.isGridLoading = false
+      }, 300)
+    }
+  })
+
+  onActivated(async () => {
+    if (communityStore.workflows?.lastState) {
+      loadingStates.value.isGridLoading = true
+      try {
+        const targetPage = communityStore.workflows.lastState.currentPage || 1
+        communityStore.workflows.modelListPathParams.current = targetPage
+        await fetchData(targetPage - 1, communityStore.workflows.modelListPathParams.page_size)
+
+        await nextTick()
+        await new Promise<void>(resolve => {
+          setTimeout(() => {
+            const container = document.querySelector('.scroll-container')
+            if (container) {
+              const maxScroll = container.scrollHeight - container.clientHeight
+              const savedRatio = communityStore.workflows?.lastState?.scrollRatio ?? 0
+              if (maxScroll > 0 && typeof savedRatio === 'number') {
+                container.scrollTop = maxScroll * savedRatio
+              }
+            }
+            resolve()
+          }, 100)
+        })
+      } finally {
+        loadingStates.value.isGridLoading = false
+      }
+    }
+  })
+
+  const handleImageLoad = (_e: Event, modelId: number | string) => {
     cacheState.value.imageLoadStates.set(modelId, true)
   }
 
-const handleImageError = async (e: Event, modelId: number | string) => {
-  const img = e.target as HTMLImageElement
+  const handleImageError = async (e: Event, modelId: number | string) => {
+    const img = e.target as HTMLImageElement
     const src = img.src
 
-  if (!retryCountMap.value.has(src)) {
-    retryCountMap.value.set(src, 0)
-  }
-  
-  const retryCount = retryCountMap.value.get(src) || 0
-  if (retryCount < MAX_RETRY_COUNT) {
+    if (!retryCountMap.value.has(src)) {
+      retryCountMap.value.set(src, 0)
+    }
+
+    const retryCount = retryCountMap.value.get(src) || 0
+    if (retryCount < MAX_RETRY_COUNT) {
       retryCountMap.value.set(src, retryCount + 1)
-    img.src = src
-  } else {
-          cacheState.value.imageLoadStates.set(modelId, false)
-          retryCountMap.value.delete(src)
+      img.src = src
+    } else {
+      cacheState.value.imageLoadStates.set(modelId, false)
+      retryCountMap.value.delete(src)
     }
   }
 </script>
@@ -260,7 +260,7 @@ const handleImageError = async (e: Event, modelId: number | string) => {
 
     <BaseModelGrid
       :models="communityStore.workflows.models"
-      :loading="loadingStates.isGridLoading" 
+      :loading="loadingStates.isGridLoading"
       :total="communityStore.workflows.modelListPathParams.total"
       :page-size="communityStore.workflows.modelListPathParams.page_size"
       :cache-key="cacheState.key"
