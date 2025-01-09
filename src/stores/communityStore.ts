@@ -39,7 +39,8 @@ export const useCommunityStore = defineStore('community', {
         hasMore: true,
         hasPrevious: false,
         loadedPages: [],
-        scrollRatio: 0
+        scrollRatio: 0,
+        totalItems: 0
       }
     } as PageState,
     quickStart: {
@@ -65,7 +66,8 @@ export const useCommunityStore = defineStore('community', {
         hasMore: true,
         hasPrevious: false,
         loadedPages: [],
-        scrollRatio: 0
+        scrollRatio: 0,
+        totalItems: 0
       }
     } as PageState,
     workflows: {
@@ -91,7 +93,8 @@ export const useCommunityStore = defineStore('community', {
         hasMore: true,
         hasPrevious: false,
         loadedPages: [],
-        scrollRatio: 0
+        scrollRatio: 0,
+        totalItems: 0
       }
     } as PageState,
 
@@ -119,7 +122,8 @@ export const useCommunityStore = defineStore('community', {
           hasMore: true,
           hasPrevious: false,
           loadedPages: [],
-          scrollRatio: 0
+          scrollRatio: 0,
+          totalItems: 0
         }
       } as PageState,
       forked: {
@@ -145,7 +149,8 @@ export const useCommunityStore = defineStore('community', {
           hasMore: true,
           hasPrevious: false,
           loadedPages: [],
-          scrollRatio: 0
+          scrollRatio: 0,
+          totalItems: 0
         }
       } as PageState
     },
@@ -256,7 +261,8 @@ export const useCommunityStore = defineStore('community', {
       if (this[page]) {
         this[page].lastState = {
           ...state,
-          loadedPages: [...state.loadedPages]
+          loadedPages: [...state.loadedPages],
+          totalItems: 0
         }
       }
     },
