@@ -104,15 +104,12 @@
     ) {
       store[props.page].filterState.model_types = store.modelTypes.map(type => type.value)
     }
-    console.log('props.page',props.page)
-
     if ((props.page === 'posts' || props.page === 'forked') && store.modelTypes.length > 0) {
      
       const hasWorkflow = store.modelTypes.some(type => type.value === 'Workflow')
       if (!hasWorkflow) {
         store.modelTypes.push({ label: 'Workflow', value: 'Workflow' })
       }
-      console.log('store.modelTypes', store.modelTypes)
     }
 
     await nextTick()

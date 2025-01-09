@@ -1,3 +1,10 @@
+declare global {
+  interface Window {
+    LiteGraph: any
+    LGraphCanvas: any
+  }
+}
+
 export type ModeType = 'my' | 'my_fork' | 'publicity'
 
 export type SortValue = 'Recently' | 'Most Forked' | 'Most Used'
@@ -85,6 +92,7 @@ export interface PageState {
     hasPrevious: boolean;
     loadedPages: number[];
     scrollRatio: number;
+    totalItems: number;
   };
 }
 
