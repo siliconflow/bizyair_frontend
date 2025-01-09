@@ -50,7 +50,6 @@
       store[props.page].filterState.model_types = types
     }
 
-    // 重置分页状态
     store[props.page].modelListPathParams.current = 1
 
     await nextTick()
@@ -105,12 +104,15 @@
     ) {
       store[props.page].filterState.model_types = store.modelTypes.map(type => type.value)
     }
+    console.log('props.page',props.page)
 
     if ((props.page === 'posts' || props.page === 'forked') && store.modelTypes.length > 0) {
+     
       const hasWorkflow = store.modelTypes.some(type => type.value === 'Workflow')
       if (!hasWorkflow) {
-        store[props.page].modelTypes.push({ label: 'Workflow', value: 'Workflow' })
+        store.modelTypes.push({ label: 'Workflow', value: 'Workflow' })
       }
+      console.log('store.modelTypes', store.modelTypes)
     }
 
     await nextTick()

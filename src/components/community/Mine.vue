@@ -31,11 +31,9 @@
   const loading = ref(false)
   const hasMore = ref(true)
   const hasPrevious = ref(false)
-  const isLoadingPrevious = ref(false)
+ 
   const showSortPopover = ref(false)
   const showBackToTop = ref(false)
-
-  const SCROLL_THRESHOLD = 100
 
   const loadingStates = ref({
     isLoading: false,
@@ -103,50 +101,7 @@
     }
   }
 
-  const loadPrevious = async () => {
-    if (isLoadingPrevious.value || !hasPrevious.value) return
-    const container = document.querySelector('.scroll-container')
-    if (!container || container.scrollTop > SCROLL_THRESHOLD) return
 
-    isLoadingPrevious.value = true
-
-    try {
-      const currentState = communityStore.mine[currentTab.value]
-      const prevPage = currentState.modelListPathParams.current - 1
-      if (prevPage < 1) {
-        hasPrevious.value = false
-        return
-      }
-
-      currentState.modelListPathParams.current = prevPage
-      const mode = currentTab.value === 'posts' ? 'my' : 'my_fork'
-      const response = await get_model_list(
-        {
-          ...currentState.modelListPathParams,
-          mode
-        },
-        currentState.filterState
-      )
-
-      if (response?.data?.list) {
-        currentState.models = [...response.data.list, ...currentState.models]
-        currentState.modelListPathParams.total = response.data.total
-        hasPrevious.value = prevPage > 1
-        hasMore.value = currentState.models.length < response.data.total
-
-        await nextTick()
-        const firstNewItem = container.querySelector('.playground-container > div')
-        if (firstNewItem) {
-          firstNewItem.scrollIntoView({ behavior: 'auto', block: 'start' })
-          container.scrollBy(0, 10)
-        }
-      }
-    } catch (error) {
-      useToaster.error(`Failed to load previous data: ${error}`)
-    } finally {
-      isLoadingPrevious.value = false
-    }
-  }
 
   const throttle = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
     let timer: number | null = null
@@ -191,10 +146,6 @@
         if (!loadingStates.value.isLoading && !loadingStates.value.isLoadingMore && hasMore.value) {
           loadMore()
         }
-      }
-
-      if (container.scrollTop < SCROLL_THRESHOLD && hasPrevious.value && !isLoadingPrevious.value) {
-        loadPrevious()
       }
     }, 150)
   }, 100)
@@ -302,14 +253,12 @@
     currentTab.value = tab
     const currentState = communityStore.mine[tab]
 
-    // 重置缓存状态
     cacheKey.value++
     gridCache.value.clear()
     cacheState.value.loadedPages.clear()
     cacheState.value.imageLoadStates.clear()
 
     if (currentState.lastState) {
-      // 恢复之前的状态
       lastLoadedPage.value = currentState.lastState.currentPage
       hasMore.value = currentState.lastState.hasMore ?? true
       hasPrevious.value = currentState.lastState.hasPrevious
@@ -319,7 +268,6 @@
       await fetchData(true)
       setScrollPosition(currentState.lastState.scrollRatio)
     } else {
-      // 确保从第一页开始
       currentState.modelListPathParams.current = 1
       lastLoadedPage.value = 1
       await fetchData(true)
@@ -543,7 +491,7 @@
   onMounted(async () => {
     loadingStates.value.isGridLoading = true
     try {
-      await resetState() // 初始化时调用 resetState
+      await resetState() 
     } finally {
       loadingStates.value.isGridLoading = false
     }
@@ -589,7 +537,8 @@
     () => communityStore.reload,
     async (newVal: number, oldVal: number) => {
       if (newVal !== oldVal) {
-        await fetchData()
+        communityStore.mine[currentTab.value].modelListPathParams.current = 1
+       await  fetchData(true)
       }
     },
     { deep: true }
@@ -606,7 +555,7 @@
             page="posts"
             @fetch-data="
               () => {
-                communityStore.mine.posts.modelListPathParams.current = 1
+                communityStore.mine[currentTab].modelListPathParams.current = 1
                 fetchData(true)
               }
             "

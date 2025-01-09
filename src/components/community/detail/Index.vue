@@ -604,10 +604,12 @@
             class="flex flex-row gap-1.5 items-start justify-start self-stretch shrink-0 relative"
           >
             <Button
+              v-if="mode !== 'my' && mode !== 'my_fork'"
               variant="default"
               class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
               :disabled="currentVersion?.forked"
               @click="handleFork"
+             
             >
               {{ currentVersion?.forked ? 'Forked' : 'Fork' }}
             </Button>
