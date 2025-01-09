@@ -54,11 +54,11 @@
 
         loraLoaderNode.widgets_values = widgetValues
         if (loraLoaderNode.widgets) {
-        loraLoaderNode.widgets.forEach((widget: any, index: number) => {
-          if (widget && widgetValues[index] !== undefined) {
-            widget.value = widgetValues[index]
-          }
-        })
+          loraLoaderNode.widgets.forEach((widget: any, index: number) => {
+            if (widget && widgetValues[index] !== undefined) {
+              widget.value = widgetValues[index]
+            }
+          })
         }
         const currentConfig = canvas.graph.serialize()
         const nodeCount = currentConfig.nodes?.length || 0
