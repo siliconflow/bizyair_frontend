@@ -1006,13 +1006,13 @@
 
 <style scoped>
   .scroll-container {
-    height: calc(80vh - 180px);
+    height: calc(80vh - 220px);
     margin-top: 1rem;
     position: relative;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
     -webkit-overflow-scrolling: touch;
-    min-height: 400px;
+  
   }
 
   .scroll-container::-webkit-scrollbar {
