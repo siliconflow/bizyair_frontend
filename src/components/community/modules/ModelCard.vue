@@ -21,6 +21,14 @@ const props = defineProps({
     type: Object as () => Model | null,
     default: null
   },
+  mode: {
+    type: String,
+    default: 'publicity'
+  },
+  currentTab: {
+    type: String,
+    default: ''
+  },
   loading: {
     type: Boolean,
     default: false
@@ -232,7 +240,8 @@ watch(() => showDialog.value, (newVal) => {
         <ModelDetail
           :model-id="model?.id || ''"
           :version="model?.versions?.[0]"
-          mode="publicity"
+          :mode="mode"
+          :current-tab="currentTab"
           @loaded="handleLoaded"
         />
       </div>

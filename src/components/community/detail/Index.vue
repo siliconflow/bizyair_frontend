@@ -486,7 +486,7 @@
             </defs>
           </svg>
           <Popover
-            v-if="currentTab === 'posts' || currentTab === 'forked'"
+            v-if="mode === 'my'"
             class="bg-[#353535]"
             :open="downloadOpen"
             @update:open="handleDownload"

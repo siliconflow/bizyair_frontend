@@ -344,6 +344,7 @@ onActivated(async () => {
       :image-load-states="cacheState.imageLoadStates"
       :on-image-load="handleImageLoad"
       :on-image-error="handleImageError"
+      mode="publicity"
       @scroll="handleScroll"
       @load-more="loadMore"
       @scroll-to-top="scrollToTop"

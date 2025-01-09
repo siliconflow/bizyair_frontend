@@ -16,6 +16,14 @@ defineOptions({
     type: Array as () => Model[],
     required: true
   },
+  mode: {
+    type: String,
+    required: true
+  },
+  currentTab: {
+    type: String,
+    default: ''
+  },
   loading: {
     type: Boolean,
     default: false
@@ -142,6 +150,8 @@ onUnmounted(() => {
               <ModelCard
                 :model="model"
                 :style="style"
+                :mode="mode"
+                :current-tab="currentTab"
                 :image-loaded="imageLoadStates.get(model.id) ?? false"
                 @action="onModelAction(model)"
                 @detail="emit('showDetail', model)"
