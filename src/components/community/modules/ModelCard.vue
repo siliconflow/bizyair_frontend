@@ -79,7 +79,7 @@ watch(() => showDialog.value, (newVal) => {
 
         <div
           class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
-          @click.stop="$emit('action', model)"
+          @click.prevent.stop="$emit('action', model)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +103,7 @@ watch(() => showDialog.value, (newVal) => {
 
         <div
           class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
-          @click="handleDetail"
+          @click.prevent="handleDetail"
         >
           <div
             class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a]"

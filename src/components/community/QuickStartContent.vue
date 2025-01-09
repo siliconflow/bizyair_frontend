@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted , nextTick , onActivated } from 'vue'
+import { ref, onMounted , nextTick , onActivated, inject } from 'vue'
 import BaseModelGrid from './modules/BaseModelGrid.vue'
 import ModelFilterBar from './modules/ModelFilterBar.vue'
 import { useCommunityStore } from '@/stores/communityStore'
 
-import { get_model_list } from '@/api/model'
+import { get_model_list, get_workflow_dowload_url } from '@/api/model'
 import { useToaster } from '@/components/modules/toats'
 import { Model } from '@/types/model'
 
@@ -35,40 +35,26 @@ const showSortPopover = ref(false)
 const retryCountMap = ref(new Map<string, number>())
 const MAX_RETRY_COUNT = 3
 
-const handleAddNode = async (model: Model) => {
+const comfyUIApp: any = inject('comfyUIApp')
+
+const handleLoadWorkflow = async (model: Model) => {
   try {
-    let nodeID = model.type === 'LoRA' ? 'BizyAir_LoraLoader' : 'BizyAir_ControlNetLoader'
-    let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
-    const canvas = window.LGraphCanvas?.active_canvas
+    if (!model.versions?.[0]) {
+      useToaster.error('No workflow found')
+      return
+    }
 
-    if (loraLoaderNode && canvas) {
-      loraLoaderNode.title = model.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
-      loraLoaderNode.color = '#7C3AED'
+    const workflow = await get_workflow_dowload_url(model.versions[0].id, model.versions[0].sign)
 
-      const widgetValues = model.type === 'LoRA'
-          ? [model.name, 1.0, 1.0, model.versions?.[0]?.id || '']
-          : [model.name, model.versions?.[0]?.id || '']
-
-      loraLoaderNode.widgets_values = widgetValues
-
-      const currentConfig = canvas.graph.serialize()
-      const nodeCount = currentConfig.nodes?.length || 0
-
-      const visibleRect = canvas.visible_area
-      const offsetX = (nodeCount % 3) * 30
-      const offsetY = Math.floor(nodeCount / 3) * 25
-      const baseX = visibleRect ? visibleRect[0] + 100 : 100
-      const baseY = visibleRect ? visibleRect[1] + 100 : 100
-
-      loraLoaderNode.pos = [baseX + offsetX, baseY + offsetY]
-
-      canvas.graph.add(loraLoaderNode)
+    if (workflow.data && comfyUIApp && comfyUIApp.graph) {
+      comfyUIApp.graph.clear()
+      await comfyUIApp.loadGraphData(workflow.data)
       communityStore.showDialog = false
-      useToaster.success('Node added successfully')
+      useToaster.success('Workflow loaded successfully')
     }
   } catch (error) {
-    console.error('Failed to add node:', error)
-    useToaster.error(`Failed to add node: ${error}`)
+    console.error('Failed to load workflow:', error)
+    useToaster.error(`Failed to load workflow: ${error}`)
   }
 }
 
@@ -281,7 +267,7 @@ const handleImageError = async (e: Event, modelId: number | string) => {
       :page-size="communityStore.quickStart.modelListPathParams.page_size"
       :cache-key="cacheState.key"
       :on-fetch-data="fetchData"
-      :on-model-action="handleAddNode"
+      :on-model-action="handleLoadWorkflow"
       :image-load-states="cacheState.imageLoadStates"
       :on-image-load="handleImageLoad"
       :on-image-error="handleImageError"

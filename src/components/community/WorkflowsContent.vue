@@ -1,32 +1,33 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, onActivated } from 'vue'
+import { ref, onMounted, nextTick, onActivated, inject } from 'vue'
 import BaseModelGrid from './modules/BaseModelGrid.vue'
 import ModelFilterBar from './modules/ModelFilterBar.vue'
 import { useCommunityStore } from '@/stores/communityStore'
-import { get_model_list } from '@/api/model'
+import { get_model_list, get_workflow_dowload_url } from '@/api/model'
 import { useToaster } from '@/components/modules/toats'
 import { Model } from '@/types/model'
 
-  defineOptions({
-    name: 'WorkflowsContent'
-  })
+defineOptions({
+  name: 'WorkflowsContent'
+})
 
-  const communityStore = useCommunityStore()
+const communityStore = useCommunityStore()
+const comfyUIApp: any = inject('comfyUIApp')
 
-  const loadingStates = ref({
+const loadingStates = ref({
   isGridLoading: false,
   isLoadingMore: false,
-    isLoading: false,
-    isManualLoading: false,
+  isLoading: false,
+  isManualLoading: false,
   isScrolling: false
-  })
+})
 
-  const cacheState = ref({
-    key: 0,
-    grid: new Map(),
-    loadedPages: new Set<number>(),
-    imageLoadStates: new Map<number | string, boolean>()
-  })
+const cacheState = ref({
+  key: 0,
+  grid: new Map(),
+  loadedPages: new Set<number>(),
+  imageLoadStates: new Map<number | string, boolean>()
+})
 
 const hasMore = ref(true)
 const showSortPopover = ref(false)
@@ -34,29 +35,21 @@ const showSortPopover = ref(false)
 const retryCountMap = ref(new Map<string, number>())
 const MAX_RETRY_COUNT = 3
 
-const handleAddNode = async (model: Model) => {
+const handleLoadWorkflow = async (model: Model) => {
   try {
-    const canvas = window.LGraphCanvas?.active_canvas
-    if (!canvas) {
-      useToaster.error('Canvas not found')
+    if (!model.versions?.[0]) {
+      useToaster.error('No workflow found')
       return
     }
 
-    const response = await get_workflow_dowload_url(model.versions?.[0]?.id)
-    if (!response?.data?.url) {
-      useToaster.error('Failed to get workflow download url')
-      return
+    const workflow = await get_workflow_dowload_url(model.versions[0].id, model.versions[0].sign)
+
+    if (workflow.data && comfyUIApp && comfyUIApp.graph) {
+      comfyUIApp.graph.clear()
+      await comfyUIApp.loadGraphData(workflow.data)
+      communityStore.showDialog = false
+      useToaster.success('Workflow loaded successfully')
     }
-
-    const workflowJson = await fetch(response.data.url).then(res => res.json())
-    if (!workflowJson) {
-      useToaster.error('Failed to load workflow')
-          return
-        }
-
-    canvas.graph.configure(workflowJson)
-    communityStore.showDialog = false
-    useToaster.success('Workflow loaded successfully')
   } catch (error) {
     console.error('Failed to load workflow:', error)
     useToaster.error(`Failed to load workflow: ${error}`)
@@ -272,7 +265,7 @@ const handleImageError = async (e: Event, modelId: number | string) => {
       :page-size="communityStore.workflows.modelListPathParams.page_size"
       :cache-key="cacheState.key"
       :on-fetch-data="fetchData"
-      :on-model-action="handleAddNode"
+      :on-model-action="handleLoadWorkflow"
       :image-load-states="cacheState.imageLoadStates"
       :on-image-load="handleImageLoad"
       :on-image-error="handleImageError"
@@ -280,5 +273,5 @@ const handleImageError = async (e: Event, modelId: number | string) => {
       @load-more="loadMore"
       @scroll-to-top="scrollToTop"
     />
-              </div>
-            </template>
+  </div>
+</template>
