@@ -83,9 +83,6 @@ jobs:
         run: |
           mkdir -p ComfyUI/user/default
           cp -r ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests/workflows ComfyUI/user/default
-          python3 ComfyUI/custom_nodes/BizyAir/tests/write_api_ini_file.py
-        env:
-          BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
 
       - name: Update bizyair_frontend.js
         run: |
@@ -93,15 +90,12 @@ jobs:
           npx vite build
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend
 
-      - name: Start ComfyUI server
-        run: |
-          python main.py --cpu &
-          wait-for-it --service 127.0.0.1:8188 -t 600
-        working-directory: ComfyUI
-
       - name: Run Tests
+        env:
+          BIZYAIR_KEY: ${{ secrets.BIZYAIR_KEY }}
+          COMFY_PATH: "../../../.."
         run: |
-          npx playwright test --project chromium chromium-2x --workers=4
+          npx playwright test --workers=2
         working-directory: ComfyUI/custom_nodes/BizyAir/bizyair_frontend/browser_tests
 
       - uses: actions/upload-artifact@v4
