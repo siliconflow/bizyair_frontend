@@ -21,7 +21,8 @@
   const props = defineProps<Props>()
   const modes = ['my', 'my_fork', 'publicity'] as const
 
-  const tabLabels: Record<ModeType, string> = {
+  type NewModeType = Exclude<ModeType, 'official'>
+  const tabLabels: Record<NewModeType, string> = {
     my: 'My Models',
     my_fork: 'My Forks',
     publicity: 'Community Models'
