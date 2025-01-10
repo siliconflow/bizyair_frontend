@@ -2,9 +2,9 @@
   <div
     @click="toshowDrawer"
     variant="outline"
-    class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3"
+    class="profile-container"
   >
-    <span class="mr-1">
+    <span class="icon-container">
       <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
         <g
           fill="none"
@@ -18,69 +18,70 @@
         </g>
       </svg>
     </span>
-    <span class="block leading h-full leading-8 text-sm">Profile</span>
+    <span class="profile-text">Profile</span>
   </div>
-  <vDrawer v-model:open="showDrawer">
-    <div class="bizyair-profile-primary flex items-center">
-      <img :src="profileImageSrc" alt="Profile Image" />
-      <div v-if="statusStore.infoData.name" class="ml-4">{{ statusStore.infoData.name }}</div>
-    </div>
-    <div class="py-2 flex items-center mt-4">
-      <span>API Key:</span>
-      <span class="ml-2" id="bizyair-profile-password">
-        {{ statusStore.infoData.api_key }}
-      </span>
-      <vTooltips tips="Edit">
-        <FilePenLine @click="statusStore.handleApiKeyDialog(true)" class="ml-2 cursor-pointer" />
-      </vTooltips>
-      <!-- <vTooltips tips="Copy">
-        <Copy @click="statusStore.copyText(statusStore.infoData.api_key)" class="ml-2 cursor-pointer" />
-      </vTooltips> -->
-    </div>
-    <div class="py-2 flex">
-      <span>Level:</span>
-      <span class="ml-2">{{ levelText }}</span>
-    </div>
-    <div class="py-2 flex w-full">
-      <div class="flex items-center">
-        <span class="whitespace-nowrap">Share ID:</span>
-        <span class="px-2 ml-2" v-if="!isEditingShareId">
-          {{ statusStore.infoData.share_id }}
+  <n-drawer v-model:show="showDrawer" :width="502" placement="left" >
+    <n-drawer-content closable>
+      <template #header>
+        <div class="profile-primary">
+          <img :src="profileImageSrc" alt="Profile Image" />
+          <div v-if="statusStore.infoData.name" class="name-container">{{ statusStore.infoData.name }}</div>
+        </div>
+      </template>
+      <div class="api-key-container">
+        <span>API Key:</span>
+        <span class="api-key-value" id="bizyair-profile-password">
+          {{ statusStore.infoData.api_key }}
         </span>
-        <Input
-          v-else
-          class="px-2 ml-2 border rounded-md box-border h-7"
-          ref="shareIdInput"
-          v-model="statusStore.infoData.share_id"
-          @keyup.enter="saveShareId"
-        />
-      </div>
-      <div class="flex items-center ml-2">
-        <span v-show="!isEditingShareId">
-          <vTooltips tips="Edit" v-if="canEditShareId">
-            <FilePenLine @click="editShareId" class="ml-2 cursor-pointer" />
-          </vTooltips>
-          <vTooltips
-            v-else
-            :tips="generateShareIDMessage(statusStore.infoData.last_share_id_update_at)"
-          >
-            <FilePenLine class="ml-2 cursor-not-allowed" />
-          </vTooltips>
-        </span>
-        <span v-show="isEditingShareId">
-          <vTooltips :tips="'Save'">
-            <Save @click="saveShareId" class="cursor-pointer" />
-          </vTooltips>
-        </span>
-        <vTooltips :tips="'Copy'">
-          <Copy
-            @click="statusStore.copyText(statusStore.infoData.share_id)"
-            class="cursor-pointer ml-2"
-          />
+        <vTooltips tips="Edit">
+          <FilePenLine @click="statusStore.handleApiKeyDialog(true)" class="edit-icon" />
         </vTooltips>
       </div>
-    </div>
-  </vDrawer>
+      <div class="level-container">
+        <span>Level:</span>
+        <span class="level-value">{{ levelText }}</span>
+      </div>
+      <div class="share-id-container">
+        <div class="share-id-input-container">
+          <span class="share-id-label">Share ID:</span>
+          <span class="share-id-value" v-if="!isEditingShareId">
+            {{ statusStore.infoData.share_id }}
+          </span>
+          <Input
+            v-else
+            class="share-id-input"
+            ref="shareIdInput"
+            v-model="statusStore.infoData.share_id"
+            @keyup.enter="saveShareId"
+          />
+        </div>
+        <div class="share-id-actions">
+          <span v-show="!isEditingShareId">
+            <vTooltips tips="Edit" v-if="canEditShareId">
+              <FilePenLine @click="editShareId" class="edit-icon" />
+            </vTooltips>
+            <vTooltips
+              v-else
+              :tips="generateShareIDMessage(statusStore.infoData.last_share_id_update_at)"
+            >
+              <FilePenLine class="disabled-icon" />
+            </vTooltips>
+          </span>
+          <span v-show="isEditingShareId">
+            <vTooltips :tips="'Save'">
+              <Save @click="saveShareId" class="save-icon" />
+            </vTooltips>
+          </span>
+          <vTooltips :tips="'Copy'">
+            <Copy
+              @click="statusStore.copyText(statusStore.infoData.share_id)"
+              class="copy-icon"
+            />
+          </vTooltips>
+        </div>
+      </div>
+    </n-drawer-content>
+  </n-drawer>
 </template>
 <script setup lang="ts">
   import { put_share_id } from '@/api/user'
@@ -90,6 +91,7 @@
   import vTooltips from '@/components/modules/v-tooltip.vue'
   import { useAlertDialog } from '@/components/modules/vAlertDialog'
   import { ref, computed } from 'vue'
+  import { NDrawer, NDrawerContent } from 'naive-ui'
 
   import { useStatusStore } from '@/stores/userStatus'
 
@@ -158,4 +160,109 @@
     showDrawer.value = true
   }
 </script>
-<style scoped></style>
+<style scoped>
+  .profile-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    padding: 0 12px;
+  }
+
+  .profile-container:hover {
+    background-color: #4A238E;
+  }
+
+  .icon-container {
+    margin-right: 4px;
+  }
+
+  .profile-text {
+    display: block;
+    line-height: 32px;
+    font-size: 14px;
+  }
+
+  .profile-primary {
+    display: flex;
+    align-items: center;
+  }
+
+  .name-container {
+    margin-left: 16px;
+  }
+
+  .api-key-container {
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+  }
+
+  .api-key-value {
+    margin-left: 8px;
+  }
+
+  .edit-icon {
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+  .level-container {
+    padding: 8px 0;
+    display: flex;
+  }
+
+  .level-value {
+    margin-left: 8px;
+  }
+
+  .share-id-container {
+    padding: 8px 0;
+    display: flex;
+    width: 100%;
+  }
+
+  .share-id-input-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .share-id-label {
+    white-space: nowrap;
+  }
+
+  .share-id-value {
+    padding: 0 8px;
+    margin-left: 8px;
+  }
+
+  .share-id-input {
+    padding: 0 8px;
+    margin-left: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    height: 28px;
+  }
+
+  .share-id-actions {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+  }
+
+  .disabled-icon {
+    margin-left: 8px;
+    cursor: not-allowed;
+  }
+
+  .save-icon {
+    cursor: pointer;
+  }
+
+  .copy-icon {
+    cursor: pointer;
+    margin-left: 8px;
+  }
+</style>
