@@ -288,7 +288,7 @@
       }
     }
     return tempData.versions.every(
-      (e: any) => e.version && e.base_model && e.sign && !(e.cover_urls && !e.imageDone)
+      (e: any) => e.version && e.base_model && e.sign
     )
   }
   const fnProgress = (p: number, i: number) => {
