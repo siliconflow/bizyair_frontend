@@ -223,6 +223,20 @@
               >
                 Most Used
               </CommandItem>
+              <CommandItem
+                v-if="props.page === 'quickStart' || props.page === 'workflows'"
+                value="most-used"
+                :class="[
+                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer',
+                  '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]',
+                  store[props.page].filterState.sort === 'Most Downloaded'
+                    ? '!bg-[#6D28D9] !text-[#F9FAFB]'
+                    : ''
+                ]"
+                @click="handleSortChange('Most Downloaded')"
+              >
+                Most Downloaded
+              </CommandItem>
             </CommandGroup>
           </CommandList>
         </Command>

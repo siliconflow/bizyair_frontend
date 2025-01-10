@@ -7,7 +7,7 @@ declare global {
 
 export type ModeType = 'my' | 'my_fork' | 'publicity'
 
-export type SortValue = 'Recently' | 'Most Forked' | 'Most Used'
+export type SortValue = 'Recently' | 'Most Forked' | 'Most Used' | 'Most Downloaded'
 export interface Model {
   id: string
   name: string
@@ -52,7 +52,7 @@ export interface FilterState {
   model_types: string[]
   base_models: string[]
   selected_model_types: string[]
-  sort:'Recently' | 'Most Forked' | 'Most Used'
+  sort:'Recently' | 'Most Forked' | 'Most Used' | 'Most Downloaded'
 }
 
 export interface CommonModelType {
