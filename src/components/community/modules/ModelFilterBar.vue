@@ -248,7 +248,7 @@
                 ]"
                 @click="handleSortChange('Most Liked')"
               >
-                Most Liked  
+                Most Liked
               </CommandItem>
             </CommandGroup>
           </CommandList>
