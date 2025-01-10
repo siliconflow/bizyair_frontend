@@ -2,7 +2,7 @@
   <div :class="{ 'w-full': !disableUpload }">
     <div
       :class="[
-        'hover:border-[hsl(var(--primary))] border-dashed border-2 border-[#9CA3AF] rounded-lg p-4 w-full border-box relative file-box',
+        'hover:border-[hsl(var(--primary))] border-dashed border-2 border-[#9CA3AF] rounded-lg p-4 border-box relative file-box',
         { 'border-[hsl(var(--primary))]': isHighlighted },
         { hidden: disableUpload }
       ]"
@@ -40,8 +40,8 @@
       />
     </div>
     <div v-if="disableUpload" class="pl-2">
-      <Button class="" @click="interrupt()" v-if="!uploadSuccessful">interrupt</Button>
-      <Button class="" @click="cancel()" v-else>cancel</Button>
+      <n-button type="primary" @click="interrupt()" v-if="!uploadSuccessful">interrupt</n-button>
+      <n-button type="primary" @click="cancel()" v-else>cancel</n-button>
     </div>
   </div>
 </template>
@@ -53,6 +53,8 @@
   import { Button } from '@/components/ui/button'
   import { commit_file } from '@/api/model'
   import { creatClient } from './ossClient'
+
+  import { NButton } from 'naive-ui'
 
   const props = defineProps({
     modelType: String,
