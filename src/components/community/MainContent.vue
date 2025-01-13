@@ -12,7 +12,6 @@
   })
 
   const communityStore = useCommunityStore()
- 
 
   const loadingStates = ref({
     isGridLoading: false,
@@ -200,7 +199,6 @@
     }
   )
 
-
   onUnmounted(() => {
     if (loadingStates.value.isGridLoading) {
       loadingStates.value.isGridLoading = false
@@ -265,8 +263,6 @@
       retryCountMap.value.delete(src)
     }
   }
-
-
 </script>
 
 <template>

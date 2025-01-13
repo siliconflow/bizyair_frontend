@@ -83,7 +83,7 @@
 
 <template>
   <div
-    class="group flex flex-col min-w-0   rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
+    class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
   >
     <div
       class="relative flex flex-col flex-1 rounded-lg cursor-pointer overflow-hidden bg-[#1a1a1a]"

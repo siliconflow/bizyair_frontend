@@ -489,8 +489,6 @@
     }
   })
 
- 
-
   onUnmounted(() => {
     if (observer) {
       observer.disconnect()

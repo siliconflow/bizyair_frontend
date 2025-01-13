@@ -88,7 +88,7 @@
 
   onMounted(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         if (entries[0].isIntersecting) {
           emit('loadMore')
         }
@@ -112,7 +112,7 @@
 
 <template>
   <div class="flex flex-col h-full">
-    <div class="flex-1 px-6  overflow-hidden">
+    <div class="flex-1 px-6 overflow-hidden">
       <LoadingOverlay v-if="loading" />
       <div class="scroll-container overflow-y-auto px-2" @scroll="handleScroll">
         <EmptyState v-if="!loading && (!models || models.length === 0)" />
@@ -152,7 +152,7 @@
             </template>
           </Grid>
 
-          <div 
+          <div
             :key="'load-more-trigger'"
             ref="loadMoreTrigger"
             class="h-10 opacity-0 pointer-events-none"

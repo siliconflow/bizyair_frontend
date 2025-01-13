@@ -197,8 +197,6 @@
     }
   })
 
-
-
   const handleImageLoad = (_e: Event, modelId: number | string) => {
     cacheState.value.imageLoadStates.set(modelId, true)
   }
