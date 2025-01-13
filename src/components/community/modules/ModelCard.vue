@@ -83,7 +83,7 @@
 
 <template>
   <div
-    class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
+    class="group flex flex-col min-w-0   rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
   >
     <div
       class="relative flex flex-col flex-1 rounded-lg cursor-pointer overflow-hidden bg-[#1a1a1a]"
@@ -127,7 +127,6 @@
             class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a]"
             :class="{ 'opacity-0': props.imageLoaded }"
           ></div>
-          <div class="w-full h-0 pb-[150%]"></div>
           <img
             :src="model.versions?.[0]?.cover_urls"
             :alt="model.versions?.[0]?.version || model.name"

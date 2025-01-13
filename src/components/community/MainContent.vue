@@ -1,9 +1,8 @@
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, nextTick, watch, onActivated } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
   import BaseModelGrid from './modules/BaseModelGrid.vue'
   import ModelFilterBar from './modules/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
-  import { modelStore } from '@/stores/modelStatus'
   import { get_model_list } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import { Model } from '@/types/model'
@@ -13,7 +12,7 @@
   })
 
   const communityStore = useCommunityStore()
-  const modelStoreInstance = modelStore()
+ 
 
   const loadingStates = ref({
     isGridLoading: false,
@@ -201,40 +200,6 @@
     }
   )
 
-  watch(
-    () => modelStoreInstance.reload,
-    async (newVal: number, oldVal: number) => {
-      if (newVal !== oldVal) {
-        loadingStates.value.isGridLoading = true
-        try {
-          await fetchData(0, communityStore.mainContent.modelListPathParams.page_size)
-        } finally {
-          setTimeout(() => {
-            loadingStates.value.isGridLoading = false
-          }, 300)
-        }
-      }
-    }
-  )
-
-  watch(
-    () => communityStore.currentPath,
-    async () => {
-      loadingStates.value.isGridLoading = true
-      try {
-        communityStore.mainContent.modelListPathParams.current = 1
-        communityStore.mainContent.models = []
-        hasMore.value = true
-        cacheState.value.key = 0
-
-        await fetchData(0, communityStore.mainContent.modelListPathParams.page_size)
-      } finally {
-        setTimeout(() => {
-          loadingStates.value.isGridLoading = false
-        }, 300)
-      }
-    }
-  )
 
   onUnmounted(() => {
     if (loadingStates.value.isGridLoading) {
@@ -301,33 +266,7 @@
     }
   }
 
-  onActivated(async () => {
-    if (communityStore.mainContent?.lastState) {
-      loadingStates.value.isGridLoading = true
-      try {
-        const targetPage = communityStore.mainContent.lastState.currentPage || 1
-        communityStore.mainContent.modelListPathParams.current = targetPage
-        await fetchData(targetPage - 1, communityStore.mainContent.modelListPathParams.page_size)
 
-        await nextTick()
-        await new Promise<void>(resolve => {
-          setTimeout(() => {
-            const container = document.querySelector('.scroll-container')
-            if (container) {
-              const maxScroll = container.scrollHeight - container.clientHeight
-              const savedRatio = communityStore.mainContent?.lastState?.scrollRatio ?? 0
-              if (maxScroll > 0 && typeof savedRatio === 'number') {
-                container.scrollTop = maxScroll * savedRatio
-              }
-            }
-            resolve()
-          }, 100)
-        })
-      } finally {
-        loadingStates.value.isGridLoading = false
-      }
-    }
-  })
 </script>
 
 <template>
@@ -343,7 +282,7 @@
     <BaseModelGrid
       :models="communityStore.mainContent.models"
       :loading="loadingStates.isGridLoading"
-      :total="communityStore.mainContent.modelListPathParams.total"
+      :total="communityStore.mainContent.models.length || 100"
       :page-size="communityStore.mainContent.modelListPathParams.page_size"
       :cache-key="cacheState.key"
       :on-fetch-data="fetchData"

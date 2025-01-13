@@ -70,65 +70,56 @@
     timer: null as number | null
   })
 
-  const throttle = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
-    let timer: number | null = null
-    return (...args: Parameters<T>) => {
-      if (timer) return
-      timer = window.setTimeout(() => {
-        fn(...args)
-        timer = null
-      }, delay)
-    }
-  }
+  const loadMoreTrigger = ref<HTMLDivElement | null>(null)
 
-  const handleScroll = throttle((e: Event) => {
+  const handleScroll = (e: Event) => {
     const container = e.target as HTMLElement
     scrollState.value.showBackToTop = container.scrollTop > 500
-    emit('scroll', e)
-  }, 100)
 
-  const loadingRef = ref<HTMLDivElement | null>(null)
-  let observer: IntersectionObserver | null = null
+    const scrollBottom = container.scrollTop + container.clientHeight
+    const threshold = container.scrollHeight - 100
+
+    if (scrollBottom >= threshold) {
+      emit('loadMore')
+    }
+
+    emit('scroll', e)
+  }
 
   onMounted(() => {
-    observer = new IntersectionObserver(
-      throttle((entries: IntersectionObserverEntry[]) => {
+    const observer = new IntersectionObserver(
+      (entries) => {
         if (entries[0].isIntersecting) {
           emit('loadMore')
         }
-      }, 800),
+      },
       {
+        root: document.querySelector('.scroll-container'),
         threshold: 0.1,
-        rootMargin: '100px 0px',
-        root: document.querySelector('.scroll-container')
+        rootMargin: '100px'
       }
     )
 
-    if (loadingRef.value) {
-      observer.observe(loadingRef.value)
+    if (loadMoreTrigger.value) {
+      observer.observe(loadMoreTrigger.value)
     }
-  })
 
-  onUnmounted(() => {
-    if (observer) {
+    onUnmounted(() => {
       observer.disconnect()
-    }
-    if (scrollState.value.timer) {
-      window.clearTimeout(scrollState.value.timer)
-    }
+    })
   })
 </script>
 
 <template>
   <div class="flex flex-col h-full">
-    <div class="flex-1 px-6 relative overflow-hidden">
+    <div class="flex-1 px-6  overflow-hidden">
       <LoadingOverlay v-if="loading" />
       <div class="scroll-container overflow-y-auto px-2" @scroll="handleScroll">
         <EmptyState v-if="!loading && (!models || models.length === 0)" />
 
         <transition-group v-else name="grid" tag="div" class="grid-container">
           <Grid
-            :key="cacheKey"
+            :key="`grid-${cacheKey}`"
             :length="total"
             :page-size="pageSize"
             :page-provider="onFetchData"
@@ -160,6 +151,12 @@
               />
             </template>
           </Grid>
+
+          <div 
+            :key="'load-more-trigger'"
+            ref="loadMoreTrigger"
+            class="h-10 opacity-0 pointer-events-none"
+          />
         </transition-group>
       </div>
     </div>
@@ -172,12 +169,13 @@
   .scroll-container {
     height: calc(80vh - 140px);
     margin-top: 1rem;
-    position: relative;
+    /* position: relative; */
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
     -webkit-overflow-scrolling: touch;
     min-height: 400px;
     z-index: 0;
+    scroll-behavior: smooth;
   }
 
   .scroll-container::-webkit-scrollbar {
@@ -264,5 +262,6 @@
 
   .grid-container {
     padding-bottom: 40px;
+    min-height: calc(100% + 100px);
   }
 </style>

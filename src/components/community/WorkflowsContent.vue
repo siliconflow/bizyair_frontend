@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, onMounted, nextTick, onActivated, inject } from 'vue'
+  import { ref, onMounted, nextTick, inject } from 'vue'
   import BaseModelGrid from './modules/BaseModelGrid.vue'
   import ModelFilterBar from './modules/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
@@ -197,33 +197,7 @@
     }
   })
 
-  onActivated(async () => {
-    if (communityStore.workflows?.lastState) {
-      loadingStates.value.isGridLoading = true
-      try {
-        const targetPage = communityStore.workflows.lastState.currentPage || 1
-        communityStore.workflows.modelListPathParams.current = targetPage
-        await fetchData(targetPage - 1, communityStore.workflows.modelListPathParams.page_size)
 
-        await nextTick()
-        await new Promise<void>(resolve => {
-          setTimeout(() => {
-            const container = document.querySelector('.scroll-container')
-            if (container) {
-              const maxScroll = container.scrollHeight - container.clientHeight
-              const savedRatio = communityStore.workflows?.lastState?.scrollRatio ?? 0
-              if (maxScroll > 0 && typeof savedRatio === 'number') {
-                container.scrollTop = maxScroll * savedRatio
-              }
-            }
-            resolve()
-          }, 100)
-        })
-      } finally {
-        loadingStates.value.isGridLoading = false
-      }
-    }
-  })
 
   const handleImageLoad = (_e: Event, modelId: number | string) => {
     cacheState.value.imageLoadStates.set(modelId, true)

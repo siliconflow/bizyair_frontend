@@ -20,10 +20,15 @@
     </div>
     <div class="flex-1 bg-[#353535] h-full">
       <keep-alive>
-        <MainContent v-if="communityStore.currentPath === '/models'" />
-        <QuickStartContent v-else-if="communityStore.currentPath === '/quick-start'" />
-        <WorkflowsContent v-else-if="communityStore.currentPath === '/workflows'" />
-        <Mine v-else />
+        <component 
+          :is="communityStore.currentPath === '/models' 
+            ? MainContent 
+            : communityStore.currentPath === '/quick-start'
+            ? QuickStartContent
+            : communityStore.currentPath === '/workflows'
+            ? WorkflowsContent
+            : Mine"
+        />
       </keep-alive>
     </div>
   </div>

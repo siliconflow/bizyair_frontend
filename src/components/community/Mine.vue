@@ -3,7 +3,7 @@
     name: 'Mine'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick, watch, inject, onActivated } from 'vue'
+  import { ref, onMounted, onUnmounted, nextTick, watch, inject } from 'vue'
   import ModelFilterBar from '@/components/community/modules/ModelFilterBar.vue'
   import MineTabs from '@/components/community/modules/MineTabs.vue'
   import { useCommunityStore } from '@/stores/communityStore'
@@ -489,9 +489,7 @@
     }
   })
 
-  onActivated(() => {
-    resetState()
-  })
+ 
 
   onUnmounted(() => {
     if (observer) {
