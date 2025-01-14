@@ -12,6 +12,7 @@
   })
 
   const communityStore = useCommunityStore()
+ 
 
   const loadingStates = ref({
     isGridLoading: false,
@@ -143,12 +144,7 @@
     }
   }
 
-  const scrollToTop = () => {
-    const container = document.querySelector('.scroll-container')
-    if (container) {
-      container.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
+
 
   const fetchData = async (pageNumber: number, pageSize: number): Promise<unknown[]> => {
     try {
@@ -199,42 +195,20 @@
     }
   )
 
+
   onUnmounted(() => {
     if (loadingStates.value.isGridLoading) {
       loadingStates.value.isGridLoading = false
     }
   })
 
-  const restoreScrollPosition = () => {
-    const scrollRatio = communityStore.mainContent?.lastState?.scrollRatio
-    if (typeof scrollRatio === 'number') {
-      nextTick(() => {
-        setTimeout(() => {
-          const container = document.querySelector('.scroll-container')
-          if (container) {
-            const maxScroll = container.scrollHeight - container.clientHeight
-            if (maxScroll > 0) {
-              container.scrollTop = maxScroll * scrollRatio
-              setTimeout(() => {
-                const newMaxScroll = container.scrollHeight - container.clientHeight
-                if (newMaxScroll !== maxScroll) {
-                  container.scrollTop = newMaxScroll * scrollRatio
-                }
-              }, 200)
-            }
-          }
-        }, 300)
-      })
-    }
-  }
+  
 
   onMounted(async () => {
     loadingStates.value.isGridLoading = true
     try {
       communityStore.mainContent.modelListPathParams.current = 1
       await fetchData(0, communityStore.mainContent.modelListPathParams.page_size)
-      await nextTick()
-      restoreScrollPosition()
     } finally {
       setTimeout(() => {
         loadingStates.value.isGridLoading = false
@@ -263,6 +237,8 @@
       retryCountMap.value.delete(src)
     }
   }
+
+
 </script>
 
 <template>
@@ -289,22 +265,8 @@
       mode="publicity"
       @scroll="handleScroll"
       @load-more="loadMore"
-      @scroll-to-top="scrollToTop"
     />
   </div>
 </template>
 
-<style scoped>
-  .animate-spin {
-    animation: spin 1s linear infinite;
-  }
 
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-</style>

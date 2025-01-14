@@ -6,7 +6,7 @@
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { sliceString, formatNumber } from '@/utils/tool'
   import { useCommunityStore } from '@/stores/communityStore'
-  import { ref, watch } from 'vue'
+  import { ref, watch, onMounted } from 'vue'
 
   defineOptions({
     name: 'ModelCard'
@@ -15,6 +15,7 @@
   const communityStore = useCommunityStore()
   const dialogLoading = ref(true)
   const showDialog = ref(false)
+  const imgSrc = ref('')
 
   const props = defineProps({
     model: {
@@ -79,11 +80,17 @@
       }
     }
   )
+
+  onMounted(() => {
+    if (props.model?.versions?.[0]?.cover_urls) {
+      imgSrc.value = props.model.versions[0].cover_urls
+    }
+  })
 </script>
 
 <template>
   <div
-    class="group flex flex-col min-w-0 rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
+    class="group flex flex-col min-w-0   rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-102"
   >
     <div
       class="relative flex flex-col flex-1 rounded-lg cursor-pointer overflow-hidden bg-[#1a1a1a]"
@@ -128,11 +135,11 @@
             :class="{ 'opacity-0': props.imageLoaded }"
           ></div>
           <img
-            :src="model.versions?.[0]?.cover_urls"
+            v-if="imgSrc"
+            :src="imgSrc"
             :alt="model.versions?.[0]?.version || model.name"
             :crossorigin="
-              typeof model.versions?.[0]?.cover_urls === 'string' &&
-              model.versions?.[0]?.cover_urls?.startsWith('blob:')
+              typeof imgSrc === 'string' && imgSrc.startsWith('blob:')
                 ? 'anonymous'
                 : undefined
             "

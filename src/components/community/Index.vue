@@ -20,16 +20,14 @@
     </div>
     <div class="flex-1 bg-[#353535] h-full">
       <keep-alive>
-        <component
-          :is="
-            communityStore.currentPath === '/models'
-              ? MainContent
-              : communityStore.currentPath === '/quick-start'
-                ? QuickStartContent
-                : communityStore.currentPath === '/workflows'
-                  ? WorkflowsContent
-                  : Mine
-          "
+        <component 
+          :is="communityStore.currentPath === '/models' 
+            ? MainContent 
+            : communityStore.currentPath === '/quick-start'
+            ? QuickStartContent
+            : communityStore.currentPath === '/workflows'
+            ? WorkflowsContent
+            : Mine"
         />
       </keep-alive>
     </div>

@@ -122,12 +122,6 @@
     }
   }
 
-  const scrollToTop = () => {
-    const container = document.querySelector('.scroll-container')
-    if (container) {
-      container.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
 
   const fetchData = async (pageNumber: number, pageSize: number): Promise<unknown[]> => {
     try {
@@ -199,6 +193,8 @@
     }
   })
 
+
+
   const handleImageLoad = (_e: Event, modelId: number | string) => {
     cacheState.value.imageLoadStates.set(modelId, true)
   }
@@ -246,7 +242,6 @@
       mode="publicity"
       @scroll="handleScroll"
       @load-more="loadMore"
-      @scroll-to-top="scrollToTop"
     />
   </div>
 </template>

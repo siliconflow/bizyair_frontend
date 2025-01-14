@@ -11,7 +11,7 @@
     CommandSeparator
   } from '@/components/ui/command'
 
-  import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+  import { ScrollArea } from '@/components/ui/scroll-area'
   import { useCommunityStore } from '@/stores/communityStore'
 
   import { sliceString, formatSize, formatNumber } from '@/utils/tool'
@@ -142,12 +142,22 @@
         const viewportWidth = viewport.clientWidth
         const tabWidth = targetTab.offsetWidth
 
-        const scrollPosition = Math.max(0, tabPosition - (viewportWidth - tabWidth) / 2)
+        // 计算目标滚动位置，使目标标签居中
+        const scrollPosition = Math.max(
+          0,
+          Math.min(
+            tabPosition - (viewportWidth - tabWidth) / 2,
+            totalWidth - viewportWidth
+          )
+        )
 
         viewport.scrollTo({
           left: scrollPosition,
           behavior: 'smooth'
         })
+
+        // 更新箭头状态
+        handleScroll({ target: viewport })
       }, 100)
     })
   }
@@ -204,12 +214,6 @@
     }
   }
 
-  // const handleApply = () => {
-  //   if (currentVersion.value && model.value) {
-  //      modelStoreInstance.setApplyObject(currentVersion.value, model.value)
-  //   }
-  // }
-
   const handleCopy = async (sign: string) => {
     try {
       if (navigator.clipboard) {
@@ -248,20 +252,20 @@
     }
   }
 
-  const handleAddNode = async (model: Model) => {
+  const handleAddNode = async () => {
     try {
-      let nodeID = model.type === 'LoRA' ? 'BizyAir_LoraLoader' : 'BizyAir_ControlNetLoader'
+      let nodeID = model.value?.type === 'LoRA' ? 'BizyAir_LoraLoader' : 'BizyAir_ControlNetLoader'
       let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
       const canvas = window.LGraphCanvas?.active_canvas
 
       loraLoaderNode.title =
-        model.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
+        model.value?.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
       loraLoaderNode.color = '#7C3AED'
 
       const widgetValues =
-        model.type === 'LoRA'
-          ? [model.name, 1.0, 1.0, model.versions?.[0]?.id || '']
-          : [model.name, model.versions?.[0]?.id || '']
+        model.value?.type === 'LoRA'
+          ? [model.value?.name, 1.0, 1.0, currentVersion.value?.id || '']
+          : [model.value?.name, currentVersion.value?.id || '']
 
       loraLoaderNode.widgets_values = widgetValues
       if (loraLoaderNode.widgets) {
@@ -292,6 +296,7 @@
     }
   }
 
+
   const handleDownloadWorkFlow = async () => {
     const workflow = await get_workflow_dowload_url(
       currentVersion.value?.id,
@@ -310,6 +315,81 @@
       useToaster.error('Failed to download workflow.')
     }
   }
+
+  const showLeftArrow = ref(false)
+  const showRightArrow = ref(false)
+
+  const handleScroll = (event: any) => {
+    const viewport = event.target
+    const scrollLeft = viewport.scrollLeft
+    const scrollWidth = viewport.scrollWidth
+    const clientWidth = viewport.clientWidth
+
+    // 添加一个小的阈值，避免浮点数计算误差
+    const threshold = 1
+    
+    // 只要有滚动（scrollLeft > 0）就显示左箭头
+    showLeftArrow.value = scrollLeft > threshold
+    
+    // 如果还有未显示的内容就显示右箭头
+    showRightArrow.value = Math.ceil(scrollLeft + clientWidth) < scrollWidth - threshold
+  }
+
+  const handleScrollLeft = () => {
+    if (!scrollViewportRef.value) return
+    const viewport = scrollViewportRef.value.$el.querySelector('[data-radix-scroll-area-viewport]')
+    if (!viewport) return
+
+    const scrollAmount = viewport.clientWidth
+    const targetScroll = Math.max(viewport.scrollLeft - scrollAmount, 0)
+    
+    viewport.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth'
+    })
+
+    // 手动触发滚动事件，更新箭头状态
+    setTimeout(() => {
+      handleScroll({ target: viewport })
+    }, 100)
+  }
+
+  const handleScrollRight = () => {
+    if (!scrollViewportRef.value) return
+    const viewport = scrollViewportRef.value.$el.querySelector('[data-radix-scroll-area-viewport]')
+    if (!viewport) return
+
+    const scrollAmount = viewport.clientWidth
+    const maxScroll = viewport.scrollWidth - viewport.clientWidth
+    const targetScroll = Math.min(viewport.scrollLeft + scrollAmount, maxScroll)
+
+    viewport.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth'
+    })
+
+    // 手动触发滚动事件，更新箭头状态
+    setTimeout(() => {
+      handleScroll({ target: viewport })
+    }, 100)
+  }
+
+  onMounted(() => {
+    nextTick(() => {
+      if (!scrollViewportRef.value) return
+      const viewport = scrollViewportRef.value.$el.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      )
+      if (viewport) {
+        // 初始化时检查是否有足够的内容需要滚动
+        const hasOverflow = viewport.scrollWidth > viewport.clientWidth
+        showRightArrow.value = hasOverflow
+        showLeftArrow.value = false // 初始时左箭头应该隐藏
+        
+        handleScroll({ target: viewport })
+      }
+    })
+  })
 </script>
 
 <template>
@@ -433,9 +513,59 @@
         <div
           class="bg-[#4e4e4e] rounded-lg p-1 flex flex-row gap-4 items-start justify-start self-stretch shrink-0 relative"
         >
-          <div class="min-w-[200px] max-w-[600px]">
-            <ScrollArea ref="scrollViewportRef" class="rounded-md w-full">
-              <div class="whitespace-nowrap">
+          <div class="min-w-[200px] max-w-[600px] relative">
+            <div 
+              v-show="showLeftArrow"
+              class="absolute left-0 top-0 z-20 cursor-pointer h-full flex items-center"
+              @click="handleScrollLeft"
+            >
+              <div class="flex items-center justify-center w-6 h-full bg-gradient-to-r from-[#4e4e4e] to-transparent">
+                <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none"
+                >
+                  <path 
+                    d="M15 18L9 12L15 6" 
+                    stroke="#F9FAFB" 
+                    stroke-width="2" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <div 
+              v-show="showRightArrow"
+              class="absolute right-0 top-0 z-20 cursor-pointer h-full flex items-center"
+              @click="handleScrollRight"
+            >
+              <div class="flex items-center justify-center w-6 h-full bg-gradient-to-l from-[#4e4e4e] to-transparent">
+                <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none"
+                >
+                  <path 
+                    d="M9 18L15 12L9 6" 
+                    stroke="#F9FAFB" 
+                    stroke-width="2" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <ScrollArea 
+              ref="scrollViewportRef" 
+              class="rounded-md w-full overflow-hidden"
+              @scroll="handleScroll"
+            >
+              <div class="whitespace-nowrap px-2">
                 <Tabs :default-value="currentVersion?.id" :value="currentVersion?.id">
                   <TabsList class="inline-flex h-12 bg-transparent text-sm text-white w-auto">
                     <TabsTrigger
@@ -443,7 +573,7 @@
                       :key="version.id"
                       :value="version.id"
                       :class="['version-tab', `version-tab-${version.id}`]"
-                      class="text-sm t bg-[#9CA3AF] data-[state=active]:bg-[#7C3AED] h-10 px-3 py-2 mx-1"
+                      class="text-sm bg-[#9CA3AF] data-[state=active]:bg-[#7C3AED] h-10 px-4 py-2 mx-1 rounded-md transition-colors duration-200"
                       @click="handleTabChange(version.id)"
                     >
                       {{ version.version }}
@@ -451,7 +581,6 @@
                   </TabsList>
                 </Tabs>
               </div>
-              <ScrollBar orientation="horizontal" />
             </ScrollArea>
           </div>
         </div>
@@ -578,7 +707,7 @@
             :no-img-zoom-in="true"
             :preview="true"
             theme="dark"
-            class="bg-[#353535] w-full min-h-[80vh]"
+            class="bg-[#353535] w-full h-full"
           />
           <div v-else class="w-full h-[200px] bg-[#353535] rounded-tl-lg rounded-tr-lg">
             <div class="flex justify-center items-center h-full">
@@ -737,7 +866,7 @@
               >
                 <g clip-path="url(#clip0_315_3710)">
                   <path
-                    d="M2.66659 10.6666C1.93325 10.6666 1.33325 10.0666 1.33325 9.33325V2.66659C1.33325 1.93325 1.93325 1.33325 2.66659 1.33325H9.33325C10.0666 1.33325 10.6666 1.93325 10.6666 2.66659M6.66658 5.33325H13.3333C14.0696 5.33325 14.6666 5.93021 14.6666 6.66658V13.3333C14.6666 14.0696 14.0696 14.6666 13.3333 14.6666H6.66658C5.93021 14.6666 5.33325 14.0696 5.33325 13.3333V6.66658C5.33325 5.93021 5.93021 5.33325 6.66658 5.33325Z"
+                    d="M2.66659 10.6666C1.93325 10.6666 1.33325 10.0666 1.33325 9.33325V2.66659C1.33325 1.93325 1.93325 1.33325 2.66659 1.33325H9.33325C10.0666 1.33325 10.6666 1.93325 10.6666 2.66658V13.3333C10.6666 14.0696 10.0696 14.6666 9.33333 14.6666H6.66658C5.93021 14.6666 5.33325 14.0696 5.33325 13.3333V6.66658C5.33325 5.93021 5.93021 5.33325 6.66658 5.33325Z"
                     stroke="#9CA3AF"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -950,6 +1079,12 @@
 
   :deep([data-radix-scroll-area-viewport]) {
     width: 100%;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  :deep([data-radix-scroll-area-viewport])::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
   }
 
   .Checkpoint {

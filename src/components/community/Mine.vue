@@ -86,6 +86,7 @@
       } else {
         hasMore.value = false
       }
+      return []
     } catch (error) {
       console.error('fetch data error:', error)
       useToaster.error(`Failed to load more data: ${error}`)
@@ -142,91 +143,40 @@
     }, 150)
   }, 100)
 
-  const fetchData = async (
-    pageNumberOrResetScroll?: number | boolean,
-    pageSize?: number
-  ): Promise<unknown[]> => {
-    return new Promise(resolve => {
-      const doFetch = async () => {
-        if (typeof pageNumberOrResetScroll === 'boolean' && pageNumberOrResetScroll) {
-          loadingStates.value.isGridLoading = true
+
+  const fetchData = async (pageNumber: number, pageSize: number) => {
+    try {
+      const response = await get_model_list(
+        {
+          ...communityStore.mine[currentTab.value].modelListPathParams,
+          current: pageNumber + 1,
+          page_size: pageSize
+        },
+        communityStore.mine[currentTab.value].filterState
+      )
+
+      if (response?.data?.list) {
+        communityStore.mine[currentTab.value].modelListPathParams.total = response.data.total || 0
+
+        if (pageNumber === 0) {
+          communityStore.mine[currentTab.value].models = response.data.list
+        } else {
+          communityStore.mine[currentTab.value].models = [
+            ...communityStore.mine[currentTab.value].models,
+            ...response.data.list
+          ]
         }
 
-        const isPageProvider = typeof pageNumberOrResetScroll === 'number'
-        const mode = currentTab.value === 'posts' ? 'my' : 'my_fork'
-
-        const filterKey = JSON.stringify({
-          ...communityStore.mine[currentTab.value].filterState,
-          cacheKey: cacheKey.value,
-          mode
-        })
-        const cachePageKey = `${filterKey}-${pageNumberOrResetScroll}`
-
-        if (gridCache.value.has(cachePageKey)) {
-          resolve(gridCache.value.get(cachePageKey))
-          return
-        }
-
-        const currentState = communityStore.mine[currentTab.value]
-        if (isPageProvider) {
-          currentState.modelListPathParams.current = (pageNumberOrResetScroll as number) + 1
-          if (pageSize) {
-            currentState.modelListPathParams.page_size = pageSize
-          }
-        }
-
-        try {
-          const response = await get_model_list(
-            {
-              ...currentState.modelListPathParams,
-              mode
-            },
-            currentState.filterState
-          )
-
-          if (response?.data?.list) {
-            currentState.modelListPathParams.total = response.data.total || 0
-
-            if (isPageProvider) {
-              gridCache.value.set(cachePageKey, response.data.list)
-              if (pageNumberOrResetScroll === 0) {
-                currentState.models = response.data.list
-                lastLoadedPage.value = 1
-              } else {
-                currentState.models = [...currentState.models, ...response.data.list]
-                lastLoadedPage.value = (pageNumberOrResetScroll as number) + 1
-              }
-              hasMore.value = currentState.models.length < response.data.total
-            } else {
-              currentState.models = response.data.list
-              lastLoadedPage.value = 1
-            }
-            resolve(response.data.list)
-          } else {
-            if (pageNumberOrResetScroll === 0) {
-              currentState.models = []
-              lastLoadedPage.value = 1
-            }
-            resolve([])
-          }
-        } catch (error) {
-          console.error(error)
-          if (pageNumberOrResetScroll === 0) {
-            currentState.models = []
-            lastLoadedPage.value = 1
-          }
-          resolve([])
-        } finally {
-          if (typeof pageNumberOrResetScroll === 'boolean' && pageNumberOrResetScroll) {
-            setTimeout(() => {
-              loadingStates.value.isGridLoading = false
-            }, 300)
-          }
-        }
+        return response.data.list
       }
-
-      doFetch()
-    })
+      else{
+        communityStore.mine[currentTab.value].models = []
+      }
+    } catch (error) {
+      console.error('Fetch data error:', error)
+      useToaster.error(`Failed to fetch data: ${error}`)
+      communityStore.mine[currentTab.value].models = []
+    }
   }
 
   const setScrollPosition = (ratio: number) => {
@@ -242,27 +192,27 @@
   }
 
   const switchTab = async (tab: TabType) => {
-    currentTab.value = tab
-    const currentState = communityStore.mine[tab]
-
+    currentTab.value = tab 
+    const currentState = communityStore.mine[tab] 
+    
     cacheKey.value++
     gridCache.value.clear()
     cacheState.value.loadedPages.clear()
     cacheState.value.imageLoadStates.clear()
 
-    if (currentState.lastState) {
+    if (currentState?.lastState) {
       lastLoadedPage.value = currentState.lastState.currentPage
       hasMore.value = currentState.lastState.hasMore ?? true
       hasPrevious.value = currentState.lastState.hasPrevious
       currentState.lastState.loadedPages.forEach(page => {
         cacheState.value.loadedPages.add(page)
       })
-      await fetchData(true)
+      await fetchData(0,communityStore.mine[currentTab.value].modelListPathParams.page_size)
       setScrollPosition(currentState.lastState.scrollRatio)
     } else {
       currentState.modelListPathParams.current = 1
       lastLoadedPage.value = 1
-      await fetchData(true)
+      await fetchData(0,communityStore.mine[currentTab.value].modelListPathParams.page_size)
     }
   }
 
@@ -301,31 +251,7 @@
     }
   }
 
-  const handleScrollToTop = async () => {
-    const container = document.querySelector('.scroll-container')
-    if (!container) return
 
-    container.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    })
-
-    setTimeout(async () => {
-      loading.value = true
-      try {
-        const currentState = communityStore.mine[currentTab.value]
-        currentState.modelListPathParams.current = 1
-        lastLoadedPage.value = 1
-        await fetchData()
-        hasMore.value = true
-        hasPrevious.value = false
-      } catch (error) {
-        useToaster.error(`Failed to reset data: ${error}`)
-      } finally {
-        loading.value = false
-      }
-    }, 500)
-  }
 
   const handleLoadWorkflow = async (versions: any) => {
     if (!versions || versions.length === 0) {
@@ -417,6 +343,9 @@
             }, 100)
           })
         }
+        else{
+          communityStore.mine[currentTab.value].models = []
+        }
       } catch (error) {
         console.error('Reset state error:', error)
       }
@@ -489,6 +418,8 @@
     }
   })
 
+ 
+
   onUnmounted(() => {
     if (observer) {
       observer.disconnect()
@@ -508,7 +439,7 @@
         cacheState.value.loadedPages.clear()
         cacheState.value.imageLoadStates.clear()
         communityStore.mine[currentTab.value].modelListPathParams.current = 1
-        await fetchData(true)
+        await fetchData(0,communityStore.mine[currentTab.value].modelListPathParams.page_size)
       }
     },
     { deep: true }
@@ -525,8 +456,8 @@
             page="posts"
             @fetch-data="
               () => {
-                communityStore.mine[currentTab].modelListPathParams.current = 1
-                fetchData(true)
+                communityStore.mine.posts.modelListPathParams.current = 1
+                fetchData(0,communityStore.mine.posts.modelListPathParams.page_size)
               }
             "
           />
@@ -540,7 +471,7 @@
             @fetch-data="
               () => {
                 communityStore.mine.forked.modelListPathParams.current = 1
-                fetchData(true)
+                fetchData(0,communityStore.mine.forked.modelListPathParams.page_size)
               }
             "
           />
@@ -563,7 +494,7 @@
       mode="my"
       @scroll="handleScroll"
       @load-more="loadMore"
-      @scroll-to-top="handleScrollToTop"
+    
     />
   </div>
 </template>
