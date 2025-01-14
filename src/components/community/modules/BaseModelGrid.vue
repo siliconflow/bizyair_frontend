@@ -9,7 +9,6 @@
   import { debounce } from 'lodash-es'
   import type { VirtualListInst } from 'naive-ui'
 
-
   defineOptions({
     name: 'BaseModelGrid'
   })
@@ -81,7 +80,7 @@
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLElement
     const scrollTop = target.scrollTop
-    
+
     scrollState.value.showBackToTop = scrollTop > 500
 
     const scrollBottom = scrollTop + target.clientHeight
@@ -95,8 +94,6 @@
     emit('scroll', e)
   }
 
-
-
   const windowWidth = ref(window.innerWidth)
 
   const handleWindowResize = debounce(() => {
@@ -105,7 +102,7 @@
 
   onMounted(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         if (entries[0].isIntersecting) {
           emit('loadMore')
         }
@@ -158,8 +155,8 @@
     if (width >= 1890) return 340 // 7列
     if (width >= 1650) return 320 // 6列
     if (width >= 1440) return 300 // 5列
-    if (width >= 992) return 280  // 4列
-    if (width >= 768) return 260  // 3列
+    if (width >= 992) return 280 // 4列
+    if (width >= 768) return 260 // 3列
     return 240 // 2列
   })
 
@@ -167,10 +164,16 @@
     items: rows.value,
     itemSize: rowHeight.value,
     style: {
+<<<<<<< HEAD
       height: '100%',
+=======
+      maxHeight: 'calc(100vh - 200px)',
+      height: 'auto'
+>>>>>>> 1094ae3dd940f985557e3b0668fa5bbe2ec9babe
     },
     itemResizable: true,
     ignoreItemResize: false,
+<<<<<<< HEAD
     scrollable: false
   }))
 
@@ -179,6 +182,16 @@
       scrollContainer.value.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }   
+=======
+    scrollbarProps: {
+      trigger: 'none'
+    }
+  }))
+
+  const backToTop = () => {
+    virtualListInst.value?.scrollTo({ top: 0 })
+  }
+>>>>>>> 1094ae3dd940f985557e3b0668fa5bbe2ec9babe
 
   watch(
     () => props.cacheKey,
@@ -189,7 +202,6 @@
       }
     }
   )
-
 </script>
 
 <template>
@@ -288,43 +300,66 @@
 
 @media (min-width: 768px) {
   .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    position: relative;
+    transition: opacity 0.3s ease-in-out;
+    align-items: stretch;
+    width: 100%;
+    margin-bottom: 20px;
+    z-index: 1;
   }
   /* :deep(.v-vl-items) {
     padding-bottom: 220px !important;
   } */
 }
 
-@media (min-width: 992px) {
-  .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  @media (min-width: 992px) {
+    .grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 200px !important;
+    }
   }
   /* :deep(.v-vl-items) {
     padding-bottom: 200px !important;
   } */
 }
 
-@media (min-width: 1440px) {
-  .grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+  @media (min-width: 1650px) {
+    .grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 220px !important;
+    }
   }
   /* :deep(.v-vl-items) {
     padding-bottom: 100px !important;
   } */
 }
 
-@media (min-width: 1650px) {
-  .grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+  .grid-container {
+    position: relative;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    max-width: 2000px;
+    padding-bottom: 100px;
+    padding-right: 6px;
+    flex: 1;
   }
   /* :deep(.v-vl-items) {
     padding-bottom: 220px !important;
   } */
 }
 
-@media (min-width: 1890px) {
-  .grid {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+  :deep(.n-virtual-list::-webkit-scrollbar-track) {
+    background: transparent;
   }
   /* :deep(.v-vl-items) {
     padding-bottom: 240px !important;
@@ -371,6 +406,3 @@
 
 
 </style>
-
-
-

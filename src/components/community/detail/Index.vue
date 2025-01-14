@@ -145,10 +145,7 @@
         // 计算目标滚动位置，使目标标签居中
         const scrollPosition = Math.max(
           0,
-          Math.min(
-            tabPosition - (viewportWidth - tabWidth) / 2,
-            totalWidth - viewportWidth
-          )
+          Math.min(tabPosition - (viewportWidth - tabWidth) / 2, totalWidth - viewportWidth)
         )
 
         viewport.scrollTo({
@@ -296,7 +293,6 @@
     }
   }
 
-
   const handleDownloadWorkFlow = async () => {
     const workflow = await get_workflow_dowload_url(
       currentVersion.value?.id,
@@ -327,10 +323,10 @@
 
     // 添加一个小的阈值，避免浮点数计算误差
     const threshold = 1
-    
+
     // 只要有滚动（scrollLeft > 0）就显示左箭头
     showLeftArrow.value = scrollLeft > threshold
-    
+
     // 如果还有未显示的内容就显示右箭头
     showRightArrow.value = Math.ceil(scrollLeft + clientWidth) < scrollWidth - threshold
   }
@@ -342,7 +338,7 @@
 
     const scrollAmount = viewport.clientWidth
     const targetScroll = Math.max(viewport.scrollLeft - scrollAmount, 0)
-    
+
     viewport.scrollTo({
       left: targetScroll,
       behavior: 'smooth'
@@ -385,7 +381,7 @@
         const hasOverflow = viewport.scrollWidth > viewport.clientWidth
         showRightArrow.value = hasOverflow
         showLeftArrow.value = false // 初始时左箭头应该隐藏
-        
+
         handleScroll({ target: viewport })
       }
     })
@@ -514,54 +510,48 @@
           class="bg-[#4e4e4e] rounded-lg p-1 flex flex-row gap-4 items-start justify-start self-stretch shrink-0 relative"
         >
           <div class="min-w-[200px] max-w-[600px] relative">
-            <div 
+            <div
               v-show="showLeftArrow"
               class="absolute left-0 top-0 z-20 cursor-pointer h-full flex items-center"
               @click="handleScrollLeft"
             >
-              <div class="flex items-center justify-center w-6 h-full bg-gradient-to-r from-[#4e4e4e] to-transparent">
-                <svg 
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 24 24" 
-                  fill="none"
-                >
-                  <path 
-                    d="M15 18L9 12L15 6" 
-                    stroke="#F9FAFB" 
-                    stroke-width="2" 
-                    stroke-linecap="round" 
+              <div
+                class="flex items-center justify-center w-6 h-full bg-gradient-to-r from-[#4e4e4e] to-transparent"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M15 18L9 12L15 6"
+                    stroke="#F9FAFB"
+                    stroke-width="2"
+                    stroke-linecap="round"
                     stroke-linejoin="round"
                   />
                 </svg>
               </div>
             </div>
 
-            <div 
+            <div
               v-show="showRightArrow"
               class="absolute right-0 top-0 z-20 cursor-pointer h-full flex items-center"
               @click="handleScrollRight"
             >
-              <div class="flex items-center justify-center w-6 h-full bg-gradient-to-l from-[#4e4e4e] to-transparent">
-                <svg 
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 24 24" 
-                  fill="none"
-                >
-                  <path 
-                    d="M9 18L15 12L9 6" 
-                    stroke="#F9FAFB" 
-                    stroke-width="2" 
-                    stroke-linecap="round" 
+              <div
+                class="flex items-center justify-center w-6 h-full bg-gradient-to-l from-[#4e4e4e] to-transparent"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M9 18L15 12L9 6"
+                    stroke="#F9FAFB"
+                    stroke-width="2"
+                    stroke-linecap="round"
                     stroke-linejoin="round"
                   />
                 </svg>
               </div>
             </div>
 
-            <ScrollArea 
-              ref="scrollViewportRef" 
+            <ScrollArea
+              ref="scrollViewportRef"
               class="rounded-md w-full overflow-hidden"
               @scroll="handleScroll"
             >
