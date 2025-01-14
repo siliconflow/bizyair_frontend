@@ -1,170 +1,170 @@
 <script setup lang="ts">
-    import { ref, onMounted, onUnmounted, PropType, computed, watch } from 'vue'
-    import { Model } from '@/types/model'
-    import ModelCard from './ModelCard.vue'
-    import LoadingOverlay from './LoadingOverlay.vue'
-    import EmptyState from './EmptyState.vue'
-    import BackToTop from './BackToTop.vue'
-    import { NVirtualList } from 'naive-ui'
-    import { debounce } from 'lodash-es'
-    import type { VirtualListInst } from 'naive-ui'
+  import { ref, onMounted, onUnmounted, PropType, computed, watch } from 'vue'
+  import { Model } from '@/types/model'
+  import ModelCard from './ModelCard.vue'
+  import LoadingOverlay from './LoadingOverlay.vue'
+  import EmptyState from './EmptyState.vue'
+  import BackToTop from './BackToTop.vue'
+  import { NVirtualList } from 'naive-ui'
+  import { debounce } from 'lodash-es'
+  import type { VirtualListInst } from 'naive-ui'
 
-    defineOptions({
-      name: 'BaseModelGrid'
-    })
+  defineOptions({
+    name: 'BaseModelGrid'
+  })
 
-    const props = defineProps({
-      models: {
-        type: Array as () => Model[],
-        required: true
-      },
-      mode: {
-        type: String,
-        required: true
-      },
-      currentTab: {
-        type: String,
-        default: ''
-      },
-      loading: {
-        type: Boolean,
-        default: false
-      },
-      total: {
-        type: Number,
-        required: true
-      },
-      pageSize: {
-        type: Number,
-        required: true
-      },
-      cacheKey: {
-        type: Number,
-        required: true
-      },
-      onFetchData: {
-        type: Function as PropType<(pageNumber: number, pageSize: number) => Promise<unknown[]>>,
-        required: true
-      },
-      onModelAction: {
-        type: Function as PropType<(model: Model) => Promise<void>>,
-        required: true
-      },
-      imageLoadStates: {
-        type: Object as PropType<Map<number | string, boolean>>,
-        required: true
-      },
-      onImageLoad: {
-        type: Function as PropType<(e: Event, modelId: number | string) => void>,
-        required: true
-      },
-      onImageError: {
-        type: Function as PropType<(e: Event, modelId: number | string) => void>,
-        required: true
-      }
-    })
+  const props = defineProps({
+    models: {
+      type: Array as () => Model[],
+      required: true
+    },
+    mode: {
+      type: String,
+      required: true
+    },
+    currentTab: {
+      type: String,
+      default: ''
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    total: {
+      type: Number,
+      required: true
+    },
+    pageSize: {
+      type: Number,
+      required: true
+    },
+    cacheKey: {
+      type: Number,
+      required: true
+    },
+    onFetchData: {
+      type: Function as PropType<(pageNumber: number, pageSize: number) => Promise<unknown[]>>,
+      required: true
+    },
+    onModelAction: {
+      type: Function as PropType<(model: Model) => Promise<void>>,
+      required: true
+    },
+    imageLoadStates: {
+      type: Object as PropType<Map<number | string, boolean>>,
+      required: true
+    },
+    onImageLoad: {
+      type: Function as PropType<(e: Event, modelId: number | string) => void>,
+      required: true
+    },
+    onImageError: {
+      type: Function as PropType<(e: Event, modelId: number | string) => void>,
+      required: true
+    }
+  })
 
-    const virtualListInst = ref<VirtualListInst>()
-    const emit = defineEmits(['scroll', 'loadMore', 'showDetail'])
+  const virtualListInst = ref<VirtualListInst>()
+  const emit = defineEmits(['scroll', 'loadMore', 'showDetail'])
 
-    const scrollState = ref({
-      ratio: 0,
-      showBackToTop: false,
-      timer: null as number | null
-    })
+  const scrollState = ref({
+    ratio: 0,
+    showBackToTop: false,
+    timer: null as number | null
+  })
 
-    const loadMoreTrigger = ref<HTMLDivElement | null>(null)
+  const loadMoreTrigger = ref<HTMLDivElement | null>(null)
 
-    const scrollContainer = ref<HTMLElement | null>(null)
+  const scrollContainer = ref<HTMLElement | null>(null)
 
-    const handleScroll = (e: Event) => {
-      const target = e.target as HTMLElement
-      const scrollTop = target.scrollTop
+  const handleScroll = (e: Event) => {
+    const target = e.target as HTMLElement
+    const scrollTop = target.scrollTop
 
-      scrollState.value.showBackToTop = scrollTop > 500
+    scrollState.value.showBackToTop = scrollTop > 500
 
-      const scrollBottom = scrollTop + target.clientHeight
-      const scrollHeight = target.scrollHeight
-      const scrollPercentage = (scrollBottom / scrollHeight) * 100
+    const scrollBottom = scrollTop + target.clientHeight
+    const scrollHeight = target.scrollHeight
+    const scrollPercentage = (scrollBottom / scrollHeight) * 100
 
-      if (scrollPercentage > 90 && !props.loading) {
-        emit('loadMore')
-      }
-
-      emit('scroll', e)
+    if (scrollPercentage > 90 && !props.loading) {
+      emit('loadMore')
     }
 
-    const windowWidth = ref(window.innerWidth)
+    emit('scroll', e)
+  }
 
-    const handleWindowResize = debounce(() => {
-      windowWidth.value = window.innerWidth
-    }, 100)
+  const windowWidth = ref(window.innerWidth)
 
-    onMounted(() => {
-      const observer = new IntersectionObserver(
-        entries => {
-          if (entries[0].isIntersecting) {
-            emit('loadMore')
-          }
-        },
-        {
-          root: document.querySelector('.scroll-container'),
-          threshold: 0.1,
-          rootMargin: '100px'
+  const handleWindowResize = debounce(() => {
+    windowWidth.value = window.innerWidth
+  }, 100)
+
+  onMounted(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
+          emit('loadMore')
         }
-      )
-
-      if (loadMoreTrigger.value) {
-        observer.observe(loadMoreTrigger.value)
+      },
+      {
+        root: document.querySelector('.scroll-container'),
+        threshold: 0.1,
+        rootMargin: '100px'
       }
+    )
 
-      window.addEventListener('resize', handleWindowResize)
+    if (loadMoreTrigger.value) {
+      observer.observe(loadMoreTrigger.value)
+    }
 
-      onUnmounted(() => {
-        observer.disconnect()
-        window.removeEventListener('resize', handleWindowResize)
+    window.addEventListener('resize', handleWindowResize)
+
+    onUnmounted(() => {
+      observer.disconnect()
+      window.removeEventListener('resize', handleWindowResize)
+    })
+  })
+
+  const columnsCount = computed(() => {
+    const width = windowWidth.value
+    if (width >= 1890) return 7
+    if (width >= 1650) return 6
+    if (width >= 1440) return 5
+    if (width >= 992) return 4
+    if (width >= 768) return 3
+    return 2
+  })
+
+  const rows = computed(() => {
+    if (!props.models) return []
+    const result = []
+    const count = columnsCount.value
+    for (let i = 0; i < props.models.length; i += count) {
+      const row = props.models.slice(i, i + count)
+      result.push({
+        id: `row-${i}`,
+        models: row
       })
-    })
+    }
+    return result
+  })
 
-    const columnsCount = computed(() => {
-      const width = windowWidth.value
-      if (width >= 1890) return 7
-      if (width >= 1650) return 6
-      if (width >= 1440) return 5
-      if (width >= 992) return 4
-      if (width >= 768) return 3
-      return 2
-    })
-
-    const rows = computed(() => {
-      if (!props.models) return []
-      const result = []
-      const count = columnsCount.value
-      for (let i = 0; i < props.models.length; i += count) {
-        const row = props.models.slice(i, i + count)
-        result.push({
-          id: `row-${i}`,
-          models: row
-        })
-      }
-      return result
-    })
-
-    const rowHeight = computed(() => {
-      const width = windowWidth.value
-      if (width >= 1890) return 340 // 7列
-      if (width >= 1650) return 320 // 6列
-      if (width >= 1440) return 300 // 5列
-      if (width >= 992) return 280 // 4列
-      if (width >= 768) return 260 // 3列
-      return 240 // 2列
-    })
+  const rowHeight = computed(() => {
+    const width = windowWidth.value
+    if (width >= 1890) return 340 // 7列
+    if (width >= 1650) return 320 // 6列
+    if (width >= 1440) return 300 // 5列
+    if (width >= 992) return 280 // 4列
+    if (width >= 768) return 260 // 3列
+    return 240 // 2列
+  })
 
   const virtualListProps = computed(() => ({
     items: rows.value,
     itemSize: rowHeight.value,
     style: {
-      height: '100%',
+      height: '100%'
     },
     itemResizable: true,
     ignoreItemResize: false,
@@ -175,17 +175,17 @@
     if (scrollContainer.value) {
       scrollContainer.value.scrollTo({ top: 0, behavior: 'smooth' })
     }
-  }   
+  }
 
-    watch(
-      () => props.cacheKey,
-      () => {
-        if (scrollContainer.value) {
-          scrollContainer.value.scrollTo({ top: 0 })
-          scrollState.value.showBackToTop = false
-        }
+  watch(
+    () => props.cacheKey,
+    () => {
+      if (scrollContainer.value) {
+        scrollContainer.value.scrollTo({ top: 0 })
+        scrollState.value.showBackToTop = false
       }
-    )
+    }
+  )
 </script>
 
 <template>
@@ -275,7 +275,6 @@
     width: 100%;
     margin-bottom: 20px;
     z-index: 1;
-
   }
 
   @media (min-width: 768px) {
@@ -307,7 +306,6 @@
     padding-bottom: 200px !important;
   } */
 
-
   @media (min-width: 1650px) {
     .grid {
       grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -319,7 +317,6 @@
   /* :deep(.v-vl-items) {
     padding-bottom: 100px !important;
   } */
-
 
   .grid-container {
     position: relative;
@@ -337,14 +334,12 @@
     padding-bottom: 220px !important;
   } */
 
-
   :deep(.n-virtual-list::-webkit-scrollbar-track) {
     background: transparent;
   }
   /* :deep(.v-vl-items) {
     padding-bottom: 240px !important;
   } */
-
 
   .grid-container {
     position: relative;
@@ -357,7 +352,6 @@
     padding-bottom: 100px;
     padding-right: 6px;
     flex: 1;
-
   }
 
   :deep(.n-virtual-list) {
