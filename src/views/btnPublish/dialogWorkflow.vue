@@ -4,7 +4,6 @@
     preset="card"
     size="huge"
     :bordered="false"
-    :segmented="segmented"
     :on-after-leave="onDialogClose"
     content-style="padding: 0"
     header-style="padding: 20px"
@@ -73,8 +72,8 @@
           </v-item>
           <v-item label="Base Model">
             <n-select 
-              placeholder="Select Base Model" 
               v-model:value="e.base_model" 
+              placeholder="Select Base Model" 
               :options="modelStoreObject.baseTypeLis" />
             <!-- <v-select
               v-model:model-value="e.base_model"
@@ -162,7 +161,7 @@
 <script setup lang="ts">
   import { useToaster } from '@/components/modules/toats/index'
   import { computed, inject, ref, watch } from 'vue'
-  import { SelectItem } from '@/components/ui/select'
+  // import { SelectItem } from '@/components/ui/select'
   // import { Input } from '@/components/ui/input'
   
   // import { Button } from '@/components/ui/button'
@@ -173,8 +172,8 @@
   import { modelStore } from '@/stores/modelStatus'
   import { create_models, put_model } from '@/api/model'
   import { Trash2 } from 'lucide-vue-next'
-  import vDialog from '@/components/modules/vDialog.vue'
-  import vSelect from '@/components/modules/vSelect.vue'
+  // import vDialog from '@/components/modules/vDialog.vue'
+  // import vSelect from '@/components/modules/vSelect.vue'
   import vItem from '@/components/modules/vItem.vue'
   import vCustomAccordion from '@/components/modules/vCustomAccordion.vue'
   import vCustomAccordionItem from '@/components/modules/vCustomAccordionItem.vue'
@@ -209,11 +208,11 @@
 
     return progress
   })
-  function handleChange(val: any, index: number) {
-    if (formData.value.versions) {
-      formData.value.versions[index].public = val
-    }
-  }
+  // function handleChange(val: any, index: number) {
+  //   if (formData.value.versions) {
+  //     formData.value.versions[index].public = val
+  //   }
+  // }
   async function delVersion(index: number) {
     const res = await useAlertDialog({
       title: 'Are you sure you want to delete this version?',
@@ -423,7 +422,7 @@
       deep: true
     }
   )
-  const test123123 = (e) => {
+  const test123123 = (e: { target: { files: string | any[] } }) => {
     console.log(e.target.files)
     for (let i = 0; i < e.target.files.length; i++) {
       const file = e.target.files[i]
