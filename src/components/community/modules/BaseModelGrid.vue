@@ -76,6 +76,8 @@
 
   const loadMoreTrigger = ref<HTMLDivElement | null>(null)
 
+  const scrollContainer = ref<HTMLElement | null>(null)
+
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLElement
     const scrollTop = target.scrollTop
@@ -165,27 +167,26 @@
     items: rows.value,
     itemSize: rowHeight.value,
     style: {
-      maxHeight: 'calc(100vh - 200px)',
-      height: 'auto',
+      height: '100%',
     },
-    keyField: 'id',
     itemResizable: true,
     ignoreItemResize: false,
-    scrollbarProps: {
-      trigger: 'none',
-      
-    }
+    scrollable: false
   }))
 
   const backToTop = () => {
-    virtualListInst.value?.scrollTo({ top: 0 })
+    if (scrollContainer.value) {
+      scrollContainer.value.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }   
 
   watch(
     () => props.cacheKey,
     () => {
-      virtualListInst.value?.scrollTo({ top: 0 })
-      scrollState.value.showBackToTop = false
+      if (scrollContainer.value) {
+        scrollContainer.value.scrollTo({ top: 0 })
+        scrollState.value.showBackToTop = false
+      }
     }
   )
 
@@ -193,7 +194,11 @@
 
 <template>
   <div class="flex flex-col h-full">
-    <div class="flex-1 px-6 overflow-hidden main-container">
+    <div 
+      ref="scrollContainer"
+      class="flex-1 px-6 overflow-auto main-container" 
+      @scroll="handleScroll"
+    >
       <LoadingOverlay v-if="loading" />
       <div class="scroll-container">
         <EmptyState v-if="!loading && (!models || models.length === 0)" />
@@ -202,7 +207,6 @@
             v-if="rows.length > 0"
             ref="virtualListInst"
             v-bind="virtualListProps"
-            @scroll="handleScroll"
           >
             <template #default="{ item: row }">
               <div class="grid">
@@ -229,8 +233,29 @@
 </template>
 
 <style scoped>
+.main-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.main-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.main-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.main-container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.main-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
 .scroll-container {
-  max-height: calc(100vh - 200px);
   height: auto;
   margin-top: 0.5rem;
   position: relative;
@@ -238,7 +263,6 @@
   display: flex;
   flex-direction: column;
 }
-
 
 .virtual-list {
   width: 100%;
@@ -266,45 +290,45 @@
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  :deep(.v-vl-items) {
+  /* :deep(.v-vl-items) {
     padding-bottom: 220px !important;
-  }
+  } */
 }
 
 @media (min-width: 992px) {
   .grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  :deep(.v-vl-items) {
+  /* :deep(.v-vl-items) {
     padding-bottom: 200px !important;
-  }
+  } */
 }
 
 @media (min-width: 1440px) {
   .grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
-  :deep(.v-vl-items) {
+  /* :deep(.v-vl-items) {
     padding-bottom: 100px !important;
-  }
+  } */
 }
 
 @media (min-width: 1650px) {
   .grid {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
-  :deep(.v-vl-items) {
+  /* :deep(.v-vl-items) {
     padding-bottom: 220px !important;
-  }
+  } */
 }
 
 @media (min-width: 1890px) {
   .grid {
     grid-template-columns: repeat(7, minmax(0, 1fr));
   }
-  :deep(.v-vl-items) {
+  /* :deep(.v-vl-items) {
     padding-bottom: 240px !important;
-  }
+  } */
 }
 
 .grid-container {
@@ -321,6 +345,9 @@
 
 }
 
+:deep(.n-virtual-list) {
+  overflow: visible !important;
+}
 
 :deep(.n-virtual-list::-webkit-scrollbar) {
   width: 6px;
@@ -340,14 +367,6 @@
 :deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
   background-color: rgba(255, 255, 255, 0.5);
 }
-
-
-
-:deep(.v-vl:not(.v-vl--show-scrollbar)){
-  padding: 10px 20px 100px 20px;
-}
-
-
 
 
 
