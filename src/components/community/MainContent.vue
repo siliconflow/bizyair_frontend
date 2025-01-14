@@ -12,7 +12,6 @@
   })
 
   const communityStore = useCommunityStore()
- 
 
   const loadingStates = ref({
     isGridLoading: false,
@@ -144,8 +143,6 @@
     }
   }
 
-
-
   const fetchData = async (pageNumber: number, pageSize: number): Promise<unknown[]> => {
     try {
       const response = await get_model_list(
@@ -195,14 +192,11 @@
     }
   )
 
-
   onUnmounted(() => {
     if (loadingStates.value.isGridLoading) {
       loadingStates.value.isGridLoading = false
     }
   })
-
-  
 
   onMounted(async () => {
     loadingStates.value.isGridLoading = true
@@ -237,8 +231,6 @@
       retryCountMap.value.delete(src)
     }
   }
-
-
 </script>
 
 <template>
@@ -268,5 +260,3 @@
     />
   </div>
 </template>
-
-

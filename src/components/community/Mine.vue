@@ -143,7 +143,6 @@
     }, 150)
   }, 100)
 
-
   const fetchData = async (pageNumber: number, pageSize: number) => {
     try {
       const response = await get_model_list(
@@ -168,8 +167,7 @@
         }
 
         return response.data.list
-      }
-      else{
+      } else {
         communityStore.mine[currentTab.value].models = []
       }
     } catch (error) {
@@ -192,9 +190,9 @@
   }
 
   const switchTab = async (tab: TabType) => {
-    currentTab.value = tab 
-    const currentState = communityStore.mine[tab] 
-    
+    currentTab.value = tab
+    const currentState = communityStore.mine[tab]
+
     cacheKey.value++
     gridCache.value.clear()
     cacheState.value.loadedPages.clear()
@@ -207,12 +205,12 @@
       currentState.lastState.loadedPages.forEach(page => {
         cacheState.value.loadedPages.add(page)
       })
-      await fetchData(0,communityStore.mine[currentTab.value].modelListPathParams.page_size)
+      await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
       setScrollPosition(currentState.lastState.scrollRatio)
     } else {
       currentState.modelListPathParams.current = 1
       lastLoadedPage.value = 1
-      await fetchData(0,communityStore.mine[currentTab.value].modelListPathParams.page_size)
+      await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
     }
   }
 
@@ -250,8 +248,6 @@
       await handleAddNode(model)
     }
   }
-
-
 
   const handleLoadWorkflow = async (versions: any) => {
     if (!versions || versions.length === 0) {
@@ -342,8 +338,7 @@
               setScrollPosition(savedScrollRatio)
             }, 100)
           })
-        }
-        else{
+        } else {
           communityStore.mine[currentTab.value].models = []
         }
       } catch (error) {
@@ -418,8 +413,6 @@
     }
   })
 
- 
-
   onUnmounted(() => {
     if (observer) {
       observer.disconnect()
@@ -439,7 +432,7 @@
         cacheState.value.loadedPages.clear()
         cacheState.value.imageLoadStates.clear()
         communityStore.mine[currentTab.value].modelListPathParams.current = 1
-        await fetchData(0,communityStore.mine[currentTab.value].modelListPathParams.page_size)
+        await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
       }
     },
     { deep: true }
@@ -457,7 +450,7 @@
             @fetch-data="
               () => {
                 communityStore.mine.posts.modelListPathParams.current = 1
-                fetchData(0,communityStore.mine.posts.modelListPathParams.page_size)
+                fetchData(0, communityStore.mine.posts.modelListPathParams.page_size)
               }
             "
           />
@@ -471,7 +464,7 @@
             @fetch-data="
               () => {
                 communityStore.mine.forked.modelListPathParams.current = 1
-                fetchData(0,communityStore.mine.forked.modelListPathParams.page_size)
+                fetchData(0, communityStore.mine.forked.modelListPathParams.page_size)
               }
             "
           />
@@ -494,7 +487,6 @@
       mode="my"
       @scroll="handleScroll"
       @load-more="loadMore"
-    
     />
   </div>
 </template>

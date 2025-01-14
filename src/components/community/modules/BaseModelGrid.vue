@@ -9,7 +9,6 @@
   import { debounce } from 'lodash-es'
   import type { VirtualListInst } from 'naive-ui'
 
-
   defineOptions({
     name: 'BaseModelGrid'
   })
@@ -79,7 +78,7 @@
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLElement
     const scrollTop = target.scrollTop
-    
+
     scrollState.value.showBackToTop = scrollTop > 500
 
     const scrollBottom = scrollTop + target.clientHeight
@@ -93,8 +92,6 @@
     emit('scroll', e)
   }
 
-
-
   const windowWidth = ref(window.innerWidth)
 
   const handleWindowResize = debounce(() => {
@@ -103,7 +100,7 @@
 
   onMounted(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         if (entries[0].isIntersecting) {
           emit('loadMore')
         }
@@ -156,8 +153,8 @@
     if (width >= 1890) return 340 // 7列
     if (width >= 1650) return 320 // 6列
     if (width >= 1440) return 300 // 5列
-    if (width >= 992) return 280  // 4列
-    if (width >= 768) return 260  // 3列
+    if (width >= 992) return 280 // 4列
+    if (width >= 768) return 260 // 3列
     return 240 // 2列
   })
 
@@ -166,20 +163,19 @@
     itemSize: rowHeight.value,
     style: {
       maxHeight: 'calc(100vh - 200px)',
-      height: 'auto',
+      height: 'auto'
     },
     keyField: 'id',
     itemResizable: true,
     ignoreItemResize: false,
     scrollbarProps: {
-      trigger: 'none',
-      
+      trigger: 'none'
     }
   }))
 
   const backToTop = () => {
     virtualListInst.value?.scrollTo({ top: 0 })
-  }   
+  }
 
   watch(
     () => props.cacheKey,
@@ -188,7 +184,6 @@
       scrollState.value.showBackToTop = false
     }
   )
-
 </script>
 
 <template>
@@ -229,129 +224,115 @@
 </template>
 
 <style scoped>
-.scroll-container {
-  max-height: calc(100vh - 200px);
-  height: auto;
-  margin-top: 0.5rem;
-  position: relative;
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
+  .scroll-container {
+    max-height: calc(100vh - 200px);
+    height: auto;
+    margin-top: 0.5rem;
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
 
+  .virtual-list {
+    width: 100%;
+    height: auto !important;
+    max-height: inherit;
+    overflow-x: hidden !important;
+    padding: 12px 20px 64px 20px;
+    min-height: 300px;
+  }
 
-.virtual-list {
-  width: 100%;
-  height: auto !important;
-  max-height: inherit;
-  overflow-x: hidden !important;
-  padding: 12px 20px 64px 20px;
-  min-height: 300px;
-}
-
-.grid {
-  display: grid;
-  grid-gap: 20px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  position: relative;
-  transition: opacity 0.3s ease-in-out;
-  align-items: stretch;
-  width: 100%;
-  margin-bottom: 20px;
-  z-index: 1;
-  
-}
-
-@media (min-width: 768px) {
   .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    position: relative;
+    transition: opacity 0.3s ease-in-out;
+    align-items: stretch;
+    width: 100%;
+    margin-bottom: 20px;
+    z-index: 1;
   }
-  :deep(.v-vl-items) {
-    padding-bottom: 220px !important;
+
+  @media (min-width: 768px) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 220px !important;
+    }
   }
-}
 
-@media (min-width: 992px) {
-  .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  @media (min-width: 992px) {
+    .grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 200px !important;
+    }
   }
-  :deep(.v-vl-items) {
-    padding-bottom: 200px !important;
+
+  @media (min-width: 1440px) {
+    .grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 100px !important;
+    }
   }
-}
 
-@media (min-width: 1440px) {
-  .grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+  @media (min-width: 1650px) {
+    .grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 220px !important;
+    }
   }
-  :deep(.v-vl-items) {
-    padding-bottom: 100px !important;
+
+  @media (min-width: 1890px) {
+    .grid {
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 240px !important;
+    }
   }
-}
 
-@media (min-width: 1650px) {
-  .grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+  .grid-container {
+    position: relative;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    max-width: 2000px;
+    padding-bottom: 100px;
+    padding-right: 6px;
+    flex: 1;
   }
-  :deep(.v-vl-items) {
-    padding-bottom: 220px !important;
+
+  :deep(.n-virtual-list::-webkit-scrollbar) {
+    width: 6px;
+    position: absolute;
+    right: 0;
   }
-}
 
-@media (min-width: 1890px) {
-  .grid {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+  :deep(.n-virtual-list::-webkit-scrollbar-track) {
+    background: transparent;
   }
-  :deep(.v-vl-items) {
-    padding-bottom: 240px !important;
+
+  :deep(.n-virtual-list::-webkit-scrollbar-thumb) {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
   }
-}
 
-.grid-container {
-  position: relative;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin: 0 auto;
-  max-width: 2000px;
-  padding-bottom: 100px;
-  padding-right: 6px;
-  flex: 1;
+  :deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 
-}
-
-
-:deep(.n-virtual-list::-webkit-scrollbar) {
-  width: 6px;
-  position: absolute;
-  right: 0;
-}
-
-:deep(.n-virtual-list::-webkit-scrollbar-track) {
-  background: transparent;
-}
-
-:deep(.n-virtual-list::-webkit-scrollbar-thumb) {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
-
-:deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-
-
-:deep(.v-vl:not(.v-vl--show-scrollbar)){
-  padding: 10px 20px 100px 20px;
-}
-
-
-
-
-
+  :deep(.v-vl:not(.v-vl--show-scrollbar)) {
+    padding: 10px 20px 100px 20px;
+  }
 </style>
-
-
-
