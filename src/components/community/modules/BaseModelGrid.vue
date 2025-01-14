@@ -164,16 +164,10 @@
     items: rows.value,
     itemSize: rowHeight.value,
     style: {
-<<<<<<< HEAD
       height: '100%',
-=======
-      maxHeight: 'calc(100vh - 200px)',
-      height: 'auto'
->>>>>>> 1094ae3dd940f985557e3b0668fa5bbe2ec9babe
     },
     itemResizable: true,
     ignoreItemResize: false,
-<<<<<<< HEAD
     scrollable: false
   }))
 
@@ -182,16 +176,6 @@
       scrollContainer.value.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }   
-=======
-    scrollbarProps: {
-      trigger: 'none'
-    }
-  }))
-
-  const backToTop = () => {
-    virtualListInst.value?.scrollTo({ top: 0 })
-  }
->>>>>>> 1094ae3dd940f985557e3b0668fa5bbe2ec9babe
 
   watch(
     () => props.cacheKey,
@@ -326,7 +310,7 @@
   /* :deep(.v-vl-items) {
     padding-bottom: 200px !important;
   } */
-}
+
 
   @media (min-width: 1650px) {
     .grid {
@@ -339,7 +323,7 @@
   /* :deep(.v-vl-items) {
     padding-bottom: 100px !important;
   } */
-}
+
 
   .grid-container {
     position: relative;
@@ -356,7 +340,7 @@
   /* :deep(.v-vl-items) {
     padding-bottom: 220px !important;
   } */
-}
+
 
   :deep(.n-virtual-list::-webkit-scrollbar-track) {
     background: transparent;
@@ -364,7 +348,7 @@
   /* :deep(.v-vl-items) {
     padding-bottom: 240px !important;
   } */
-}
+
 
 .grid-container {
   position: relative;
