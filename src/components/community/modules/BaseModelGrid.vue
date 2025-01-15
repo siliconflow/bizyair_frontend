@@ -163,16 +163,16 @@
     itemSize: rowHeight.value,
     style: {
       maxHeight: 'calc(100vh - 200px)',
-      height: 'auto',
+      height: 'auto'
     },
     keyField: 'id',
     itemResizable: true,
-    ignoreItemResize: false,
+    ignoreItemResize: false
   }))
 
   const backToTop = () => {
     virtualListInst.value?.scrollTo({ top: 0 })
-  }   
+  }
 
   watch(
     () => props.cacheKey,
@@ -221,83 +221,81 @@
 </template>
 
 <style scoped>
-.scroll-container {
-  max-height: calc(100vh - 200px);
-  height: auto;
-  margin-top: 0.5rem;
-  position: relative;
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
+  .scroll-container {
+    max-height: calc(100vh - 200px);
+    height: auto;
+    margin-top: 0.5rem;
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
 
+  .virtual-list {
+    width: 100%;
+    height: auto !important;
+    max-height: inherit;
+    overflow-x: hidden !important;
+    padding: 12px 20px 64px 20px;
+    min-height: 300px;
+  }
 
-.virtual-list {
-  width: 100%;
-  height: auto !important;
-  max-height: inherit;
-  overflow-x: hidden !important;
-  padding: 12px 20px 64px 20px;
-  min-height: 300px;
-}
-
-.grid {
-  display: grid;
-  grid-gap: 10px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  position: relative;
-  transition: opacity 0.3s ease-in-out;
-  align-items: stretch;
-  width: 100%;
-  margin-bottom: 10px;
-  z-index: 1;
-  
-}
-
-@media (min-width: 768px) {
   .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    position: relative;
+    transition: opacity 0.3s ease-in-out;
+    align-items: stretch;
+    width: 100%;
+    margin-bottom: 10px;
+    z-index: 1;
   }
-  :deep(.v-vl-items) {
-    padding-bottom: 220px !important;
-  }
-}
 
-@media (min-width: 992px) {
-  .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  @media (min-width: 768px) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 220px !important;
+    }
   }
-  :deep(.v-vl-items) {
-    padding-bottom: 200px !important;
-  }
-}
 
-@media (min-width: 1440px) {
-  .grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+  @media (min-width: 992px) {
+    .grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 200px !important;
+    }
   }
-  :deep(.v-vl-items) {
-    padding-bottom: 100px !important;
-  }
-}
 
-@media (min-width: 1650px) {
-  .grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+  @media (min-width: 1440px) {
+    .grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 100px !important;
+    }
   }
-  :deep(.v-vl-items) {
-    padding-bottom: 220px !important;
-  }
-}
 
-@media (min-width: 1890px) {
-  .grid {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+  @media (min-width: 1650px) {
+    .grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 220px !important;
+    }
   }
-  :deep(.v-vl-items) {
-    padding-bottom: 240px !important;
+
+  @media (min-width: 1890px) {
+    .grid {
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+    :deep(.v-vl-items) {
+      padding-bottom: 240px !important;
+    }
   }
-}
 
   .grid-container {
     position: relative;
@@ -311,7 +309,6 @@
     padding-right: 6px;
     flex: 1;
   }
-
 
   :deep(.n-virtual-list::-webkit-scrollbar) {
     width: 6px;
@@ -328,20 +325,11 @@
     border-radius: 4px;
   }
 
-:deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
-  background-color: rgba(255, 255, 255, 0.5);
-}
+  :deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 
-
-
-:deep(.v-vl:not(.v-vl--show-scrollbar)){
-  padding: 10px 20px 100px 20px;
-}
-
-
-
-
-
+  :deep(.v-vl:not(.v-vl--show-scrollbar)) {
+    padding: 10px 20px 100px 20px;
+  }
 </style>
-
-
