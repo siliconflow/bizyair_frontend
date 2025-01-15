@@ -9,15 +9,6 @@
   import { debounce } from 'lodash-es'
   import type { VirtualListInst } from 'naive-ui'
 
-  import { ref, onMounted, onUnmounted, PropType, computed, watch } from 'vue'
-  import { Model } from '@/types/model'
-  import ModelCard from './ModelCard.vue'
-  import LoadingOverlay from './LoadingOverlay.vue'
-  import EmptyState from './EmptyState.vue'
-  import BackToTop from './BackToTop.vue'
-  import { NVirtualList } from 'naive-ui'
-  import { debounce } from 'lodash-es'
-  import type { VirtualListInst } from 'naive-ui'
 
   defineOptions({
     name: 'BaseModelGrid'
@@ -92,11 +83,6 @@
     const scrollTop = target.scrollTop
     
     scrollState.value.showBackToTop = scrollTop > 500
-  const handleScroll = (e: Event) => {
-    const target = e.target as HTMLElement
-    const scrollTop = target.scrollTop
-
-    scrollState.value.showBackToTop = scrollTop > 500
 
     const scrollBottom = scrollTop + target.clientHeight
     const scrollHeight = target.scrollHeight
@@ -110,8 +96,6 @@
   }
 
 
-    emit('scroll', e)
-  }
 
   const windowWidth = ref(window.innerWidth)
 
@@ -122,19 +106,6 @@
   onMounted(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          emit('loadMore')
-        }
-      },
-      {
-        root: document.querySelector('.scroll-container'),
-        threshold: 0.1,
-        rootMargin: '100px'
-      }
-    )
-  onMounted(() => {
-    const observer = new IntersectionObserver(
-      entries => {
         if (entries[0].isIntersecting) {
           emit('loadMore')
         }
@@ -191,21 +162,12 @@
     if (width >= 768) return 260  // 3列
     return 240 // 2列
   })
-  const rowHeight = computed(() => {
-    const width = windowWidth.value
-    if (width >= 1890) return 340 // 7列
-    if (width >= 1650) return 320 // 6列
-    if (width >= 1440) return 300 // 5列
-    if (width >= 992) return 280 // 4列
-    if (width >= 768) return 260 // 3列
-    return 240 // 2列
-  })
 
   const virtualListProps = computed(() => ({
     items: rows.value,
     itemSize: rowHeight.value,
     style: {
-      height: '100%'
+      height: '100%',
     },
     itemResizable: true,
     ignoreItemResize: false,
@@ -216,7 +178,7 @@
     if (scrollContainer.value) {
       scrollContainer.value.scrollTo({ top: 0, behavior: 'smooth' })
     }
-  }
+  }   
 
   watch(
     () => props.cacheKey,
@@ -228,15 +190,6 @@
     }
   )
 
-  watch(
-    () => props.cacheKey,
-    () => {
-      if (scrollContainer.value) {
-        scrollContainer.value.scrollTo({ top: 0 })
-        scrollState.value.showBackToTop = false
-      }
-    }
-  )
 </script>
 
 <template>
@@ -332,77 +285,46 @@
   z-index: 1;
   
 }
+
+@media (min-width: 768px) {
   .grid {
-    display: grid;
-    grid-gap: 20px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    position: relative;
-    transition: opacity 0.3s ease-in-out;
-    align-items: stretch;
-    width: 100%;
-    margin-bottom: 20px;
-    z-index: 1;
-  }
-
-  @media (min-width: 768px) {
-    .grid {
-      display: grid;
-      grid-gap: 20px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      position: relative;
-      transition: opacity 0.3s ease-in-out;
-      align-items: stretch;
-      width: 100%;
-      margin-bottom: 20px;
-      z-index: 1;
-    }
-    /* :deep(.v-vl-items) {
-      padding-bottom: 220px !important;
-    } */
-  }
-
-  @media (min-width: 992px) {
-    .grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-    :deep(.v-vl-items) {
-      padding-bottom: 200px !important;
-    }
-  }
-  /* :deep(.v-vl-items) {
-    padding-bottom: 200px !important;
-  } */
-
-  @media (min-width: 1650px) {
-    .grid {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-    :deep(.v-vl-items) {
-      padding-bottom: 220px !important;
-    }
-  }
-  /* :deep(.v-vl-items) {
-    padding-bottom: 100px !important;
-  } */
-
-  .grid-container {
-    position: relative;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin: 0 auto;
-    max-width: 2000px;
-    padding-bottom: 100px;
-    padding-right: 6px;
-    flex: 1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   /* :deep(.v-vl-items) {
     padding-bottom: 220px !important;
   } */
+}
 
-  :deep(.n-virtual-list::-webkit-scrollbar-track) {
-    background: transparent;
+@media (min-width: 992px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  /* :deep(.v-vl-items) {
+    padding-bottom: 200px !important;
+  } */
+}
+
+@media (min-width: 1440px) {
+  .grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  /* :deep(.v-vl-items) {
+    padding-bottom: 100px !important;
+  } */
+}
+
+@media (min-width: 1650px) {
+  .grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  /* :deep(.v-vl-items) {
+    padding-bottom: 220px !important;
+  } */
+}
+
+@media (min-width: 1890px) {
+  .grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
   /* :deep(.v-vl-items) {
     padding-bottom: 240px !important;
@@ -422,18 +344,6 @@
   flex: 1;
 
 }
-  .grid-container {
-    position: relative;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin: 0 auto;
-    max-width: 2000px;
-    padding-bottom: 100px;
-    padding-right: 6px;
-    flex: 1;
-  }
 
 :deep(.n-virtual-list) {
   overflow: visible !important;
