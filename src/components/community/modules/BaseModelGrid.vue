@@ -167,8 +167,7 @@
     },
     keyField: 'id',
     itemResizable: true,
-    ignoreItemResize: false,
-  
+    ignoreItemResize: false
   }))
 
   const backToTop = () => {
@@ -257,35 +256,30 @@
     .grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-    
   }
 
   @media (min-width: 992px) {
     .grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
-   
   }
 
   @media (min-width: 1440px) {
     .grid {
       grid-template-columns: repeat(5, minmax(0, 1fr));
     }
-    
   }
 
   @media (min-width: 1650px) {
     .grid {
       grid-template-columns: repeat(6, minmax(0, 1fr));
     }
-    
   }
 
   @media (min-width: 1890px) {
     .grid {
       grid-template-columns: repeat(7, minmax(0, 1fr));
     }
-   
   }
 
   .grid-container {
