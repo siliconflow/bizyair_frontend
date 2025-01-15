@@ -83,10 +83,12 @@
 
   watch(
     () => props.model?.versions?.[0]?.cover_urls,
-    (newUrl) => {
+    newUrl => {
       if (newUrl) {
         const timestamp = new Date().getTime()
-        imgSrc.value = newUrl.includes('?') ? `${newUrl}&t=${timestamp}` : `${newUrl}?t=${timestamp}`
+        imgSrc.value = newUrl.includes('?')
+          ? `${newUrl}&t=${timestamp}`
+          : `${newUrl}?t=${timestamp}`
       }
     }
   )
