@@ -292,9 +292,7 @@
         break
       }
     }
-    return tempData.versions.every(
-      (e: any) => e.version && e.base_model && e.sign
-    )
+    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
   }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p
