@@ -2,11 +2,10 @@
   import { Button } from '@/components/ui/button'
   import { Input } from '@/components/ui/input'
   import { Badge } from '@/components/ui/badge'
-  import { onMounted } from 'vue'
+
   import { useCommunityStore } from '@/stores/communityStore'
-  import type { SortValue, CommonModelType, PageType } from '@/types/model'
-  import { base_model_types, model_types } from '@/api/model'
-  import { useToaster } from '@/components/modules/toats'
+  import type { SortValue, PageType } from '@/types/model'
+
   import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
   import {
     Command,
@@ -15,26 +14,25 @@
     CommandList,
     CommandSeparator
   } from '@/components/ui/command'
+  import { onMounted, nextTick } from 'vue'
 
   const store = useCommunityStore()
 
-  interface Props {
+  const props = defineProps<{
     showSortPopover: boolean
     page: PageType
-  }
+  }>()
 
-  interface Emits {
+  const emit = defineEmits<{
     (e: 'update:showSortPopover', value: boolean): void
     (e: 'fetchData'): void
-    (e: 'filterDataReady'): void
-  }
+    (e: 'filter-data-ready'): void
+  }>()
 
-  const props = defineProps<Props>()
-  const emit = defineEmits<Emits>()
-
-  const handleSortChange = (value: SortValue) => {
+  const handleSortChange = async (value: SortValue) => {
     store[props.page].filterState.sort = value
     store[props.page].modelListPathParams.current = 1
+    await nextTick()
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
@@ -43,21 +41,23 @@
     const types = [...store[props.page].filterState.selected_model_types]
     const index = types.indexOf(String(type))
     index === -1 ? types.push(String(type)) : types.splice(index, 1)
-    store[props.page].modelListPathParams.current = 1
-    if (props.page === 'mainContent' && types.length === 0) {
-      store[props.page].filterState.model_types = store[props.page].modelTypes.map(
-        type => type.value
-      )
+
+    store[props.page].filterState.selected_model_types = types
+
+    if (types.length === 0) {
+      store[props.page].filterState.model_types = store.modelTypes.map(type => type.value)
     } else {
       store[props.page].filterState.model_types = types
     }
-    store[props.page].filterState.selected_model_types = types
 
+    store[props.page].modelListPathParams.current = 1
+
+    await nextTick()
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
 
-  const handleBaseModelChange = (model: string) => {
+  const handleBaseModelChange = async (model: string) => {
     const models = [...store[props.page].filterState.base_models]
     const modelIndex = models.indexOf(String(model))
     if (modelIndex === -1) {
@@ -66,47 +66,10 @@
       models.splice(modelIndex, 1)
     }
     store[props.page].filterState.base_models = models
+
+    await nextTick()
     emit('fetchData')
     emit('update:showSortPopover', false)
-  }
-
-  const getFilterData = async () => {
-    try {
-      const [modelTypesResponse, baseModelResponse] = await Promise.all([
-        model_types(),
-        base_model_types()
-      ])
-
-      if (modelTypesResponse?.data) {
-        store.setModelTypes(props.page as PageType, modelTypesResponse.data as CommonModelType[])
-        if (props.page === 'mainContent') {
-          if (store[props.page].filterState.selected_model_types.length === 0) {
-            if (Array.isArray(store[props.page].modelTypes)) {
-              store[props.page].filterState.model_types = store[props.page].modelTypes.map(
-                type => type.value
-              )
-            }
-          }
-        }
-        if (props.page === 'posts' || props.page === 'forked') {
-          const hasWorkflow = store[props.page].modelTypes.some(type => type.value === 'Workflow')
-          if (!hasWorkflow) {
-            store[props.page].modelTypes.push({ label: 'Workflow', value: 'Workflow' })
-          }
-        }
-      }
-
-      if (baseModelResponse?.data) {
-        store.setBaseModelTypes(props.page, baseModelResponse.data as CommonModelType[])
-      }
-
-      emit('filterDataReady')
-    } catch (error) {
-      useToaster.error(`Failed to fetch model types: ${error}`)
-      store.setModelTypes(props.page, [])
-      store.setBaseModelTypes(props.page, [])
-      emit('filterDataReady')
-    }
   }
 
   const getStoreRef = (path: PageType) => {
@@ -119,11 +82,42 @@
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
-  onMounted(async () => {
+
+  const initializeState = async () => {
     if (!store[props.page]) {
       store.resetPageState(props.page)
     }
-    await getFilterData()
+
+    if (!store[props.page].filterState) {
+      store[props.page].filterState = {
+        selected_model_types: [],
+        model_types: [],
+        base_models: [],
+        keyword: '',
+        sort: 'Recently'
+      }
+    }
+
+    if (props.page === 'mainContent') {
+      if (store[props.page].filterState.selected_model_types.length === 0) {
+        store[props.page].filterState.model_types = store.modelTypes
+          .filter(type => type.value !== 'Workflow')
+          .map(type => type.value)
+      }
+    }
+    if ((props.page === 'posts' || props.page === 'forked') && store.modelTypes.length > 0) {
+      const hasWorkflow = store.modelTypes.some(type => type.value === 'Workflow')
+      if (!hasWorkflow) {
+        store.modelTypes.push({ label: 'Workflow', value: 'Workflow' })
+      }
+    }
+
+    await nextTick()
+    emit('filter-data-ready')
+  }
+
+  onMounted(async () => {
+    await initializeState()
   })
 </script>
 
@@ -230,6 +224,33 @@
               >
                 Most Used
               </CommandItem>
+              <CommandItem
+                v-if="props.page === 'quickStart' || props.page === 'workflows'"
+                value="most-used"
+                :class="[
+                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer',
+                  '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]',
+                  store[props.page].filterState.sort === 'Most Downloaded'
+                    ? '!bg-[#6D28D9] !text-[#F9FAFB]'
+                    : ''
+                ]"
+                @click="handleSortChange('Most Downloaded')"
+              >
+                Most Downloaded
+              </CommandItem>
+              <CommandItem
+                value="most-used"
+                :class="[
+                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer',
+                  '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]',
+                  store[props.page].filterState.sort === 'Most Liked'
+                    ? '!bg-[#6D28D9] !text-[#F9FAFB]'
+                    : ''
+                ]"
+                @click="handleSortChange('Most Liked')"
+              >
+                Most Liked
+              </CommandItem>
             </CommandGroup>
           </CommandList>
         </Command>
@@ -285,7 +306,7 @@
               <CommandItem value="model-types" class="p-2">
                 <div class="flex flex-wrap gap-2">
                   <Badge
-                    v-for="type in store[props.page].modelTypes"
+                    v-for="type in store.modelTypes"
                     :key="type.value"
                     variant="secondary"
                     :class="[
@@ -309,7 +330,7 @@
               <CommandItem value="base-models" class="p-2">
                 <div class="flex flex-wrap gap-2">
                   <Badge
-                    v-for="model in store[props.page].baseModelTypes"
+                    v-for="model in store.baseModelTypes"
                     :key="model.value"
                     variant="secondary"
                     :class="[
