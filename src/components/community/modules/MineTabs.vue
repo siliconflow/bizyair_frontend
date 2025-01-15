@@ -23,7 +23,7 @@
 </script>
 
 <template>
-  <Tabs :default-value="modelValue" class="h-full flex flex-col" @change="handleTabChange">
+  <Tabs :default-value="modelValue" class="h-full flex flex-col">
     <TabsList
       class="grid grid-cols-2 h-12 w-[300px] mb-[20px] bg-[#4E4E4E] text-white text-sm shrink-0 border-0"
     >

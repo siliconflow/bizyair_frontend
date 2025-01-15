@@ -248,20 +248,20 @@
     }
   }
 
-  const handleAddNode = async (model: Model) => {
+  const handleAddNode = async () => {
     try {
-      let nodeID = model.type === 'LoRA' ? 'BizyAir_LoraLoader' : 'BizyAir_ControlNetLoader'
+      let nodeID = model.value?.type === 'LoRA' ? 'BizyAir_LoraLoader' : 'BizyAir_ControlNetLoader'
       let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
       const canvas = window.LGraphCanvas?.active_canvas
 
       loraLoaderNode.title =
-        model.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
+        model.value?.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
       loraLoaderNode.color = '#7C3AED'
 
       const widgetValues =
-        model.type === 'LoRA'
-          ? [model.name, 1.0, 1.0, model.versions?.[0]?.id || '']
-          : [model.name, model.versions?.[0]?.id || '']
+        model.value?.type === 'LoRA'
+          ? [model.value?.name, 1.0, 1.0, currentVersion.value?.id || '']
+          : [model.value?.name, currentVersion.value?.id || '']
 
       loraLoaderNode.widgets_values = widgetValues
       if (loraLoaderNode.widgets) {
@@ -314,7 +314,7 @@
 
 <template>
   <div
-    v-if="model"
+    v-if="!isLoading && model"
     class="p-6 pb-12 flex flex-col gap-4 items-start justify-start min-w-[1000px] relative shadow-[0px_20px_40px_0px_rgba(0,0,0,0.25)]"
   >
     <div class="flex flex-col gap-1.5 items-start justify-start self-stretch shrink-0 relative">
@@ -348,6 +348,30 @@
               class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
             >
               {{ formatNumber(model?.counter?.used_count) }}
+            </div>
+          </div>
+          <div
+            v-else
+            class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+            >
+              <path
+                d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2"
+                stroke="#F9FAFB"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <div
+              class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
+            >
+              {{ formatNumber(model?.counter?.downloaded_count) }}
             </div>
           </div>
         </div>
@@ -409,7 +433,7 @@
         <div
           class="bg-[#4e4e4e] rounded-lg p-1 flex flex-row gap-4 items-start justify-start self-stretch shrink-0 relative"
         >
-          <div class="min-w-[200px] max-w-[600px]">
+          <div class="min-w-[200px] max-w-[1000px]">
             <ScrollArea ref="scrollViewportRef" class="rounded-md w-full">
               <div class="whitespace-nowrap">
                 <Tabs :default-value="currentVersion?.id" :value="currentVersion?.id">
@@ -462,7 +486,7 @@
             </defs>
           </svg>
           <Popover
-            v-if="currentTab === 'posts' || currentTab === 'forked'"
+            v-if="mode === 'my'"
             class="bg-[#353535]"
             :open="downloadOpen"
             @update:open="handleDownload"
@@ -546,7 +570,7 @@
       <div
         class="flex flex-col gap-4 items-start justify-start relative min-w-[620px] w-[65%] overflow-hidden"
       >
-        <div class="w-full min-h-[80vh]">
+        <div class="w-full">
           <MdPreview
             v-if="currentVersion?.intro"
             id="previewRef"
@@ -554,9 +578,9 @@
             :no-img-zoom-in="true"
             :preview="true"
             theme="dark"
-            class="bg-[#353535] w-full min-h-[80vh]"
+            class="bg-[#353535] w-full h-[80vh]"
           />
-          <div v-else class="w-full h-[80vh] bg-[#353535] rounded-tl-lg rounded-tr-lg">
+          <div v-else class="w-full h-[200px] bg-[#353535] rounded-tl-lg rounded-tr-lg">
             <div class="flex justify-center items-center h-full">
               <div
                 class="text-text-text-muted-foreground text-left font-['Inter-Regular',_sans-serif] text-xs leading-5 font-normal relative"
@@ -580,6 +604,7 @@
             class="flex flex-row gap-1.5 items-start justify-start self-stretch shrink-0 relative"
           >
             <Button
+              v-if="mode !== 'my' && mode !== 'my_fork'"
               variant="default"
               class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
               :disabled="currentVersion?.forked"
@@ -808,6 +833,30 @@
                   class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
                 >
                   {{ formatNumber(currentVersion?.counter?.liked_count) }}
+                </div>
+              </div>
+              <div
+                v-if="model?.type === 'Workflow'"
+                class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                >
+                  <path
+                    d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2"
+                    stroke="#F9FAFB"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <div
+                  class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
+                >
+                  {{ formatNumber(currentVersion?.counter?.downloaded_count) }}
                 </div>
               </div>
             </div>
