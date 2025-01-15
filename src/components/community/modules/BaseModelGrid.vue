@@ -162,12 +162,13 @@
     items: rows.value,
     itemSize: rowHeight.value,
     style: {
-      maxHeight: 'calc(100vh - 200px)',
+      maxHeight: 'calc(80vh - 100px)',
       height: 'auto'
     },
     keyField: 'id',
     itemResizable: true,
-    ignoreItemResize: false
+    ignoreItemResize: false,
+  
   }))
 
   const backToTop = () => {
@@ -256,45 +257,35 @@
     .grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-    :deep(.v-vl-items) {
-      padding-bottom: 220px !important;
-    }
+    
   }
 
   @media (min-width: 992px) {
     .grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
-    :deep(.v-vl-items) {
-      padding-bottom: 200px !important;
-    }
+   
   }
 
   @media (min-width: 1440px) {
     .grid {
       grid-template-columns: repeat(5, minmax(0, 1fr));
     }
-    :deep(.v-vl-items) {
-      padding-bottom: 100px !important;
-    }
+    
   }
 
   @media (min-width: 1650px) {
     .grid {
       grid-template-columns: repeat(6, minmax(0, 1fr));
     }
-    :deep(.v-vl-items) {
-      padding-bottom: 220px !important;
-    }
+    
   }
 
   @media (min-width: 1890px) {
     .grid {
       grid-template-columns: repeat(7, minmax(0, 1fr));
     }
-    :deep(.v-vl-items) {
-      padding-bottom: 240px !important;
-    }
+   
   }
 
   .grid-container {
