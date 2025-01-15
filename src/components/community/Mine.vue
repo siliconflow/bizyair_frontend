@@ -424,8 +424,9 @@
   })
 
   watch(
-    () => communityStore.reload,
+    () => useModelStore.reload,
     async (newVal: number, oldVal: number) => {
+      console.log('newVal', newVal)
       if (newVal !== oldVal) {
         cacheKey.value++
         gridCache.value.clear()

@@ -81,9 +81,21 @@
     }
   )
 
+  watch(
+    () => props.model?.versions?.[0]?.cover_urls,
+    (newUrl) => {
+      if (newUrl) {
+        const timestamp = new Date().getTime()
+        imgSrc.value = newUrl.includes('?') ? `${newUrl}&t=${timestamp}` : `${newUrl}?t=${timestamp}`
+      }
+    }
+  )
+
   onMounted(() => {
     if (props.model?.versions?.[0]?.cover_urls) {
-      imgSrc.value = props.model.versions[0].cover_urls
+      const timestamp = new Date().getTime()
+      const url = props.model.versions[0].cover_urls
+      imgSrc.value = url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`
     }
   })
 </script>
