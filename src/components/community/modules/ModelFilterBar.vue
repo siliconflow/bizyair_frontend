@@ -97,16 +97,13 @@
         sort: 'Recently'
       }
     }
-   
 
-    if (
-      props.page === 'mainContent'
-    ) {
-      if(store[props.page].filterState.selected_model_types.length === 0){
+    if (props.page === 'mainContent') {
+      if (store[props.page].filterState.selected_model_types.length === 0) {
         store[props.page].filterState.model_types = store.modelTypes
           .filter(type => type.value !== 'Workflow')
           .map(type => type.value)
-      }    
+      }
     }
     if ((props.page === 'posts' || props.page === 'forked') && store.modelTypes.length > 0) {
       const hasWorkflow = store.modelTypes.some(type => type.value === 'Workflow')
