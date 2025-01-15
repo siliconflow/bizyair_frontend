@@ -194,20 +194,16 @@
 
 <template>
   <div class="flex flex-col h-full">
-    <div 
+    <div
       ref="scrollContainer"
-      class="flex-1 px-6 overflow-auto main-container" 
+      class="flex-1 px-6 overflow-auto main-container"
       @scroll="handleScroll"
     >
       <LoadingOverlay v-if="loading" />
       <div class="scroll-container">
         <EmptyState v-if="!loading && (!models || models.length === 0)" />
         <div v-else class="grid-container">
-          <NVirtualList
-            v-if="rows.length > 0"
-            ref="virtualListInst"
-            v-bind="virtualListProps"
-          >
+          <NVirtualList v-if="rows.length > 0" ref="virtualListInst" v-bind="virtualListProps">
             <template #default="{ item: row }">
               <div class="grid">
                 <ModelCard
@@ -233,45 +229,45 @@
 </template>
 
 <style scoped>
-.main-container {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
+  .main-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
 
-.main-container::-webkit-scrollbar {
-  width: 6px;
-}
+  .main-container::-webkit-scrollbar {
+    width: 6px;
+  }
 
-.main-container::-webkit-scrollbar-track {
-  background: transparent;
-}
+  .main-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-.main-container::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
+  .main-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
 
-.main-container::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
+  .main-container::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 
-.scroll-container {
-  height: auto;
-  margin-top: 0.5rem;
-  position: relative;
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
+  .scroll-container {
+    height: auto;
+    margin-top: 0.5rem;
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-.virtual-list {
-  width: 100%;
-  height: auto !important;
-  max-height: inherit;
-  overflow-x: hidden !important;
-  padding: 12px 20px 64px 20px;
-  min-height: 300px;
-}
+  .virtual-list {
+    width: 100%;
+    height: auto !important;
+    max-height: inherit;
+    overflow-x: hidden !important;
+    padding: 12px 20px 64px 20px;
+    min-height: 300px;
+  }
 
 .grid {
   display: grid;
@@ -364,13 +360,7 @@
   border-radius: 4px;
 }
 
-:deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-
-
+  :deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 </style>
-
-
-
