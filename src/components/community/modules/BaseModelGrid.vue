@@ -76,8 +76,6 @@
 
   const loadMoreTrigger = ref<HTMLDivElement | null>(null)
 
-  const scrollContainer = ref<HTMLElement | null>(null)
-
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLElement
     const scrollTop = target.scrollTop
@@ -167,26 +165,23 @@
     items: rows.value,
     itemSize: rowHeight.value,
     style: {
-      height: '100%',
+      maxHeight: 'calc(100vh - 200px)',
+      height: 'auto',
     },
+    keyField: 'id',
     itemResizable: true,
     ignoreItemResize: false,
-    scrollable: false
   }))
 
   const backToTop = () => {
-    if (scrollContainer.value) {
-      scrollContainer.value.scrollTo({ top: 0, behavior: 'smooth' })
-    }
+    virtualListInst.value?.scrollTo({ top: 0 })
   }   
 
   watch(
     () => props.cacheKey,
     () => {
-      if (scrollContainer.value) {
-        scrollContainer.value.scrollTo({ top: 0 })
-        scrollState.value.showBackToTop = false
-      }
+      virtualListInst.value?.scrollTo({ top: 0 })
+      scrollState.value.showBackToTop = false
     }
   )
 
@@ -194,16 +189,17 @@
 
 <template>
   <div class="flex flex-col h-full">
-    <div
-      ref="scrollContainer"
-      class="flex-1 px-6 overflow-auto main-container"
-      @scroll="handleScroll"
-    >
+    <div class="flex-1 px-6 overflow-hidden main-container">
       <LoadingOverlay v-if="loading" />
       <div class="scroll-container">
         <EmptyState v-if="!loading && (!models || models.length === 0)" />
         <div v-else class="grid-container">
-          <NVirtualList v-if="rows.length > 0" ref="virtualListInst" v-bind="virtualListProps">
+          <NVirtualList
+            v-if="rows.length > 0"
+            ref="virtualListInst"
+            v-bind="virtualListProps"
+            @scroll="handleScroll"
+          >
             <template #default="{ item: row }">
               <div class="grid">
                 <ModelCard
@@ -229,55 +225,35 @@
 </template>
 
 <style scoped>
-  .main-container {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-  }
+.scroll-container {
+  max-height: calc(100vh - 200px);
+  height: auto;
+  margin-top: 0.5rem;
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
 
-  .main-container::-webkit-scrollbar {
-    width: 6px;
-  }
 
-  .main-container::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .main-container::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-  }
-
-  .main-container::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-
-  .scroll-container {
-    height: auto;
-    margin-top: 0.5rem;
-    position: relative;
-    min-height: 80vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .virtual-list {
-    width: 100%;
-    height: auto !important;
-    max-height: inherit;
-    overflow-x: hidden !important;
-    padding: 12px 20px 64px 20px;
-    min-height: 300px;
-  }
+.virtual-list {
+  width: 100%;
+  height: auto !important;
+  max-height: inherit;
+  overflow-x: hidden !important;
+  padding: 12px 20px 64px 20px;
+  min-height: 300px;
+}
 
 .grid {
   display: grid;
-  grid-gap: 20px;
+  grid-gap: 10px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   position: relative;
   transition: opacity 0.3s ease-in-out;
   align-items: stretch;
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   z-index: 1;
   
 }
@@ -286,45 +262,45 @@
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  /* :deep(.v-vl-items) {
+  :deep(.v-vl-items) {
     padding-bottom: 220px !important;
-  } */
+  }
 }
 
 @media (min-width: 992px) {
   .grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  /* :deep(.v-vl-items) {
+  :deep(.v-vl-items) {
     padding-bottom: 200px !important;
-  } */
+  }
 }
 
 @media (min-width: 1440px) {
   .grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
-  /* :deep(.v-vl-items) {
+  :deep(.v-vl-items) {
     padding-bottom: 100px !important;
-  } */
+  }
 }
 
 @media (min-width: 1650px) {
   .grid {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
-  /* :deep(.v-vl-items) {
+  :deep(.v-vl-items) {
     padding-bottom: 220px !important;
-  } */
+  }
 }
 
 @media (min-width: 1890px) {
   .grid {
     grid-template-columns: repeat(7, minmax(0, 1fr));
   }
-  /* :deep(.v-vl-items) {
+  :deep(.v-vl-items) {
     padding-bottom: 240px !important;
-  } */
+  }
 }
 
 .grid-container {
@@ -341,9 +317,6 @@
 
 }
 
-:deep(.n-virtual-list) {
-  overflow: visible !important;
-}
 
 :deep(.n-virtual-list::-webkit-scrollbar) {
   width: 6px;
@@ -360,7 +333,20 @@
   border-radius: 4px;
 }
 
-  :deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
-    background-color: rgba(255, 255, 255, 0.5);
-  }
+:deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+
+
+:deep(.v-vl:not(.v-vl--show-scrollbar)){
+  padding: 10px 20px 100px 20px;
+}
+
+
+
+
+
 </style>
+
+
