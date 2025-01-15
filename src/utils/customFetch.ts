@@ -30,7 +30,8 @@ export function customFetch(url: string, options = {}, needDebounce = true) {
       const { code, message } = data
       if (code !== 20000) {
         useToaster.error(message)
-        return
+        throw new Error(message)
+        // return
       }
       return data
     })
