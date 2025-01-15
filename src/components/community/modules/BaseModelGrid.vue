@@ -9,7 +9,6 @@
   import { debounce } from 'lodash-es'
   import type { VirtualListInst } from 'naive-ui'
 
-
   defineOptions({
     name: 'BaseModelGrid'
   })
@@ -79,7 +78,7 @@
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLElement
     const scrollTop = target.scrollTop
-    
+
     scrollState.value.showBackToTop = scrollTop > 500
 
     const scrollBottom = scrollTop + target.clientHeight
@@ -93,8 +92,6 @@
     emit('scroll', e)
   }
 
-
-
   const windowWidth = ref(window.innerWidth)
 
   const handleWindowResize = debounce(() => {
@@ -103,7 +100,7 @@
 
   onMounted(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         if (entries[0].isIntersecting) {
           emit('loadMore')
         }
@@ -156,8 +153,8 @@
     if (width >= 1890) return 340 // 7列
     if (width >= 1650) return 320 // 6列
     if (width >= 1440) return 300 // 5列
-    if (width >= 992) return 280  // 4列
-    if (width >= 768) return 260  // 3列
+    if (width >= 992) return 280 // 4列
+    if (width >= 768) return 260 // 3列
     return 240 // 2列
   })
 
@@ -184,7 +181,6 @@
       scrollState.value.showBackToTop = false
     }
   )
-
 </script>
 
 <template>
@@ -303,35 +299,34 @@
   }
 }
 
-.grid-container {
-  position: relative;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin: 0 auto;
-  max-width: 2000px;
-  padding-bottom: 100px;
-  padding-right: 6px;
-  flex: 1;
+  .grid-container {
+    position: relative;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    max-width: 2000px;
+    padding-bottom: 100px;
+    padding-right: 6px;
+    flex: 1;
+  }
 
-}
 
+  :deep(.n-virtual-list::-webkit-scrollbar) {
+    width: 6px;
+    position: absolute;
+    right: 0;
+  }
 
-:deep(.n-virtual-list::-webkit-scrollbar) {
-  width: 6px;
-  position: absolute;
-  right: 0;
-}
+  :deep(.n-virtual-list::-webkit-scrollbar-track) {
+    background: transparent;
+  }
 
-:deep(.n-virtual-list::-webkit-scrollbar-track) {
-  background: transparent;
-}
-
-:deep(.n-virtual-list::-webkit-scrollbar-thumb) {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
+  :deep(.n-virtual-list::-webkit-scrollbar-thumb) {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
 
 :deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
   background-color: rgba(255, 255, 255, 0.5);
