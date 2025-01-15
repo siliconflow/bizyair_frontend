@@ -90,7 +90,7 @@
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLElement
     const scrollTop = target.scrollTop
-    
+
     scrollState.value.showBackToTop = scrollTop > 500
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLElement
@@ -241,20 +241,16 @@
 
 <template>
   <div class="flex flex-col h-full">
-    <div 
+    <div
       ref="scrollContainer"
-      class="flex-1 px-6 overflow-auto main-container" 
+      class="flex-1 px-6 overflow-auto main-container"
       @scroll="handleScroll"
     >
       <LoadingOverlay v-if="loading" />
       <div class="scroll-container">
         <EmptyState v-if="!loading && (!models || models.length === 0)" />
         <div v-else class="grid-container">
-          <NVirtualList
-            v-if="rows.length > 0"
-            ref="virtualListInst"
-            v-bind="virtualListProps"
-          >
+          <NVirtualList v-if="rows.length > 0" ref="virtualListInst" v-bind="virtualListProps">
             <template #default="{ item: row }">
               <div class="grid">
                 <ModelCard
@@ -280,58 +276,46 @@
 </template>
 
 <style scoped>
-.main-container {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
+  .main-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
 
-.main-container::-webkit-scrollbar {
-  width: 6px;
-}
+  .main-container::-webkit-scrollbar {
+    width: 6px;
+  }
 
-.main-container::-webkit-scrollbar-track {
-  background: transparent;
-}
+  .main-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-.main-container::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
+  .main-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
 
-.main-container::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
+  .main-container::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 
-.scroll-container {
-  height: auto;
-  margin-top: 0.5rem;
-  position: relative;
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
+  .scroll-container {
+    height: auto;
+    margin-top: 0.5rem;
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-.virtual-list {
-  width: 100%;
-  height: auto !important;
-  max-height: inherit;
-  overflow-x: hidden !important;
-  padding: 12px 20px 64px 20px;
-  min-height: 300px;
-}
+  .virtual-list {
+    width: 100%;
+    height: auto !important;
+    max-height: inherit;
+    overflow-x: hidden !important;
+    padding: 12px 20px 64px 20px;
+    min-height: 300px;
+  }
 
-.grid {
-  display: grid;
-  grid-gap: 20px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  position: relative;
-  transition: opacity 0.3s ease-in-out;
-  align-items: stretch;
-  width: 100%;
-  margin-bottom: 20px;
-  z-index: 1;
-  
-}
   .grid {
     display: grid;
     grid-gap: 20px;
@@ -342,9 +326,8 @@
     width: 100%;
     margin-bottom: 20px;
     z-index: 1;
-  }
 
-  @media (min-width: 768px) {
+  }
     .grid {
       display: grid;
       grid-gap: 20px;
@@ -356,34 +339,71 @@
       margin-bottom: 20px;
       z-index: 1;
     }
+
+    @media (min-width: 768px) {
+      .grid {
+        display: grid;
+        grid-gap: 20px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        position: relative;
+        transition: opacity 0.3s ease-in-out;
+        align-items: stretch;
+        width: 100%;
+        margin-bottom: 20px;
+        z-index: 1;
+      }
+      /* :deep(.v-vl-items) {
+        padding-bottom: 220px !important;
+      } */
+    }
+
+    @media (min-width: 992px) {
+      .grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      :deep(.v-vl-items) {
+        padding-bottom: 200px !important;
+      }
+    }
+    /* :deep(.v-vl-items) {
+      padding-bottom: 200px !important;
+    } */
+
+    @media (min-width: 1650px) {
+      .grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+      :deep(.v-vl-items) {
+        padding-bottom: 220px !important;
+      }
+    }
+    /* :deep(.v-vl-items) {
+      padding-bottom: 100px !important;
+    } */
+
+    .grid-container {
+      position: relative;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin: 0 auto;
+      max-width: 2000px;
+      padding-bottom: 100px;
+      padding-right: 6px;
+      flex: 1;
+    }
     /* :deep(.v-vl-items) {
       padding-bottom: 220px !important;
     } */
-  }
 
-  @media (min-width: 992px) {
-    .grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+    :deep(.n-virtual-list::-webkit-scrollbar-track) {
+      background: transparent;
     }
-    :deep(.v-vl-items) {
-      padding-bottom: 200px !important;
-    }
+    /* :deep(.v-vl-items) {
+      padding-bottom: 240px !important;
+    } */
   }
-  /* :deep(.v-vl-items) {
-    padding-bottom: 200px !important;
-  } */
-
-  @media (min-width: 1650px) {
-    .grid {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-    :deep(.v-vl-items) {
-      padding-bottom: 220px !important;
-    }
-  }
-  /* :deep(.v-vl-items) {
-    padding-bottom: 100px !important;
-  } */
 
   .grid-container {
     position: relative;
@@ -396,71 +416,41 @@
     padding-bottom: 100px;
     padding-right: 6px;
     flex: 1;
+
   }
-  /* :deep(.v-vl-items) {
-    padding-bottom: 220px !important;
-  } */
+    .grid-container {
+      position: relative;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin: 0 auto;
+      max-width: 2000px;
+      padding-bottom: 100px;
+      padding-right: 6px;
+      flex: 1;
+    }
+
+  :deep(.n-virtual-list) {
+    overflow: visible !important;
+  }
+
+  :deep(.n-virtual-list::-webkit-scrollbar) {
+    width: 6px;
+    position: absolute;
+    right: 0;
+  }
 
   :deep(.n-virtual-list::-webkit-scrollbar-track) {
     background: transparent;
   }
-  /* :deep(.v-vl-items) {
-    padding-bottom: 240px !important;
-  } */
-}
 
-.grid-container {
-  position: relative;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin: 0 auto;
-  max-width: 2000px;
-  padding-bottom: 100px;
-  padding-right: 6px;
-  flex: 1;
-
-}
-  .grid-container {
-    position: relative;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin: 0 auto;
-    max-width: 2000px;
-    padding-bottom: 100px;
-    padding-right: 6px;
-    flex: 1;
+  :deep(.n-virtual-list::-webkit-scrollbar-thumb) {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
   }
 
-:deep(.n-virtual-list) {
-  overflow: visible !important;
-}
-
-:deep(.n-virtual-list::-webkit-scrollbar) {
-  width: 6px;
-  position: absolute;
-  right: 0;
-}
-
-:deep(.n-virtual-list::-webkit-scrollbar-track) {
-  background: transparent;
-}
-
-:deep(.n-virtual-list::-webkit-scrollbar-thumb) {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
-
-:deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-
-
+  :deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 </style>
-
-
-
