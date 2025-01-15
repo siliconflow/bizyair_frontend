@@ -279,12 +279,12 @@
         acActiveIndex.value = i
         break
       }
-      if (e.cover_urls && !e.imageDone) {
-        e.imageError = true
-        useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
-        acActiveIndex.value = i
-        break
-      }
+      // if (e.cover_urls && !e.imageDone) {
+      //   e.imageError = true
+      //   useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
+      //   acActiveIndex.value = i
+      //   break
+      // }
       if (!e.sign) {
         e.filePathError = true
         useToaster.error(`Please enter the file path for version ${i + 1}`)
@@ -293,7 +293,7 @@
       }
     }
     return tempData.versions.every(
-      (e: any) => e.version && e.base_model && e.sign && !(e.cover_urls && !e.imageDone)
+      (e: any) => e.version && e.base_model && e.sign
     )
   }
   const fnProgress = (p: number, i: number) => {
