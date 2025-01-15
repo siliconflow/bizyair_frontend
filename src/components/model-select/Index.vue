@@ -183,9 +183,9 @@
   <v-dialog
     v-model:open="showDialog"
     class="max-w-[70%] px-6 pb-6 overflow-hidden z-8000"
-    layoutClass="z-8000"
-    @onClose="handleClose"
-    contentClass="custom-scrollbar max-h-[78vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+    layout-class="z-8000"
+    content-class="custom-scrollbar max-h-[78vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+    @on-close="handleClose"
   >
     <template #title>
       <span class="text-[#F9FAFB] mb-4 text-[18px] font-semibold leading-[18px] tracking-[-0.45px]">
@@ -195,7 +195,7 @@
 
     <div class="font-['Inter'] flex flex-col">
       <Tabs
-        :defaultValue="modelStoreInstance.mode"
+        :default-value="modelStoreInstance.mode"
         class="h-full flex flex-col"
         @update:model-value="handleTabChange"
       >
@@ -220,8 +220,8 @@
               <div class="flex-1 relative">
                 <ModelFilterBar
                   v-model:show-sort-popover="showSortPopover"
-                  @fetchData="fetchData"
                   class="shrink-0"
+                  @fetch-data="fetchData"
                 />
                 <div class="h-full">
                   <ModelTable />
