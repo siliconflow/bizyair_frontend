@@ -25,7 +25,7 @@
           @change="formData.nameError = false"
         />
       </v-item>
-      <input type="file" webkitdirectory multiple @change="test123123" class="w-[500px] bg-red-400 h-[200px]" />
+      <input webkitdirectory class="w-[500px] bg-red-400 h-[200px]" type="file" @change="test123123" />
       <n-button type="primary" class="next-button" @click="nextStep">Next Step</n-button>
     </div>
 
@@ -40,12 +40,6 @@
           <div class="accordion-title">
             <span v-if="acActiveIndex !== i && e.version">{{ e.version }}</span>
             <span v-else>Add Version</span>
-            <Trash2
-              v-if="formData.versions.length !== 1"
-              #icon
-              class="trash-icon"
-              @click.capture.stop="delVersion(i)"
-            />
             <!-- <Progress
               v-if="e.progress && acActiveIndex && acActiveIndex !== i"
               :model-value="e.progress"
@@ -57,6 +51,12 @@
               :show-indicator="false"
               color="#6D28D9"
               :percentage="e.progress"
+              class="progress-bar"
+            />
+            <Trash2
+              v-if="formData.versions.length !== 1"
+              class="trash-icon"
+              @click.capture.stop="delVersion(i)"
             />
           </div>
         </template>
@@ -92,8 +92,8 @@
           <v-item label="Upload Image">
             <vUploadImage
               v-model.modelValue="e.cover_urls"
-              :previewPrc="e.cover_urls ? e.cover_urls[0] : ''"
               :class-name="e.imageError ? 'input-error' : ''"
+              :preview-prc="e.cover_urls ? e.cover_urls[0] : ''"
               @done="imageUploadDone(i)"
             />
           </v-item>
@@ -124,9 +124,9 @@
                   <span v-if="e.speed" class="speed-text">Speed: {{ e.speed }}</span>
                 </p>
               </div>
-              <n-button type="primary" v-if="e.hideUpload" class="cancel-button" @click="cancelFile">cancel</n-button>
+              <n-button v-if="e.hideUpload" type="primary" class="cancel-button" @click="cancelFile">cancel</n-button>
               <div v-if="!e.hideUpload" :class="{ 'full-width': !e.progress }">
-                <n-button type="primary" v-if="!e.progress" class="load-button" @click="loadWorkflow()"
+                <n-button v-if="!e.progress" type="primary" class="load-button" @click="loadWorkflow()"
                   >Load from current workspace</n-button
                 >
                 <vUpload
@@ -286,12 +286,12 @@
         acActiveIndex.value = i
         break
       }
-      if (e.cover_urls && !e.imageDone) {
-        e.imageError = true
-        useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
-        acActiveIndex.value = i
-        break
-      }
+      // if (e.cover_urls && !e.imageDone) {
+      //   e.imageError = true
+      //   useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
+      //   acActiveIndex.value = i
+      //   break
+      // }
       if (!e.sign) {
         e.filePathError = true
         useToaster.error(`Please enter the file path for version ${i + 1}`)
@@ -299,9 +299,7 @@
         break
       }
     }
-    return tempData.versions.every(
-      (e: any) => e.version && e.base_model && e.sign && !(e.cover_urls && !e.imageDone)
-    )
+    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
   }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p
@@ -422,17 +420,27 @@
       deep: true
     }
   )
-  const test123123 = (e: { target: { files: string | any[] } }) => {
-    console.log(e.target.files)
-    for (let i = 0; i < e.target.files.length; i++) {
-      const file = e.target.files[i]
-      console.log(URL.createObjectURL(file))
 
+  const test123123 = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files) {
+      console.log(target.files);
+      for (let i = 0; i < target.files.length; i++) {
+        const file = target.files[i];
+        console.log(URL.createObjectURL(file));
+      }
     }
+  // };
+    // console.log(e.target.files)
+    // for (let i = 0; i < e.target.files.length; i++) {
+    //   const file = e.target.files[i]
+    //   console.log(URL.createObjectURL(file))
+
+    // }
   }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .custom-modal {
   max-width: 800px;
 }

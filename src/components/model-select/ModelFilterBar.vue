@@ -140,39 +140,39 @@
             <CommandGroup>
               <CommandItem
                 value="recently"
-                @click="handleSortChange('Recently')"
                 :class="[
                   'px-2 py-1.5 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]',
                   modelStoreInstance.filterState.sort === 'Recently'
                     ? '!bg-[#6D28D9] !text-[#F9FAFB]'
                     : ''
                 ]"
+                @click="handleSortChange('Recently')"
               >
                 Recently
               </CommandItem>
               <CommandItem
                 v-if="!['my', 'my_fork'].includes(modelStoreInstance.mode)"
                 value="most-forked"
-                @click="handleSortChange('Most Forked')"
                 :class="[
                   'px-2 py-1.5 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]',
                   modelStoreInstance.filterState.sort === 'Most Forked'
                     ? '!bg-[#6D28D9] !text-[#F9FAFB]'
                     : ''
                 ]"
+                @click="handleSortChange('Most Forked')"
               >
                 Most Forked
               </CommandItem>
               <CommandItem
                 v-if="!['my', 'my_fork'].includes(modelStoreInstance.mode)"
                 value="most-used"
-                @click="handleSortChange('Most Used')"
                 :class="[
                   'px-2 py-1.5 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]',
                   modelStoreInstance.filterState.sort === 'Most Used'
                     ? '!bg-[#6D28D9] !text-[#F9FAFB]'
                     : ''
                 ]"
+                @click="handleSortChange('Most Used')"
               >
                 Most Used
               </CommandItem>
@@ -231,16 +231,16 @@
               <CommandItem value="model-types" class="p-2">
                 <div class="flex flex-wrap gap-2">
                   <Badge
-                    variant="secondary"
                     v-for="type in modelStoreInstance.modelTypes"
                     :key="type.value"
-                    @click="handleModelTypeChange(type.value)"
+                    variant="secondary"
                     :class="[
                       'cursor-not-allowed hover:!bg-inherit',
                       modelStoreInstance.filterState.model_types.includes(type.value)
                         ? 'bg-[#6D28D9] hover:!bg-[#6D28D9]'
                         : 'bg-[#4E4E4E] hover:!bg-[#4E4E4E]'
                     ]"
+                    @click="handleModelTypeChange(type.value)"
                   >
                     {{ type.label }}
                   </Badge>
@@ -255,20 +255,20 @@
               <CommandItem value="base-models" class="p-2">
                 <div class="flex flex-wrap gap-2">
                   <Badge
-                    variant="secondary"
                     v-for="model in modelStoreInstance.baseModelTypes.filter(
                       (m: any) =>
                         modelStoreInstance.selectedBaseModels?.length === 0 ||
                         modelStoreInstance.selectedBaseModels?.includes(m.value)
                     )"
                     :key="model.value"
-                    @click="handleBaseModelChange(model.value)"
+                    variant="secondary"
                     :class="[
                       'cursor-pointer hover:!bg-inherit',
                       modelStoreInstance.filterState.base_models.includes(model.value)
                         ? 'bg-[#6D28D9] hover:!bg-[#6D28D9]'
                         : 'bg-[#4E4E4E] hover:!bg-[#4E4E4E]'
                     ]"
+                    @click="handleBaseModelChange(model.value)"
                   >
                     {{ model.label }}
                   </Badge>

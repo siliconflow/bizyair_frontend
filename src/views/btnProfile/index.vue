@@ -85,7 +85,7 @@
 </template>
 <script setup lang="ts">
   import { put_share_id } from '@/api/user'
-  import vDrawer from '@/components/modules/vDrawer.vue'
+  // import vDrawer from '@/components/modules/vDrawer.vue'
   import { FilePenLine, Copy, Save } from 'lucide-vue-next'
   import { Input } from '@/components/ui/input'
   import vTooltips from '@/components/modules/v-tooltip.vue'

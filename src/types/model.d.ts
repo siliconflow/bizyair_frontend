@@ -1,6 +1,14 @@
-export type ModeType = 'my' | 'my_fork' | 'publicity'
+declare global {
+  interface Window {
+    LiteGraph: any
+    LGraphCanvas: any
+  }
+}
 
-export type SortValue = 'Recently' | 'Most Forked' | 'Most Used'
+export type ModeType = 'my' | 'my_fork' | 'publicity' | 'official'
+
+export type SortValue = 'Recently' | 'Most Forked' | 'Most Used' | 'Most Downloaded' | 'Most Liked'
+
 export interface Model {
   id: string
   name: string
@@ -33,10 +41,10 @@ export interface ModelVersion {
 
 
 export interface ModelListPathParams {
-  current: number
-  page_size: number
-  mode: string
-  total:number
+  current: number 
+  page_size: number 
+  mode: string 
+  total:number 
 
 }
 
@@ -45,7 +53,7 @@ export interface FilterState {
   model_types: string[]
   base_models: string[]
   selected_model_types: string[]
-  sort:'Recently' | 'Most Forked' | 'Most Used'
+  sort:SortValue
 }
 
 export interface CommonModelType {
@@ -85,6 +93,7 @@ export interface PageState {
     hasPrevious: boolean;
     loadedPages: number[];
     scrollRatio: number;
+    totalItems: number;
   };
 }
 
