@@ -50,7 +50,7 @@
   import { useToaster } from '@/components/modules/toats/index'
   import { onMounted, ref } from 'vue'
   import { useShadet } from '@/components/modules/vShadet/index'
-  import { Button } from '@/components/ui/button'
+  // import { Button } from '@/components/ui/button'
   import { commit_file } from '@/api/model'
   import { creatClient } from './ossClient'
 

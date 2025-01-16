@@ -5,7 +5,6 @@
     title="Publish a Workflow"
     size="huge"
     :bordered="false"
-    :segmented="segmented"
   >
   <template #header-extra>
     <span class="px-6 cursor-pointer" @click="handleToggleTitle">Publish a Workflow</span>
@@ -163,7 +162,7 @@
   import { modelStore } from '@/stores/modelStatus'
   import { create_models, put_model } from '@/api/model'
   import { Trash2 } from 'lucide-vue-next'
-  import vDialog from '@/components/modules/vDialog.vue'
+  // import vDialog from '@/components/modules/vDialog.vue'
   import vSelect from '@/components/modules/vSelect.vue'
   import vItem from '@/components/modules/vItem.vue'
   import vCustomAccordion from '@/components/modules/vCustomAccordion.vue'

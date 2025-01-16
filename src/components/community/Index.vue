@@ -10,6 +10,7 @@
   const handleMenuClick = (item: { path: string }) => {
     communityStore.currentPath = item.path
   }
+  communityStore.loadFilterData()
 </script>
 
 <template>

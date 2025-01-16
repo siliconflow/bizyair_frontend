@@ -21,8 +21,8 @@
   </n-dropdown>
 </template>
 <script setup lang="ts">
-  import { NModal, NCard, NDropdown, NButton, useNotification } from 'naive-ui'
-  import { inject, ref, watch } from 'vue'
+  import { NDropdown } from 'naive-ui'
+  import { ref, watch } from 'vue'
   import { objectToArray } from '@/utils/tool'
   const props = defineProps({
     show_cases: Object,
@@ -72,6 +72,8 @@
   cursor: pointer;
   position: relative;
   padding: 0 12px;
+  border-radius: 4px;
+  transition: all 0.3s;
 }
 
 .dropdown-container:hover {
