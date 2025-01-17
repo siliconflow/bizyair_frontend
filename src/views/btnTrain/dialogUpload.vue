@@ -3,6 +3,9 @@
     v-model:show="datasetStore.showUploadDialog"
     size="huge"
     :bordered="false"
+    :auto-focus="false"
+    :close-on-esc="false"
+    :mask-closable="false"
     :on-after-leave="onDialogClose"
   >
     <n-card 
@@ -86,8 +89,11 @@
   const rules = ref(datasetStore.rules)
 
   const onDialogClose = () => {
-    datasetStore.clearDetail()
-    datasetStore.showUploadDialog = false
+    if (datasetStore.clearDetail) {
+      datasetStore.clearDetail()
+      datasetStore.showUploadDialog = false
+    }
+    
   }
   const imageUploadDone = () => {
     console.log('imageUploadDone')
