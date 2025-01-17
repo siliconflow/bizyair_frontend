@@ -18,7 +18,8 @@
   import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
   import { Button } from '@/components/ui/button'
   import { ref, onMounted, nextTick, inject } from 'vue'
-
+  import { NImageGroup, NImage } from 'naive-ui'
+  import vTooltips from '@/components/modules/v-tooltip.vue'
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { MdPreview } from 'md-editor-v3'
   import { modelStore } from '@/stores/modelStatus'
@@ -204,11 +205,7 @@
     }
   }
 
-  // const handleApply = () => {
-  //   if (currentVersion.value && model.value) {
-  //      modelStoreInstance.setApplyObject(currentVersion.value, model.value)
-  //   }
-  // }
+
 
   const handleCopy = async (sign: string) => {
     try {
@@ -330,6 +327,7 @@
             v-if="model?.type !== 'Workflow'"
             class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
           >
+            <vTooltips tips="Used">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -342,8 +340,9 @@
                 stroke="#F9FAFB"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-              />
-            </svg>
+                />
+              </svg>
+            </vTooltips>
             <div
               class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
             >
@@ -354,6 +353,7 @@
             v-else
             class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
           >
+            <vTooltips tips="Downloaded">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -366,8 +366,9 @@
                 stroke="#F9FAFB"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-              />
-            </svg>
+                />
+              </svg>
+            </vTooltips>
             <div
               class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
             >
@@ -378,6 +379,7 @@
         <div
           class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
         >
+          <vTooltips tips="Forked">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -390,8 +392,9 @@
               stroke="#F9FAFB"
               stroke-linecap="round"
               stroke-linejoin="round"
-            />
-          </svg>
+              />
+            </svg>
+          </vTooltips>
           <div
             class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
           >
@@ -401,6 +404,7 @@
         <div
           class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
         >
+          <vTooltips tips="Liked">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -420,8 +424,9 @@
               <clipPath id="clip0_315_3742">
                 <rect width="16" height="16" fill="white" />
               </clipPath>
-            </defs>
-          </svg>
+              </defs>
+            </svg>
+          </vTooltips>
           <div
             class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
           >
@@ -459,6 +464,7 @@
           class="text-text-text-muted-foreground text-left font-['Inter-Regular',_sans-serif] text-xs leading-5 font-normal relative flex-1"
         ></div>
         <div class="flex gap-8">
+          <vTooltips :tips="currentVersion?.liked ? 'Liked' : 'Like'">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -484,7 +490,8 @@
                 <rect width="16" height="16" fill="white" />
               </clipPath>
             </defs>
-          </svg>
+            </svg>
+          </vTooltips>
           <Popover
             v-if="mode === 'my'"
             class="bg-[#353535]"
@@ -571,6 +578,15 @@
         class="flex flex-col gap-4 items-start justify-start relative min-w-[620px] w-[65%] overflow-hidden"
       >
         <div class="w-full">
+          <NImageGroup v-if="currentVersion?.cover_urls && currentVersion?.cover_urls.length > 0">
+              <NImage
+                v-for="(cover, index) in currentVersion?.cover_urls"
+                :key="index"
+                :src="cover"
+                :preview-src="cover"
+                height="512px"
+              />
+            </NImageGroup>
           <MdPreview
             v-if="currentVersion?.intro"
             id="previewRef"
@@ -725,12 +741,13 @@
               <span>
                 {{ currentVersion?.sign ? sliceString(currentVersion?.sign, 15) : '' }}
               </span>
-              <svg
-                v-if="currentVersion?.sign"
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
+              <vTooltips tips="Copy">
+                <svg
+                  v-if="currentVersion?.sign"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
                 fill="none"
                 class="cursor-pointer hover:opacity-80"
                 @click="handleCopy(currentVersion?.sign || '')"
@@ -747,8 +764,9 @@
                   <clipPath id="clip0_315_3710">
                     <rect width="16" height="16" fill="white" />
                   </clipPath>
-                </defs>
-              </svg>
+                  </defs>
+                </svg>
+              </vTooltips>
             </div>
           </div>
           <div className="flex w-full">
@@ -762,10 +780,11 @@
                 v-if="model?.type !== 'Workflow'"
                 class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
+                <vTooltips tips="Used">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
                   viewBox="0 0 16 16"
                   fill="none"
                 >
@@ -775,7 +794,8 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   />
-                </svg>
+                  </svg>
+                </vTooltips>
                 <div
                   class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
                 >
@@ -785,6 +805,7 @@
               <div
                 class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
               >
+                <vTooltips tips="Forked">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -797,8 +818,9 @@
                     stroke="#F9FAFB"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                  />
-                </svg>
+                    />
+                  </svg>
+                </vTooltips>
                 <div
                   class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
                 >
@@ -808,6 +830,7 @@
               <div
                 class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
               >
+                <vTooltips tips="Liked">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -829,6 +852,7 @@
                     </clipPath>
                   </defs>
                 </svg>
+                </vTooltips>
                 <div
                   class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
                 >
@@ -839,6 +863,7 @@
                 v-if="model?.type === 'Workflow'"
                 class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
               >
+                <vTooltips tips="Downloaded">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -853,6 +878,7 @@
                     stroke-linejoin="round"
                   />
                 </svg>
+                </vTooltips>
                 <div
                   class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
                 >
@@ -881,6 +907,7 @@
               class="cursor-pointer ml-2 hover:opacity-80"
               @click="handleDownloadWorkFlow"
             >
+              <vTooltips tips="Download">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -895,6 +922,7 @@
                   stroke-linejoin="round"
                 />
               </svg>
+            </vTooltips>
             </span>
           </div>
         </div>

@@ -120,6 +120,7 @@
           class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
           @click.prevent.stop="$emit('action', model)"
         >
+        <vTooltips :tips="model?.type === 'Workflow' ? 'Load Workflow' : 'Add Node'">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -136,8 +137,9 @@
               stroke-linejoin="round"
               class="group-hover:stroke-[#7C3AEDCC] transition-colors duration-200"
               filter="drop-shadow(0 1px 2px rgb(0 0 0 / 0.5))"
-            />
-          </svg>
+              />
+            </svg>
+          </vTooltips>
         </div>
 
         <div
@@ -181,6 +183,7 @@
               v-if="model?.type === 'Workflow' && model?.counter?.downloaded_count"
               class="flex items-center space-x-1"
             >
+            <vTooltips tips="Downloaded">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -196,15 +199,17 @@
                   stroke-linejoin="round"
                 ></path>
               </svg>
+              </vTooltips>
               <span class="opacity-80">{{ formatNumber(model?.counter?.downloaded_count) }}</span>
             </span>
             <span v-else class="flex items-center space-x-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
+              <vTooltips tips="Used">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
               >
                 <path
                   d="M3.33325 2L12.6666 8L3.33325 14V2Z"
@@ -213,31 +218,30 @@
                   stroke-linejoin="round"
                 />
               </svg>
+              </vTooltips>
               <span class="opacity-80">{{ formatNumber(model?.counter?.used_count) }}</span>
             </span>
             <span class="flex items-center space-x-1">
+              <vTooltips tips="Forked">
               <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_1021_3310)">
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                >
                   <path
-                    d="M9.09948 0.538851L9.09948 0.538843C9.10201 0.523701 9.09385 0.508778 9.07973 0.502729L9.09948 0.538851ZM9.09948 0.538851L8.13633 6.31781L8.03929 6.90001M9.09948 0.538851L8.03929 6.90001M8.03929 6.90001H8.62952M8.03929 6.90001H8.62952M8.62952 6.90001H13.3333C13.3459 6.90001 13.3575 6.90717 13.3631 6.91844L13.3631 6.91846M8.62952 6.90001L13.3631 6.91846M13.3631 6.91846C13.3687 6.92969 13.3675 6.94313 13.36 6.95323L13.3599 6.95335M13.3631 6.91846L13.3599 6.95335M13.3599 6.95335L6.95994 15.4867C6.95084 15.4988 6.93448 15.5033 6.9202 15.4973C6.90603 15.4913 6.89788 15.4763 6.9004 15.4612L7.86356 9.6822L7.96059 9.1M13.3599 6.95335L7.96059 9.1M7.96059 9.1H7.37037M7.96059 9.1H7.37037M7.37037 9.1H2.66663M7.37037 9.1H2.66663M2.66663 9.1C2.65402 9.1 2.64248 9.09288 2.63683 9.08159L2.66663 9.1ZM3.3333 8.23334L2.7333 9.03334L7.97452 6.9549C7.97451 6.95489 7.9745 6.95488 7.97449 6.95487C7.96816 6.94738 7.96546 6.93752 7.96707 6.92789L7.96707 6.92786L8.67416 2.68531L7.78097 2.30311L3.3333 8.23334ZM2.63682 9.08157C2.63117 9.07026 2.6324 9.05675 2.63997 9.04666L9.03994 0.513374C9.04916 0.501082 9.06559 0.496684 9.07972 0.502726L2.63682 9.08157Z"
-                    stroke="#E5E7EB"
+                    d="M7.99992 1.33325L10.0599 5.50659L14.6666 6.17992L11.3333 9.42659L12.1199 14.0133L7.99992 11.8466L3.87992 14.0133L4.66659 9.42659L1.33325 6.17992L5.93992 5.50659L7.99992 1.33325Z"
+                    stroke="#F9FAFB"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   />
-                </g>
-                <defs>
-                  <clipPath id="clip0_1021_3310">
-                    <rect width="14" height="14" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
+                </svg>
+              </vTooltips>
               <span class="opacity-80">{{ formatNumber(model?.counter?.forked_count) }}</span>
             </span>
             <span class="flex items-center space-x-1">
+              <vTooltips tips="Liked">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="15"
@@ -252,6 +256,7 @@
                   stroke-linejoin="round"
                 />
               </svg>
+              </vTooltips>
               <span class="opacity-80">{{ formatNumber(model?.counter?.liked_count) }}</span>
             </span>
           </div>

@@ -39,7 +39,6 @@
     </TabsList>
     <template v-for="mode in modes" :key="mode">
       <TabsContent
-        v-if="modelValue === mode"
         :value="mode"
         class="flex-1 flex flex-col mt-0 outline-none"
       >
