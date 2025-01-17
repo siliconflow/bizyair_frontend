@@ -2,10 +2,10 @@
   import { Button } from '@/components/ui/button'
   import { Input } from '@/components/ui/input'
   import { Badge } from '@/components/ui/badge'
-  import { onMounted, ref } from 'vue'
-  import { modelStore } from '@/stores/modelStatus'
-  import type { SortValue } from '@/types/model'
-  const modelStoreInstance = modelStore()
+
+  import { useModelSelectStore } from '@/stores/modelSelectStore'
+  import type { SortValue, ModeTabType } from '@/types/model'
+
   import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
   import {
     Command,
@@ -14,64 +14,90 @@
     CommandList,
     CommandSeparator
   } from '@/components/ui/command'
+  import { onMounted, nextTick } from 'vue'
 
-  const selectedBaseModels = ref<string[]>([])
+  const store = useModelSelectStore()
 
-  interface Props {
+  const props = defineProps<{
     showSortPopover: boolean
-  }
+    page: ModeTabType
+  }>()
 
-  interface Emits {
+  const emit = defineEmits<{
     (e: 'update:showSortPopover', value: boolean): void
     (e: 'fetchData'): void
-  }
+    (e: 'filter-data-ready'): void
+  }>()
 
-  defineProps<Props>()
-  const emit = defineEmits<Emits>()
-
-  const handleSortChange = (value: SortValue) => {
-    modelStoreInstance.filterState.sort = value
+  const handleSortChange = async (value: SortValue) => {
+    store[props.page].filterState.sort = value
+    store[props.page].modelListPathParams.current = 1
+    await nextTick()
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
 
-  const handleModelTypeChange = (type: string) => {
-    if (modelStoreInstance.selectedBaseModels.length !== 0) return
-
-    const types = [...modelStoreInstance.filterState.model_types]
-    const index = types.indexOf(type)
-    index === -1 ? types.push(type) : types.splice(index, 1)
-
-    modelStoreInstance.filterState.model_types = types
-    emit('fetchData')
-    emit('update:showSortPopover', false)
-  }
-
-  const handleBaseModelChange = (model: string) => {
-    const models = [...modelStoreInstance.filterState.base_models]
-    const modelIndex = models.indexOf(model)
-
+  const handleBaseModelChange = async (model: string) => {
+    const models = [...store[props.page].filterState.base_models]
+    const modelIndex = models.indexOf(String(model))
     if (modelIndex === -1) {
-      models.push(model)
+      models.push(String(model))
     } else {
       models.splice(modelIndex, 1)
     }
-    modelStoreInstance.modelListPathParams.current = 1
-    modelStoreInstance.filterState.base_models = models
+    store[props.page].filterState.base_models = models
+
+    await nextTick()
     emit('fetchData')
     emit('update:showSortPopover', false)
+  }
+
+  const getStoreRef = (path: ModeTabType) => {
+    return store[path]
   }
 
   const handleSearch = () => {
-    modelStoreInstance.modelListPathParams.current = 1
+    const storeRef = getStoreRef(props.page)
+    storeRef.modelListPathParams.current = 1
     emit('fetchData')
     emit('update:showSortPopover', false)
   }
 
-  onMounted(async () => {
-    if (modelStoreInstance.selectedBaseModels) {
-      selectedBaseModels.value = [...modelStoreInstance.selectedBaseModels]
+  const initializeState = async () => {
+    if (!store[props.page]) {
+      store.resetPageState(props.page)
     }
+
+    if (!store[props.page].filterState) {
+      store[props.page].filterState = {
+        selected_model_types: [],
+        model_types: [],
+        base_models: [],
+        keyword: '',
+        sort: 'Recently'
+      }
+    }
+
+    // if (props.page === 'mainContent') {
+    //   if (store[props.page].filterState.selected_model_types.length === 0) {
+    //     store[props.page].filterState.model_types = store.modelTypes
+    //       .filter(type => type.value !== 'Workflow')
+    //       .map(type => type.value)
+    //   }
+    // }
+    // if ((props.page === 'posts' || props.page === 'forked') && store.modelTypes.length > 0) {
+    //   const hasWorkflow = store.modelTypes.some(type => type.value === 'Workflow')
+    //   if (!hasWorkflow) {
+    //     store.modelTypes.push({ label: 'Workflow', value: 'Workflow' })
+    //   }
+    // }
+
+    await nextTick()
+    emit('filter-data-ready')
+  }
+
+  onMounted(async () => {
+    await initializeState()
   })
 </script>
 
@@ -79,10 +105,11 @@
   <div class="flex space-x-2 mb-4">
     <div class="relative flex-1">
       <Input
-        v-model="modelStoreInstance.filterState.keyword"
+        v-model="store[props.page].filterState.keyword"
         v-debounce="handleSearch"
         placeholder="Filter by name"
         class="h-[44px] border border-[#9CA3AF] w-full bg-[#222] rounded-lg pr-8 pl-8"
+        @update:model-value="val => (store[props.page].filterState.keyword = String(val))"
       />
       <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
         <svg
@@ -141,8 +168,9 @@
               <CommandItem
                 value="recently"
                 :class="[
-                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]',
-                  modelStoreInstance.filterState.sort === 'Recently'
+                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer',
+                  '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]',
+                  store[props.page].filterState.sort === 'Recently'
                     ? '!bg-[#6D28D9] !text-[#F9FAFB]'
                     : ''
                 ]"
@@ -151,11 +179,11 @@
                 Recently
               </CommandItem>
               <CommandItem
-                v-if="!['my', 'my_fork'].includes(modelStoreInstance.mode)"
                 value="most-forked"
                 :class="[
-                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]',
-                  modelStoreInstance.filterState.sort === 'Most Forked'
+                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer',
+                  '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]',
+                  store[props.page].filterState.sort === 'Most Forked'
                     ? '!bg-[#6D28D9] !text-[#F9FAFB]'
                     : ''
                 ]"
@@ -164,17 +192,30 @@
                 Most Forked
               </CommandItem>
               <CommandItem
-                v-if="!['my', 'my_fork'].includes(modelStoreInstance.mode)"
                 value="most-used"
                 :class="[
-                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]',
-                  modelStoreInstance.filterState.sort === 'Most Used'
+                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer',
+                  '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]',
+                  store[props.page].filterState.sort === 'Most Used'
                     ? '!bg-[#6D28D9] !text-[#F9FAFB]'
                     : ''
                 ]"
                 @click="handleSortChange('Most Used')"
               >
                 Most Used
+              </CommandItem>
+              <CommandItem
+                value="most-used"
+                :class="[
+                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer',
+                  '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]',
+                  store[props.page].filterState.sort === 'Most Liked'
+                    ? '!bg-[#6D28D9] !text-[#F9FAFB]'
+                    : ''
+                ]"
+                @click="handleSortChange('Most Liked')"
+              >
+                Most Liked
               </CommandItem>
             </CommandGroup>
           </CommandList>
@@ -188,22 +229,6 @@
           variant="default"
           class="w-[44px] h-[44px] hover:border-2 hover:border-white cursor-pointer"
         >
-          <!-- <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            class="mr-2"
-          >
-            <path
-              d="M14.6666 2H1.33325L6.66658 8.30667V12.6667L9.33325 14V8.30667L14.6666 2Z"
-              stroke="#F9FAFB"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg> -->
-
           <svg
             width="16"
             height="14"
@@ -231,23 +256,22 @@
               <CommandItem value="model-types" class="p-2">
                 <div class="flex flex-wrap gap-2">
                   <Badge
-                    v-for="type in modelStoreInstance.modelTypes"
+                    v-for="type in store.modelTypes"
                     :key="type.value"
                     variant="secondary"
                     :class="[
-                      'cursor-not-allowed hover:!bg-inherit',
-                      modelStoreInstance.filterState.model_types.includes(type.value)
-                        ? 'bg-[#6D28D9] hover:!bg-[#6D28D9]'
-                        : 'bg-[#4E4E4E] hover:!bg-[#4E4E4E]'
+                      'cursor-pointer transition-colors duration-200',
+                      store[props.page].filterState.model_types.includes(type.value)
+                        ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
+                        : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
-                    @click="handleModelTypeChange(type.value)"
                   >
                     {{ type.label }}
                   </Badge>
                 </div>
               </CommandItem>
             </CommandGroup>
-            <CommandSeparator />
+            <CommandSeparator v-if="props.page !== 'posts' && props.page !== 'community'" />
             <CommandGroup>
               <div class="p-2">
                 <div class="text-sm font-medium text-[#F9FAFB] mb-2">Base Models</div>
@@ -255,18 +279,14 @@
               <CommandItem value="base-models" class="p-2">
                 <div class="flex flex-wrap gap-2">
                   <Badge
-                    v-for="model in modelStoreInstance.baseModelTypes.filter(
-                      (m: any) =>
-                        modelStoreInstance.selectedBaseModels?.length === 0 ||
-                        modelStoreInstance.selectedBaseModels?.includes(m.value)
-                    )"
+                    v-for="model in store.baseModelTypes"
                     :key="model.value"
                     variant="secondary"
                     :class="[
-                      'cursor-pointer hover:!bg-inherit',
-                      modelStoreInstance.filterState.base_models.includes(model.value)
-                        ? 'bg-[#6D28D9] hover:!bg-[#6D28D9]'
-                        : 'bg-[#4E4E4E] hover:!bg-[#4E4E4E]'
+                      'cursor-pointer transition-colors duration-200',
+                      store[props.page].filterState.base_models.includes(model.value)
+                        ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
+                        : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
                     @click="handleBaseModelChange(model.value)"
                   >
