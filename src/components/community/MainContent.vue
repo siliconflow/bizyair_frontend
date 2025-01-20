@@ -1,25 +1,33 @@
 <script setup lang="ts">
-  import { ref, onMounted, watch } from 'vue'
+  import { onMounted, watch } from 'vue'
   import BaseModelGrid from './modules/BaseModelGrid.vue'
   import ModelFilterBar from './modules/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
-  import { get_model_list } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import { Model } from '@/types/model'
+  import { useModelGrid } from '@/composables/useModelGrid'
 
   defineOptions({
     name: 'MainContent'
   })
 
   const communityStore = useCommunityStore()
-
-  const loading = ref(false)
-  const isGridLoading = ref(false)
-  const cacheKey = ref(0)
-  const imageLoadStates = ref<Map<number | string, boolean>>(new Map())
-
-  const hasMore = ref(true)
-  const showSortPopover = ref(false)
+  
+  const {
+    state: {
+      isGridLoading,
+      cacheKey,
+      showSortPopover,
+      imageLoadStates
+    },
+    storeState,
+    doMetaFetch,
+    loadMore,
+    handleImageLoad,
+    handleImageError
+  } = useModelGrid({
+    pageKey: 'mainContent'
+  })
 
   const handleAddNode = async (model: Model) => {
     try {
@@ -66,74 +74,17 @@
     }
   }
 
-  const loadMore = async () => {
-    if (loading.value || !hasMore.value) return
-    loading.value = true
-    try {
-      const { current, page_size, total } = communityStore.mainContent.modelListPathParams
-      if (current * page_size >= total) {
-        hasMore.value = false
-        return
-      }
-      communityStore.mainContent.modelListPathParams.current = current + 1
-      await fetchData()
-      hasMore.value = (current + 1) * page_size < total
-    } catch (error) {
-      console.error('Load more error:', error)
-      useToaster.error(`Failed to load more: ${error}`)
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const fetchData = async (): Promise<unknown[]> => {
-    try {
-      const response = await get_model_list(
-        {
-          ...communityStore.mainContent.modelListPathParams
-        },
-        communityStore.mainContent.filterState
-      )
-
-      if (response?.data?.list) {
-        hasMore.value = communityStore.mainContent.models.length < response.data.total
-        communityStore.mainContent.modelListPathParams.total = response.data.total || 0
-
-        if (communityStore.mainContent.modelListPathParams.current === 1) {
-          communityStore.mainContent.models = response.data.list
-        } else {
-          communityStore.mainContent.models = [
-            ...communityStore.mainContent.models,
-            ...response.data.list
-          ]
-        }
-        return response.data.list
-      }
-      hasMore.value = false
-      return []
-    } catch (error) {
-      console.error('Fetch data error:', error)
-      useToaster.error(`Failed to fetch data: ${error}`)
-      return []
-    }
-  }
-
   watch(
     () => communityStore.reload,
     async (newVal: number, oldVal: number) => {
       if (newVal !== oldVal) {
         isGridLoading.value = true
         cacheKey.value++
-        imageLoadStates.value.clear()
-        doMetaFetch()
+        imageLoadStates.clear()
+        await doMetaFetch()
       }
     }
   )
-
-  const doMetaFetch = async () => {
-    communityStore.mainContent.modelListPathParams.current = 1
-    await fetchData()
-  }
 
   onMounted(async () => {
     isGridLoading.value = true
@@ -145,14 +96,6 @@
       }, 200)
     }
   })
-
-  const handleImageLoad = (_event: Event, modelId: number | string) => {
-    imageLoadStates.value.set(modelId, true)
-  }
-
-  const handleImageError = (_event: Event, modelId: number | string) => {
-    imageLoadStates.value.set(modelId, false)
-  }
 </script>
 
 <template>
@@ -166,10 +109,10 @@
     </div>
 
     <BaseModelGrid
-      :models="communityStore.mainContent.models"
+      :models="storeState.models"
       :loading="isGridLoading"
-      :total="communityStore.mainContent.models.length || 0"
-      :page-size="communityStore.mainContent.modelListPathParams.page_size"
+      :total="storeState.models.length || 0"
+      :page-size="storeState.modelListPathParams.page_size"
       :cache-key="cacheKey"
       :on-model-action="handleAddNode"
       :image-load-states="imageLoadStates"

@@ -1,27 +1,35 @@
 <script setup lang="ts">
-  import { ref, onMounted, inject } from 'vue'
+  import { onMounted, inject } from 'vue'
   import BaseModelGrid from './modules/BaseModelGrid.vue'
   import ModelFilterBar from './modules/ModelFilterBar.vue'
   import { useCommunityStore } from '@/stores/communityStore'
-
-  import { get_model_list, get_workflow_dowload_url } from '@/api/model'
+  import { get_workflow_dowload_url } from '@/api/model'
   import { useToaster } from '@/components/modules/toats'
   import { Model } from '@/types/model'
+  import { useModelGrid } from '@/composables/useModelGrid'
 
   defineOptions({
     name: 'QuickStartContent'
   })
 
   const communityStore = useCommunityStore()
-  const loading = ref(false)
-  const isGridLoading = ref(false)
-  const cacheKey = ref(0)
-  const imageLoadStates = ref<Map<number | string, boolean>>(new Map())
-
-  const hasMore = ref(true)
-  const showSortPopover = ref(false)
-
   const comfyUIApp: any = inject('comfyUIApp')
+
+  const {
+    state: {
+      isGridLoading,
+      cacheKey,
+      showSortPopover,
+      imageLoadStates
+    },
+    storeState,
+    doMetaFetch,
+    loadMore,
+    handleImageLoad,
+    handleImageError
+  } = useModelGrid({
+    pageKey: 'quickStart'
+  })
 
   const handleLoadWorkflow = async (model: Model) => {
     try {
@@ -44,66 +52,6 @@
     }
   }
 
-  const doMetaFetch = async () => {
-    communityStore.quickStart.modelListPathParams.current = 1
-    await fetchData()
-  }
-
-  const loadMore = async () => {
-    if (loading.value || !hasMore.value) return
-    loading.value = true
-
-    try {
-      const { current, page_size, total } = communityStore.quickStart.modelListPathParams
-      if (current * page_size >= total) {
-        hasMore.value = false
-        return
-      }
-
-      communityStore.quickStart.modelListPathParams.current = current + 1
-      await fetchData()
-
-      hasMore.value = (current + 1) * page_size < total
-    } catch (error) {
-      console.error('Load more error:', error)
-      useToaster.error(`Failed to load more: ${error}`)
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const fetchData = async (): Promise<unknown[]> => {
-    try {
-      const response = await get_model_list(
-        {
-          ...communityStore.quickStart.modelListPathParams
-        },
-        communityStore.quickStart.filterState
-      )
-
-      if (response?.data?.list) {
-        communityStore.quickStart.modelListPathParams.total = response.data.total || 0
-
-        if (communityStore.quickStart.modelListPathParams.current === 1) {
-          communityStore.quickStart.models = response.data.list
-        } else {
-          communityStore.quickStart.models = [
-            ...communityStore.quickStart.models,
-            ...response.data.list
-          ]
-        }
-
-        return response.data.list
-      }
-      hasMore.value = false
-      return []
-    } catch (error) {
-      console.error('Fetch data error:', error)
-      useToaster.error(`Failed to fetch data: ${error}`)
-      return []
-    }
-  }
-
   onMounted(async () => {
     isGridLoading.value = true
     try {
@@ -114,14 +62,6 @@
       }, 200)
     }
   })
-
-  const handleImageLoad = (_e: Event, modelId: number | string) => {
-    imageLoadStates.value.set(modelId, true)
-  }
-
-  const handleImageError = async (_e: Event, modelId: number | string) => {
-    imageLoadStates.value.set(modelId, false)
-  }
 </script>
 
 <template>
@@ -135,12 +75,12 @@
     </div>
 
     <BaseModelGrid
-      :models="communityStore.quickStart.models"
+      :models="storeState.models"
       :loading="isGridLoading"
-      :total="communityStore.quickStart.modelListPathParams.total"
-      :page-size="communityStore.quickStart.modelListPathParams.page_size"
+      :total="storeState.models.length || 0"
+      :page-size="storeState.modelListPathParams.page_size"
       :cache-key="cacheKey"
-      :on-fetch-data="fetchData"
+      :on-fetch-data="doMetaFetch"
       :on-model-action="handleLoadWorkflow"
       :image-load-states="imageLoadStates"
       :on-image-load="handleImageLoad"
