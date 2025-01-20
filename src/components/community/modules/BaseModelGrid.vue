@@ -12,7 +12,6 @@
     name: 'BaseModelGrid'
   })
 
-
   const props = defineProps({
     models: {
       type: Array as () => Model[],
@@ -32,10 +31,6 @@
     },
     cacheKey: {
       type: Number,
-      required: true
-    },
-    onFetchData: {
-      type: Function as PropType<(pageNumber: number, pageSize: number) => Promise<unknown[]>>,
       required: true
     },
     onModelAction: {

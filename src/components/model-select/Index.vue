@@ -2,7 +2,7 @@
   import { useModelSelectStore } from '@/stores/modelSelectStore'
   import vDialog from '@/components/modules/vDialog.vue'
   import Mine from '@/components/model-select/Mine.vue'
-  import {  onMounted } from 'vue'
+  import { onMounted } from 'vue'
   import type { ModelVersion, Model } from '@/types/model'
   import { watch } from 'vue'
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
@@ -13,17 +13,16 @@
     selectedBaseModels?: string[]
   }
   const props = defineProps<Props>()
-  const emit = defineEmits(['apply','close'])
+  const emit = defineEmits(['apply', 'close'])
 
   watch(
     () => modelSelectStore.showDialog,
-    (newVal) => {
-      if(!newVal){
+    newVal => {
+      if (!newVal) {
         emit('close')
       }
     }
   )
-
 
   watch(
     () => modelSelectStore.applyObject,
@@ -37,8 +36,8 @@
 
   watch(
     () => props.modelType,
-    (newModelType) => {
-      modelSelectStore.filterDataLoaded=false
+    newModelType => {
+      modelSelectStore.filterDataLoaded = false
       modelSelectStore.loadFilterData(newModelType, props.selectedBaseModels)
     },
     { deep: true, immediate: true }
@@ -46,19 +45,17 @@
 
   watch(
     () => props.selectedBaseModels,
-    (newSelectedBaseModels) => {
-      modelSelectStore.filterDataLoaded=false
+    newSelectedBaseModels => {
+      modelSelectStore.filterDataLoaded = false
       modelSelectStore.loadFilterData(props.modelType, newSelectedBaseModels)
     },
     { deep: true, immediate: true }
   )
- 
 
   onMounted(async () => {
     await modelSelectStore.loadFilterData(props.modelType, props.selectedBaseModels)
     modelSelectStore.showDialog = true
   })
- 
 
   const handleClose = () => {
     modelSelectStore.showDialog = false
@@ -74,9 +71,9 @@
     content-class="max-h-[80vh] w-full rounded-tl-lg rounded-tr-lg custom-shadow"
     @on-close="handleClose"
   >
-    <div v-if="modelSelectStore.filterDataLoaded" class="flex w-full h-full overflow-hidden" >
+    <div v-if="modelSelectStore.filterDataLoaded" class="flex w-full h-full overflow-hidden">
       <div class="flex-1 bg-[#353535] h-full">
-        <Mine   />
+        <Mine />
       </div>
     </div>
     <div v-else>

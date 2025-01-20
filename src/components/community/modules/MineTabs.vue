@@ -22,7 +22,7 @@
     } else {
       communityStore.TabSource = 'publicity'
     }
-   
+
     emit('update:modelValue', value as TabType)
   }
 
@@ -49,10 +49,7 @@
       </TabsTrigger>
     </TabsList>
     <template v-for="mode in modes" :key="mode">
-      <TabsContent
-        :value="mode"
-        class="flex-1 flex flex-col mt-0 outline-none"
-      >
+      <TabsContent :value="mode" class="flex-1 flex flex-col mt-0 outline-none">
         <slot :name="mode"></slot>
       </TabsContent>
     </template>

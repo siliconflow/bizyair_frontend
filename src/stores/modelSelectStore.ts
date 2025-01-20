@@ -196,7 +196,6 @@ export const useModelSelectStore = defineStore('modelSelect', {
             this.filterDataLoaded = true
           }
         }
-       
       } catch (error) {
         useToaster.error(`Failed to fetch model types: ${error}`)
         this.modelTypes = []

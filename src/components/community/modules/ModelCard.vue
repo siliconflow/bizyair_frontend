@@ -104,23 +104,23 @@
           class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
           @click.prevent.stop="$emit('action', model)"
         >
-        <vTooltips :tips="model?.type === 'Workflow' ? 'Load Workflow' : 'Add Node'">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            class="drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] hover:scale-110 transition-transform duration-200 cursor-pointer"
-          >
-            <path
-              d="M5 3L19 12L5 21V3Z"
-              stroke="#F3F4F6"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="group-hover:stroke-[#7C3AEDCC] transition-colors duration-200"
-              filter="drop-shadow(0 1px 2px rgb(0 0 0 / 0.5))"
+          <vTooltips :tips="model?.type === 'Workflow' ? 'Load Workflow' : 'Add Node'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              class="drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] hover:scale-110 transition-transform duration-200 cursor-pointer"
+            >
+              <path
+                d="M5 3L19 12L5 21V3Z"
+                stroke="#F3F4F6"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="group-hover:stroke-[#7C3AEDCC] transition-colors duration-200"
+                filter="drop-shadow(0 1px 2px rgb(0 0 0 / 0.5))"
               />
             </svg>
           </vTooltips>
@@ -167,22 +167,22 @@
               v-if="model?.type === 'Workflow' && model?.counter?.downloaded_count"
               class="flex items-center space-x-1"
             >
-            <vTooltips tips="Downloaded">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-              >
-                <path
-                  data-v-eb6fbda7=""
-                  d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2"
-                  stroke="#F9FAFB"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                ></path>
-              </svg>
+              <vTooltips tips="Downloaded">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                >
+                  <path
+                    data-v-eb6fbda7=""
+                    d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2"
+                    stroke="#F9FAFB"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>
+                </svg>
               </vTooltips>
               <span class="opacity-80">{{ formatNumber(model?.counter?.downloaded_count) }}</span>
             </span>
@@ -194,20 +194,20 @@
                   height="14"
                   viewBox="0 0 14 14"
                   fill="none"
-              >
-                <path
-                  d="M3.33325 2L12.6666 8L3.33325 14V2Z"
-                  stroke="#F9FAFB"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+                >
+                  <path
+                    d="M3.33325 2L12.6666 8L3.33325 14V2Z"
+                    stroke="#F9FAFB"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
               </vTooltips>
               <span class="opacity-80">{{ formatNumber(model?.counter?.used_count) }}</span>
             </span>
             <span class="flex items-center space-x-1">
               <vTooltips tips="Forked">
-              <svg
+                <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
                   height="16"
@@ -226,20 +226,20 @@
             </span>
             <span class="flex items-center space-x-1">
               <vTooltips tips="Liked">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="15"
-                height="14"
-                viewBox="0 0 15 14"
-                fill="none"
-              >
-                <path
-                  d="M4.58317 5.83329V12.8333M9.24984 3.42996L8.6665 5.83329H12.0673C12.2485 5.83329 12.4271 5.87546 12.5891 5.95646C12.7511 6.03746 12.892 6.15506 13.0007 6.29996C13.1093 6.44485 13.1828 6.61306 13.2152 6.79126C13.2476 6.96946 13.2381 7.15275 13.1873 7.32663L11.8282 11.9933C11.7575 12.2356 11.6101 12.4485 11.4082 12.6C11.2062 12.7514 10.9606 12.8333 10.7082 12.8333H2.83317C2.52375 12.8333 2.22701 12.7104 2.00821 12.4916C1.78942 12.2728 1.6665 11.976 1.6665 11.6666V6.99996C1.6665 6.69054 1.78942 6.39379 2.00821 6.175C2.22701 5.95621 2.52375 5.83329 2.83317 5.83329H4.44317C4.66022 5.83318 4.87293 5.77252 5.05739 5.65813C5.24186 5.54374 5.39075 5.38017 5.48734 5.18579L7.49984 1.16663C7.77492 1.17003 8.04568 1.23556 8.29189 1.35831C8.53809 1.48106 8.75338 1.65785 8.92166 1.87549C9.08993 2.09313 9.20686 2.34599 9.26368 2.61516C9.32051 2.88433 9.31578 3.16287 9.24984 3.42996Z"
-                  stroke="#E5E7EB"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="15"
+                  height="14"
+                  viewBox="0 0 15 14"
+                  fill="none"
+                >
+                  <path
+                    d="M4.58317 5.83329V12.8333M9.24984 3.42996L8.6665 5.83329H12.0673C12.2485 5.83329 12.4271 5.87546 12.5891 5.95646C12.7511 6.03746 12.892 6.15506 13.0007 6.29996C13.1093 6.44485 13.1828 6.61306 13.2152 6.79126C13.2476 6.96946 13.2381 7.15275 13.1873 7.32663L11.8282 11.9933C11.7575 12.2356 11.6101 12.4485 11.4082 12.6C11.2062 12.7514 10.9606 12.8333 10.7082 12.8333H2.83317C2.52375 12.8333 2.22701 12.7104 2.00821 12.4916C1.78942 12.2728 1.6665 11.976 1.6665 11.6666V6.99996C1.6665 6.69054 1.78942 6.39379 2.00821 6.175C2.22701 5.95621 2.52375 5.83329 2.83317 5.83329H4.44317C4.66022 5.83318 4.87293 5.77252 5.05739 5.65813C5.24186 5.54374 5.39075 5.38017 5.48734 5.18579L7.49984 1.16663C7.77492 1.17003 8.04568 1.23556 8.29189 1.35831C8.53809 1.48106 8.75338 1.65785 8.92166 1.87549C9.08993 2.09313 9.20686 2.34599 9.26368 2.61516C9.32051 2.88433 9.31578 3.16287 9.24984 3.42996Z"
+                    stroke="#E5E7EB"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
               </vTooltips>
               <span class="opacity-80">{{ formatNumber(model?.counter?.liked_count) }}</span>
             </span>
