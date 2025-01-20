@@ -204,7 +204,7 @@ export const useModelSelectStore = defineStore('modelSelect', {
       }
     },
 
-    setShowCommunityDetail(modelId: number, versionId: number) {
+    setAndShowCommunityDetail(modelId: number, versionId: number) {
       this.modelId = modelId
       this.versionId = versionId
       this.showCommunityDetail = true

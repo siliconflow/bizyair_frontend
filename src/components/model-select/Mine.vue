@@ -105,7 +105,6 @@
   }
 
   const switchTab = async (tab: ModeTabType) => {
-    console.log('aaa',new Date().getTime())
     currentTab.value = tab
     const currentState = modelSelectStore.mine[tab]
 
@@ -117,12 +116,10 @@
       lastLoadedPage.value = currentState.lastState.currentPage
       hasMore.value = currentState.lastState.hasMore ?? true
       hasPrevious.value = currentState.lastState.hasPrevious
-console.log('来了1')
       await fetchData(0, modelSelectStore.mine[currentTab.value].modelListPathParams.page_size)
     } else {
       currentState.modelListPathParams.current = 1
       lastLoadedPage.value = 1
-      console.log('来了2')
       await fetchData(0, modelSelectStore.mine[currentTab.value].modelListPathParams.page_size)
     }
   }
@@ -157,11 +154,9 @@ console.log('来了1')
   }
 
   onMounted(async () => {
-    console.log(new Date().getTime())
     isGridLoading.value = true
     try {
       modelSelectStore.mine[currentTab.value].modelListPathParams.current = 1
-      console.log('来了3')
       await fetchData(0, modelSelectStore.mine[currentTab.value].modelListPathParams.page_size)
     } finally {
       setTimeout(() => {
@@ -178,7 +173,6 @@ console.log('来了1')
 
         imageLoadStates.value.clear()
         modelSelectStore.mine[currentTab.value].modelListPathParams.current = 1
-        console.log('来了4')
         await fetchData(0, modelSelectStore.mine[currentTab.value].modelListPathParams.page_size)
       }
     },
@@ -197,7 +191,6 @@ console.log('来了1')
             @fetch-data="
               () => {
                 modelSelectStore.mine.posts.modelListPathParams.current = 1
-                console.log('来了5')
                 fetchData(0, modelSelectStore.mine.posts.modelListPathParams.page_size)
               }
             "
@@ -212,7 +205,6 @@ console.log('来了1')
             @fetch-data="
               () => {
                 modelSelectStore.mine.forked.modelListPathParams.current = 1
-                console.log('来了6')
                 fetchData(0, modelSelectStore.mine.forked.modelListPathParams.page_size)
               }
             "
@@ -225,7 +217,6 @@ console.log('来了1')
             @fetch-data="
               () => {
                 modelSelectStore.mine.community.modelListPathParams.current = 1
-                console.log('来了7')
                 fetchData(0, modelSelectStore.mine.community.modelListPathParams.page_size)
               }
             "

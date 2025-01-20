@@ -41,7 +41,7 @@
   }
 
   const handleDetail = (modelId: number, versionId: number) => {
-    modelSelectStore.setShowCommunityDetail(modelId, versionId)
+    modelSelectStore.setAndShowCommunityDetail(modelId, versionId)
   }
 
   watch(
