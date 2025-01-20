@@ -8,10 +8,10 @@
   import { NVirtualList } from 'naive-ui'
   import { debounce } from 'lodash-es'
   import type { VirtualListInst } from 'naive-ui'
-
   defineOptions({
     name: 'BaseModelGrid'
   })
+
 
   const props = defineProps({
     models: {

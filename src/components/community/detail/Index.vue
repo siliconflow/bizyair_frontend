@@ -3,6 +3,7 @@
 
   import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
+
   import {
     Command,
     CommandGroup,
@@ -24,6 +25,8 @@
   import { MdPreview } from 'md-editor-v3'
   import { modelStore } from '@/stores/modelStatus'
   import { Model, ModelVersion } from '@/types/model'
+  import vDialog from '@/components/modules/vDialog.vue'
+  import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
   import {
     model_detail,
     like_model,
@@ -42,45 +45,33 @@
   const modelStoreInstance = modelStore()
   const isLoading = ref(false)
 
-  const props = defineProps<{
-    modelId: string | number
-    version: ModelVersion
-    mode: string
-    currentTab?: string
-  }>()
-
-  const emit = defineEmits<{
-    (e: 'loaded'): void
-  }>()
 
   const comfyUIApp: any = inject('comfyUIApp')
 
   const fetchModelDetail = async () => {
     try {
-      const res = await model_detail({ id: props.modelId, source: props.mode })
+      const res = await model_detail({ id: communityStore.modelId, source: communityStore.TabSource })
       if (!res.data) {
         useToaster.error('Model not found.')
         return
       }
       model.value = res.data
       initializeScroll()
-      nextTick(() => {
-        emit('loaded')
-      })
+      isLoading.value = false
     } catch (error) {
       useToaster.error('Failed to fetch model details')
-      emit('loaded')
+      isLoading.value = false
     }
   }
 
   const initializeScroll = () => {
     if (model.value && model.value.versions && model.value.versions.length > 0) {
-      if (props.version?.id) {
-        const targetVersion = model.value.versions.find(v => v.id === props.version.id)
+      if (communityStore.versionId) {
+        const targetVersion = model.value.versions.find(v => v.id === communityStore.versionId)
         if (targetVersion) {
           currentVersion.value = { ...targetVersion }
           nextTick(() => {
-            scrollWithDelay(props.version?.id)
+            scrollWithDelay(communityStore.versionId)
           })
         }
       } else {
@@ -95,6 +86,7 @@
   }
 
   onMounted(async () => {
+    isLoading.value = true
     await fetchModelDetail()
   })
 
@@ -310,6 +302,12 @@
 </script>
 
 <template>
+   <v-dialog
+    v-model:open="communityStore.showCommunityDetail"
+    class="px-6 overflow-visible pb-6 z-10000 max-w-[90%] bg-[#353535]"
+    layout-class="z-10000"
+    content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+  >
   <div
     v-if="!isLoading && model"
     class="p-6 pb-12 flex flex-col gap-4 items-start justify-start min-w-[1000px] relative shadow-[0px_20px_40px_0px_rgba(0,0,0,0.25)]"
@@ -493,7 +491,7 @@
             </svg>
           </vTooltips>
           <Popover
-            v-if="mode === 'my'"
+            v-if="['my', 'my_fork'].includes(communityStore.TabSource)"
             class="bg-[#353535]"
             :open="downloadOpen"
             @update:open="handleDownload"
@@ -538,7 +536,7 @@
                 <CommandList>
                   <CommandGroup>
                     <CommandItem
-                      v-if="currentTab === 'posts'"
+                      v-if="['my'].includes(communityStore.TabSource)"
                       value="edit"
                       class="px-2 py-1.5 mb-1 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]"
                       @click="handleModelOperation('edit', model?.id)"
@@ -620,7 +618,7 @@
             class="flex flex-row gap-1.5 items-start justify-start self-stretch shrink-0 relative"
           >
             <Button
-              v-if="mode !== 'my' && mode !== 'my_fork'"
+              v-if="['publicity'].includes(communityStore.TabSource)"
               variant="default"
               class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
               :disabled="currentVersion?.forked"
@@ -929,6 +927,10 @@
       </div>
     </div>
   </div>
+  <div v-if="isLoading" class="min-h-[60vh]">
+      <LoadingOverlay v-if="isLoading" />
+    </div>
+  </v-dialog>
 </template>
 
 <style scoped>

@@ -4,11 +4,13 @@
   import QuickStartContent from '@/components/community/QuickStartContent.vue'
   import WorkflowsContent from '@/components/community/WorkflowsContent.vue'
   import Mine from '@/components/community/Mine.vue'
+  import ModelDetail from '@/components/community/detail/Index.vue'
   import { useCommunityStore } from '@/stores/communityStore'
 
   const communityStore = useCommunityStore()
   const handleMenuClick = (item: { path: string }) => {
     communityStore.currentPath = item.path
+    communityStore.TabSource = item.path === '/mine' ? 'my' : 'publicity'
   }
   communityStore.loadFilterData()
 </script>
@@ -31,7 +33,9 @@
                   : Mine
           "
         />
+     
       </keep-alive>
+      <ModelDetail v-if="communityStore.showCommunityDetail" />
     </div>
   </div>
 </template>

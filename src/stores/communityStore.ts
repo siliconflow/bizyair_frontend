@@ -161,6 +161,7 @@ export const useCommunityStore = defineStore('community', {
     get forked() {
       return this.mine.forked
     },
+    TabSource: 'publicity',
     modelId: 0,
     versionId: 0,
     modelTypes: [] as CommonModelType[],
