@@ -20,14 +20,6 @@
       type: Object as () => Model | null,
       default: null
     },
-    mode: {
-      type: String,
-      default: 'publicity'
-    },
-    currentTab: {
-      type: String,
-      default: ''
-    },
     loading: {
       type: Boolean,
       default: false

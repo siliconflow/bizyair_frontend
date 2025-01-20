@@ -10,7 +10,7 @@
   const communityStore = useCommunityStore()
   const handleMenuClick = (item: { path: string }) => {
     communityStore.currentPath = item.path
-    communityStore.TabSource = item.path === '/mine' ? 'my' : 'publicity'
+    communityStore.TabSource = item.path === '/my-models' ? 'my' : 'publicity'
   }
   communityStore.loadFilterData()
 </script>
