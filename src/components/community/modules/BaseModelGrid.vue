@@ -18,14 +18,6 @@
       type: Array as () => Model[],
       required: true
     },
-    mode: {
-      type: String,
-      required: true
-    },
-    currentTab: {
-      type: String,
-      default: ''
-    },
     loading: {
       type: Boolean,
       default: false
@@ -202,8 +194,6 @@
                   v-for="model in row.models"
                   :key="`${model.id}`"
                   :model="model"
-                  :mode="mode"
-                  :current-tab="currentTab"
                   :image-loaded="imageLoadStates.get(model.id) ?? false"
                   @action="onModelAction(model)"
                   @detail="emit('showDetail', model)"

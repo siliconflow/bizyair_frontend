@@ -485,8 +485,6 @@
       :image-load-states="imageLoadStates"
       :on-image-load="handleImageLoad"
       :on-image-error="handleImageError"
-      :current-tab="currentTab"
-      mode="my"
       @scroll="handleScroll"
       @load-more="loadMore"
     />
