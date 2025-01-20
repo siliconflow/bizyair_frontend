@@ -2,8 +2,6 @@
   import { Model } from '@/types/model'
   import vDefaultPic from '@/components/modules/vDefaultPic.vue'
   import vTooltips from '@/components/modules/v-tooltip.vue'
-  import vDialog from '@/components/modules/vDialog.vue'
-  import ModelDetail from '@/components/community/detail/Index.vue'
   import { sliceString, formatNumber } from '@/utils/tool'
   import { useCommunityStore } from '@/stores/communityStore'
   import { ref, watch, onMounted } from 'vue'
@@ -50,14 +48,8 @@
     emit('image-error', e)
   }
 
-  const handleDetail = () => {
-    dialogLoading.value = true
-    showDialog.value = true
-    communityStore.showCommunityDetail = true
-  }
-
-  const handleLoaded = () => {
-    dialogLoading.value = false
+  const handleDetail = (modelId: number, versionId: number) => {
+    communityStore.setAndShowCommunityDetail(modelId, versionId)
   }
 
   watch(
@@ -144,7 +136,7 @@
 
         <div
           class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
-          @click.prevent="handleDetail"
+          @click.prevent="handleDetail(Number(model?.id), Number(model?.versions?.[0]?.id))"
         >
           <div
             class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a]"
@@ -279,29 +271,6 @@
         </div>
       </template>
     </div>
-
-    <v-dialog
-      v-if="model?.versions?.[0] && showDialog"
-      v-model:open="communityStore.showCommunityDetail"
-      class="px-6 overflow-visible pb-6 z-10000 max-w-[90%] bg-[#353535]"
-      layout-class="z-10000"
-      content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
-      :title="model?.name || ''"
-      @close="showDialog = false"
-    >
-      <div v-show="!dialogLoading">
-        <ModelDetail
-          :model-id="model?.id || ''"
-          :version="model?.versions?.[0]"
-          :mode="mode"
-          :current-tab="currentTab"
-          @loaded="handleLoaded"
-        />
-      </div>
-      <div v-show="dialogLoading" class="flex justify-center items-center min-h-[300px]">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-      </div>
-    </v-dialog>
   </div>
 </template>
 

@@ -1,7 +1,10 @@
 <script setup lang="ts">
   import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+  import { useCommunityStore } from '@/stores/communityStore'
 
   type TabType = 'posts' | 'forked'
+
+  const communityStore = useCommunityStore()
 
   const { modelValue } = defineProps<{
     modelValue: TabType
@@ -12,6 +15,14 @@
   }>()
 
   const handleTabChange = (value: string) => {
+    if (value === 'posts') {
+      communityStore.TabSource = 'my'
+    } else if (value === 'forked') {
+      communityStore.TabSource = 'my_fork'
+    } else {
+      communityStore.TabSource = 'publicity'
+    }
+   
     emit('update:modelValue', value as TabType)
   }
 

@@ -321,7 +321,8 @@
         const response = await get_model_list(
           {
             ...communityStore.mine[currentTab.value]?.modelListPathParams,
-            mode: currentTab.value === 'posts' ? 'my' : 'my_fork'
+            // mode: currentTab.value === 'posts' ? 'my' : 'my_fork'
+            mode: communityStore.TabSource
           },
           communityStore.mine[currentTab.value]?.filterState
         )
