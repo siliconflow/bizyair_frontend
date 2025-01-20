@@ -32,34 +32,17 @@
     loading.value = true
 
     try {
-      if (
-        communityStore.mine[currentTab.value]?.models.length >=
-        communityStore.mine[currentTab.value]?.modelListPathParams.total
-      ) {
+      const { current, page_size, total } =
+        communityStore.mine[currentTab.value].modelListPathParams
+      if (current * page_size >= total) {
         hasMore.value = false
         return
       }
-      const currentState = communityStore.mine[currentTab.value]
-      const nextPage = currentState.modelListPathParams.current + 1
-      currentState.modelListPathParams.current = nextPage
-
-      const mode = currentTab.value === 'posts' ? 'my' : 'my_fork'
-      const response = await get_model_list(
-        {
-          ...currentState.modelListPathParams,
-          mode
-        },
-        currentState.filterState
-      )
-
-      if (response?.data?.list) {
-        currentState.models = [...currentState.models, ...response.data.list]
-        currentState.modelListPathParams.total = response.data.total
-        hasMore.value = currentState.models.length < response.data.total
-      } else {
-        hasMore.value = false
-      }
-      return []
+      communityStore.mine[currentTab.value].modelListPathParams.current = current + 1
+      communityStore.mine[currentTab.value].modelListPathParams.mode =
+        currentTab.value === 'posts' ? 'my' : 'my_fork'
+      await fetchData()
+      hasMore.value = (current + 1) * page_size < total
     } catch (error) {
       console.error('fetch data error:', error)
       useToaster.error(`Failed to load more data: ${error}`)
@@ -68,13 +51,11 @@
     }
   }
 
-  const fetchData = async (pageNumber: number, pageSize: number) => {
+  const fetchData = async () => {
     try {
       const response = await get_model_list(
         {
-          ...communityStore.mine[currentTab.value].modelListPathParams,
-          current: pageNumber + 1,
-          page_size: pageSize
+          ...communityStore.mine[currentTab.value].modelListPathParams
         },
         communityStore.mine[currentTab.value].filterState
       )
@@ -82,7 +63,7 @@
       if (response?.data?.list) {
         communityStore.mine[currentTab.value].modelListPathParams.total = response.data.total || 0
 
-        if (pageNumber === 0) {
+        if (communityStore.mine[currentTab.value].modelListPathParams.current === 1) {
           communityStore.mine[currentTab.value].models = response.data.list
         } else {
           communityStore.mine[currentTab.value].models = [
@@ -93,6 +74,7 @@
 
         return response.data.list
       } else {
+        hasMore.value = false
         communityStore.mine[currentTab.value].models = []
       }
     } catch (error) {
@@ -102,14 +84,16 @@
     }
   }
 
+  const doMetaFetch = async () => {
+    communityStore.mine[currentTab.value].modelListPathParams.current = 1
+    await fetchData()
+  }
 
   const switchTab = async (tab: TabType) => {
     currentTab.value = tab
-    const currentState = communityStore.mine[tab]
     cacheKey.value++
     imageLoadStates.value.clear()
-    currentState.modelListPathParams.current = 1
-    await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
+    await doMetaFetch()
   }
 
   const imageLoadStates = ref<Map<number | string, boolean>>(new Map())
@@ -205,8 +189,7 @@
   onMounted(async () => {
     isGridLoading.value = true
     try {
-      communityStore.mine[currentTab.value].modelListPathParams.current = 1
-      await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
+      await doMetaFetch()
     } finally {
       setTimeout(() => {
         isGridLoading.value = false
@@ -214,16 +197,14 @@
     }
   })
 
-
   watch(
     () => useModelStore.reload,
     async (newVal: number, oldVal: number) => {
-      console.log('newVal', newVal)
       if (newVal !== oldVal) {
+        isGridLoading.value = true
         cacheKey.value++
         imageLoadStates.value.clear()
-        communityStore.mine[currentTab.value].modelListPathParams.current = 1
-        await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
+        await doMetaFetch()
       }
     },
     { deep: true }
@@ -232,18 +213,13 @@
 
 <template>
   <div class="flex flex-col h-screen">
-    <div class="px-6  pb-0 sticky top-0 z-20">
+    <div class="px-6 pb-0 sticky top-0 z-20">
       <MineTabs v-model="currentTab" @update:model-value="switchTab">
         <template #posts>
           <ModelFilterBar
             v-model:show-sort-popover="showSortPopover"
             page="posts"
-            @fetch-data="
-              () => {
-                communityStore.mine.posts.modelListPathParams.current = 1
-                fetchData(0, communityStore.mine.posts.modelListPathParams.page_size)
-              }
-            "
+            @fetch-data="doMetaFetch"
           />
           <NewPostButton @new-model="handleNewModel" @new-workflow="handleNewWorkflow" />
         </template>
@@ -252,12 +228,7 @@
           <ModelFilterBar
             v-model:show-sort-popover="showSortPopover"
             page="forked"
-            @fetch-data="
-              () => {
-                communityStore.mine.forked.modelListPathParams.current = 1
-                fetchData(0, communityStore.mine.forked.modelListPathParams.page_size)
-              }
-            "
+            @fetch-data="doMetaFetch"
           />
         </template>
       </MineTabs>

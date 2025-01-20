@@ -33,7 +33,6 @@
                   : Mine
           "
         />
-     
       </keep-alive>
       <ModelDetail v-if="communityStore.showCommunityDetail" />
     </div>

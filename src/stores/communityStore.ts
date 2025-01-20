@@ -47,7 +47,7 @@ export const useCommunityStore = defineStore('community', {
       modelListPathParams: {
         mode: 'official',
         current: 1,
-        page_size: 50,
+        page_size: 28,
         total: 0
       } as ModelListPathParams,
       models: [],
@@ -74,7 +74,7 @@ export const useCommunityStore = defineStore('community', {
       modelListPathParams: {
         mode: 'publicity',
         current: 1,
-        page_size: 50,
+        page_size: 28,
         total: 0
       } as ModelListPathParams,
       models: [],
