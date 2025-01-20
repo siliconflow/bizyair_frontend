@@ -137,7 +137,7 @@
       if (newVal !== oldVal) {
         isGridLoading.value = true
         cacheKey.value++
-        imageLoadStates.clear()
+        imageLoadStates.value = new Map()
         await doMetaFetch()
       }
     },

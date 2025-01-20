@@ -7,7 +7,7 @@ export interface GridState {
   cacheKey: Ref<number>
   hasMore: Ref<boolean>
   showSortPopover: Ref<boolean>
-  imageLoadStates: Map<number | string, boolean>
+  imageLoadStates: Ref<Map<number | string, boolean>>
 }
 
 export interface UseModelGridOptions {

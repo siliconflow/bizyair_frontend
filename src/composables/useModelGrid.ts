@@ -13,7 +13,7 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
     cacheKey: ref(0),
     hasMore: ref(true),
     showSortPopover: ref(false),
-    imageLoadStates: new Map()
+    imageLoadStates: ref(new Map())
   }
 
   const getStoreData = () => {
@@ -109,17 +109,21 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
   }
 
   const handleImageLoad = (_event: Event, modelId: number | string) => {
-    state.imageLoadStates.set(modelId, true)
+    const newMap = new Map(state.imageLoadStates.value)
+    newMap.set(modelId, true)
+    state.imageLoadStates.value = newMap
   }
 
   const handleImageError = (_event: Event, modelId: number | string) => {
-    state.imageLoadStates.set(modelId, false)
+    const newMap = new Map(state.imageLoadStates.value)
+    newMap.set(modelId, false)
+    state.imageLoadStates.value = newMap
   }
 
   if (isRef(pageKey)) {
     watch(pageKey, () => {
       state.cacheKey.value++
-      state.imageLoadStates.clear()
+      state.imageLoadStates.value = new Map()
       doMetaFetch()
     })
   }
