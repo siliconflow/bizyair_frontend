@@ -161,7 +161,8 @@ export const useCommunityStore = defineStore('community', {
     get forked() {
       return this.mine.forked
     },
-
+    modelId: 0,
+    versionId: 0,
     modelTypes: [] as CommonModelType[],
     baseModelTypes: [] as CommonModelType[],
     filterDataLoaded: false
@@ -275,6 +276,11 @@ export const useCommunityStore = defineStore('community', {
         }
       }
       return null
+    },
+    setAndShowCommunityDetail(modelId: number, versionId: number) {
+      this.modelId = modelId
+      this.versionId = versionId
+      this.showCommunityDetail = true
     }
   }
 })
