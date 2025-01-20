@@ -3,7 +3,7 @@
     name: 'Mine'
   })
 
-  import { ref, onMounted, onUnmounted, nextTick, watch, inject } from 'vue'
+  import { ref, onMounted, watch, inject } from 'vue'
   import ModelFilterBar from '@/components/community/modules/ModelFilterBar.vue'
   import MineTabs from '@/components/community/modules/MineTabs.vue'
   import { useCommunityStore } from '@/stores/communityStore'
@@ -19,40 +19,13 @@
   const communityStore = useCommunityStore()
   const useModelStore = modelStore()
   const currentTab = ref<TabType>('posts')
-  const loadingRef = ref<HTMLDivElement | null>(null)
-  let observer: IntersectionObserver | null = null
+
   const loading = ref(false)
   const hasMore = ref(true)
-  const hasPrevious = ref(false)
 
   const showSortPopover = ref(false)
-  const showBackToTop = ref(false)
-
-  const loadingStates = ref({
-    isLoading: false,
-    isLoadingMore: false,
-    isGridLoading: false,
-    isManualLoading: false,
-    isScrolling: false,
-    dialogLoading: true
-  })
-
-  const scrollState = ref({
-    ratio: 0,
-    showBackToTop: false,
-    timer: null as number | null
-  })
-
-  const cacheState = ref({
-    key: 0,
-    grid: new Map(),
-    loadedPages: new Set<number>(),
-    imageLoadStates: new Map<number | string, boolean>()
-  })
-
+  const isGridLoading = ref(false)
   const cacheKey = ref(0)
-  const gridCache = ref(new Map())
-  const lastLoadedPage = ref(1)
 
   const loadMore = async () => {
     if (loading.value || !hasMore.value) return
@@ -95,54 +68,6 @@
     }
   }
 
-  const throttle = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
-    let timer: number | null = null
-    return (...args: Parameters<T>) => {
-      if (timer) return
-      timer = window.setTimeout(() => {
-        fn(...args)
-        timer = null
-      }, delay)
-    }
-  }
-
-  const handleScroll = throttle((e: Event) => {
-    if (loadingStates.value.isManualLoading) return
-
-    const container = e.target as HTMLElement
-    scrollState.value.showBackToTop = container.scrollTop > 500
-    showBackToTop.value = scrollState.value.showBackToTop
-
-    const maxScroll = container.scrollHeight - container.clientHeight
-    if (maxScroll > 0) {
-      scrollState.value.ratio = container.scrollTop / maxScroll
-      communityStore.mine[currentTab.value].lastState = {
-        currentPage: lastLoadedPage.value,
-        hasMore: hasMore.value,
-        hasPrevious: hasPrevious.value,
-        loadedPages: Array.from(cacheState.value.loadedPages),
-        scrollRatio: scrollState.value.ratio,
-        totalItems: communityStore.mine[currentTab.value].modelListPathParams.total
-      }
-    }
-
-    loadingStates.value.isScrolling = true
-
-    if (scrollState.value.timer) {
-      window.clearTimeout(scrollState.value.timer)
-    }
-
-    scrollState.value.timer = window.setTimeout(() => {
-      loadingStates.value.isScrolling = false
-
-      if (maxScroll - container.scrollTop <= 1000) {
-        if (!loadingStates.value.isLoading && !loadingStates.value.isLoadingMore && hasMore.value) {
-          loadMore()
-        }
-      }
-    }, 150)
-  }, 100)
-
   const fetchData = async (pageNumber: number, pageSize: number) => {
     try {
       const response = await get_model_list(
@@ -177,52 +102,23 @@
     }
   }
 
-  const setScrollPosition = (ratio: number) => {
-    nextTick(() => {
-      const container = document.querySelector('.scroll-container')
-      if (container) {
-        const maxScroll = container.scrollHeight - container.clientHeight
-        if (maxScroll > 0) {
-          container.scrollTop = maxScroll * ratio
-        }
-      }
-    })
-  }
 
   const switchTab = async (tab: TabType) => {
     currentTab.value = tab
     const currentState = communityStore.mine[tab]
-
     cacheKey.value++
-    gridCache.value.clear()
-    cacheState.value.loadedPages.clear()
-    cacheState.value.imageLoadStates.clear()
-
-    if (currentState?.lastState) {
-      lastLoadedPage.value = currentState.lastState.currentPage
-      hasMore.value = currentState.lastState.hasMore ?? true
-      hasPrevious.value = currentState.lastState.hasPrevious
-      currentState.lastState.loadedPages.forEach(page => {
-        cacheState.value.loadedPages.add(page)
-      })
-      await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
-      setScrollPosition(currentState.lastState.scrollRatio)
-    } else {
-      currentState.modelListPathParams.current = 1
-      lastLoadedPage.value = 1
-      await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
-    }
+    imageLoadStates.value.clear()
+    currentState.modelListPathParams.current = 1
+    await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
   }
 
   const imageLoadStates = ref<Map<number | string, boolean>>(new Map())
 
   const handleImageLoad = (_event: Event, modelId: number | string) => {
-    cacheState.value.imageLoadStates.set(modelId, true)
     imageLoadStates.value.set(modelId, true)
   }
 
   const handleImageError = (_event: Event, modelId: number | string) => {
-    cacheState.value.imageLoadStates.set(modelId, false)
     imageLoadStates.value.set(modelId, false)
   }
 
@@ -306,123 +202,18 @@
     }
   }
 
-  const resetState = async () => {
-    if (communityStore.mine && communityStore.mine[currentTab.value]?.lastState?.currentPage) {
-      const targetPage = communityStore.mine[currentTab.value]?.lastState?.currentPage || 1
-      const savedScrollRatio = communityStore.mine[currentTab.value]?.lastState?.scrollRatio || 0
-
-      if (communityStore.mine[currentTab.value]) {
-        communityStore.mine[currentTab.value].modelListPathParams.current = targetPage
-      }
-      lastLoadedPage.value = targetPage
-      hasMore.value = communityStore.mine[currentTab.value]?.lastState?.hasMore ?? true
-
-      try {
-        const response = await get_model_list(
-          {
-            ...communityStore.mine[currentTab.value]?.modelListPathParams,
-            // mode: currentTab.value === 'posts' ? 'my' : 'my_fork'
-            mode: communityStore.TabSource
-          },
-          communityStore.mine[currentTab.value]?.filterState
-        )
-
-        if (response?.data?.list) {
-          if (communityStore.mine[currentTab.value]) {
-            communityStore.mine[currentTab.value].models = response.data.list
-            communityStore.mine[currentTab.value].modelListPathParams.total =
-              response.data.total || 0
-          }
-
-          nextTick(() => {
-            setTimeout(() => {
-              setScrollPosition(savedScrollRatio)
-            }, 100)
-          })
-        } else {
-          communityStore.mine[currentTab.value].models = []
-        }
-      } catch (error) {
-        console.error('Reset state error:', error)
-      }
-      return
-    }
-
-    const container = document.querySelector('.scroll-container')
-    if (container) {
-      container.scrollTo({ top: 0, behavior: 'auto' })
-    }
-    hasMore.value = true
-    if (communityStore.mine[currentTab.value]) {
-      communityStore.mine[currentTab.value].modelListPathParams.current = 1
-    }
-    lastLoadedPage.value = 1
-    loading.value = true
-
-    try {
-      const response = await get_model_list(
-        {
-          ...communityStore.mine[currentTab.value]?.modelListPathParams,
-          mode: currentTab.value === 'posts' ? 'my' : 'my_fork'
-        },
-        communityStore.mine[currentTab.value]?.filterState
-      )
-
-      if (response?.data?.list) {
-        if (communityStore.mine[currentTab.value]) {
-          communityStore.mine[currentTab.value].models = response.data.list
-          communityStore.mine[currentTab.value].modelListPathParams.total = response.data.total || 0
-        }
-        hasMore.value = response.data.list.length < response.data.total
-      }
-      cacheState.value.loadedPages.add(1)
-    } catch (error) {
-      console.error('Reset state error:', error)
-    } finally {
-      loading.value = false
-    }
-  }
-
   onMounted(async () => {
-    loadingStates.value.isGridLoading = true
+    isGridLoading.value = true
     try {
-      await resetState()
+      communityStore.mine[currentTab.value].modelListPathParams.current = 1
+      await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
     } finally {
-      loadingStates.value.isGridLoading = false
-    }
-
-    observer = new IntersectionObserver(
-      throttle((entries: IntersectionObserverEntry[]) => {
-        if (entries[0].isIntersecting) {
-          loadMore()
-        }
-      }, 800),
-      {
-        root: null,
-        rootMargin: '100px',
-        threshold: 0.1
-      }
-    )
-
-    if (loadingRef.value) {
-      observer.observe(loadingRef.value)
-    }
-
-    const container = document.querySelector('.scroll-container')
-    if (container) {
-      container.addEventListener('scroll', handleScroll)
+      setTimeout(() => {
+        isGridLoading.value = false
+      }, 200)
     }
   })
 
-  onUnmounted(() => {
-    if (observer) {
-      observer.disconnect()
-    }
-    const container = document.querySelector('.scroll-container')
-    if (container) {
-      container.removeEventListener('scroll', handleScroll)
-    }
-  })
 
   watch(
     () => useModelStore.reload,
@@ -430,9 +221,7 @@
       console.log('newVal', newVal)
       if (newVal !== oldVal) {
         cacheKey.value++
-        gridCache.value.clear()
-        cacheState.value.loadedPages.clear()
-        cacheState.value.imageLoadStates.clear()
+        imageLoadStates.value.clear()
         communityStore.mine[currentTab.value].modelListPathParams.current = 1
         await fetchData(0, communityStore.mine[currentTab.value].modelListPathParams.page_size)
       }
@@ -476,7 +265,7 @@
 
     <BaseModelGrid
       :models="communityStore.mine[currentTab]?.models || []"
-      :loading="loadingStates.isGridLoading"
+      :loading="isGridLoading"
       :total="communityStore.mine[currentTab]?.modelListPathParams.total || 0"
       :page-size="communityStore.mine[currentTab]?.modelListPathParams.page_size"
       :cache-key="cacheKey"
@@ -485,7 +274,6 @@
       :image-load-states="imageLoadStates"
       :on-image-load="handleImageLoad"
       :on-image-error="handleImageError"
-      @scroll="handleScroll"
       @load-more="loadMore"
     />
   </div>
