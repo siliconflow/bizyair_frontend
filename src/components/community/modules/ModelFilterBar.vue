@@ -14,7 +14,7 @@
     CommandList,
     CommandSeparator
   } from '@/components/ui/command'
-  import { onMounted, nextTick } from 'vue'
+  import { onMounted, nextTick,watch } from 'vue'
 
   const store = useCommunityStore()
 
@@ -97,7 +97,6 @@
         sort: 'Recently'
       }
     }
-
     if (props.page === 'mainContent') {
       if (store[props.page].filterState.selected_model_types.length === 0) {
         store[props.page].filterState.model_types = store.modelTypes
@@ -115,6 +114,12 @@
     await nextTick()
     emit('filter-data-ready')
   }
+
+  watch(()=>props.page,async (newVal:string)=>{
+    if(newVal==='mainContent'){
+      store.modelTypes = store.modelTypes.filter(type=>type.value!=='Workflow')
+    }
+  },{immediate:true})
 
   onMounted(async () => {
     await initializeState()
