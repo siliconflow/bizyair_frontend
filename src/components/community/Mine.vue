@@ -40,12 +40,12 @@
 
   const handleNewModel = () => {
     useModelStore.setDialogStatus(true)
-    communityStore.showDialog = false
+    // communityStore.showDialog = false
   }
 
   const handleNewWorkflow = () => {
     useModelStore.setDialogStatusWorkflow(true)
-    communityStore.showDialog = false
+    // communityStore.showDialog = false
   }
 
   const handleLoadWorkflow = async (versions: any) => {
@@ -139,6 +139,7 @@
         cacheKey.value++
         imageLoadStates.value = new Map()
         await doMetaFetch()
+        isGridLoading.value = false
       }
     },
     { deep: true }

@@ -138,6 +138,7 @@
         cacheKey.value++
         imageLoadStates.value.clear()
         await doMetaFetch()
+        isGridLoading.value = false
       }
     },
     { deep: true }
