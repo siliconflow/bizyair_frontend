@@ -216,9 +216,9 @@
       useToaster.error('No model versions found')
       return
     }
+    modelSelectStore.setApplyObject(currentVersion.value, model.value)
     modelSelectStore.showDialog = false
     modelSelectStore.showCommunityDetail = false
-    modelSelectStore.setApplyObject(currentVersion.value, model.value)
   }
 
   const handleCopy = async (sign: string) => {
