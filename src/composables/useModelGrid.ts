@@ -69,8 +69,11 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
         }
         return response.data.list
       }
-      state.hasMore.value = false
-      return []
+      else {
+        state.hasMore.value = false
+        storeData.models = []
+        return []
+      }
     } catch (error) {
       console.error('Fetch data error:', error)
       useToaster.error(`Failed to fetch data: ${error}`)
