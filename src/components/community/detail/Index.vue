@@ -23,6 +23,7 @@
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { MdPreview } from 'md-editor-v3'
   import { modelStore } from '@/stores/modelStatus'
+  import {useStatusStore} from '@/stores/userStatus'
   import { Model, ModelVersion } from '@/types/model'
   import vDialog from '@/components/modules/vDialog.vue'
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
@@ -35,7 +36,9 @@
   } from '@/api/model'
   import { useToaster } from '@/components/modules/toats/index'
   import 'md-editor-v3/lib/style.css'
+  import { debounce } from 'lodash-es'
   const communityStore = useCommunityStore()
+  const userStatusStore=useStatusStore()
 
   const model = ref<Model>()
   const currentVersion = ref<ModelVersion>()
@@ -102,15 +105,33 @@
     downloadOpen.value = !downloadOpen.value
   }
 
-  const handleLike = async () => {
-    await like_model(currentVersion.value?.id)
-    fetchModelDetail()
-  }
+  const handleLike = debounce(async () => {
+    if (!currentVersion.value) return
+    
+    await like_model(currentVersion.value.id)
+    const delta = currentVersion.value.liked ? -1 : 1
+    const newLikedCount = Math.max(0, (currentVersion.value.counter?.liked_count || 0) + delta)
+    
+    if (currentVersion.value.counter && model.value?.counter) {
+      currentVersion.value.counter.liked_count = newLikedCount
+      model.value.counter.liked_count = newLikedCount
+      currentVersion.value.liked = !currentVersion.value.liked
+    }
+  }, 300)
 
-  const handleFork = async () => {
-    await fork_model(currentVersion.value?.id)
-    await fetchModelDetail()
-  }
+  const handleFork = debounce(async () => {
+    if (!currentVersion.value) return
+    
+    await fork_model(currentVersion.value.id)
+    const delta = currentVersion.value.forked ? -1 : 1
+    const newForkedCount = Math.max(0, (currentVersion.value.counter?.forked_count || 0) + delta)
+    
+    if (currentVersion.value.counter && model.value?.counter) {
+      currentVersion.value.counter.forked_count = newForkedCount
+      model.value.counter.forked_count = newForkedCount
+      currentVersion.value.forked = !currentVersion.value.forked
+    }
+  }, 300)
 
   const scrollToTab = (versionId: number) => {
     nextTick(() => {
@@ -619,7 +640,7 @@
               class="flex flex-row gap-1.5 items-start justify-start self-stretch shrink-0 relative"
             >
               <Button
-                v-if="['publicity'].includes(communityStore.TabSource)"
+                v-if="['publicity'].includes(communityStore.TabSource) && userStatusStore.infoData.id!==model?.user_id"
                 variant="default"
                 class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
                 :disabled="currentVersion?.forked"
