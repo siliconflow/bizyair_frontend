@@ -40,12 +40,10 @@
 
   const handleNewModel = () => {
     useModelStore.setDialogStatus(true)
-    // communityStore.showDialog = false
   }
 
   const handleNewWorkflow = () => {
     useModelStore.setDialogStatusWorkflow(true)
-    // communityStore.showDialog = false
   }
 
   const handleLoadWorkflow = async (versions: any) => {
