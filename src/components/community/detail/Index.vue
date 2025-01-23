@@ -31,6 +31,7 @@
     model_detail,
     like_model,
     fork_model,
+    un_fork_model,
     remove_model,
     get_workflow_dowload_url
   } from '@/api/model'
@@ -121,16 +122,26 @@
 
   const handleFork = debounce(async () => {
     if (!currentVersion.value) return
-    
-    await fork_model(currentVersion.value.id)
-    const delta = currentVersion.value.forked ? -1 : 1
-    const newForkedCount = Math.max(0, (currentVersion.value.counter?.forked_count || 0) + delta)
-    
-    if (currentVersion.value.counter && model.value?.counter) {
-      currentVersion.value.counter.forked_count = newForkedCount
-      model.value.counter.forked_count = newForkedCount
-      currentVersion.value.forked = !currentVersion.value.forked
+    if(communityStore.TabSource==='my_fork'){
+      await un_fork_model(currentVersion.value.id)
+      communityStore.showCommunityDetail=false
+      communityStore.reload++
+      return
     }
+    if(!currentVersion.value.forked){
+      await fork_model(currentVersion.value.id)
+    }
+    else{
+      await un_fork_model(currentVersion.value.id)
+    }
+    const delta = currentVersion.value.forked ? -1 : 1
+      const newForkedCount = Math.max(0, (currentVersion.value.counter?.forked_count || 0) + delta)
+      
+      if (currentVersion.value.counter && model.value?.counter) {
+        currentVersion.value.counter.forked_count = newForkedCount
+        model.value.counter.forked_count = newForkedCount
+        currentVersion.value.forked = !currentVersion.value.forked
+      }
   }, 300)
 
   const scrollToTab = (versionId: number) => {
@@ -191,7 +202,7 @@
         title: 'Are you sure you want to delete this model?',
         desc: 'This action cannot be undone.',
         cancel: 'No, Keep It',
-        continue: 'Yes, Delete It',
+        continue: 'Yes, Un Fork It',
         z: 'z-12000'
       })
       if (!res) return
@@ -210,12 +221,12 @@
   const handleRemoveModel = async (id: number | string) => {
     try {
       await remove_model(id)
-      useToaster.success('Model removed successfully.')
+      useToaster.success('Removed successfully.')
       communityStore.showCommunityDetail = false
       communityStore.reload++
     } catch (error) {
-      useToaster.error('Failed to remove model.')
-      console.error('Error removing model:', error)
+      useToaster.error('Failed to Remove .')
+      console.error('Error removing :', error)
     }
   }
 
@@ -640,13 +651,17 @@
               class="flex flex-row gap-1.5 items-start justify-start self-stretch shrink-0 relative"
             >
               <Button
-                v-if="['publicity'].includes(communityStore.TabSource) && userStatusStore.infoData.id!==model?.user_id"
+                v-if="['publicity'].includes(communityStore.TabSource) && userStatusStore.infoData.id!==model?.user_id || ['my_fork'].includes(communityStore.TabSource)"
                 variant="default"
                 class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
-                :disabled="currentVersion?.forked"
                 @click="handleFork"
               >
-                {{ currentVersion?.forked ? 'Forked' : 'Fork' }}
+              <template v-if="['my_fork'].includes(communityStore.TabSource)">
+                UnFork
+              </template>
+              <template v-else>
+                {{ currentVersion?.forked ? 'UnFork' : 'Fork' }}
+              </template>
               </Button>
               <Button
                 v-if="model?.type !== 'Workflow'"

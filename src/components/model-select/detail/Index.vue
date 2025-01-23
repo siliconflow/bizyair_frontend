@@ -27,7 +27,7 @@
 
   import { NImageGroup, NImage } from 'naive-ui'
   import vTooltips from '@/components/modules/v-tooltip.vue'
-  import { model_detail, like_model, fork_model, remove_model } from '@/api/model'
+  import { model_detail, like_model, fork_model, remove_model,un_fork_model } from '@/api/model'
   import { useToaster } from '@/components/modules/toats/index'
   import 'md-editor-v3/lib/style.css'
   import { debounce } from 'lodash-es'
@@ -113,16 +113,28 @@
 
   const handleFork = debounce(async () => {
     if (!currentVersion.value) return
-    
-    await fork_model(currentVersion.value.id)
-    const delta = currentVersion.value.forked ? -1 : 1
-    const newForkedCount = Math.max(0, (currentVersion.value.counter?.forked_count || 0) + delta)
-    
-    if (currentVersion.value.counter && model.value?.counter) {
-      currentVersion.value.counter.forked_count = newForkedCount
-      model.value.counter.forked_count = newForkedCount
-      currentVersion.value.forked = !currentVersion.value.forked
+    console.log(modelSelectStore.TabSource)
+    if(modelSelectStore.TabSource==='my_fork'){
+      await un_fork_model(currentVersion.value.id)
+      modelSelectStore.showCommunityDetail=false
+      modelSelectStore.reload++
+      return
     }
+
+    if(!currentVersion.value.forked){
+      await fork_model(currentVersion.value.id)
+    }
+    else{
+      await un_fork_model(currentVersion.value.id)
+    }
+    const delta = currentVersion.value.forked ? -1 : 1
+      const newForkedCount = Math.max(0, (currentVersion.value.counter?.forked_count || 0) + delta)
+      
+      if (currentVersion.value.counter && model.value?.counter) {
+        currentVersion.value.counter.forked_count = newForkedCount
+        model.value.counter.forked_count = newForkedCount
+        currentVersion.value.forked = !currentVersion.value.forked
+      }
   }, 300)
   const scrollToTab = (versionId: number) => {
     nextTick(() => {
@@ -561,13 +573,17 @@
               class="flex flex-row gap-1.5 items-start justify-start self-stretch shrink-0 relative"
             >
               <Button
-                v-if="['publicity'].includes(modelSelectStore.TabSource) && userStatusStore.infoData.id!==model?.user_id"
+                v-if="['publicity'].includes(modelSelectStore.TabSource) && userStatusStore.infoData.id!==model?.user_id || ['my_fork'].includes(modelSelectStore.TabSource)"
                 variant="default"
                 class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
-                :disabled="currentVersion?.forked"
                 @click="handleFork"
               >
-                {{ currentVersion?.forked ? 'Forked' : 'Fork' }}
+              <template v-if="['my_fork'].includes(modelSelectStore.TabSource)">
+                UnFork
+              </template>
+              <template v-else>
+                {{ currentVersion?.forked ? 'UnFork' : 'Fork' }}
+              </template>
               </Button>
 
               <Button

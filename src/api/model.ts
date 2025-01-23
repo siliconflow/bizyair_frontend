@@ -119,6 +119,11 @@ export const fork_model = (model_version_id: any) =>
     method: 'POST'
   })
 
+export const un_fork_model = (model_version_id: any) =>
+  customFetch(`/bizyair/community/models/fork/${model_version_id}`, {
+    method: 'DELETE'
+  })
+
 export const commit_file = (data: any) =>
   customFetch('/bizyair/community/commit_file', {
     method: 'POST',
