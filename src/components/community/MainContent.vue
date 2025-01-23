@@ -78,7 +78,6 @@
     () => communityStore.reload,
     async (newVal: number, oldVal: number) => {
       if (newVal !== oldVal) {
-        isGridLoading.value = true
         cacheKey.value++
         imageLoadStates.value = new Map()
         await doMetaFetch()
