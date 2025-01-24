@@ -15,6 +15,7 @@
   }>()
 
   const handleTabChange = (value: string) => {
+    communityStore.mineTabSource = value
     if (value === 'posts') {
       communityStore.TabSource = 'my'
     } else if (value === 'forked') {

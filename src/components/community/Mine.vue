@@ -20,6 +20,7 @@
   const communityStore = useCommunityStore()
   const useModelStore = modelStore()
   const currentTab = ref<TabType>('posts')
+  communityStore.mineTabSource = currentTab.value
   const comfyUIApp: any = inject('comfyUIApp')
 
   const {
@@ -116,6 +117,7 @@
 
   const switchTab = async (tab: TabType) => {
     currentTab.value = tab
+    communityStore.mineTabSource = tab
   }
 
   onMounted(async () => {
