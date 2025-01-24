@@ -19,10 +19,10 @@
   const datesetStore = useDatesetStore()
 
   const show_cases = ref({
-    'My Datasets': () => {
+    'Datasets': () => {
       datesetStore.setListDialog(true)
     },
-    'My Training': () => {
+    'Tasks': () => {
       datesetStore.setUploadDialog(true)
     }
   })

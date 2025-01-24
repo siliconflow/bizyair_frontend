@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { NProgress, NTooltip } from 'naive-ui'
+import { useToaster } from '@/components/modules/toats/index'
+import { NProgress, NTooltip, NModal } from 'naive-ui'
 import { creatClient } from './ossClient'
 import { commit_file } from '@/api/model'
 import { computed, ref, watch } from 'vue'
@@ -11,28 +12,46 @@ interface UploadFile extends File {
   client?: any
 }
 
+const props = defineProps<{
+  isVerify: boolean
+}>()
+
 const emit = defineEmits(['update:value', 'isUploading', 'uploadDone'])
 
+const showConfirm = ref(false)
+const tipsText = ref('')
 const isUploading = ref(false)
+const fileInput = ref<HTMLInputElement | null>(null)
 const fileList = ref<UploadFile[]>([])
 const uploadQueue = ref<UploadFile[]>([])
 const uploadedNumber = ref(0)
 const uploadingFiles = ref<UploadFile[]>([])
 const uploadList = ref<HTMLElement | null>(null)
+
 const uploadFile = async (file: UploadFile) => {
   const { oss, objectKey, md5Hash, sha256sum, fileId } = await creatClient(
     file,
     'ComfyUI'
   )
   if (fileId) {
-    file.progress = 100
-    file.sha256sum = sha256sum
-    file.path = file.name
+    const index = fileList.value.findIndex(f => f === file)
+    if (index !== -1) {
+      file.progress = 100
+      file.sha256sum = sha256sum
+      file.path = file.name
+      fileList.value[index] = file
+    }
+    emit('update:value', fileList.value)
   } else {
     file.client = oss
     const result = await oss?.multipartUpload(objectKey, file, {
-      progress: (p: number) => {
-        file.progress = p
+      progress: async (p: number) => {
+        const index = fileList.value.findIndex(f => f === file);
+        if (index !== -1) {
+          file.progress = Number((p * 100).toFixed(2));
+          fileList.value[index] = file;
+          fileList.value = [...fileList.value];
+        }
       },
     })
     if (result && result.res && result.res.status === 200) {
@@ -43,13 +62,19 @@ const uploadFile = async (file: UploadFile) => {
         object_key: objectKey,
         type: 'DATASET',
       })
+      const index = fileList.value.findIndex(f => f === file)
+      if (index !== -1) {
+        file.sha256sum = sha256sum
+        file.path = file.name
+        fileList.value[index] = file
+      }
       emit('update:value', fileList.value)
     }
   }
   const index = uploadingFiles.value.indexOf(file)
   if (index !== -1) {
     uploadingFiles.value.splice(index, 1)
-    uploadedNumber.value++ 
+    uploadedNumber.value++
   }
   startUpload()
 }
@@ -78,14 +103,55 @@ const startUpload = () => {
   }
 }
 
+const toUpload = () => {
+  showConfirm.value = false
+  startUpload()
+}
+const cancelUpload = () => {
+  showConfirm.value = false
+  uploadQueue.value = []
+  fileList.value = []
+  uploadedNumber.value = 0
+  uploadingFiles.value = []
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+  emit('update:value', fileList.value)
+}
 const changeFiles = (e: Event) => {
   const target = e.target as HTMLInputElement
-  console.log(target.files)
   if (target?.files) {
-    const newFiles = Array.from(target.files)
+    const temp = Array.from(target.files)
+    const newFiles = temp.filter((e) => e.type === 'image/png' || e.type === 'image/jpeg' || e.type === 'image/jpg' || e.type === 'text/plain')
+    const newFilesImage = temp.filter((e) => e.type === 'image/png' || e.type === 'image/jpeg' || e.type === 'image/jpg')
+    const newFilesText = temp.filter((e) => e.type === 'text/plain')
+
+    let isValid = true;
+    if (props.isVerify) {
+      const text = newFilesText.map(e => e.webkitRelativePath.replace(/\.txt/g,''))
+      for (let i = 0; i < newFilesImage.length; i++) {
+        const image = newFilesImage[i].webkitRelativePath.replace(/\.png/g,'').replace(/\.jpg/g,'').replace(/\.JPG/g,'').replace(/\.jpeg/g,'').replace(/\.JPEG/g,'')
+        console.log(text.includes(image))
+        if(!text.includes(image)) {
+          useToaster({
+            type: 'error',
+            message: 'Some of your images are missing captions. Please provide the caption files.'
+          })
+          target.value = ''
+          isValid = false
+          break
+        }
+      }
+    }
+    if (!isValid) {
+      return
+    }
+
+    showConfirm.value = true
+    tipsText.value = `You are about to upload ${newFilesImage.length} images and ${newFilesText.length} texts.`
+
     fileList.value.push(...newFiles)
     uploadQueue.value.push(...newFiles)
-    startUpload()
   }
 }
 
@@ -96,27 +162,31 @@ const cancelOss = (e: any, i: any) => {
     uploadQueue.value.splice(index, 1)
   }
   if (e.progress == 100) {
-    uploadedNumber.value --
+    uploadedNumber.value--
   }
   e.client?.cancel()
   emit('update:value', fileList.value)
 }
+const clearAll = () => {
+  fileList.value.forEach((e) => {
+    e.client?.cancel()
+  })
+  cancelUpload()
+}
 
-const uploadRatio = computed(() =>  uploadedNumber.value / fileList.value.length)
+const uploadRatio = computed(() => uploadedNumber.value / fileList.value.length)
 watch(uploadRatio, (val) => {
-  if (val === 1) {
+  if (val >= 1) {
     emit('uploadDone')
-    console.log('upload done')
   } else {
     emit('isUploading', true)
-    console.log('uploading')
   }
 })
 watch(fileList, (val) => {
   if (val.length > 0) {
     isUploading.value = true
   } else {
-    isUploading.value = false    
+    isUploading.value = false
   }
 }, { deep: true })
 </script>
@@ -124,8 +194,8 @@ watch(fileList, (val) => {
 <template>
   <div class="v-upload-multi">
     <div v-show="!isUploading" class="v-upload-input">
-      <span class="icon"
-        ><svg
+      <span class="icon">
+        <svg
           xmlns="http://www.w3.org/2000/svg"
           width="96"
           height="96"
@@ -145,16 +215,18 @@ watch(fileList, (val) => {
             <path
               d="M4.596 12.576c.43-1.15.647-1.724 1.067-2.085c.68-.582 1.657-.485 2.494-.485h9.095c2.477 0 3.716 0 4.334.797c1.06 1.368-.191 3.587-.695 4.93c-.904 2.408-1.356 3.612-2.256 4.346c-1.371 1.119-3.366.904-5.021.904H9.937c-3.543 0-5.314 0-6.236-1.096c-1.7-2.025.13-5.274.895-7.312"
             />
-          </g></svg
-      ></span>
-      <span class="word"
-        >Drag 'n' drop some files here, or click to select files</span
-      >
-      <input webkitdirectory type="file" @change="changeFiles" />
+          </g>
+        </svg>
+      </span>
+      <span class="word">
+        Click to upload, please select a folder.<br />
+        You can add up to 600 images, with support for PNG, JPG, and JPEG formats.
+      </span>
+      <input ref="fileInput" webkitdirectory type="file" @change="changeFiles" />
     </div>
     <div v-show="isUploading" class="v-upload-progress">
       <p>
-        <span>Overall Progress</span>
+        <span>File Number</span>
         <span>{{ uploadedNumber }}/{{ fileList.length }}</span>
       </p>
       <n-progress
@@ -191,12 +263,25 @@ watch(fileList, (val) => {
             <path
               fill="currentColor"
               d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"
-            /></svg
-        ></span>
+            />
+          </svg>
+        </span>
       </li>
-      <!-- <n-button type="primary" class="upload-clear" @click="clearAll">clear</n-button> -->
+      <li class="clear-btn" @click="clearAll">
+        <n-botton>clear</n-botton>
+      </li>
     </ul>
   </div>
+  <n-modal
+    v-model:show="showConfirm"
+    preset="dialog"
+    title="Tips"
+    :content="tipsText"
+    positive-text="Upload"
+    negative-text="Cancel"
+    @positive-click="toUpload"
+    @negative-click="cancelUpload"
+  />
 </template>
 
 <style scoped lang="less">
@@ -212,7 +297,7 @@ watch(fileList, (val) => {
   position: relative;
   .icon {
     display: block;
-    margin: 32px auto 0;
+    margin: 24px auto 0;
     width: 28px;
     height: 28px;
     svg {
@@ -224,7 +309,8 @@ watch(fileList, (val) => {
     text-align: center;
     width: 100%;
     display: block;
-    line-height: 30px;
+    line-height: 24px;
+    margin-top: 6px;
   }
   input {
     width: 100%;
@@ -256,6 +342,7 @@ watch(fileList, (val) => {
   overflow-y: auto;
   border-radius: 8px;
   position: relative;
+  transform: translate(0, 0);
   li {
     display: flex;
     justify-content: space-between;
@@ -293,6 +380,12 @@ watch(fileList, (val) => {
       width: 24px;
       height: 24px;
     }
+  }
+  .clear-btn{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40px;
   }
 }
 </style>

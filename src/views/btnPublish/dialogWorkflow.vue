@@ -25,7 +25,6 @@
           @change="formData.nameError = false"
         />
       </v-item>
-      <input webkitdirectory class="w-[500px] bg-red-400 h-[200px]" type="file" @change="test123123" />
       <n-button type="primary" class="next-button" @click="nextStep">Next Step</n-button>
     </div>
 
@@ -421,23 +420,7 @@
     }
   )
 
-  const test123123 = (e: Event) => {
-    const target = e.target as HTMLInputElement;
-    if (target.files) {
-      console.log(target.files);
-      for (let i = 0; i < target.files.length; i++) {
-        const file = target.files[i];
-        console.log(URL.createObjectURL(file));
-      }
-    }
-  // };
-    // console.log(e.target.files)
-    // for (let i = 0; i < e.target.files.length; i++) {
-    //   const file = e.target.files[i]
-    //   console.log(URL.createObjectURL(file))
-
-    // }
-  }
+  
 </script>
 
 <style scoped lang="less">
