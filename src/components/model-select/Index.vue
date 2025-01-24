@@ -28,7 +28,6 @@
     () => modelSelectStore.applyObject,
     (newVal: { version: ModelVersion; model: Model }) => {
       if (newVal.version && newVal.model) {
-        console.log('newVal', newVal)
         emit('apply', newVal.version, newVal.model.name)
       }
     },
