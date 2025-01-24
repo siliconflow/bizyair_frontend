@@ -40,7 +40,7 @@
   const scrollViewportRef = ref<any | null>(null)
   const modelStoreInstance = modelStore()
   const isLoading = ref(false)
-
+  const activeTab = ref<number>()
   const fetchModelDetail = async () => {
     try {
       const res = await model_detail({
@@ -90,6 +90,7 @@
     const version = model.value?.versions?.find(v => v.id === value)
     if (version) {
       currentVersion.value = version
+      activeTab.value = value
     }
   }
 
@@ -112,12 +113,34 @@
   }, 300)
 
   const handleFork = debounce(async () => {
-    if (!currentVersion.value) return
-    console.log(modelSelectStore.TabSource)
+    if (!currentVersion.value || !model.value?.versions) return
     if(modelSelectStore.TabSource==='my_fork'){
-      await un_fork_model(currentVersion.value.id)
-      modelSelectStore.showCommunityDetail=false
-      modelSelectStore.reload++
+      if (model.value.versions.length <= 1) {
+      const res = await useAlertDialog({
+        title: `Are you sure you want to unfork  this ${model.value?.type === 'Workflow' ? 'workflow' : 'model'}?`,
+        desc: 'The original model may no longer be public.',
+        cancel: 'No, Keep It',
+        continue: 'Yes, UnFork It',
+        z: 'z-12000'
+      })
+      if (!res) return
+
+        await un_fork_model(currentVersion.value.id)
+        modelSelectStore.showCommunityDetail = false
+        modelSelectStore.reload++
+      } else {
+        await un_fork_model(currentVersion.value.id)
+        const currentIndex = model.value.versions.findIndex(v => v.id === currentVersion.value?.id)
+        model.value.versions.splice(currentIndex, 1)
+        const nextVersion = model.value.versions[currentIndex] || model.value.versions[currentIndex - 1]
+        if (nextVersion) {
+          handleTabChange(nextVersion.id)
+          activeTab.value = nextVersion.id
+          nextTick(() => {
+            scrollWithDelay(nextVersion.id)
+          })
+        }
+      }
       return
     }
 
@@ -128,13 +151,13 @@
       await un_fork_model(currentVersion.value.id)
     }
     const delta = currentVersion.value.forked ? -1 : 1
-      const newForkedCount = Math.max(0, (currentVersion.value.counter?.forked_count || 0) + delta)
-      
-      if (currentVersion.value.counter && model.value?.counter) {
-        currentVersion.value.counter.forked_count = newForkedCount
-        model.value.counter.forked_count = newForkedCount
-        currentVersion.value.forked = !currentVersion.value.forked
-      }
+    const newForkedCount = Math.max(0, (currentVersion.value.counter?.forked_count || 0) + delta)
+    
+    if (currentVersion.value.counter && model.value?.counter) {
+      currentVersion.value.counter.forked_count = newForkedCount
+      model.value.counter.forked_count = newForkedCount
+      currentVersion.value.forked = !currentVersion.value.forked
+    }
   }, 300)
   const scrollToTab = (versionId: number) => {
     nextTick(() => {
@@ -392,7 +415,7 @@
             <div class="min-w-[200px] max-w-[1000px]">
               <ScrollArea ref="scrollViewportRef" class="rounded-md w-full">
                 <div class="whitespace-nowrap">
-                  <Tabs :default-value="currentVersion?.id" :value="currentVersion?.id">
+                  <Tabs v-model="activeTab" :default-value="currentVersion?.id">
                     <TabsList class="inline-flex h-12 bg-transparent text-sm text-white w-auto">
                       <TabsTrigger
                         v-for="version in model?.versions"
