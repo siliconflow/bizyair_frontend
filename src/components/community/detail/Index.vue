@@ -114,17 +114,26 @@
     
     await like_model(currentVersion.value.id)
     const delta = currentVersion.value.liked ? -1 : 1
-    const newLikedCount = Math.max(0, (currentVersion.value.counter?.liked_count || 0) + delta)
     
-    if (currentVersion.value.counter && model.value?.counter) {
-      currentVersion.value.counter.liked_count = newLikedCount
-      model.value.counter.liked_count = newLikedCount
+    if (currentVersion.value.counter) {
+      currentVersion.value.counter.liked_count = Math.max(0, (currentVersion.value.counter.liked_count || 0) + delta)
       currentVersion.value.liked = !currentVersion.value.liked
+    }
+    
+    if (model.value?.counter) {
+      if (model.value.versions?.length === 1) {
+        model.value.counter.liked_count = currentVersion.value.counter?.liked_count || 0
+      } else {
+        model.value.counter.liked_count = model.value.versions?.reduce((sum, version) => {
+          return sum + (version.counter?.liked_count || 0)
+        }, 0) || 0
+      }
     }
   }, 300)
 
   const handleFork = debounce(async () => {
     if (!currentVersion.value || !model.value?.versions) return
+    
     if(communityStore.TabSource==='my_fork'){
       if (model.value.versions.length <= 1) {
       const res = await useAlertDialog({
@@ -158,18 +167,25 @@
     if(!currentVersion.value.forked){
       await fork_model(currentVersion.value.id)
       currentVersion.value.forked = true
-    }
-    else{
+    } else {
       await un_fork_model(currentVersion.value.id)
       currentVersion.value.forked = false
     }
-    const delta = currentVersion.value.forked ? -1 : 1
-    const newForkedCount = Math.max(0, (currentVersion.value.counter?.forked_count || 0) + delta)
     
-    if (currentVersion.value.counter && model.value?.counter) {
-      currentVersion.value.counter.forked_count = newForkedCount
-      model.value.counter.forked_count = newForkedCount
-      currentVersion.value.forked = !currentVersion.value.forked
+    const delta = currentVersion.value.forked ? 1 : -1
+    
+    if (currentVersion.value.counter) {
+      currentVersion.value.counter.forked_count = Math.max(0, (currentVersion.value.counter.forked_count || 0) + delta)
+    }
+    
+    if (model.value?.counter) {
+      if (model.value.versions.length === 1) {
+        model.value.counter.forked_count = currentVersion.value.counter?.forked_count || 0
+      } else {
+        model.value.counter.forked_count = model.value.versions.reduce((sum, version) => {
+          return sum + (version.counter?.forked_count || 0)
+        }, 0) || 0
+      }
     }
   }, 300)
 
