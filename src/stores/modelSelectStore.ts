@@ -20,6 +20,7 @@ export const useModelSelectStore = defineStore('modelSelect', {
     reloadModelSelectList: false,
     closeModelSelectDialog: false,
     closeModelDetailDialog: false,
+    currentTab: 'posts' as ModeTabType,
     showModelDetail: false,
     applyObject: { version: {} as ModelVersion, model: {} as Model },
     reload: 0,
