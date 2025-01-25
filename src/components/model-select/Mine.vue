@@ -17,7 +17,7 @@
 
   const modelSelectStore = useModelSelectStore()
   const useModelStore = modelStore()
-  const currentTab = ref<ModeTabType>('posts')
+  const currentTab = ref<ModeTabType>(modelSelectStore.currentTab)
   const loading = ref(false)
   const hasMore = ref(true)
 
@@ -87,9 +87,17 @@
 
   const switchTab = async (tab: ModeTabType) => {
     currentTab.value = tab
+    modelSelectStore.currentTab = tab
     cacheKey.value++
     imageLoadStates.value.clear()
-    await doMetaFetch()
+    if(modelSelectStore.mine[modelSelectStore.currentTab].models.length === 0) {
+      isGridLoading.value = true
+      await doMetaFetch()
+      isGridLoading.value = false
+    }
+    else {
+      await doMetaFetch()
+    }
   }
 
   const handleImageLoad = (_event: Event, modelId: number | string) => {
