@@ -2,17 +2,16 @@
   import { Model } from '@/types/model'
   import vDefaultPic from '@/components/modules/vDefaultPic.vue'
   import vTooltips from '@/components/modules/v-tooltip.vue'
+
   import { sliceString, formatNumber } from '@/utils/tool'
-  import { useCommunityStore } from '@/stores/communityStore'
+  import { useModelSelectStore } from '@/stores/modelSelectStore'
   import { ref, watch, onMounted } from 'vue'
 
   defineOptions({
     name: 'ModelCard'
   })
 
-  const communityStore = useCommunityStore()
-  const dialogLoading = ref(true)
-  const showDialog = ref(false)
+  const modelSelectStore = useModelSelectStore()
   const imgSrc = ref('')
 
   const props = defineProps({
@@ -20,6 +19,7 @@
       type: Object as () => Model | null,
       default: null
     },
+
     loading: {
       type: Boolean,
       default: false
@@ -41,29 +41,8 @@
   }
 
   const handleDetail = (modelId: number, versionId: number) => {
-    communityStore.setAndShowCommunityDetail(modelId, versionId)
+    modelSelectStore.setAndShowCommunityDetail(modelId, versionId)
   }
-
-  watch(
-    () => communityStore.showCommunityDetail,
-    newVal => {
-      if (!newVal) {
-        setTimeout(() => {
-          showDialog.value = false
-          dialogLoading.value = true
-        }, 300)
-      }
-    }
-  )
-
-  watch(
-    () => showDialog.value,
-    newVal => {
-      if (!newVal) {
-        communityStore.showCommunityDetail = false
-      }
-    }
-  )
 
   watch(
     () => props.model?.versions?.[0]?.cover_urls,
@@ -104,7 +83,7 @@
           class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
           @click.prevent.stop="$emit('action', model)"
         >
-          <vTooltips :tips="model?.type === 'Workflow' ? 'Load Workflow' : 'Add Node'">
+          <vTooltips tips="Apply">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
