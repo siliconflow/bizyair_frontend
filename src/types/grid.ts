@@ -27,4 +27,4 @@ export interface UseModelGridReturn {
   doMetaFetch: () => Promise<void>
   handleImageLoad: (_event: Event, modelId: number | string) => void
   handleImageError: (_event: Event, modelId: number | string) => void
-} 
+}

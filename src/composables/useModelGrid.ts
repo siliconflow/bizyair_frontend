@@ -6,7 +6,7 @@ import { useToaster } from '@/components/modules/toats'
 
 export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridReturn {
   const communityStore = useCommunityStore()
-  
+
   const state: GridState = {
     loading: ref(false),
     isGridLoading: ref(false),
@@ -27,8 +27,8 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
   const updateMode = () => {
     const key = isRef(pageKey) ? pageKey.value : pageKey
     const storeData = getStoreData()
-    
-    switch(key) {
+
+    switch (key) {
       case 'posts':
         storeData.modelListPathParams.mode = 'my'
         break
@@ -49,7 +49,7 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
 
   const fetchData = async () => {
     try {
-      updateMode() 
+      updateMode()
       const storeData = getStoreData()
       const response = await get_model_list(
         {
@@ -68,8 +68,7 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
           storeData.models = [...storeData.models, ...response.data.list]
         }
         return response.data.list
-      }
-      else {
+      } else {
         state.hasMore.value = false
         storeData.models = []
         return []
@@ -84,11 +83,11 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
   const loadMore = async () => {
     if (state.loading.value || !state.hasMore.value) return
     state.loading.value = true
-    
+
     try {
       const storeData = getStoreData()
       const { current, page_size, total } = storeData.modelListPathParams
-      
+
       if (current * page_size >= total) {
         state.hasMore.value = false
         return
@@ -135,11 +134,11 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
 
   return {
     state,
-    storeState, 
+    storeState,
     fetchData,
     loadMore,
     doMetaFetch,
     handleImageLoad,
     handleImageError
   }
-} 
+}

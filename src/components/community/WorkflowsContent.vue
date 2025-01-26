@@ -16,12 +16,7 @@
   const comfyUIApp: any = inject('comfyUIApp')
 
   const {
-    state: {
-      isGridLoading,
-      cacheKey,
-      showSortPopover,
-      imageLoadStates
-    },
+    state: { isGridLoading, cacheKey, showSortPopover, imageLoadStates },
     storeState,
     doMetaFetch,
     loadMore,

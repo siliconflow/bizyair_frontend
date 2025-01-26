@@ -24,12 +24,7 @@
   const comfyUIApp: any = inject('comfyUIApp')
 
   const {
-    state: {
-      isGridLoading,
-      cacheKey,
-      showSortPopover,
-      imageLoadStates
-    },
+    state: { isGridLoading, cacheKey, showSortPopover, imageLoadStates },
     storeState,
     doMetaFetch,
     loadMore,
@@ -118,7 +113,7 @@
   const switchTab = async (tab: TabType) => {
     currentTab.value = tab
     communityStore.mineTabSource = tab
-    if(storeState.value.models.length === 0) {
+    if (storeState.value.models.length === 0) {
       isGridLoading.value = true
       setTimeout(() => {
         isGridLoading.value = false
