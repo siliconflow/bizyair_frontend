@@ -118,6 +118,12 @@
   const switchTab = async (tab: TabType) => {
     currentTab.value = tab
     communityStore.mineTabSource = tab
+    if(storeState.value.models.length === 0) {
+      isGridLoading.value = true
+      setTimeout(() => {
+        isGridLoading.value = false
+      }, 300)
+    }
   }
 
   onMounted(async () => {
