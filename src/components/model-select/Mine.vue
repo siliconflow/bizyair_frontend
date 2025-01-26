@@ -31,7 +31,7 @@
 
     try {
       const { current, page_size, total } =
-      modelSelectStore.mine[currentTab.value].modelListPathParams
+        modelSelectStore.mine[currentTab.value].modelListPathParams
       if (current * page_size >= total) {
         hasMore.value = false
         return
@@ -52,7 +52,7 @@
     try {
       const response = await get_model_list(
         {
-          ...modelSelectStore.mine[currentTab.value].modelListPathParams,
+          ...modelSelectStore.mine[currentTab.value].modelListPathParams
         },
         modelSelectStore.mine[currentTab.value].filterState
       )
@@ -90,12 +90,11 @@
     modelSelectStore.currentTab = tab
     cacheKey.value++
     imageLoadStates.value.clear()
-    if(modelSelectStore.mine[modelSelectStore.currentTab].models.length === 0) {
+    if (modelSelectStore.mine[modelSelectStore.currentTab].models.length === 0) {
       isGridLoading.value = true
       await doMetaFetch()
       isGridLoading.value = false
-    }
-    else {
+    } else {
       await doMetaFetch()
     }
   }

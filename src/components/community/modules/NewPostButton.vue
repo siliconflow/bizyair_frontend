@@ -2,7 +2,7 @@
   import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
   import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
   import { Button } from '@/components/ui/button'
-import { ref } from 'vue'
+  import { ref } from 'vue'
 
   defineOptions({
     name: 'NewPostButton'

@@ -23,7 +23,7 @@
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { MdPreview } from 'md-editor-v3'
   import { modelStore } from '@/stores/modelStatus'
-  import {useStatusStore} from '@/stores/userStatus'
+  import { useStatusStore } from '@/stores/userStatus'
   import { Model, ModelVersion } from '@/types/model'
   import vDialog from '@/components/modules/vDialog.vue'
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
@@ -39,7 +39,7 @@
   import 'md-editor-v3/lib/style.css'
   import { debounce } from 'lodash-es'
   const communityStore = useCommunityStore()
-  const userStatusStore=useStatusStore()
+  const userStatusStore = useStatusStore()
 
   const model = ref<Model>()
   const currentVersion = ref<ModelVersion>()
@@ -111,39 +111,43 @@
 
   const handleLike = debounce(async () => {
     if (!currentVersion.value) return
-    
+
     await like_model(currentVersion.value.id)
     const delta = currentVersion.value.liked ? -1 : 1
-    
+
     if (currentVersion.value.counter) {
-      currentVersion.value.counter.liked_count = Math.max(0, (currentVersion.value.counter.liked_count || 0) + delta)
+      currentVersion.value.counter.liked_count = Math.max(
+        0,
+        (currentVersion.value.counter.liked_count || 0) + delta
+      )
       currentVersion.value.liked = !currentVersion.value.liked
     }
-    
+
     if (model.value?.counter) {
       if (model.value.versions?.length === 1) {
         model.value.counter.liked_count = currentVersion.value.counter?.liked_count || 0
       } else {
-        model.value.counter.liked_count = model.value.versions?.reduce((sum, version) => {
-          return sum + (version.counter?.liked_count || 0)
-        }, 0) || 0
+        model.value.counter.liked_count =
+          model.value.versions?.reduce((sum, version) => {
+            return sum + (version.counter?.liked_count || 0)
+          }, 0) || 0
       }
     }
   }, 300)
 
   const handleFork = debounce(async () => {
     if (!currentVersion.value || !model.value?.versions) return
-    
-    if(communityStore.TabSource==='my_fork'){
+
+    if (communityStore.TabSource === 'my_fork') {
       if (model.value.versions.length <= 1) {
-      const res = await useAlertDialog({
-        title: `Are you sure you want to unfork  this ${model.value?.type === 'Workflow' ? 'workflow' : 'model'}?`,
-        desc: 'The original model may no longer be public.',
-        cancel: 'No, Keep It',
-        continue: 'Yes, UnFork It',
-        z: 'z-12000'
-      })
-      if (!res) return
+        const res = await useAlertDialog({
+          title: `Are you sure you want to unfork  this ${model.value?.type === 'Workflow' ? 'workflow' : 'model'}?`,
+          desc: 'The original model may no longer be public.',
+          cancel: 'No, Keep It',
+          continue: 'Yes, UnFork It',
+          z: 'z-12000'
+        })
+        if (!res) return
 
         await un_fork_model(currentVersion.value.id)
         communityStore.showCommunityDetail = false
@@ -152,7 +156,8 @@
         await un_fork_model(currentVersion.value.id)
         const currentIndex = model.value.versions.findIndex(v => v.id === currentVersion.value?.id)
         model.value.versions.splice(currentIndex, 1)
-        const nextVersion = model.value.versions[currentIndex] || model.value.versions[currentIndex - 1]
+        const nextVersion =
+          model.value.versions[currentIndex] || model.value.versions[currentIndex - 1]
         if (nextVersion) {
           handleTabChange(nextVersion.id)
           activeTab.value = nextVersion.id
@@ -164,27 +169,31 @@
       return
     }
 
-    if(!currentVersion.value.forked){
+    if (!currentVersion.value.forked) {
       await fork_model(currentVersion.value.id)
       currentVersion.value.forked = true
     } else {
       await un_fork_model(currentVersion.value.id)
       currentVersion.value.forked = false
     }
-    
+
     const delta = currentVersion.value.forked ? 1 : -1
-    
+
     if (currentVersion.value.counter) {
-      currentVersion.value.counter.forked_count = Math.max(0, (currentVersion.value.counter.forked_count || 0) + delta)
+      currentVersion.value.counter.forked_count = Math.max(
+        0,
+        (currentVersion.value.counter.forked_count || 0) + delta
+      )
     }
-    
+
     if (model.value?.counter) {
       if (model.value.versions.length === 1) {
         model.value.counter.forked_count = currentVersion.value.counter?.forked_count || 0
       } else {
-        model.value.counter.forked_count = model.value.versions.reduce((sum, version) => {
-          return sum + (version.counter?.forked_count || 0)
-        }, 0) || 0
+        model.value.counter.forked_count =
+          model.value.versions.reduce((sum, version) => {
+            return sum + (version.counter?.forked_count || 0)
+          }, 0) || 0
       }
     }
   }, 300)
@@ -696,17 +705,19 @@
               class="flex flex-row gap-1.5 items-start justify-start self-stretch shrink-0 relative"
             >
               <Button
-                v-if="['publicity'].includes(communityStore.TabSource) && userStatusStore.infoData.id!==model?.user_id || ['my_fork'].includes(communityStore.TabSource)"
+                v-if="
+                  (['publicity'].includes(communityStore.TabSource) &&
+                    userStatusStore.infoData.id !== model?.user_id) ||
+                  ['my_fork'].includes(communityStore.TabSource)
+                "
                 variant="default"
                 class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
                 @click="handleFork"
               >
-              <template v-if="['my_fork'].includes(communityStore.TabSource)">
-                UnFork
-              </template>
-              <template v-else>
-                {{ currentVersion?.forked ? 'UnFork' : 'Fork' }}
-              </template>
+                <template v-if="['my_fork'].includes(communityStore.TabSource)"> UnFork </template>
+                <template v-else>
+                  {{ currentVersion?.forked ? 'UnFork' : 'Fork' }}
+                </template>
               </Button>
               <Button
                 v-if="model?.type !== 'Workflow'"
