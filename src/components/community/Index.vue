@@ -4,11 +4,20 @@
   import QuickStartContent from '@/components/community/QuickStartContent.vue'
   import WorkflowsContent from '@/components/community/WorkflowsContent.vue'
   import Mine from '@/components/community/Mine.vue'
+  import ModelDetail from '@/components/community/detail/Index.vue'
   import { useCommunityStore } from '@/stores/communityStore'
 
   const communityStore = useCommunityStore()
+  const PATH_TO_TAB_SOURCE = {
+    '/my-models': (mineTabSource: string) => (mineTabSource === 'forked' ? 'my_fork' : 'my'),
+    default: () => 'publicity'
+  } as const
+
   const handleMenuClick = (item: { path: string }) => {
     communityStore.currentPath = item.path
+    const getTabSource =
+      PATH_TO_TAB_SOURCE[item.path as keyof typeof PATH_TO_TAB_SOURCE] || PATH_TO_TAB_SOURCE.default
+    communityStore.TabSource = getTabSource(communityStore.mineTabSource)
   }
   communityStore.loadFilterData()
 </script>
@@ -32,6 +41,7 @@
           "
         />
       </keep-alive>
+      <ModelDetail v-if="communityStore.showCommunityDetail" />
     </div>
   </div>
 </template>

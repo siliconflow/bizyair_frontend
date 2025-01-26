@@ -2,6 +2,7 @@
   import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
   import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
   import { Button } from '@/components/ui/button'
+  import { ref } from 'vue'
 
   defineOptions({
     name: 'NewPostButton'
@@ -10,6 +11,7 @@
   interface NewPostButtonProps {
     disabled?: boolean
   }
+  const downloadOpen = ref(false)
 
   const props = withDefaults(defineProps<NewPostButtonProps>(), {
     disabled: false
@@ -20,13 +22,19 @@
     'new-workflow': []
   }>()
 
+  const handleDownload = () => {
+    downloadOpen.value = !downloadOpen.value
+  }
+
   const handleNewModel = () => {
     if (props.disabled) return
+    downloadOpen.value = false
     emit('new-model')
   }
 
   const handleNewWorkflow = () => {
     if (props.disabled) return
+    downloadOpen.value = false
     emit('new-workflow')
   }
 </script>
@@ -34,7 +42,7 @@
 <template>
   <div class="flex items-center justify-between">
     <div class="text-white text-base font-medium">My Posts</div>
-    <Popover class="bg-[#353535]">
+    <Popover class="bg-[#353535]" :open="downloadOpen" @update:open="handleDownload">
       <PopoverTrigger class="bg-transparent" :disabled="disabled">
         <Button
           class="bg-[#7C3AED] hover:bg-[#7C3AED]/90 cursor-pointer flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium"
