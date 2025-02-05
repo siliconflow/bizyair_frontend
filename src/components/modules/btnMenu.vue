@@ -34,7 +34,7 @@
   // const comfyUIApp: any = inject('comfyUIApp')
 
   const toDo = async (e: any) => {
-    console.log(e)
+    
     if (typeof e === 'function') {
       e()
       return

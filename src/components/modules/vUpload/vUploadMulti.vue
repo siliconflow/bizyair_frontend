@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useToaster } from '@/components/modules/toats/index'
-import { NProgress, NTooltip, NModal } from 'naive-ui'
+import { NProgress, NTooltip, NModal, NButton } from 'naive-ui'
 import { creatClient } from './ossClient'
 import { commit_file } from '@/api/model'
 import { computed, ref, watch } from 'vue'
@@ -268,20 +268,20 @@ watch(fileList, (val) => {
         </span>
       </li>
       <li class="clear-btn" @click="clearAll">
-        <n-botton>clear</n-botton>
+        <n-button>clear</n-button>
       </li>
     </ul>
+    <n-modal
+      v-model:show="showConfirm"
+      preset="dialog"
+      title="Tips"
+      :content="tipsText"
+      positive-text="Upload"
+      negative-text="Cancel"
+      @positive-click="toUpload"
+      @negative-click="cancelUpload"
+    />
   </div>
-  <n-modal
-    v-model:show="showConfirm"
-    preset="dialog"
-    title="Tips"
-    :content="tipsText"
-    positive-text="Upload"
-    negative-text="Cancel"
-    @positive-click="toUpload"
-    @negative-click="cancelUpload"
-  />
 </template>
 
 <style scoped lang="less">

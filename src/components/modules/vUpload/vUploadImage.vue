@@ -42,121 +42,123 @@
 </script>
 
 <template>
-  <div
-    :class="
-      cn(
-        'w-32 h-32 border border-dashed border-slate-300 rounded-lg relative overflow-hidden',
-        props.className
-      )
-    "
-  >
-    <input
-      ref="fileInput"
-      class="cursor-pointer opacity-0 w-full h-full absolute left-0 top-0 z-20"
-      type="file"
-      @change="handleFileChange"
-      accept="image/*"
-    />
-    <vImage
-      :src="imageSrc"
-      class="block object-cover w-32 h-32 rounded-lg absolute left-0 top-0 z-10"
-    />
-    <div class="w-20 h-1 absolute left-6 top-1/2 -translate-y-1/2 bg-slate-400 rounded-md"></div>
-    <div class="w-1 h-20 absolute top-6 left-1/2 -translate-x-1/2 bg-slate-400 rounded-md"></div>
-    <Trash2 class="absolute right-2 top-2 z-30 cursor-pointer" v-if="imageSrc" @click="clearVal" />
-  </div>
-  <div v-if="showLoading" class="fixed w-[100vw] h-[100vh] left-0 top-0 bg-black/40 z-13000">
-    <div class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-      <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24">
-        <circle cx="12" cy="2" r="0" fill="currentColor">
-          <animate
-            attributeName="r"
-            begin="0"
-            calcMode="spline"
-            dur="1s"
-            keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-            repeatCount="indefinite"
-            values="0;2;0;0"
-          />
-        </circle>
-        <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(45 12 12)">
-          <animate
-            attributeName="r"
-            begin="0.125s"
-            calcMode="spline"
-            dur="1s"
-            keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-            repeatCount="indefinite"
-            values="0;2;0;0"
-          />
-        </circle>
-        <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(90 12 12)">
-          <animate
-            attributeName="r"
-            begin="0.25s"
-            calcMode="spline"
-            dur="1s"
-            keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-            repeatCount="indefinite"
-            values="0;2;0;0"
-          />
-        </circle>
-        <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(135 12 12)">
-          <animate
-            attributeName="r"
-            begin="0.375s"
-            calcMode="spline"
-            dur="1s"
-            keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-            repeatCount="indefinite"
-            values="0;2;0;0"
-          />
-        </circle>
-        <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(180 12 12)">
-          <animate
-            attributeName="r"
-            begin="0.5s"
-            calcMode="spline"
-            dur="1s"
-            keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-            repeatCount="indefinite"
-            values="0;2;0;0"
-          />
-        </circle>
-        <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(225 12 12)">
-          <animate
-            attributeName="r"
-            begin="0.625s"
-            calcMode="spline"
-            dur="1s"
-            keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-            repeatCount="indefinite"
-            values="0;2;0;0"
-          />
-        </circle>
-        <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(270 12 12)">
-          <animate
-            attributeName="r"
-            begin="0.75s"
-            calcMode="spline"
-            dur="1s"
-            keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-            repeatCount="indefinite"
-            values="0;2;0;0"
-          />
-        </circle>
-        <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(315 12 12)">
-          <animate
-            attributeName="r"
-            begin="0.875s"
-            calcMode="spline"
-            dur="1s"
-            keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-            repeatCount="indefinite"
-            values="0;2;0;0"
-          />
-        </circle>
-      </svg>
+  <div>
+    <div
+      :class="
+        cn(
+          'w-32 h-32 border border-dashed border-slate-300 rounded-lg relative overflow-hidden',
+          props.className
+        )
+      "
+    >
+      <input
+        ref="fileInput"
+        class="cursor-pointer opacity-0 w-full h-full absolute left-0 top-0 z-20"
+        type="file"
+        @change="handleFileChange"
+        accept="image/*"
+      />
+      <vImage
+        :src="imageSrc"
+        class="block object-cover w-32 h-32 rounded-lg absolute left-0 top-0 z-10"
+      />
+      <div class="w-20 h-1 absolute left-6 top-1/2 -translate-y-1/2 bg-slate-400 rounded-md"></div>
+      <div class="w-1 h-20 absolute top-6 left-1/2 -translate-x-1/2 bg-slate-400 rounded-md"></div>
+      <Trash2 class="absolute right-2 top-2 z-30 cursor-pointer" v-if="imageSrc" @click="clearVal" />
+    </div>
+    <div v-if="showLoading" class="fixed w-[100vw] h-[100vh] left-0 top-0 bg-black/40 z-13000">
+      <div class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24">
+          <circle cx="12" cy="2" r="0" fill="currentColor">
+            <animate
+              attributeName="r"
+              begin="0"
+              calcMode="spline"
+              dur="1s"
+              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
+              repeatCount="indefinite"
+              values="0;2;0;0"
+            />
+          </circle>
+          <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(45 12 12)">
+            <animate
+              attributeName="r"
+              begin="0.125s"
+              calcMode="spline"
+              dur="1s"
+              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
+              repeatCount="indefinite"
+              values="0;2;0;0"
+            />
+          </circle>
+          <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(90 12 12)">
+            <animate
+              attributeName="r"
+              begin="0.25s"
+              calcMode="spline"
+              dur="1s"
+              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
+              repeatCount="indefinite"
+              values="0;2;0;0"
+            />
+          </circle>
+          <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(135 12 12)">
+            <animate
+              attributeName="r"
+              begin="0.375s"
+              calcMode="spline"
+              dur="1s"
+              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
+              repeatCount="indefinite"
+              values="0;2;0;0"
+            />
+          </circle>
+          <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(180 12 12)">
+            <animate
+              attributeName="r"
+              begin="0.5s"
+              calcMode="spline"
+              dur="1s"
+              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
+              repeatCount="indefinite"
+              values="0;2;0;0"
+            />
+          </circle>
+          <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(225 12 12)">
+            <animate
+              attributeName="r"
+              begin="0.625s"
+              calcMode="spline"
+              dur="1s"
+              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
+              repeatCount="indefinite"
+              values="0;2;0;0"
+            />
+          </circle>
+          <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(270 12 12)">
+            <animate
+              attributeName="r"
+              begin="0.75s"
+              calcMode="spline"
+              dur="1s"
+              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
+              repeatCount="indefinite"
+              values="0;2;0;0"
+            />
+          </circle>
+          <circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(315 12 12)">
+            <animate
+              attributeName="r"
+              begin="0.875s"
+              calcMode="spline"
+              dur="1s"
+              keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
+              repeatCount="indefinite"
+              values="0;2;0;0"
+            />
+          </circle>
+        </svg>
+      </div>
     </div>
   </div>
 </template>
