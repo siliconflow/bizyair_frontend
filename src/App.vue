@@ -85,6 +85,7 @@
   const convert = () => {
     console.log(shareCode.value)
     showShareCode.value = false
+    shareCode.value = ''
   }
   const toMini = () => {
     isMiniMenu.value = true

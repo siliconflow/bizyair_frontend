@@ -62,7 +62,7 @@
             </n-form-item>
             <n-form-item label="Upload Image" path="inputValue">
               <vUploadImage
-                v-model.modelValue="formData.versions[0].cover_urls"
+                v-model="formData.versions[0].cover_urls"
                 :preview-prc="formData.versions[0].cover_urls ? formData.versions[0].cover_urls[0] : ''"
                 @done="imageUploadDone"
               />
@@ -70,7 +70,7 @@
             <n-form-item label="Files" path="inputValue">
               <vUploadMulti
                 v-model:value="formData.versions[0].files"
-                :isVerify="formData.versions[0].annotated"
+                :is-verify="formData.versions[0].annotated"
                 @is-uploading="isMultiUploading = true"
                 @upload-done="isMultiUploading = false"
               />
@@ -202,6 +202,7 @@
       await create_dataset(tempData)
     }
     onDialogClose()
+
   }
 </script>
 

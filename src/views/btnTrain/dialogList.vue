@@ -178,6 +178,7 @@ onMounted(() => {
       background-color: rgba(0, 0, 0, 0.4);
       // border: 1px solid #ddd;
       height: 260px;
+      overflow: hidden;
     }
     button{
       position: absolute;

@@ -16,7 +16,10 @@
       type: String,
       default: 'Are you absolutely sure?'
     },
-    content: String,
+    content: {
+      type: String,
+      default: ''
+    },
   })
 
   const emit = defineEmits(['continueClick', 'cancelClick'])
