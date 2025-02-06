@@ -10,16 +10,19 @@ defineProps({
   }
 })
 
-const h = ref(0)
+const h = ref('0px')
 const container = ref<HTMLElement | null>(null)
 onMounted(() => {
-  if (container.value) {
-    h.value = container.value.clientWidth * (220/160)
+  const cv = container.value
+  if (cv) {
+    console.log(cv)
+    console.log(cv.clientWidth)
+    h.value = `${cv.clientWidth * (220/160)}px`
   }
 })
 </script>
 <template>
-  <div ref="container" class="image-container" :style="{ height: `${h}px` }">
+  <div ref="container" class="image-container" :style="{ height: h }">
     <v-image v-if="src" :src="src" alt="" />
     <vDefaultPic v-else />
   </div>
@@ -27,5 +30,7 @@ onMounted(() => {
 <style scoped lang="less">
 .image-container{
   width: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 </style>

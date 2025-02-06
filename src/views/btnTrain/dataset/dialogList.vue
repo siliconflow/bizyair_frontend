@@ -7,7 +7,6 @@
     :close-on-esc="false"
     :mask-closable="false"
     :on-after-leave="onDialogClose"
-    display-directive="show"
   >
     <n-card 
       closable 
@@ -36,44 +35,45 @@
             <span class="handle-item">Delete</span>
           </n-popover>
           </div>
-          <n-button type="primary">
+          <n-button type="primary" @click="toUpload">
             <template #icon>
               <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24"><path fill="currentColor" d="M11.5 20v-7.5H4v-1h7.5V4h1v7.5H20v1h-7.5V20z"/></svg>
             </template>
             New Dataset
           </n-button>
         </div>
-        <ul class="dataset-list custom-scrollbar">
-          <li v-for="(e, i) in tableData" :key="i">
-            <div class="dataset-item">
+        <div class="dataset-list-box custom-scrollbar">
+          <ul class="dataset-list">
+            <li v-for="(e, i) in datasetStore.tableData" :key="i">
+              <div class="dataset-item">
 
-              <datasetImage :src="e.versions[0]?.cover_urls && e.versions[0]?.cover_urls[0]" />
-              <div class="dataset-info">
-                <span class="judge-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M9.52 3a2 2 0 0 1 1.442.614l.12.137L12.48 5.5H20a2 2 0 0 1 1.995 1.85L22 7.5V19a2 2 0 0 1-1.85 1.995L20 21H4a2 2 0 0 1-1.995-1.85L2 19V5a2 2 0 0 1 1.85-1.995L4 3zm0 2H4v14h16V7.5h-7.52a2 2 0 0 1-1.442-.614l-.12-.137zm4.955 5.232a1 1 0 0 1 1.497 1.32l-.083.095l-4.172 4.172a1.1 1.1 0 0 1-1.46.085l-.095-.085l-2.051-2.051a1 1 0 0 1 1.32-1.498l.094.084l1.414 1.414z"/></g></svg>
-                </span>
-                <div class="word">
-                  <p class="name">{{ e.name }}</p>
-                  <!-- <p class="hint">1000 images</p> -->
+                <datasetImage :src="e.versions[0]?.cover_urls && e.versions[0]?.cover_urls[0]" />
+                <div class="dataset-info">
+                  <span class="judge-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M9.52 3a2 2 0 0 1 1.442.614l.12.137L12.48 5.5H20a2 2 0 0 1 1.995 1.85L22 7.5V19a2 2 0 0 1-1.85 1.995L20 21H4a2 2 0 0 1-1.995-1.85L2 19V5a2 2 0 0 1 1.85-1.995L4 3zm0 2H4v14h16V7.5h-7.52a2 2 0 0 1-1.442-.614l-.12-.137zm4.955 5.232a1 1 0 0 1 1.497 1.32l-.083.095l-4.172 4.172a1.1 1.1 0 0 1-1.46.085l-.095-.085l-2.051-2.051a1 1 0 0 1 1.32-1.498l.094.084l1.414 1.414z"/></g></svg>
+                  </span>
+                  <div class="word">
+                    <p class="name">{{ e.name }}</p>
+                    <!-- <p class="hint">1000 images</p> -->
+                  </div>
+                  <span class="add-node"></span>
+                  <n-popover trigger="hover" placement="bottom">
+                    <template #trigger>
+                      <span class="handle"><svg data-v-60d944c6="" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="none" class="cursor-pointer"><path data-v-60d944c6="" d="M8.66659 7.99992C8.66659 7.63173 8.36811 7.33325 7.99992 7.33325C7.63173 7.33325 7.33325 7.63173 7.33325 7.99992C7.33325 8.36811 7.63173 8.66659 7.99992 8.66659C8.36811 8.66659 8.66659 8.36811 8.66659 7.99992Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"></path><path data-v-60d944c6="" d="M8.66659 3.33325C8.66659 2.96506 8.36811 2.66658 7.99992 2.66658C7.63173 2.66658 7.33325 2.96506 7.33325 3.33325C7.33325 3.70144 7.63173 3.99992 7.99992 3.99992C8.36811 3.99992 8.66659 3.70144 8.66659 3.33325Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"></path><path data-v-60d944c6="" d="M8.66659 12.6666C8.66659 12.2984 8.36811 11.9999 7.99992 11.9999C7.63173 11.9999 7.33325 12.2984 7.33325 12.6666C7.33325 13.0348 7.63173 13.3333 7.99992 13.3333C8.36811 13.3333 8.66659 13.0348 8.66659 12.6666Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+                    </template>
+                    <span class="handle-item">rename</span>
+                    <span class="handle-item" @click="del(e.id)">Delete</span>
+                  </n-popover>
+                  
                 </div>
-                <span class="add-node"></span>
-                <n-popover trigger="hover" placement="bottom">
-                  <template #trigger>
-                    <span class="handle"><svg data-v-60d944c6="" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="none" class="cursor-pointer"><path data-v-60d944c6="" d="M8.66659 7.99992C8.66659 7.63173 8.36811 7.33325 7.99992 7.33325C7.63173 7.33325 7.33325 7.63173 7.33325 7.99992C7.33325 8.36811 7.63173 8.66659 7.99992 8.66659C8.36811 8.66659 8.66659 8.36811 8.66659 7.99992Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"></path><path data-v-60d944c6="" d="M8.66659 3.33325C8.66659 2.96506 8.36811 2.66658 7.99992 2.66658C7.63173 2.66658 7.33325 2.96506 7.33325 3.33325C7.33325 3.70144 7.63173 3.99992 7.99992 3.99992C8.36811 3.99992 8.66659 3.70144 8.66659 3.33325Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"></path><path data-v-60d944c6="" d="M8.66659 12.6666C8.66659 12.2984 8.36811 11.9999 7.99992 11.9999C7.63173 11.9999 7.33325 12.2984 7.33325 12.6666C7.33325 13.0348 7.63173 13.3333 7.99992 13.3333C8.36811 13.3333 8.66659 13.0348 8.66659 12.6666Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
-                  </template>
-                  <span class="handle-item">rename</span>
-                  <span class="handle-item" @click="del(e.id)">Delete</span>
-                </n-popover>
-                
               </div>
-            </div>
-          </li>
-        </ul>
-        <div class="pagination">
+            </li>
+          </ul>
+        </div>
+        <div v-if="datasetStore.pageCount > 1"  class="pagination">
           <n-pagination 
-            v-if="pageCount"
-            v-model:page="current" 
-            :page-count="4" 
+            v-model:page="datasetStore.current" 
+            :page-count="datasetStore.pageCount" 
             :on-update:page="pageChange" />
         </div>
       </div>
@@ -81,34 +81,20 @@
   </n-modal>
 </template>
 <script setup lang="ts">
-import { useDatesetStore } from '@/stores/datasetStore'
+import { useDatasetStore } from '@/stores/datasetStore'
 import { NModal, NCard, NInput, NButton, NPopover, NPagination } from 'naive-ui'
-import { del_datasets, get_datasets } from '@/api/dataset'
+import { del_datasets } from '@/api/dataset'
 import datasetImage from './datasetImage.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useConfirm } from '@/components/modules/vConfirm/index'
 
 
-const datasetStore = useDatesetStore()
-const tableData = ref<{name: string, id: number, versions: any}[]>([])
-const current = ref(1)
-const pageCount = ref(0)
-const pageSize = ref(20)
+const datasetStore = useDatasetStore()
 
 const onDialogClose = () => {
   datasetStore.setListDialog(false)
 }
-const getData = async () => {
-  const res = await get_datasets({
-    current: current.value,
-    page_size: pageSize.value
-  }, {
-    keyword: ''
-  })
-  pageSize.value = res.data.total/pageSize.value > 1 ? 0 : Math.ceil(res.data.total/pageSize.value)
-  tableData.value = res.data.list
-  console.log(res)
-}
+
 
 const del = async (id: number) => {
   const res = await useConfirm({
@@ -119,16 +105,19 @@ const del = async (id: number) => {
   })
   if (!res) return
   await del_datasets({ id })
-  getData()
+  datasetStore.getDatasetList()
 }
 const pageChange = (page: number) => {
-  current.value = page
-  console.log(page)
-  getData()
+  datasetStore.current = page
+  datasetStore.getDatasetList()
+}
+const toUpload = () => {
+  datasetStore.setListDialog(false)
+  datasetStore.setUploadDialog(true)
 }
 
 onMounted(() => {
-  getData()
+  datasetStore.getDatasetList()
 })
 </script>
 <style scoped lang="less">
@@ -137,6 +126,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding-bottom: 20px;
 }
 .header{
   display: flex;
@@ -152,18 +142,19 @@ onMounted(() => {
     }
   }
 }
+.dataset-list-box{
+  flex: 1;
+  width: 100%;
+  margin: 0 -10px;
+  overflow-y: auto;
+}
 .dataset-list{
   display: flex;
   flex-wrap: wrap;
-  // justify-content: space-between;
   padding: 0;
   margin: 0;
-  margin: 0 -10px;
-  overflow-y: auto;
-  flex: 1;
   li{
     width: (1/10)*100%;
-    // min-width: 300px;
     box-sizing: border-box;
     padding: 10px;
     list-style: none;
@@ -177,8 +168,8 @@ onMounted(() => {
       border-radius: 0.5rem;
       background-color: rgba(0, 0, 0, 0.4);
       // border: 1px solid #ddd;
-      height: 260px;
-      overflow: hidden;
+      // height: 260px;
+      // overflow: hidden;
     }
     button{
       position: absolute;
@@ -276,7 +267,7 @@ onMounted(() => {
 .pagination{
   display: flex;
   justify-content: center;
-  padding: 20px 0;
+  padding: 20px 0 0 0;
   box-shadow: 0px -10px 10px rgba(0, 0, 0, 0.1);
   margin: 0 -16px;
 }

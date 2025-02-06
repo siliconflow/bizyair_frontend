@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { get_datasets } from '@/api/dataset'
 
 interface DatasetVersion {
   version: string,
@@ -15,10 +16,14 @@ interface DatasetDetail {
   versions: DatasetVersion[]
 }
 
-export const useDatesetStore = defineStore('dateset', {
+export const useDatasetStore = defineStore('dataset', {
   state: () => ({
     showListDialog: false,
     showUploadDialog: false,
+    current: 1,
+    pageSize: 20,
+    pageCount: 0,
+    tableData: [] as {name: string, id: number, versions: any}[],
     formDetail: {
       name: '',
       type: 'Dataset',
@@ -34,6 +39,16 @@ export const useDatesetStore = defineStore('dateset', {
     } as DatasetDetail
   }),
   actions: {
+    async getDatasetList() {
+      const res = await get_datasets({
+        current: this.current,
+        page_size: this.pageSize
+      }, {
+        keyword: ''
+      })
+      this.pageCount = res.data.total/this.pageSize > 1 ? 0 : Math.ceil(res.data.total/this.pageSize)
+      this.tableData = res.data.list
+    },
     clearDetail() {
       this.formDetail = {
         name: '',
