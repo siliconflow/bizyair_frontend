@@ -12,19 +12,19 @@
 </template>
 <script setup lang="ts">
   import btnMenu from '@/components/modules/btnMenu.vue'
-  import dialogList from './dialogList.vue'
-  import dialogUpload from './dialogUpload.vue'
+  import dialogList from './dataset/dialogList.vue'
+  import dialogUpload from './dataset/dialogUpload.vue'
   import { onMounted, ref } from 'vue'
-  import { useDatesetStore } from '@/stores/datasetStore'
-  const datesetStore = useDatesetStore()
+  import { useDatasetStore } from '@/stores/datasetStore'
+  const datasetStore = useDatasetStore()
 
   const show_cases = ref({
     'Datasets': () => {
-      datesetStore.setListDialog(true)
+      datasetStore.setListDialog(true)
     },
-    'Tasks': () => {
-      datesetStore.setUploadDialog(true)
-    }
+    // 'Tasks': () => {
+    //   datasetStore.setUploadDialog(true)
+    // }
   })
 
   onMounted(() => {

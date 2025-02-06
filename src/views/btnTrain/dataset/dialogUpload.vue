@@ -33,60 +33,32 @@
         <n-form-item label="Input" path="inputValue">
           <n-input v-model:value="formData.name" placeholder="Input" />
         </n-form-item>
-        <!-- <n-collapse 
-          ref="collapseRef"
-          :default-expanded-names="defaultExpandedNames" 
-          accordion 
-          display-directive="show"
-          arrow-placement="right">
-          <n-collapse-item 
-            v-for="(e, i) in formData.versions" 
-            :key="i" 
-            :title="`versions${i + 1}`" 
-            :name="i">
-            <template #header-extra>
-              <Trash2
-                v-if="formData.versions.length !== 1"
-                class="trash-icon"
-                @click.capture.stop="delVersion(i)"
-              />
-            </template> -->
-            <!-- <n-form-item label="Version" path="inputValue">
-              <input v-model="formData.versions[0].version" type="hidden" />
-            </n-form-item> -->
-            <!-- <n-form-item label="Description" path="inputValue">
-              <Markdown v-model="formData.versions[0].intro" editor-id="myeditor1" />
-            </n-form-item> -->
-            <n-form-item label="Annotated" path="inputValue">
-              <n-switch v-model:value="formData.versions[0].annotated" />
-            </n-form-item>
-            <n-form-item label="Upload Image" path="inputValue">
-              <vUploadImage
-                v-model="formData.versions[0].cover_urls"
-                :preview-prc="formData.versions[0].cover_urls ? formData.versions[0].cover_urls[0] : ''"
-                @done="imageUploadDone"
-              />
-            </n-form-item>
-            <n-form-item label="Files" path="inputValue">
-              <vUploadMulti
-                v-model:value="formData.versions[0].files"
-                :is-verify="formData.versions[0].annotated"
-                @is-uploading="isMultiUploading = true"
-                @upload-done="isMultiUploading = false"
-              />
+        
+        <n-form-item label="Annotated" path="inputValue">
+          <n-switch v-model:value="formData.versions[0].annotated" />
+        </n-form-item>
+        <n-form-item label="Upload Image" path="inputValue">
+          <vUploadImage
+            v-model="formData.versions[0].cover_urls"
+            :preview-prc="formData.versions[0].cover_urls ? formData.versions[0].cover_urls[0] : ''"
+            @done="imageUploadDone"
+          />
+        </n-form-item>
+        <n-form-item label="Files" path="inputValue">
+          <vUploadMulti
+            v-model:value="formData.versions[0].files"
+            :is-verify="formData.versions[0].annotated"
+            @is-uploading="isMultiUploading = true"
+            @upload-done="isMultiUploading = false"
+          />
 
-            </n-form-item>
-          <!-- </n-collapse-item>
-        </n-collapse> -->
+        </n-form-item>
       </n-form>
 
       <template #footer>
         <div class="footer-content">
-          <!-- <n-button tertiary @click="addVersion">Add Version</n-button>
-          <span> -->
-            <n-button tertiary @click="cancel">cancel</n-button>
-            <n-button type="primary" @click="submit">Publish</n-button>
-          <!-- </span> -->
+          <n-button tertiary @click="cancel">cancel</n-button>
+          <n-button type="primary" @click="submit">Publish</n-button>
         </div>
       </template>
   </n-card>
@@ -95,24 +67,14 @@
 
 <script setup lang="ts">
   import { useToaster } from '@/components/modules/toats/index'
-  // import { computed, inject, ref, watch } from 'vue'
-  
-  // import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
-  // import { Trash2 } from 'lucide-vue-next'
-  // import { useConfirm } from '@/components/modules/vConfirm/index'
-  // import Markdown from '@/components/markdown/Index.vue'
   import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import vUploadMulti from '@/components/modules/vUpload/vUploadMulti.vue'
   import { NModal, NCard, NForm, NFormItem, NInput, NButton, NSwitch } from 'naive-ui'
-  // NCollapse, NCollapseItem 
   import { create_dataset, put_dataset } from '@/api/dataset'
-  import { useDatesetStore } from '@/stores/datasetStore'
+  import { useDatasetStore } from '@/stores/datasetStore'
   import { ref } from 'vue';
-  // import { create_models, put_model } from '@/api/model'
   
-  const datasetStore = useDatesetStore()
-  // const defaultExpandedNames = ref([0])
-  // const collapseRef = ref<HTMLDivElement | null>(null)
+  const datasetStore = useDatasetStore()
   const isMultiUploading = ref(false)
 
   const formData = ref({
@@ -136,32 +98,12 @@
       }
       datasetStore.showUploadDialog = false
     }
-    
+    datasetStore.setListDialog(true)
   }
   const imageUploadDone = () => {
     console.log('imageUploadDone')
   }
-  // const addVersion = () => {
-  //   formData.value.versions.push({
-  //     intro: '',
-  //     annotated: false,
-  //     cover_urls: [],
-  //     files: []
-  //   })
-  // }
-  // async function delVersion(index: number) {
-  //   console.log(index)
-  //   const res = await useAlertDialog({
-  //     title: 'Are you sure you want to delete this version?',
-  //     desc: 'This action cannot be undone.',
-  //     cancel: 'No, Keep It',
-  //     continue: 'Yes, Delete It',
-  //     z: 'z-9000'
-  //   })
-  //   if (!res) return
-  // }
   const cancel = () => {
-    // datasetStore.setDialogStatus(false)
     onDialogClose()
   }
   const verifyVersion = () => {
@@ -202,7 +144,9 @@
       await create_dataset(tempData)
     }
     onDialogClose()
-
+    datasetStore.getDatasetList()
+    datasetStore.current = 1
+    datasetStore.setListDialog(true)
   }
 </script>
 
@@ -215,9 +159,5 @@
   justify-content: flex-end;
   padding: 24px;
   gap: 16px;
-  // span{
-  //   display: flex;
-  //   gap: 16px;
-  // }
 }
 </style>
