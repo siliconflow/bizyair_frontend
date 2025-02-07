@@ -15,8 +15,6 @@ const container = ref<HTMLElement | null>(null)
 onMounted(() => {
   const cv = container.value
   if (cv) {
-    console.log(cv)
-    console.log(cv.clientWidth)
     h.value = `${cv.clientWidth * (220/160)}px`
   }
 })
