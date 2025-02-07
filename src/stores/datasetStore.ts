@@ -23,6 +23,8 @@ export const useDatasetStore = defineStore('dataset', {
     current: 1,
     pageSize: 20,
     pageCount: 0,
+    annotated: '',
+    keyword: '',
     tableData: [] as {name: string, id: number, versions: any}[],
     formDetail: {
       name: '',
@@ -44,10 +46,15 @@ export const useDatasetStore = defineStore('dataset', {
         current: this.current,
         page_size: this.pageSize
       }, {
-        keyword: ''
+        keyword: this.keyword,
+        annotated: this.annotated
       })
       this.pageCount = res.data.total/this.pageSize > 1 ? 0 : Math.ceil(res.data.total/this.pageSize)
       this.tableData = res.data.list
+    },
+    fileterList(annotated: string) {
+      this.annotated = annotated
+      this.getDatasetList()
     },
     clearDetail() {
       this.formDetail = {

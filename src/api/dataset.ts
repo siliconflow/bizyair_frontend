@@ -5,7 +5,7 @@ export const create_dataset = (data: any) => customFetch(`/bizyair/community/dat
   body: JSON.stringify(data)
 })
 
-export const put_dataset = (data: any) => customFetch(`/bizyair/community/datasets/${data.id}`, {
+export const put_dataset = (data: any) => customFetch(`/bizyair/community/datasets/${data.id}?clientId=${sessionStorage.getItem('clientId')}`, {
   method: 'PUT',
   body: JSON.stringify(data)
 })
