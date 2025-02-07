@@ -67,20 +67,20 @@
 
   watch(
     () => props.model?.versions?.[0]?.cover_urls,
-    newUrl => {
-      if (newUrl) {
+    newUrls => {
+      if (newUrls && Array.isArray(newUrls) && newUrls.length > 0) {
         const timestamp = new Date().getTime()
-        imgSrc.value = newUrl.includes('?')
-          ? `${newUrl}&t=${timestamp}`
-          : `${newUrl}?t=${timestamp}`
+        const url = newUrls[0]
+        imgSrc.value = url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`
       }
     }
   )
 
   onMounted(() => {
-    if (props.model?.versions?.[0]?.cover_urls) {
+    const coverUrls = props.model?.versions?.[0]?.cover_urls
+    if (coverUrls && Array.isArray(coverUrls) && coverUrls.length > 0) {
       const timestamp = new Date().getTime()
-      const url = props.model.versions[0].cover_urls
+      const url = coverUrls[0]
       imgSrc.value = url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`
     }
   })
