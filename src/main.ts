@@ -38,7 +38,13 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
   app.directive('debounce', {
     mounted(el, binding) {
       let timer: any = null
-      el.addEventListener('keyup', () => {
+      el.addEventListener('keyup', (event: KeyboardEvent) => {
+        if (event.altKey || event.ctrlKey || event.shiftKey || 
+            event.key === 'Alt' || event.key === 'Control' || 
+            event.key === 'Shift' || event.key === 'Tab') {
+          return
+        }
+
         if (timer) clearTimeout(timer)
         timer = setTimeout(
           () => {
@@ -67,7 +73,13 @@ app.use(createPinia())
 app.directive('debounce', {
   mounted(el, binding) {
     let timer: any = null
-    el.addEventListener('keyup', () => {
+    el.addEventListener('keyup', (event: KeyboardEvent) => {
+      if (event.altKey || event.ctrlKey || event.shiftKey || 
+          event.key === 'Alt' || event.key === 'Control' || 
+          event.key === 'Shift' || event.key === 'Tab') {
+        return
+      }
+
       if (timer) clearTimeout(timer)
       timer = setTimeout(
         () => {
