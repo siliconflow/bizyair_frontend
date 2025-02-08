@@ -677,7 +677,7 @@
               :no-img-zoom-in="true"
               :preview="true"
               theme="dark"
-              class="bg-[#353535] w-full h-[80vh]"
+              class="bg-[#353535] w-full h-[80vh] line-height-[2rem]"
             />
             <div v-else class="w-full h-[200px] bg-[#353535] rounded-tl-lg rounded-tr-lg">
               <div class="flex justify-center items-center h-full">
@@ -1101,5 +1101,9 @@
 
   .Workflow {
     background: rgba(0, 178, 255, 0.4);
+  }
+
+  :deep(.md-editor-preview h1 ), :deep(.md-editor-preview h2 ) {
+    line-height: 1.2em ;
   }
 </style>
