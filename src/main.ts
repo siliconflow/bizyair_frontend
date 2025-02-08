@@ -39,9 +39,15 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
     mounted(el, binding) {
       let timer: any = null
       el.addEventListener('keyup', (event: KeyboardEvent) => {
-        if (event.altKey || event.ctrlKey || event.shiftKey || 
-            event.key === 'Alt' || event.key === 'Control' || 
-            event.key === 'Shift' || event.key === 'Tab') {
+        if (
+          event.altKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.key === 'Alt' ||
+          event.key === 'Control' ||
+          event.key === 'Shift' ||
+          event.key === 'Tab'
+        ) {
           return
         }
 
@@ -74,9 +80,15 @@ app.directive('debounce', {
   mounted(el, binding) {
     let timer: any = null
     el.addEventListener('keyup', (event: KeyboardEvent) => {
-      if (event.altKey || event.ctrlKey || event.shiftKey || 
-          event.key === 'Alt' || event.key === 'Control' || 
-          event.key === 'Shift' || event.key === 'Tab') {
+      if (
+        event.altKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.key === 'Alt' ||
+        event.key === 'Control' ||
+        event.key === 'Shift' ||
+        event.key === 'Tab'
+      ) {
         return
       }
 

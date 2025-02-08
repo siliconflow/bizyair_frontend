@@ -301,9 +301,7 @@
   }
 
   :deep(.n-scrollbar-rail) {
-   position: fixed;
-   
-   
+    position: fixed;
   }
 
   :deep(.n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical--right),
@@ -313,10 +311,7 @@
     bottom: 60px !important;
   }
 
-
-
   /* :deep(.v-vl:not(.v-vl--show-scrollbar)) {
     padding: 10px 20px 100px 20px;
   } */
 </style>
-
