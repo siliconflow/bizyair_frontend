@@ -68,6 +68,7 @@
   const loadMoreTrigger = ref<HTMLDivElement | null>(null)
 
   const handleScroll = (e: Event) => {
+   
     const target = e.target as HTMLElement
     const scrollTop = target.scrollTop
 
@@ -76,10 +77,10 @@
     const scrollBottom = scrollTop + target.clientHeight
     const scrollHeight = target.scrollHeight
     const scrollPercentage = (scrollBottom / scrollHeight) * 100
-
     if (scrollPercentage > 90 && !props.loading) {
       emit('loadMore')
     }
+
 
     emit('scroll', e)
   }
@@ -157,6 +158,7 @@
       maxHeight: 'calc(80vh - 100px)',
       height: 'auto'
     },
+    trigger: 'none',
     keyField: 'id',
     itemResizable: true,
     ignoreItemResize: false
@@ -212,11 +214,11 @@
 
 <style scoped>
   .scroll-container {
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 300px);
     height: auto;
     margin-top: 0.5rem;
     position: relative;
-    min-height: 80vh;
+    min-height: 60vh;
     display: flex;
     flex-direction: column;
   }
@@ -279,7 +281,7 @@
     flex-direction: column;
     width: 100%;
     margin: 0 auto;
-    max-width: 2000px;
+
     padding-bottom: 100px;
     padding-right: 6px;
     flex: 1;
@@ -303,8 +305,20 @@
   :deep(.n-virtual-list::-webkit-scrollbar-thumb:hover) {
     background-color: rgba(255, 255, 255, 0.5);
   }
+  :deep(.n-scrollbar-rail) {
+    position: fixed;
+  }
+
+  :deep(.n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical--right),
+  :deep(.n-scrollbar + .n-scrollbar-rail.n-scrollbar-rail--vertical--right) {
+    right: 20px !important;
+    top: 180px !important;
+    bottom: 80px !important;
+  }
+
+
 
   :deep(.v-vl:not(.v-vl--show-scrollbar)) {
-    padding: 10px 20px 100px 20px;
+    padding-bottom: 100px;
   }
 </style>
