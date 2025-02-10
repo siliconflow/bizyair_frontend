@@ -1103,7 +1103,8 @@
     background: rgba(0, 178, 255, 0.4);
   }
 
-  :deep(.md-editor-preview h1 ), :deep(.md-editor-preview h2 ) {
-    line-height: 1.2em ;
+  :deep(.md-editor-preview h1),
+  :deep(.md-editor-preview h2) {
+    line-height: 1.2em;
   }
 </style>
