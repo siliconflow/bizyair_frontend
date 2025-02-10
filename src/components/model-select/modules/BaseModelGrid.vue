@@ -68,7 +68,6 @@
   const loadMoreTrigger = ref<HTMLDivElement | null>(null)
 
   const handleScroll = (e: Event) => {
-   
     const target = e.target as HTMLElement
     const scrollTop = target.scrollTop
 
@@ -80,7 +79,6 @@
     if (scrollPercentage > 90 && !props.loading) {
       emit('loadMore')
     }
-
 
     emit('scroll', e)
   }
@@ -315,8 +313,6 @@
     top: 180px !important;
     bottom: 80px !important;
   }
-
-
 
   :deep(.v-vl:not(.v-vl--show-scrollbar)) {
     padding-bottom: 100px;

@@ -31,11 +31,11 @@
 
     try {
       const { current, page_size } = modelSelectStore.mine[currentTab.value].modelListPathParams
-      
+
       modelSelectStore.mine[currentTab.value].modelListPathParams.current = current + 1
       modelSelectStore.mine[currentTab.value].modelListPathParams.mode = modelSelectStore.TabSource
       await fetchData()
-      
+
       const newTotal = modelSelectStore.mine[currentTab.value].modelListPathParams.total
       hasMore.value = (current + 1) * page_size < newTotal
     } catch (error) {
@@ -90,13 +90,14 @@
     imageLoadStates.value.clear()
     hasMore.value = true
     loading.value = false
-    
+
     isGridLoading.value = true
     await doMetaFetch()
-    
-    const { current, page_size, total } = modelSelectStore.mine[currentTab.value].modelListPathParams
+
+    const { current, page_size, total } =
+      modelSelectStore.mine[currentTab.value].modelListPathParams
     hasMore.value = current * page_size < total
-    
+
     isGridLoading.value = false
   }
 
