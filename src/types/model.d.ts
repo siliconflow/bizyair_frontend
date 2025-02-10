@@ -36,6 +36,9 @@ export interface ModelVersion {
   file_name: string
   file_size:number
   cover_urls:string | string[]
+  review_state:number
+  review_at:string
+  review_result:string
   id:number
   public:boolean
   updated_at:string
