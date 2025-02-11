@@ -210,12 +210,11 @@
     -webkit-overflow-scrolling: touch;
   }
 
-
   :deep(.mine-grid .n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical--right),
   :deep(.mine-grid .n-scrollbar + .n-scrollbar-rail.n-scrollbar-rail--vertical--right) {
-    right: 20px !important;  
-    top: 180px !important;   
-    bottom: 80px !important; 
+    right: 20px !important;
+    top: 180px !important;
+    bottom: 80px !important;
   }
 
   :deep(.mine-grid .v-vl:not(.v-vl--show-scrollbar)) {
