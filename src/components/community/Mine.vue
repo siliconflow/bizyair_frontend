@@ -210,12 +210,12 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* 为Mine.vue特别定制的滚动条样式 */
+
   :deep(.mine-grid .n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical--right),
   :deep(.mine-grid .n-scrollbar + .n-scrollbar-rail.n-scrollbar-rail--vertical--right) {
-    right: 20px !important;  /* 可以根据需要调整位置 */
-    top: 180px !important;    /* 可以根据需要调整位置 */
-    bottom: 80px !important; /* 可以根据需要调整位置 */
+    right: 20px !important;  
+    top: 180px !important;   
+    bottom: 80px !important; 
   }
 
   :deep(.mine-grid .v-vl:not(.v-vl--show-scrollbar)) {
