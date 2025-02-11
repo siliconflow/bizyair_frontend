@@ -38,6 +38,18 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
   app.directive('debounce', {
     mounted(el, binding) {
       let timer: any = null
+      
+      const handleEvent = () => {
+        if (timer) clearTimeout(timer)
+        timer = setTimeout(
+          () => {
+            binding.value()
+          },
+          (binding.arg as unknown as number) || 500
+        )
+      }
+
+      // 处理键盘输入
       el.addEventListener('keyup', (event: KeyboardEvent) => {
         if (
           event.altKey ||
@@ -50,20 +62,21 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
         ) {
           return
         }
+        handleEvent()
+      })
 
-        if (timer) clearTimeout(timer)
-        timer = setTimeout(
-          () => {
-            binding.value()
-          },
-          (binding.arg as unknown as number) || 500
-        )
+      // 处理复制粘贴等其他输入方式
+      el.addEventListener('input', (event: InputEvent) => {
+        if (event.inputType === 'insertFromPaste' || event.inputType === 'deleteByCut') {
+          handleEvent()
+        }
       })
     },
+    
     unmounted(el, binding) {
-      if (binding) {
-        el.removeEventListener('keyup', binding.value)
-      }
+      // 移除所有事件监听器
+      el.removeEventListener('keyup', binding.value)
+      el.removeEventListener('input', binding.value)
     }
   })
 
@@ -77,36 +90,50 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
 const app = createApp(App)
 app.use(createPinia())
 app.directive('debounce', {
-  mounted(el, binding) {
-    let timer: any = null
-    el.addEventListener('keyup', (event: KeyboardEvent) => {
-      if (
-        event.altKey ||
-        event.ctrlKey ||
-        event.shiftKey ||
-        event.key === 'Alt' ||
-        event.key === 'Control' ||
-        event.key === 'Shift' ||
-        event.key === 'Tab'
-      ) {
-        return
+    mounted(el, binding) {
+      let timer: any = null
+      
+      const handleEvent = () => {
+        if (timer) clearTimeout(timer)
+        timer = setTimeout(
+          () => {
+            binding.value()
+          },
+          (binding.arg as unknown as number) || 500
+        )
       }
 
-      if (timer) clearTimeout(timer)
-      timer = setTimeout(
-        () => {
-          binding.value()
-        },
-        (binding.arg as unknown as number) || 500
-      )
-    })
-  },
-  unmounted(el, binding) {
-    if (binding) {
+      // 处理键盘输入
+      el.addEventListener('keyup', (event: KeyboardEvent) => {
+        if (
+          event.altKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.key === 'Alt' ||
+          event.key === 'Control' ||
+          event.key === 'Shift' ||
+          event.key === 'Tab'
+        ) {
+          return
+        }
+        handleEvent()
+      })
+
+      // 处理复制粘贴等其他输入方式
+      el.addEventListener('input', (event: InputEvent) => {
+        if (event.inputType === 'insertFromPaste' || event.inputType === 'deleteByCut') {
+          handleEvent()
+        }
+      })
+    },
+    
+    unmounted(el, binding) {
+      // 移除所有事件监听器
       el.removeEventListener('keyup', binding.value)
+      el.removeEventListener('input', binding.value)
     }
-  }
-})
+  })
+
 export function mount(container: string | Element, comfyUIApp?: any) {
   app.provide('comfyUIApp', comfyUIApp)
 
