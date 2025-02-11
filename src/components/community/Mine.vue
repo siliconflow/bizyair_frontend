@@ -194,6 +194,7 @@
       :image-load-states="imageLoadStates"
       :on-image-load="handleImageLoad"
       :on-image-error="handleImageError"
+      class="mine-grid"
       @load-more="loadMore"
     />
   </div>
@@ -207,5 +208,17 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* 为Mine.vue特别定制的滚动条样式 */
+  :deep(.mine-grid .n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical--right),
+  :deep(.mine-grid .n-scrollbar + .n-scrollbar-rail.n-scrollbar-rail--vertical--right) {
+    right: 20px !important;  /* 可以根据需要调整位置 */
+    top: 180px !important;    /* 可以根据需要调整位置 */
+    bottom: 80px !important; /* 可以根据需要调整位置 */
+  }
+
+  :deep(.mine-grid .v-vl:not(.v-vl--show-scrollbar)) {
+    padding-bottom: 100px;
   }
 </style>
