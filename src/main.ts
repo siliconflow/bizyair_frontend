@@ -38,7 +38,7 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
   app.directive('debounce', {
     mounted(el, binding) {
       let timer: any = null
-      
+
       const handleEvent = () => {
         if (timer) clearTimeout(timer)
         timer = setTimeout(
@@ -70,7 +70,7 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
         }
       })
     },
-    
+
     unmounted(el, binding) {
       el.removeEventListener('keyup', binding.value)
       el.removeEventListener('input', binding.value)
@@ -87,46 +87,46 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
 const app = createApp(App)
 app.use(createPinia())
 app.directive('debounce', {
-    mounted(el, binding) {
-      let timer: any = null
-      
-      const handleEvent = () => {
-        if (timer) clearTimeout(timer)
-        timer = setTimeout(
-          () => {
-            binding.value()
-          },
-          (binding.arg as unknown as number) || 500
-        )
-      }
+  mounted(el, binding) {
+    let timer: any = null
 
-      el.addEventListener('keyup', (event: KeyboardEvent) => {
-        if (
-          event.altKey ||
-          event.ctrlKey ||
-          event.shiftKey ||
-          event.key === 'Alt' ||
-          event.key === 'Control' ||
-          event.key === 'Shift' ||
-          event.key === 'Tab'
-        ) {
-          return
-        }
-        handleEvent()
-      })
-
-      el.addEventListener('input', (event: InputEvent) => {
-        if (event.inputType === 'insertFromPaste' || event.inputType === 'deleteByCut') {
-          handleEvent()
-        }
-      })
-    },
-    
-    unmounted(el, binding) {
-      el.removeEventListener('keyup', binding.value)
-      el.removeEventListener('input', binding.value)
+    const handleEvent = () => {
+      if (timer) clearTimeout(timer)
+      timer = setTimeout(
+        () => {
+          binding.value()
+        },
+        (binding.arg as unknown as number) || 500
+      )
     }
-  })
+
+    el.addEventListener('keyup', (event: KeyboardEvent) => {
+      if (
+        event.altKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.key === 'Alt' ||
+        event.key === 'Control' ||
+        event.key === 'Shift' ||
+        event.key === 'Tab'
+      ) {
+        return
+      }
+      handleEvent()
+    })
+
+    el.addEventListener('input', (event: InputEvent) => {
+      if (event.inputType === 'insertFromPaste' || event.inputType === 'deleteByCut') {
+        handleEvent()
+      }
+    })
+  },
+
+  unmounted(el, binding) {
+    el.removeEventListener('keyup', binding.value)
+    el.removeEventListener('input', binding.value)
+  }
+})
 
 export function mount(container: string | Element, comfyUIApp?: any) {
   app.provide('comfyUIApp', comfyUIApp)
