@@ -49,7 +49,6 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
         )
       }
 
-      // 处理键盘输入
       el.addEventListener('keyup', (event: KeyboardEvent) => {
         if (
           event.altKey ||
@@ -65,7 +64,6 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
         handleEvent()
       })
 
-      // 处理复制粘贴等其他输入方式
       el.addEventListener('input', (event: InputEvent) => {
         if (event.inputType === 'insertFromPaste' || event.inputType === 'deleteByCut') {
           handleEvent()
@@ -74,7 +72,6 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
     },
     
     unmounted(el, binding) {
-      // 移除所有事件监听器
       el.removeEventListener('keyup', binding.value)
       el.removeEventListener('input', binding.value)
     }
@@ -103,7 +100,6 @@ app.directive('debounce', {
         )
       }
 
-      // 处理键盘输入
       el.addEventListener('keyup', (event: KeyboardEvent) => {
         if (
           event.altKey ||
@@ -119,7 +115,6 @@ app.directive('debounce', {
         handleEvent()
       })
 
-      // 处理复制粘贴等其他输入方式
       el.addEventListener('input', (event: InputEvent) => {
         if (event.inputType === 'insertFromPaste' || event.inputType === 'deleteByCut') {
           handleEvent()
@@ -128,7 +123,6 @@ app.directive('debounce', {
     },
     
     unmounted(el, binding) {
-      // 移除所有事件监听器
       el.removeEventListener('keyup', binding.value)
       el.removeEventListener('input', binding.value)
     }
