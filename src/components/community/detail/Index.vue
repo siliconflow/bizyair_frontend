@@ -521,7 +521,7 @@
           <div
             class="bg-[#4e4e4e] rounded-lg p-1 flex flex-row gap-4 items-start justify-start self-stretch shrink-0 relative"
           >
-            <div class="min-w-[200px] max-w-[1000px]">
+            <div class="max-w-[1000px]">
               <ScrollArea ref="scrollViewportRef" class="rounded-md w-full">
                 <div class="whitespace-nowrap">
                   <Tabs v-model="activeTab" :default-value="currentVersion?.id">
