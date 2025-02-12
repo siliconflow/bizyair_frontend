@@ -74,7 +74,7 @@
     >
       <template v-if="!loading && model">
         <div
-          class="absolute left-2 top-3  h-[34px] flex items-center justify-start z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-2 rounded-[6px]"
+          class="absolute left-2 top-3 h-[34px] flex items-center justify-start z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-2 rounded-[6px]"
         >
           {{ model.type }}
         </div>
