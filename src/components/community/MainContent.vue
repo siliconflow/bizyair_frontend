@@ -94,7 +94,7 @@
 
 <template>
   <div class="flex flex-col h-full">
-    <div class="px-6 pt-6 pb-0 sticky top-0 z-20">
+    <div class="px-6 pb-0 sticky top-0 z-20">
       <ModelFilterBar
         v-model:show-sort-popover="showSortPopover"
         page="mainContent"

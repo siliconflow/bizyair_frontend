@@ -46,20 +46,20 @@
 
   watch(
     () => props.model?.versions?.[0]?.cover_urls,
-    newUrl => {
-      if (newUrl) {
+    newUrls => {
+      if (newUrls && Array.isArray(newUrls) && newUrls.length > 0) {
         const timestamp = new Date().getTime()
-        imgSrc.value = newUrl.includes('?')
-          ? `${newUrl}&t=${timestamp}`
-          : `${newUrl}?t=${timestamp}`
+        const url = newUrls[0]
+        imgSrc.value = url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`
       }
     }
   )
 
   onMounted(() => {
-    if (props.model?.versions?.[0]?.cover_urls) {
+    const coverUrls = props.model?.versions?.[0]?.cover_urls
+    if (coverUrls && Array.isArray(coverUrls) && coverUrls.length > 0) {
       const timestamp = new Date().getTime()
-      const url = props.model.versions[0].cover_urls
+      const url = coverUrls[0]
       imgSrc.value = url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`
     }
   })
@@ -74,7 +74,7 @@
     >
       <template v-if="!loading && model">
         <div
-          class="absolute left-2 top-3 min-w-[100px] h-[34px] flex items-center justify-start z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-2 rounded-[6px]"
+          class="absolute left-2 top-3 h-[34px] flex items-center justify-start z-10 text-white font-inter text-base font-bold bg-[#25252566] backdrop-blur-sm px-2 rounded-[6px]"
         >
           {{ model.type }}
         </div>

@@ -30,16 +30,14 @@
     loading.value = true
 
     try {
-      const { current, page_size, total } =
-        modelSelectStore.mine[currentTab.value].modelListPathParams
-      if (current * page_size >= total) {
-        hasMore.value = false
-        return
-      }
+      const { current, page_size } = modelSelectStore.mine[currentTab.value].modelListPathParams
+
       modelSelectStore.mine[currentTab.value].modelListPathParams.current = current + 1
       modelSelectStore.mine[currentTab.value].modelListPathParams.mode = modelSelectStore.TabSource
       await fetchData()
-      hasMore.value = (current + 1) * page_size < total
+
+      const newTotal = modelSelectStore.mine[currentTab.value].modelListPathParams.total
+      hasMore.value = (current + 1) * page_size < newTotal
     } catch (error) {
       console.error('fetch data error:', error)
       useToaster.error(`Failed to load more data: ${error}`)
@@ -90,13 +88,17 @@
     modelSelectStore.currentTab = tab
     cacheKey.value++
     imageLoadStates.value.clear()
-    if (modelSelectStore.mine[modelSelectStore.currentTab].models.length === 0) {
-      isGridLoading.value = true
-      await doMetaFetch()
-      isGridLoading.value = false
-    } else {
-      await doMetaFetch()
-    }
+    hasMore.value = true
+    loading.value = false
+
+    isGridLoading.value = true
+    await doMetaFetch()
+
+    const { current, page_size, total } =
+      modelSelectStore.mine[currentTab.value].modelListPathParams
+    hasMore.value = current * page_size < total
+
+    isGridLoading.value = false
   }
 
   const handleImageLoad = (_event: Event, modelId: number | string) => {
