@@ -152,6 +152,7 @@
       maxHeight: 'calc(80vh - 100px)',
       height: 'auto'
     },
+    trigger: 'none',
     keyField: 'id',
     itemResizable: true,
     ignoreItemResize: false
@@ -299,7 +300,18 @@
     background-color: rgba(255, 255, 255, 0.5);
   }
 
-  :deep(.v-vl:not(.v-vl--show-scrollbar)) {
-    padding: 10px 20px 100px 20px;
+  :deep(.n-scrollbar-rail) {
+    position: fixed;
   }
+
+  :deep(.n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical--right),
+  :deep(.n-scrollbar + .n-scrollbar-rail.n-scrollbar-rail--vertical--right) {
+    right: 20px !important;
+    top: 120px !important;
+    bottom: 60px !important;
+  }
+
+  /* :deep(.v-vl:not(.v-vl--show-scrollbar)) {
+    padding: 10px 20px 100px 20px;
+  } */
 </style>

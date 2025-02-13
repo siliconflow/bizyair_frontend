@@ -521,7 +521,7 @@
           <div
             class="bg-[#4e4e4e] rounded-lg p-1 flex flex-row gap-4 items-start justify-start self-stretch shrink-0 relative"
           >
-            <div class="min-w-[200px] max-w-[1000px]">
+            <div class="max-w-[1000px]">
               <ScrollArea ref="scrollViewportRef" class="rounded-md w-full">
                 <div class="whitespace-nowrap">
                   <Tabs v-model="activeTab" :default-value="currentVersion?.id">
@@ -677,7 +677,7 @@
               :no-img-zoom-in="true"
               :preview="true"
               theme="dark"
-              class="bg-[#353535] w-full h-[80vh]"
+              class="bg-[#353535] w-full h-[80vh] line-height-[2rem]"
             />
             <div v-else class="w-full h-[200px] bg-[#353535] rounded-tl-lg rounded-tr-lg">
               <div class="flex justify-center items-center h-full">
@@ -822,6 +822,73 @@
                 {{ currentVersion?.created_at }}
               </div>
             </div>
+            <div
+              v-if="model?.type === 'LoRA' || model?.type === 'Checkpoint'"
+              className="flex w-full"
+            >
+              <div className="w-[100px] bg-[#4E4E4E80] p-4  border-b border-[rgba(78,78,78,0.50)]">
+                Reviews
+              </div>
+              <div className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)]">
+                <div class="flex items-center gap-2">
+                  <vTooltips
+                    :tips="`${currentVersion?.review_result !== 'Unknown' ? `The type of model file may be ${currentVersion?.review_result}` : 'Unknown base model type'}`"
+                  >
+                    <svg
+                      v-if="currentVersion?.review_state === 1"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                    >
+                      <path
+                        d="M7.99992 1.33325L2.66659 3.33325V7.33325C2.66659 11.0666 4.91992 13.3999 7.99992 14.6666C11.0799 13.3999 13.3333 11.0666 13.3333 7.33325V3.33325L7.99992 1.33325Z"
+                        stroke="#22C55E"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M5.33325 7.99992L7.33325 9.99992L10.6666 6.66659"
+                        stroke="#22C55E"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+
+                    <svg
+                      v-else
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                    >
+                      <path
+                        d="M7.99992 1.33325L2.66659 3.33325V7.33325C2.66659 11.0666 4.91992 13.3999 7.99992 14.6666C11.0799 13.3999 13.3333 11.0666 13.3333 7.33325V3.33325L7.99992 1.33325Z"
+                        stroke="#EF4444"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M10 6L6 10M6 6L10 10"
+                        stroke="#EF4444"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </vTooltips>
+                  <div v-if="currentVersion?.review_state === 1" class="flex items-center gap-1">
+                    <span class="text-green-500">Positive</span>
+                    <span class="text-gray-500">{{
+                      currentVersion?.review_at ? currentVersion?.review_at?.replace(/-/g, '') : ''
+                    }}</span>
+                  </div>
+                  <span v-else class="text-red-500"> Negative </span>
+                </div>
+              </div>
+            </div>
+
             <div className="flex w-full">
               <div className="w-[100px] bg-[#4E4E4E80] p-4  border-b border-[rgba(78,78,78,0.50)]">
                 Hash
@@ -1101,5 +1168,10 @@
 
   .Workflow {
     background: rgba(0, 178, 255, 0.4);
+  }
+
+  :deep(.md-editor-preview h1),
+  :deep(.md-editor-preview h2) {
+    line-height: 1.2em;
   }
 </style>
