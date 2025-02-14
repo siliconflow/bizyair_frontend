@@ -4,6 +4,7 @@
   import vTooltips from '@/components/modules/v-tooltip.vue'
   import { sliceString, formatNumber } from '@/utils/tool'
   import { useCommunityStore } from '@/stores/communityStore'
+  import { useTagsStore } from '@/stores/tags'
   import { ref, watch, onMounted } from 'vue'
 
   defineOptions({
@@ -14,7 +15,7 @@
   const dialogLoading = ref(true)
   const showDialog = ref(false)
   const imgSrc = ref('')
-
+  const tagsStore = useTagsStore()
   const props = defineProps({
     model: {
       type: Object as () => Model | null,
@@ -76,7 +77,8 @@
     }
   )
 
-  onMounted(() => {
+  onMounted(async () => {
+    await tagsStore.fetchTags()
     const coverUrls = props.model?.versions?.[0]?.cover_urls
     if (coverUrls && Array.isArray(coverUrls) && coverUrls.length > 0) {
       const timestamp = new Date().getTime()
@@ -105,24 +107,13 @@
           @click.prevent.stop="$emit('action', model)"
         >
           <vTooltips :tips="model?.type === 'Workflow' ? 'Load Workflow' : 'Add Node'">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              class="drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] hover:scale-110 transition-transform duration-200 cursor-pointer"
+            <div 
+              class="w-8 h-8 rounded-full bg-[#25252566] hover:bg-[#7C3AED] flex items-center justify-center transition-colors duration-200 cursor-pointer"
             >
-              <path
-                d="M5 3L19 12L5 21V3Z"
-                stroke="#F3F4F6"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="group-hover:stroke-[#7C3AEDCC] transition-colors duration-200"
-                filter="drop-shadow(0 1px 2px rgb(0 0 0 / 0.5))"
-              />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+<path d="M2.91663 1.75L11.0833 7L2.91663 12.25V1.75Z" stroke="#F3F4F6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+            </div>
           </vTooltips>
         </div>
 
@@ -155,12 +146,15 @@
         </div>
 
         <div
-          class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
+          class="absolute bottom-0 left-0 right-0 p-3  bg-gradient-to-t from-black/90 to-black/0"
         >
           <vTooltips :tips="model.name">
-            <h3 class="text-base text-white font-medium mb-2 truncate">
-              {{ sliceString(model.name, 24) }}
-            </h3>
+            <div class="flex items-center gap-2">
+              <span v-if="model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)" :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'">{{ tagsStore.getHighestOrderTag(model.tags)?.label || 'New' }}</span>
+              <h3 class="text-base text-white font-medium mb-2 truncate">
+                {{ sliceString(model.name, 24) }}
+              </h3>
+            </div>
           </vTooltips>
           <div class="flex items-center space-x-3 text-white/90 text-xs">
             <span
@@ -283,5 +277,42 @@
     50% {
       opacity: 0.5;
     }
+  }
+
+  .newTag{
+    border-radius: 4px 4px 4px 0px;
+    background: #C60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
+
+  .hotTag{
+    border-radius: 4px 4px 4px 0px;
+    background: #C60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
+
+
+  .model-tag {
+    border-radius: 4px 4px 4px 0px;
+    background: #C60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
   }
 </style>

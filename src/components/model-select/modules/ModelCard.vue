@@ -6,6 +6,7 @@
   import { sliceString, formatNumber } from '@/utils/tool'
   import { useModelSelectStore } from '@/stores/modelSelectStore'
   import { ref, watch, onMounted } from 'vue'
+  import { useTagsStore } from '@/stores/tags'
 
   defineOptions({
     name: 'ModelCard'
@@ -13,6 +14,7 @@
 
   const modelSelectStore = useModelSelectStore()
   const imgSrc = ref('')
+  const tagsStore = useTagsStore()
 
   const props = defineProps({
     model: {
@@ -137,9 +139,12 @@
           class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/30"
         >
           <vTooltips :tips="model.name">
-            <h3 class="text-base text-white font-medium mb-2 truncate">
-              {{ sliceString(model.name, 24) }}
-            </h3>
+            <div class="flex items-center gap-2">
+              <span v-if="model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)" :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'">{{ tagsStore.getHighestOrderTag(model.tags)?.label || 'New' }}</span>
+              <h3 class="text-base text-white font-medium mb-2 truncate">
+                {{ sliceString(model.name, 24) }}
+              </h3>
+            </div>
           </vTooltips>
           <div class="flex items-center space-x-3 text-white/90 text-xs">
             <span
@@ -262,5 +267,42 @@
     50% {
       opacity: 0.5;
     }
+  }
+
+  .newTag{
+    border-radius: 4px 4px 4px 0px;
+    background: #C60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
+
+  .hotTag{
+    border-radius: 4px 4px 4px 0px;
+    background: #C60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
+
+
+  .model-tag {
+    border-radius: 4px 4px 4px 0px;
+    background: #C60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
   }
 </style>

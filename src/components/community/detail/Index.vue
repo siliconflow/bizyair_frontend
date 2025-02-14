@@ -25,6 +25,7 @@
   import { modelStore } from '@/stores/modelStatus'
   import { useStatusStore } from '@/stores/userStatus'
   import { Model, ModelVersion } from '@/types/model'
+  import { useTagsStore } from '@/stores/tags'  
   import vDialog from '@/components/modules/vDialog.vue'
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
   import {
@@ -40,7 +41,7 @@
   import { debounce } from 'lodash-es'
   const communityStore = useCommunityStore()
   const userStatusStore = useStatusStore()
-
+  const tagsStore = useTagsStore()
   const model = ref<Model>()
   const currentVersion = ref<ModelVersion>()
   const downloadOpen = ref(false)
@@ -51,6 +52,8 @@
   const comfyUIApp: any = inject('comfyUIApp')
 
   const activeTab = ref<number>()
+
+  const showAllTags = ref(false)
 
   const fetchModelDetail = async () => {
     try {
@@ -384,6 +387,15 @@
       useToaster.error('Failed to download workflow.')
     }
   }
+
+  const handleTagClick = (tagId: string) => {
+    console.log('tagId', tagId)
+    // Implement the logic to handle tag click
+  }
+
+  const handleShowAllTags = () => {
+    showAllTags.value = true
+  }
 </script>
 
 <template>
@@ -517,6 +529,39 @@
             </div>
           </div>
         </div>
+        <div class="flex flex-wrap gap-2 mb-2">
+          <template v-for="(tagId, index) in (model?.tags || []).slice(0, 6)" :key="tagId">
+            <div 
+              class="px-2 py-0.5 text-xs text-[#F9FAFB] rounded cursor-pointer transition-colors"
+              :class="[
+                index === 0 ? 'bg-[#6D28D9]' : 'bg-[#4E4E4E]',
+                'hover:bg-[#6D28D9] hover:scale-105'
+              ]"
+              @click="handleTagClick(tagId)"
+            >
+              {{ tagsStore.getTagById(tagId)?.label }}
+            </div>
+          </template>
+          
+          <div 
+            v-if="(model?.tags || []).length > 6 && !showAllTags" 
+            class="px-2 py-0.5 text-xs bg-[#6D28D9] text-white rounded cursor-pointer hover:bg-[#5B21B6] hover:scale-105 transition-colors"
+            @click="handleShowAllTags"
+          >
+            +{{ model?.tags.length - 6 }}
+          </div>
+          
+          <template v-if="showAllTags">
+            <template v-for="tagId in (model?.tags || []).slice(6)" :key="tagId">
+              <div 
+                class="px-2 py-0.5 text-xs bg-[#4E4E4E] text-[#F9FAFB] rounded cursor-pointer hover:bg-[#6D28D9] hover:scale-105 transition-colors"
+                @click="handleTagClick(tagId)"
+              >
+                {{ tagsStore.getTagById(tagId)?.label }}
+              </div>
+            </template>
+          </template>
+        </div>
         <div class="flex flex-row gap-1 items-center justify-start self-stretch shrink-0 relative">
           <div
             class="bg-[#4e4e4e] rounded-lg p-1 flex flex-row gap-4 items-start justify-start self-stretch shrink-0 relative"
@@ -546,6 +591,7 @@
           <div
             class="text-text-text-muted-foreground text-left font-['Inter-Regular',_sans-serif] text-xs leading-5 font-normal relative flex-1"
           ></div>
+          
           <div class="flex gap-8">
             <vTooltips :tips="currentVersion?.liked ? 'Liked' : 'Like'">
               <svg

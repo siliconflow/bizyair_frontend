@@ -6,7 +6,6 @@
   import Mine from '@/components/community/Mine.vue'
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { useCommunityStore } from '@/stores/communityStore'
-
   const communityStore = useCommunityStore()
   const PATH_TO_TAB_SOURCE = {
     '/my-models': (mineTabSource: string) => (mineTabSource === 'forked' ? 'my_fork' : 'my'),

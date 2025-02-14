@@ -3,9 +3,11 @@ import type { GridState, UseModelGridOptions, UseModelGridReturn } from '@/types
 import { useCommunityStore } from '@/stores/communityStore'
 import { get_model_list } from '@/api/model'
 import { useToaster } from '@/components/modules/toats'
+import { useTagsStore } from '@/stores/tags'
 
 export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridReturn {
   const communityStore = useCommunityStore()
+  const tagsStore = useTagsStore()
 
   const state: GridState = {
     loading: ref(false),
@@ -50,6 +52,8 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
   const fetchData = async () => {
     try {
       updateMode()
+      await tagsStore.fetchTags()
+      
       const storeData = getStoreData()
       const response = await get_model_list(
         {
