@@ -8,6 +8,7 @@
   import { NVirtualList } from 'naive-ui'
   import { debounce } from 'lodash-es'
   import type { VirtualListInst } from 'naive-ui'
+
   defineOptions({
     name: 'BaseModelGrid'
   })
@@ -85,7 +86,7 @@
     windowWidth.value = window.innerWidth
   }, 100)
 
-  onMounted(() => {
+  onMounted(async () => {
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting) {

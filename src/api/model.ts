@@ -134,3 +134,11 @@ export const get_workflow_dowload_url = (model_version_id: any, sign: any) =>
   customFetch(`/bizyair/community/models/versions/${model_version_id}/workflow_json/${sign}`, {
     method: 'GET'
   })
+
+
+  export const get_all_model_tags = () =>
+  customFetch('/bizyair/tags/all', { method: 'GET' })
+
+  
+
+
