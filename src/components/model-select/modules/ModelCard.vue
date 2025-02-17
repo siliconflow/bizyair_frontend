@@ -43,6 +43,7 @@
   }
 
   const handleDetail = (modelId: number, versionId: number) => {
+    console.log(modelId, versionId)
     modelSelectStore.setAndShowCommunityDetail(modelId, versionId)
   }
 

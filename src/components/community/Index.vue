@@ -4,7 +4,7 @@
   import QuickStartContent from '@/components/community/QuickStartContent.vue'
   import WorkflowsContent from '@/components/community/WorkflowsContent.vue'
   import Mine from '@/components/community/Mine.vue'
-  import ModelDetail from '@/components/community/detail/Index.vue'
+  // import ModelDetail from '@/components/community/detail/Index.vue'
   import { useCommunityStore } from '@/stores/communityStore'
   import { useTagsStore } from '@/stores/tags'
   import { onMounted } from 'vue'
@@ -46,7 +46,7 @@
           "
         />
       </keep-alive>
-      <ModelDetail v-if="communityStore.showCommunityDetail" />
+      <!-- <ModelDetail v-if="communityStore.showCommunityDetail" /> -->
     </div>
   </div>
 </template>

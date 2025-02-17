@@ -145,7 +145,7 @@
     } else {
       screenfull.exit()
       document.querySelectorAll('[role="dialog"]').forEach(el => (el.style.display = 'block'))
-      document.querySelector('body').style['pointer-events'] = 'none'
+      document.querySelector('body').style['pointer-events'] = 'visible'
     }
   }
 
