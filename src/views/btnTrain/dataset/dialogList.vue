@@ -116,7 +116,7 @@
 </template>
 <script setup lang="ts">
 import { useDatasetStore } from '@/stores/datasetStore'
-import { NModal, NCard, NInput, NButton, NPopover, NPagination, c } from 'naive-ui'
+import { NModal, NCard, NInput, NButton, NPopover, NPagination } from 'naive-ui'
 // NTooltip
 import { del_datasets } from '@/api/dataset'
 import datasetImage from './datasetImage.vue'
