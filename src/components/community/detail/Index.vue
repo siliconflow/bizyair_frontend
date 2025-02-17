@@ -39,6 +39,8 @@
   import { useToaster } from '@/components/modules/toats/index'
   import 'md-editor-v3/lib/style.css'
   import { debounce } from 'lodash-es'
+  import { create_share_code } from '@/api/model'
+
   const communityStore = useCommunityStore()
   const userStatusStore = useStatusStore()
   const tagsStore = useTagsStore()
@@ -137,6 +139,26 @@
       }
     }
   }, 300)
+
+  const getShareCode = async () => {
+    if (!currentVersion.value) return
+    const res = await create_share_code({biz_id: currentVersion.value.id})
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(res.data.code)
+        useToaster.success('The share code has been copied!')
+      } else {
+        const input = document.createElement('input')
+        input.value = res.data.code
+        document.body.appendChild(input)
+        input.select()
+        document.execCommand('copy')
+        document.body.removeChild(input)
+      }
+    } catch (err) {
+      useToaster.error('Copy failed.')
+    }
+  }
 
   const handleFork = debounce(async () => {
     if (!currentVersion.value || !model.value?.versions) return
@@ -591,6 +613,9 @@
           ></div>
           
           <div class="flex gap-8">
+            <vTooltips tips="Share" v-if="communityStore.TabSource === 'publicity'">
+              <svg class="cursor-pointer" @click="getShareCode" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M15.991 1.035a4 4 0 1 1-.855 6.267l-6.28 3.626q.147.533.145 1.072c0 .358-.047.719-.145 1.072l6.28 3.626a4.002 4.002 0 0 1 6.32 4.803a4 4 0 0 1-7.32-3.07l-6.28-3.627a4.002 4.002 0 1 1 0-5.608l6.28-3.626a4 4 0 0 1 1.855-4.535M19.723 3.5a2 2 0 1 0-3.464 2a2 2 0 0 0 3.464-2M3.071 12.527a2.002 2.002 0 0 0 2.93 1.204a2 2 0 1 0-2.93-1.204m15.92 5.242a2 2 0 1 0-2 3.464a2 2 0 0 0 2-3.464"/></svg>
+            </vTooltips>
             <vTooltips :tips="currentVersion?.liked ? 'Liked' : 'Like'">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
