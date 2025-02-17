@@ -7,6 +7,8 @@ declare global {
 
 export type ModeType = 'my' | 'my_fork' | 'publicity' | 'official'
 
+export type ModeTabType = 'community' | 'posts' | 'forked' 
+
 export type SortValue = 'Recently' | 'Most Forked' | 'Most Used' | 'Most Downloaded' | 'Most Liked'
 
 export interface Model {

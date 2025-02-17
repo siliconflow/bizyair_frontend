@@ -103,8 +103,8 @@
           @click="
             handleMenuClick({
               id: 4,
-              title: 'Models',
-              subtitle: 'View your content',
+              title: 'Contents',
+              subtitle: 'View your contents',
               path: '/my-models'
             })
           "
@@ -127,8 +127,8 @@
             </svg>
           </div>
           <div class="flex-1 flex flex-col">
-            <span>Models</span>
-            <div class="text-xs text-[#9CA3AF]">View your content</div>
+            <span>Contents</span>
+            <div class="text-xs text-[#9CA3AF]">View your contents</div>
           </div>
         </div>
       </div>

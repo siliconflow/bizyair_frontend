@@ -5,10 +5,10 @@
     size="huge"
     :bordered="false"
     :on-after-leave="onDialogClose"
-    content-style="padding: 0"
+    content-style="padding: 0;max-height: 70vh;overflow-y: auto;"
     header-style="padding: 20px"
     footer-style="padding: 0"
-    style="max-width: 900px"
+    style="max-width: 900px;"
   >
 
     <template #header>
@@ -240,7 +240,7 @@
     tempData.versions = tempData.versions || []
     tempData.versions.push({
       version: '',
-      base_model: '',
+      base_model: null,
       intro: '',
       public: false,
       filePath: '',
@@ -534,6 +534,8 @@
   justify-content: space-between;
   align-items: center;
   margin-top: -16px;
+  position: relative;
+  z-index: 9;
 }
 
 .loading-overlay {

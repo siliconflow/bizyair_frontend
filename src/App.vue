@@ -15,15 +15,18 @@
               <span>BizyAir</span>
             </h1>
             <div class="handle">
-              <strong v-if="showShareCode" class="bg-[#0f172a]">
-                <n-input v-model:value="shareCode" placeholder="Paste share code" @change="convert" />
-              </strong>
-              <n-tooltip trigger="hover">
-                <template #trigger>
-                  <span class="input" @click="showShareCode = !showShareCode"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-                </template>
-                Paste share code
-              </n-tooltip>
+              <div class="share-input-box">
+                <strong class="share-input">
+                  <n-input size="tiny" v-model:value="shareCode" class="input" placeholder="Paste share code" @change="convert">
+                    <template #suffix>
+                      <span class="msg" @click="runShareCode">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor"><path d="M12.987 2h.273c3.267 0 4.9 0 6.035.798c.325.228.614.5.857.805c.85 1.066.85 2.6.85 5.67v2.545c0 2.963 0 4.445-.47 5.628c-.756 1.903-2.353 3.403-4.378 4.113c-1.259.441-2.836.441-5.99.441c-1.802 0-2.703 0-3.423-.252c-1.157-.406-2.07-1.263-2.5-2.35c-.27-.676-.27-1.523-.27-3.216V12"/><path d="M21.001 12a3.333 3.333 0 0 1-3.333 3.333c-.666 0-1.451-.116-2.098.057a1.67 1.67 0 0 0-1.179 1.179c-.173.647-.057 1.432-.057 2.098A3.333 3.333 0 0 1 11.001 22m-.029-11.979c0-2.539.133-3.728-1.513-4.906c-.809-.58-3.496-.789-5.694-.583M5.503 2L3.146 4.11a.5.5 0 0 0-.003.706l2.36 2.231"/></g></svg>
+                      </span>
+                    </template>
+                  </n-input>
+                </strong>
+                <span class="input"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+              </div>
               <!-- <span class="msg"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.019 17h-6.04m6.04 0h3.614c1.876 0 1.559-1.86.61-2.804C15.825 10.801 20.68 3 11.999 3s-3.825 7.8-7.243 11.196c-.913.908-1.302 2.804.61 2.804H8.98m6.039 0c0 1.925-.648 4-3.02 4s-3.02-2.075-3.02-4"/></svg></span>
               <span class="set"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19.9 12.66a1 1 0 0 1 0-1.32l1.28-1.44a1 1 0 0 0 .12-1.17l-2-3.46a1 1 0 0 0-1.07-.48l-1.88.38a1 1 0 0 1-1.15-.66l-.61-1.83a1 1 0 0 0-.95-.68h-4a1 1 0 0 0-1 .68l-.56 1.83a1 1 0 0 1-1.15.66L5 4.79a1 1 0 0 0-1 .48L2 8.73a1 1 0 0 0 .1 1.17l1.27 1.44a1 1 0 0 1 0 1.32L2.1 14.1a1 1 0 0 0-.1 1.17l2 3.46a1 1 0 0 0 1.07.48l1.88-.38a1 1 0 0 1 1.15.66l.61 1.83a1 1 0 0 0 1 .68h4a1 1 0 0 0 .95-.68l.61-1.83a1 1 0 0 1 1.15-.66l1.88.38a1 1 0 0 0 1.07-.48l2-3.46a1 1 0 0 0-.12-1.17ZM18.41 14l.8.9l-1.28 2.22l-1.18-.24a3 3 0 0 0-3.45 2L12.92 20h-2.56L10 18.86a3 3 0 0 0-3.45-2l-1.18.24l-1.3-2.21l.8-.9a3 3 0 0 0 0-4l-.8-.9l1.28-2.2l1.18.24a3 3 0 0 0 3.45-2L10.36 4h2.56l.38 1.14a3 3 0 0 0 3.45 2l1.18-.24l1.28 2.22l-.8.9a3 3 0 0 0 0 3.98m-6.77-6a4 4 0 1 0 4 4a4 4 0 0 0-4-4m0 6a2 2 0 1 1 2-2a2 2 0 0 1-2 2"/></svg></span> -->
               <n-tooltip trigger="hover">
@@ -40,12 +43,13 @@
               <btnApiKey v-else />
               <btnCommunity />
               <btnPublish />
-              <btnTrain />
+              <!-- <btnTrain /> -->
               <btnNews />
               <apiKeyDialog />
             </div>
           </div>
         </div>
+        <ModelDetail v-if="communityStore.showCommunityDetail" />
       </n-notification-provider>
     </n-message-provider>
   </n-config-provider>
@@ -55,13 +59,23 @@
   import btnProfile from '@/views/btnProfile/index.vue'
   import btnCommunity from '@/views/btnCommunity/index.vue'
   import btnPublish from '@/views/btnPublish/index.vue'
-  import btnTrain from '@/views/btnTrain/index.vue'
+  // import btnTrain from '@/views/btnTrain/index.vue'
   import btnNews from '@/views/btnNews/index.vue'
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
   import { useStatusStore } from '@/stores/userStatus'
   import { provide, ref } from 'vue'
   import { NInput, NTooltip, NConfigProvider, darkTheme, NMessageProvider, NNotificationProvider } from 'naive-ui'
   
+  import { useCommunityStore } from '@/stores/communityStore'
+  import { get_share_code, version_get_model } from '@/api/model'
+
+  import ModelDetail from '@/components/community/detail/Index.vue'
+  import { useToaster } from '@/components/modules/toats/index'
+  
+
+  const communityStore = useCommunityStore()
+  // communityStore.setAndShowCommunityDetail(modelId, versionId)
+
   const myDarkTheme = { ...darkTheme }
   myDarkTheme.common.primaryColor = 'rgba(109, 40, 217, 1)'
   myDarkTheme.common.primaryColorSuppl = 'rgba(109, 40, 217, 1)'
@@ -80,11 +94,11 @@
   const isMini = ref(false)
   const isMiniMenu = ref(false)
   const shareCode = ref('')
-  const showShareCode = ref(false)
   
-  const convert = () => {
-    console.log(shareCode.value)
-    showShareCode.value = false
+  const convert = async () => {
+    const res = await get_share_code({ code: shareCode.value })
+    const model = await version_get_model({ id: res.data.biz_id })
+    communityStore.setAndShowCommunityDetail(model.data.bizy_model_id, res.data.biz_id)
     shareCode.value = ''
   }
   const toMini = () => {
@@ -100,55 +114,94 @@
       isMiniMenu.value = false
     }, 400)
   }
+
+  const runShareCode = async () => {
+    if (shareCode.value) {
+      if (shareCode.value.length != 8) {
+        useToaster({
+          type: 'error',
+          message: 'The length of the share code is incorrect.'
+        })
+        shareCode.value = ''
+        return false
+      }
+      convert()
+    } else {
+      try {
+        const clipboardText = await navigator.clipboard.readText();
+        if (!clipboardText || typeof clipboardText !== 'string') {
+          useToaster({
+            type: 'error',
+            message: 'Clipboard content is empty or not a string.'
+          })
+          return false
+        }
+        if (clipboardText.length != 8) {
+          useToaster({
+            type: 'error',
+            message: 'The length of the clipboard content is incorrect.'
+          })
+          return false
+        }
+        shareCode.value = clipboardText;
+        convert();
+      } catch (error) {
+        useToaster({
+          type: 'error',
+          message: error
+        })
+      }
+    }
+  }
     
 </script>
 <style scoped lang="less">
 .menu-box {
   border-radius: 12px;
   transition: all .3s cubic-bezier(0,0,.1,1.8);
-  width: 490px;
+  width: 410px;
   .bar{
     background-color: #7C3AED;
     display: flex;
     justify-content: space-between;
     border-radius: 12px 12px 0 0;
     cursor: move;
-    height: 48px;
+    height: 36px;
   }
   h1{
     color: #fff;
     margin: 0;
-    padding: 8px;
+    padding: 4px 8px;
     display: flex;
     img{
-      width: 32px;
-      height: 32px;
-      margin-right: 8px;
+      width: 28px;
+      height: 28px;
+      margin-right: 4px;
       cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
     }
     span{
-      font-size: 18px;
-      line-height: 32px;
+      font-size: 16px;
+      line-height: 28px;
     }
   }
   .handle{
     display: flex;
-    padding: 8px;
+    padding: 4px 8px;
     span{
       cursor: pointer;
       display: block;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       padding: 6px;
       box-sizing: border-box;
       border-radius: 20px;
       margin-left: 8px;
       background-color: rgba(0, 0, 0, .2);
       svg{
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
       }
     }
   }
@@ -170,6 +223,24 @@
     opacity: 0;
     padding: 0 12px;
     overflow: hidden;
+  }
+  .share-input-box{
+    display: flex;
+    align-items: center;
+
+    .share-input{
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #0f172a;
+      width: 0px;
+      transition: all .3s;
+      height: 28px;
+    }
+
+    &:hover .share-input{
+      width: 160px;
+    }
+    
   }
 }
 .is-mini-box{

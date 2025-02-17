@@ -119,6 +119,11 @@ export const fork_model = (model_version_id: any) =>
     method: 'POST'
   })
 
+export const un_fork_model = (model_version_id: any) =>
+  customFetch(`/bizyair/community/models/fork/${model_version_id}`, {
+    method: 'DELETE'
+  })
+
 export const commit_file = (data: any) =>
   customFetch('/bizyair/community/commit_file', {
     method: 'POST',
@@ -127,5 +132,21 @@ export const commit_file = (data: any) =>
 
 export const get_workflow_dowload_url = (model_version_id: any, sign: any) =>
   customFetch(`/bizyair/community/models/versions/${model_version_id}/workflow_json/${sign}`, {
+    method: 'GET'
+  })
+
+export const create_share_code = ({biz_id, type = 'bizy_model_version'}: {biz_id: number, type?: string}) =>
+  customFetch(`/bizyair/community/share`, {
+    method: 'POST',
+    body: JSON.stringify({ biz_id, type })
+  })
+
+export const get_share_code = ({code}: {code: string}) => 
+  customFetch(`/bizyair/community/share/${code}`, {
+    method: 'GET'
+  })
+  
+export const version_get_model = ({id}: {id: string}) => 
+  customFetch(`/bizyair/community/model_version/${id}`, {
     method: 'GET'
   })

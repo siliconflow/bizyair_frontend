@@ -13,9 +13,9 @@ export const put_dataset = (data: any) => customFetch(`/bizyair/community/datase
 export const del_datasets = (data: { id: number }) => customFetch(`/bizyair/community/datasets/${data.id}`, { method: 'DELETE' })
 
 export const get_datasets = (query: any, data: any) => customFetch(`/bizyair/community/datasets/query?${new URLSearchParams(query).toString()}`, { 
-  method: 'POST',
-  body: JSON.stringify(data)
-})
+    method: 'POST',
+    body: JSON.stringify(data)
+  }, false)
 
 export const get_datasets_detail = (data: any) => customFetch(`/bizyair/community/datasets/${data.id}/detail`, { method: 'GET' })
 

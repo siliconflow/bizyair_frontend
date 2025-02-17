@@ -1,5 +1,4 @@
+export { default as Mine } from './Mine.vue'
 export { default as ModelSelect } from './Index.vue'
-export { default as ModelFilterBar } from './ModelFilterBar.vue'
-export { default as ModelTable } from './ModelTable.vue'
-export { default as ModelVersionRow } from './ModelVersionRow.vue'
-export { default as ModelPagination } from './ModelPagination.vue'
+export { default as ModelFilterBar } from './modules/ModelFilterBar.vue'
+export { default as CommunityDetail } from './detail/Index.vue'
