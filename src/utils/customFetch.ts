@@ -4,7 +4,6 @@ const fetchCache = new Map()
 
 export function customFetch(url: string, options = {}, needDebounce = true) {
   const now = Date.now()
-
   if (needDebounce) {
     if (fetchCache.has(url)) {
       const lastFetchTime = fetchCache.get(url)

@@ -30,14 +30,14 @@
         size="medium"
         class="form-content"
       >
-        <n-form-item label="Input" path="inputValue">
+        <n-form-item label="Name" path="inputValue">
           <n-input v-model:value="formData.name" placeholder="Input" />
         </n-form-item>
         
-        <n-form-item label="Annotated" path="inputValue">
+        <!-- <n-form-item label="Annotated" path="inputValue">
           <n-switch v-model:value="formData.versions[0].annotated" />
-        </n-form-item>
-        <n-form-item label="Upload Image" path="inputValue">
+        </n-form-item> -->
+        <n-form-item label="Cover" path="inputValue">
           <vUploadImage
             v-model="formData.versions[0].cover_urls"
             :preview-prc="formData.versions[0].cover_urls ? formData.versions[0].cover_urls[0] : ''"
@@ -46,6 +46,7 @@
         </n-form-item>
         <n-form-item label="Files" path="inputValue">
           <vUploadMulti
+            ref="uploadRef"
             v-model:value="formData.versions[0].files"
             :is-verify="formData.versions[0].annotated"
             @is-uploading="isMultiUploading = true"
@@ -58,7 +59,13 @@
       <template #footer>
         <div class="footer-content">
           <n-button tertiary @click="cancel">cancel</n-button>
-          <n-button type="primary" @click="submit">Publish</n-button>
+          <n-button type="primary" :disabled="true" v-if="isMultiUploading">
+            <template #icon>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="2" r="0" fill="currentColor"><animate attributeName="r" begin="0" calcMode="spline" dur="1s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/></circle><circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(45 12 12)"><animate attributeName="r" begin="0.125s" calcMode="spline" dur="1s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/></circle><circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(90 12 12)"><animate attributeName="r" begin="0.25s" calcMode="spline" dur="1s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/></circle><circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(135 12 12)"><animate attributeName="r" begin="0.375s" calcMode="spline" dur="1s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/></circle><circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(180 12 12)"><animate attributeName="r" begin="0.5s" calcMode="spline" dur="1s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/></circle><circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(225 12 12)"><animate attributeName="r" begin="0.625s" calcMode="spline" dur="1s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/></circle><circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(270 12 12)"><animate attributeName="r" begin="0.75s" calcMode="spline" dur="1s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/></circle><circle cx="12" cy="2" r="0" fill="currentColor" transform="rotate(315 12 12)"><animate attributeName="r" begin="0.875s" calcMode="spline" dur="1s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"/></circle></svg>
+            </template>
+            Publish
+          </n-button>
+          <n-button type="primary" @click="submit" v-else>Publish</n-button>
         </div>
       </template>
   </n-card>
@@ -69,10 +76,12 @@
   import { useToaster } from '@/components/modules/toats/index'
   import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import vUploadMulti from '@/components/modules/vUpload/vUploadMulti.vue'
-  import { NModal, NCard, NForm, NFormItem, NInput, NButton, NSwitch } from 'naive-ui'
+  import { NModal, NCard, NForm, NFormItem, NInput, NButton } from 'naive-ui'
+  // NSwitch
   import { create_dataset, put_dataset } from '@/api/dataset'
   import { useDatasetStore } from '@/stores/datasetStore'
-  import { ref } from 'vue';
+  import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
+  import { ref, watch } from 'vue';
   
   const datasetStore = useDatasetStore()
   const isMultiUploading = ref(false)
@@ -80,16 +89,28 @@
   const formData = ref({
     ...datasetStore.formDetail,
   })
+
+  const uploadRef = ref(null)
   
 
-  const onDialogClose = () => {
+  const onDialogClose = async () => {
     
-    if (isMultiUploading.value) {
-      useToaster({
-        type: 'error',
-        message: 'Please wait for the file to finish uploading'
+    if (formData.value.versions[0].files.length != 0 && isMultiUploading.value) {
+      // useToaster({
+      //   type: 'error',
+      //   message: 'Please wait for the file to finish uploading'
+      // })
+      // return
+
+      const res = await useAlertDialog({
+        title: 'Are you sure you want to cancel?',
+        desc: 'This operation will result in the loss of upload progress.',
+        cancel: 'No, Keep It',
+        continue: 'Yes, Cancel It',
+        z: 'z-9000'
       })
-      return
+      if (!res) return
+      
     }
     if (datasetStore.clearDetail) {
       datasetStore.clearDetail()
@@ -99,6 +120,9 @@
       datasetStore.showUploadDialog = false
     }
     datasetStore.setListDialog(true)
+    if (uploadRef.value) {
+      (uploadRef.value as {clearAll: () => {}}).clearAll()
+    }
   }
   const imageUploadDone = () => {
     console.log('imageUploadDone')
@@ -134,20 +158,30 @@
     if (!verifyVersion()) {
       return
     }
-    const tempData = { ...formData.value }
+    const tempData = JSON.parse(JSON.stringify(formData.value))
     const tempVersionsFile = tempData.versions[0].files.map((e:any) => ({ sign: e.sha256sum, path: e.path }))
     tempData.versions[0].files = tempVersionsFile
-    tempData.versions[0].cover_urls = [tempData.versions[0].cover_urls]
+    if (typeof tempData.versions[0].cover_urls === 'string') {
+      tempData.versions[0].cover_urls = [tempData.versions[0].cover_urls]
+    }
     if (tempData.id) {
       await put_dataset(tempData)
     } else {
       await create_dataset(tempData)
     }
     onDialogClose()
-    datasetStore.getDatasetList()
     datasetStore.current = 1
+    datasetStore.annotated = ''
+    
+    datasetStore.getDatasetList()
     datasetStore.setListDialog(true)
   }
+  
+  watch(() => datasetStore.showUploadDialog, (val) => {
+    if (val) {
+      isMultiUploading.value = false
+    }
+  })
 </script>
 
 <style scoped lang="less">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useToaster } from '@/components/modules/toats/index'
-import { NProgress, NTooltip, NModal, NButton } from 'naive-ui'
+import { NProgress, NTooltip, NModal } from 'naive-ui'
 import { creatClient } from './ossClient'
 import { commit_file } from '@/api/model'
 import { computed, ref, watch } from 'vue'
@@ -131,7 +131,6 @@ const changeFiles = (e: Event) => {
       const text = newFilesText.map(e => e.webkitRelativePath.replace(/\.txt/g,''))
       for (let i = 0; i < newFilesImage.length; i++) {
         const image = newFilesImage[i].webkitRelativePath.replace(/\.png/g,'').replace(/\.jpg/g,'').replace(/\.JPG/g,'').replace(/\.jpeg/g,'').replace(/\.JPEG/g,'')
-        console.log(text.includes(image))
         if(!text.includes(image)) {
           useToaster({
             type: 'error',
@@ -155,6 +154,13 @@ const changeFiles = (e: Event) => {
   }
 }
 
+const clearAll = () => {
+  fileList.value.forEach((e) => {
+    e.client?.cancel()
+  })
+  cancelUpload()
+}
+
 const cancelOss = (e: any, i: any) => {
   fileList.value.splice(i, 1)
   const index = uploadQueue.value.findIndex((file) => file === e)
@@ -167,12 +173,12 @@ const cancelOss = (e: any, i: any) => {
   e.client?.cancel()
   emit('update:value', fileList.value)
 }
-const clearAll = () => {
-  fileList.value.forEach((e) => {
-    e.client?.cancel()
-  })
-  cancelUpload()
-}
+// const clearAll = () => {
+//   fileList.value.forEach((e) => {
+//     e.client?.cancel()
+//   })
+//   cancelUpload()
+// }
 
 const uploadRatio = computed(() => uploadedNumber.value / fileList.value.length)
 watch(uploadRatio, (val) => {
@@ -189,6 +195,11 @@ watch(fileList, (val) => {
     isUploading.value = false
   }
 }, { deep: true })
+
+
+defineExpose({
+  clearAll
+})
 </script>
 
 <template>
@@ -267,9 +278,9 @@ watch(fileList, (val) => {
           </svg>
         </span>
       </li>
-      <li class="clear-btn" @click="clearAll">
+      <!-- <li class="clear-btn" @click="clearAll">
         <n-button>clear</n-button>
-      </li>
+      </li> -->
     </ul>
     <n-modal
       v-model:show="showConfirm"
@@ -324,10 +335,14 @@ watch(fileList, (val) => {
 }
 .v-upload-progress {
   width: 100%;
-  padding: 16px 0;
+  padding: 0 0 16px 0;
   p {
     display: flex;
     justify-content: space-between;
+    padding: 0;
+    margin: 0 0 16px 0;
+    line-height: 34px;
+    font-size: 12px;
     span {
       display: block;
     }

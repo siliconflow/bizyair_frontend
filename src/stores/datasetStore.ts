@@ -49,11 +49,12 @@ export const useDatasetStore = defineStore('dataset', {
         keyword: this.keyword,
         annotated: this.annotated
       })
-      this.pageCount = res.data.total/this.pageSize > 1 ? 0 : Math.ceil(res.data.total/this.pageSize)
+      this.pageCount = res.data.total/this.pageSize <= 1 ? 0 : Math.ceil(res.data.total/this.pageSize)
       this.tableData = res.data.list
     },
     fileterList(annotated: string) {
       this.annotated = annotated
+      this.current = 1
       this.getDatasetList()
     },
     clearDetail() {

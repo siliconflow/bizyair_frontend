@@ -1,13 +1,14 @@
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, PropType, computed, watch } from 'vue'
   import { Model } from '@/types/model'
-  import ModelCard from './ModelCard.vue'
-  import LoadingOverlay from './LoadingOverlay.vue'
-  import EmptyState from './EmptyState.vue'
-  import BackToTop from './BackToTop.vue'
+  import ModelCard from '@/components/model-select/modules/ModelCard.vue'
+  import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
+  import EmptyState from '@/components/community/modules/EmptyState.vue'
+  import BackToTop from '@/components/community/modules/BackToTop.vue'
   import { NVirtualList } from 'naive-ui'
   import { debounce } from 'lodash-es'
   import type { VirtualListInst } from 'naive-ui'
+
   defineOptions({
     name: 'BaseModelGrid'
   })
@@ -31,6 +32,10 @@
     },
     cacheKey: {
       type: Number,
+      required: true
+    },
+    onFetchData: {
+      type: Function as PropType<(pageNumber: number, pageSize: number) => Promise<unknown[]>>,
       required: true
     },
     onModelAction: {

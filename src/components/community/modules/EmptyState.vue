@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col items-center justify-center py-20 text-white/60">
+  <div
+    class="flex flex-col items-center justify-center min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh-220px] py-20 text-white/60"
+  >
     <svg
       xmlns="http://www.w3.org/2000/svg"
       class="h-16 w-16 mb-4 opacity-40"

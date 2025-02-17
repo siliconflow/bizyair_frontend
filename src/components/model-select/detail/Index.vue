@@ -12,53 +12,40 @@
   } from '@/components/ui/command'
 
   import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-  import { useCommunityStore } from '@/stores/communityStore'
-
+  import { useModelSelectStore } from '@/stores/modelSelectStore'
+  import vDialog from '@/components/modules/vDialog.vue'
   import { sliceString, formatSize, formatNumber } from '@/utils/tool'
   import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
   import { Button } from '@/components/ui/button'
-  import { ref, onMounted, nextTick, inject } from 'vue'
-  import { NImageGroup, NImage } from 'naive-ui'
-  import vTooltips from '@/components/modules/v-tooltip.vue'
+  import { ref, onMounted, nextTick } from 'vue'
+
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { MdPreview } from 'md-editor-v3'
   import { modelStore } from '@/stores/modelStatus'
   import { useStatusStore } from '@/stores/userStatus'
   import { Model, ModelVersion } from '@/types/model'
-  import vDialog from '@/components/modules/vDialog.vue'
-  import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
-  import {
-    model_detail,
-    like_model,
-    fork_model,
-    un_fork_model,
-    remove_model,
-    get_workflow_dowload_url
-  } from '@/api/model'
+
+  import { NImageGroup, NImage } from 'naive-ui'
+  import vTooltips from '@/components/modules/v-tooltip.vue'
+  import { model_detail, like_model, fork_model, remove_model, un_fork_model } from '@/api/model'
   import { useToaster } from '@/components/modules/toats/index'
   import 'md-editor-v3/lib/style.css'
   import { debounce } from 'lodash-es'
-  import { create_share_code } from '@/api/model'
-
-  const communityStore = useCommunityStore()
+  import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
+  const modelSelectStore = useModelSelectStore()
   const userStatusStore = useStatusStore()
-
   const model = ref<Model>()
   const currentVersion = ref<ModelVersion>()
   const downloadOpen = ref(false)
   const scrollViewportRef = ref<any | null>(null)
   const modelStoreInstance = modelStore()
   const isLoading = ref(false)
-
-  const comfyUIApp: any = inject('comfyUIApp')
-
   const activeTab = ref<number>()
-
   const fetchModelDetail = async () => {
     try {
       const res = await model_detail({
-        id: communityStore.modelId,
-        source: communityStore.TabSource
+        id: modelSelectStore.modelId,
+        source: modelSelectStore.TabSource
       })
       if (!res.data) {
         useToaster.error('Model not found.')
@@ -68,19 +55,19 @@
       initializeScroll()
       isLoading.value = false
     } catch (error) {
-      useToaster.error('Failed to fetch model details')
       isLoading.value = false
+      useToaster.error('Failed to fetch model details')
     }
   }
 
   const initializeScroll = () => {
     if (model.value && model.value.versions && model.value.versions.length > 0) {
-      if (communityStore.versionId) {
-        const targetVersion = model.value.versions.find(v => v.id === communityStore.versionId)
+      if (modelSelectStore.versionId) {
+        const targetVersion = model.value.versions.find(v => v.id === modelSelectStore.versionId)
         if (targetVersion) {
           currentVersion.value = { ...targetVersion }
           nextTick(() => {
-            scrollWithDelay(communityStore.versionId)
+            scrollWithDelay(modelSelectStore.versionId)
           })
         }
       } else {
@@ -137,30 +124,10 @@
     }
   }, 300)
 
-  const getShareCode = async () => {
-    if (!currentVersion.value) return
-    const res = await create_share_code({biz_id: currentVersion.value.id})
-    try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(res.data.code)
-        useToaster.success('The share code has been copied!')
-      } else {
-        const input = document.createElement('input')
-        input.value = res.data.code
-        document.body.appendChild(input)
-        input.select()
-        document.execCommand('copy')
-        document.body.removeChild(input)
-      }
-    } catch (err) {
-      useToaster.error('Copy failed.')
-    }
-  }
-
   const handleFork = debounce(async () => {
     if (!currentVersion.value || !model.value?.versions) return
 
-    if (communityStore.TabSource === 'my_fork') {
+    if (modelSelectStore.TabSource === 'my_fork') {
       if (model.value.versions.length <= 1) {
         const res = await useAlertDialog({
           title: `Are you sure you want to unfork  this ${model.value?.type === 'Workflow' ? 'workflow' : 'model'}?`,
@@ -172,8 +139,8 @@
         if (!res) return
 
         await un_fork_model(currentVersion.value.id)
-        communityStore.showCommunityDetail = false
-        communityStore.reload++
+        modelSelectStore.showCommunityDetail = false
+        modelSelectStore.reload++
       } else {
         await un_fork_model(currentVersion.value.id)
         const currentIndex = model.value.versions.findIndex(v => v.id === currentVersion.value?.id)
@@ -269,13 +236,14 @@
         modelStoreInstance.setDialogStatus(true, Number(currentVersion.value?.id))
       }
       downloadOpen.value = false
-      communityStore.showCommunityDetail = false
-      communityStore.reload++
+      modelSelectStore.showCommunityDetail = false
+
+      modelSelectStore.reload++
     }
     if (type === 'remove') {
       downloadOpen.value = false
       const res = await useAlertDialog({
-        title: `Are you sure you want to delete this ${model.value?.type === 'Workflow' ? 'workflow' : 'model'}?`,
+        title: 'Are you sure you want to delete this model?',
         desc: 'This action cannot be undone.',
         cancel: 'No, Keep It',
         continue: 'Yes, Delete It',
@@ -297,13 +265,23 @@
   const handleRemoveModel = async (id: number | string) => {
     try {
       await remove_model(id)
-      useToaster.success('Removed successfully.')
-      communityStore.showCommunityDetail = false
-      communityStore.reload++
+      useToaster.success('Model removed successfully.')
+      modelSelectStore.showCommunityDetail = false
+      modelSelectStore.reload++
     } catch (error) {
-      useToaster.error('Failed to Remove .')
-      console.error('Error removing :', error)
+      useToaster.error('Failed to remove model.')
+      console.error('Error removing model:', error)
     }
+  }
+
+  const handleApply = () => {
+    if (!model.value?.versions || model.value?.versions?.length === 0 || !currentVersion.value) {
+      useToaster.error('No model versions found')
+      return
+    }
+    modelSelectStore.setApplyObject(currentVersion.value, model.value)
+    modelSelectStore.showDialog = false
+    modelSelectStore.showCommunityDetail = false
   }
 
   const handleCopy = async (sign: string) => {
@@ -323,94 +301,11 @@
       useToaster.error('Copy failed.')
     }
   }
-
-  const handleLoadWorkflow = async () => {
-    try {
-      isLoading.value = true
-      const workflow = await get_workflow_dowload_url(
-        currentVersion.value?.id,
-        currentVersion.value?.sign
-      )
-      if (workflow.data && comfyUIApp && comfyUIApp.graph) {
-        comfyUIApp.graph.clear()
-        await comfyUIApp.loadGraphData(workflow.data)
-      }
-      communityStore.showDialog = false
-      communityStore.showCommunityDetail = false
-    } catch (error) {
-      useToaster.error('Failed to load workflow')
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const handleAddNode = async () => {
-    try {
-      let nodeID = model.value?.type === 'LoRA' ? 'BizyAir_LoraLoader' : 'BizyAir_ControlNetLoader'
-      let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
-      const canvas = window.LGraphCanvas?.active_canvas
-
-      loraLoaderNode.title =
-        model.value?.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
-      loraLoaderNode.color = '#7C3AED'
-
-      const widgetValues =
-        model.value?.type === 'LoRA'
-          ? [model.value?.name, 1.0, 1.0, currentVersion.value?.id || '']
-          : [model.value?.name, currentVersion.value?.id || '']
-
-      loraLoaderNode.widgets_values = widgetValues
-      if (loraLoaderNode.widgets) {
-        loraLoaderNode.widgets.forEach((widget: any, index: number) => {
-          if (widget && widgetValues[index] !== undefined) {
-            widget.value = widgetValues[index]
-          }
-        })
-      }
-
-      const currentConfig = canvas.graph.serialize()
-      const nodeCount = currentConfig.nodes?.length || 0
-
-      const visibleRect = canvas.visible_area
-      const offsetX = (nodeCount % 3) * 30
-      const offsetY = Math.floor(nodeCount / 3) * 25
-      const baseX = visibleRect ? visibleRect[0] + 100 : 100
-      const baseY = visibleRect ? visibleRect[1] + 100 : 100
-
-      loraLoaderNode.pos = [baseX + offsetX, baseY + offsetY]
-
-      canvas.graph.add(loraLoaderNode)
-      communityStore.showDialog = false
-      useToaster.success('Node added successfully')
-    } catch (error) {
-      console.error('Failed to add node:', error)
-      useToaster.error(`Failed to add node: ${error}`)
-    }
-  }
-
-  const handleDownloadWorkFlow = async () => {
-    const workflow = await get_workflow_dowload_url(
-      currentVersion.value?.id,
-      currentVersion.value?.sign
-    )
-    if (workflow?.data) {
-      const jsonString = JSON.stringify(workflow.data, null, 2)
-      const blob = new Blob([jsonString], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${model.value?.name}-${currentVersion.value?.version}.json`
-      a.click()
-      URL.revokeObjectURL(url)
-    } else {
-      useToaster.error('Failed to download workflow.')
-    }
-  }
 </script>
 
 <template>
   <v-dialog
-    v-model:open="communityStore.showCommunityDetail"
+    v-model:open="modelSelectStore.showCommunityDetail"
     class="px-6 overflow-visible pb-6 z-10000 max-w-[90%] bg-[#353535]"
     layout-class="z-10000"
     content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
@@ -448,6 +343,7 @@
                   />
                 </svg>
               </vTooltips>
+
               <div
                 class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
               >
@@ -474,6 +370,7 @@
                   />
                 </svg>
               </vTooltips>
+
               <div
                 class="text-text-text-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative flex-1"
               >
@@ -569,9 +466,6 @@
             class="text-text-text-muted-foreground text-left font-['Inter-Regular',_sans-serif] text-xs leading-5 font-normal relative flex-1"
           ></div>
           <div class="flex gap-8">
-            <vTooltips tips="Share" v-if="communityStore.TabSource === 'publicity'">
-              <svg class="cursor-pointer" @click="getShareCode" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M15.991 1.035a4 4 0 1 1-.855 6.267l-6.28 3.626q.147.533.145 1.072c0 .358-.047.719-.145 1.072l6.28 3.626a4.002 4.002 0 0 1 6.32 4.803a4 4 0 0 1-7.32-3.07l-6.28-3.627a4.002 4.002 0 1 1 0-5.608l6.28-3.626a4 4 0 0 1 1.855-4.535M19.723 3.5a2 2 0 1 0-3.464 2a2 2 0 0 0 3.464-2M3.071 12.527a2.002 2.002 0 0 0 2.93 1.204a2 2 0 1 0-2.93-1.204m15.92 5.242a2 2 0 1 0-2 3.464a2 2 0 0 0 2-3.464"/></svg>
-            </vTooltips>
             <vTooltips :tips="currentVersion?.liked ? 'Liked' : 'Like'">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -601,7 +495,7 @@
               </svg>
             </vTooltips>
             <Popover
-              v-if="['my', 'my_fork'].includes(communityStore.TabSource)"
+              v-if="['my', 'my_fork'].includes(modelSelectStore.TabSource)"
               class="bg-[#353535]"
               :open="downloadOpen"
               @update:open="handleDownload"
@@ -646,7 +540,7 @@
                   <CommandList>
                     <CommandGroup>
                       <CommandItem
-                        v-if="['my'].includes(communityStore.TabSource)"
+                        v-if="['my'].includes(modelSelectStore.TabSource)"
                         value="edit"
                         class="px-2 py-1.5 mb-1 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]"
                         @click="handleModelOperation('edit', model?.id)"
@@ -731,23 +625,25 @@
             >
               <Button
                 v-if="
-                  (['publicity'].includes(communityStore.TabSource) &&
+                  (['publicity'].includes(modelSelectStore.TabSource) &&
                     userStatusStore.infoData.id !== model?.user_id) ||
-                  ['my_fork'].includes(communityStore.TabSource)
+                  ['my_fork'].includes(modelSelectStore.TabSource)
                 "
                 variant="default"
                 class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
                 @click="handleFork"
               >
-                <template v-if="['my_fork'].includes(communityStore.TabSource)"> UnFork </template>
+                <template v-if="['my_fork'].includes(modelSelectStore.TabSource)">
+                  UnFork
+                </template>
                 <template v-else>
                   {{ currentVersion?.forked ? 'UnFork' : 'Fork' }}
                 </template>
               </Button>
+
               <Button
-                v-if="model?.type !== 'Workflow'"
                 class="flex w-[170px] px-8 py-2 justify-center items-center gap-2 bg-[#F43F5E] hover:bg-[#F43F5E]/90 rounded-[6px]"
-                @click="handleAddNode"
+                @click="handleApply"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -762,56 +658,8 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   /></svg
-                >Add Node</Button
+                >Apply</Button
               >
-
-              <Button
-                v-if="model?.type === 'Workflow'"
-                class="flex w-[170px] px-8 py-2 justify-center items-center gap-2 bg-[#F43F5E] hover:bg-[#F43F5E]/90 rounded-[6px]"
-                :disabled="isLoading"
-                @click="handleLoadWorkflow"
-              >
-                <template v-if="isLoading">
-                  <svg
-                    class="animate-spin h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      class="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      stroke-width="4"
-                    />
-                    <path
-                      class="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  <span class="ml-1">Loading...</span>
-                </template>
-                <template v-else>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="17"
-                    height="16"
-                    viewBox="0 0 17 16"
-                    fill="none"
-                  >
-                    <path
-                      d="M6.49988 7.9999L7.83322 9.33324L10.4999 6.66657M3.06655 5.74657C2.96925 5.30825 2.98419 4.85246 3.10999 4.42146C3.23579 3.99046 3.46838 3.5982 3.7862 3.28105C4.10401 2.9639 4.49676 2.73213 4.92802 2.60723C5.35929 2.48233 5.81511 2.46835 6.25322 2.56657C6.49436 2.18944 6.82655 1.87907 7.21919 1.66409C7.61182 1.44911 8.05225 1.33643 8.49988 1.33643C8.94752 1.33643 9.38795 1.44911 9.78058 1.66409C10.1732 1.87907 10.5054 2.18944 10.7466 2.56657C11.1853 2.46792 11.6419 2.48184 12.0739 2.60704C12.5058 2.73225 12.8991 2.96466 13.2171 3.28267C13.5351 3.60068 13.7675 3.99395 13.8927 4.4259C14.0179 4.85786 14.0319 5.31446 13.9332 5.75324C14.3104 5.99437 14.6207 6.32657 14.8357 6.7192C15.0507 7.11183 15.1634 7.55227 15.1634 7.9999C15.1634 8.44754 15.0507 8.88797 14.8357 9.2806C14.6207 9.67323 14.3104 10.0054 13.9332 10.2466C14.0314 10.6847 14.0175 11.1405 13.8926 11.5718C13.7677 12.003 13.5359 12.3958 13.2187 12.7136C12.9016 13.0314 12.5093 13.264 12.0783 13.3898C11.6473 13.5156 11.1915 13.5305 10.7532 13.4332C10.5124 13.8118 10.1799 14.1235 9.78663 14.3394C9.39333 14.5554 8.9519 14.6686 8.50322 14.6686C8.05453 14.6686 7.6131 14.5554 7.2198 14.3394C6.8265 14.1235 6.49404 13.8118 6.25322 13.4332C5.81511 13.5315 5.35929 13.5175 4.92802 13.3926C4.49676 13.2677 4.10401 13.0359 3.7862 12.7188C3.46838 12.4016 3.23579 12.0093 3.10999 11.5783C2.98419 11.1473 2.96925 10.6916 3.06655 10.2532C2.68652 10.0127 2.37349 9.68002 2.15658 9.28605C1.93967 8.89207 1.82593 8.44964 1.82593 7.9999C1.82593 7.55016 1.93967 7.10773 2.15658 6.71376C2.37349 6.31979 2.68652 5.98707 3.06655 5.74657Z"
-                      stroke="#F9FAFB"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  Load
-                </template>
-              </Button>
             </div>
           </div>
           <div
@@ -857,7 +705,7 @@
                 <span>
                   {{ currentVersion?.sign ? sliceString(currentVersion?.sign, 15) : '' }}
                 </span>
-                <vTooltips tips="Copy">
+                <vTooltips :tips="currentVersion?.sign ? 'Copy' : ''">
                   <svg
                     v-if="currentVersion?.sign"
                     xmlns="http://www.w3.org/2000/svg"
@@ -1018,28 +866,6 @@
               {{ currentVersion?.file_name ? sliceString(currentVersion?.file_name, 20) : '' }} ({{
                 formatSize(currentVersion?.file_size)
               }})
-              <span
-                v-if="model?.type === 'Workflow'"
-                class="cursor-pointer ml-2 hover:opacity-80"
-                @click="handleDownloadWorkFlow"
-              >
-                <vTooltips tips="Download">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                  >
-                    <path
-                      d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2"
-                      stroke="#F9FAFB"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </vTooltips>
-              </span>
             </div>
           </div>
         </div>

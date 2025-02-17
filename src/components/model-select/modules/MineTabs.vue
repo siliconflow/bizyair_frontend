@@ -1,43 +1,41 @@
 <script setup lang="ts">
   import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-  import { useCommunityStore } from '@/stores/communityStore'
+  import { ModeTabType } from '@/types/model'
+  import { useModelSelectStore } from '@/stores/modelSelectStore'
 
-  type TabType = 'posts' | 'forked'
-
-  const communityStore = useCommunityStore()
+  const modelSelectStore = useModelSelectStore()
 
   const { modelValue } = defineProps<{
-    modelValue: TabType
+    modelValue: ModeTabType
   }>()
 
   const emit = defineEmits<{
-    (e: 'update:modelValue', value: TabType): void
+    (e: 'update:modelValue', value: ModeTabType): void
   }>()
 
   const handleTabChange = (value: string) => {
-    communityStore.mineTabSource = value
     if (value === 'posts') {
-      communityStore.TabSource = 'my'
+      modelSelectStore.TabSource = 'my'
     } else if (value === 'forked') {
-      communityStore.TabSource = 'my_fork'
+      modelSelectStore.TabSource = 'my_fork'
     } else {
-      communityStore.TabSource = 'publicity'
+      modelSelectStore.TabSource = 'publicity'
     }
-
-    emit('update:modelValue', value as TabType)
+    emit('update:modelValue', value as ModeTabType)
   }
 
-  const modes = ['posts', 'forked']
+  const modes = ['posts', 'forked', 'community']
   const tabLabels: { [key: string]: string } = {
     posts: 'My Posts',
-    forked: 'My Forked'
+    forked: 'My Forked',
+    community: 'Community'
   }
 </script>
 
 <template>
   <Tabs :default-value="modelValue" class="h-full flex flex-col">
     <TabsList
-      class="grid grid-cols-2 h-12 w-[300px] mb-[20px] bg-[#4E4E4E] text-white text-sm shrink-0 border-0"
+      class="grid grid-cols-3 h-12 w-[600px] mb-[20px] bg-[#4E4E4E] text-white text-sm shrink-0 border-0"
     >
       <TabsTrigger
         v-for="mode in modes"

@@ -47,7 +47,7 @@ export const useCommunityStore = defineStore('community', {
       modelListPathParams: {
         mode: 'official',
         current: 1,
-        page_size: 50,
+        page_size: 28,
         total: 0
       } as ModelListPathParams,
       models: [],
@@ -74,7 +74,7 @@ export const useCommunityStore = defineStore('community', {
       modelListPathParams: {
         mode: 'publicity',
         current: 1,
-        page_size: 50,
+        page_size: 28,
         total: 0
       } as ModelListPathParams,
       models: [],
@@ -161,7 +161,10 @@ export const useCommunityStore = defineStore('community', {
     get forked() {
       return this.mine.forked
     },
-
+    TabSource: 'publicity',
+    mineTabSource: '',
+    modelId: 0,
+    versionId: 0,
     modelTypes: [] as CommonModelType[],
     baseModelTypes: [] as CommonModelType[],
     filterDataLoaded: false
@@ -275,6 +278,12 @@ export const useCommunityStore = defineStore('community', {
         }
       }
       return null
+    },
+    setAndShowCommunityDetail(modelId: number, versionId: number) {
+      console.log('setAndShowCommunityDetail', modelId, versionId)  
+      this.modelId = modelId
+      this.versionId = versionId
+      this.showCommunityDetail = true
     }
   }
 })
