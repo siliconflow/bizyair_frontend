@@ -4,6 +4,8 @@ import './assets/index.css'
 import App from './App.vue'
 import { createPinia } from 'pinia'
 import { ModelSelect } from '@/components/model-select/'
+import dialogList from '@/views/btnTrain/dataset/dialogList.vue'
+
 
 export const showModelSelect = (options: { [x: string]: unknown } | null | undefined) => {
   let isMounted = false
@@ -79,6 +81,63 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
 
   const instance = app.mount(container)
   isMounted = true
+  return {
+    instance
+  }
+}
+
+export const showDatasetSelect = (options: { [x: string]: unknown } | null | undefined) => {
+  const uniqueId = `bizyair-dataset-select-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  const container = document.createElement('div')
+  container.id = uniqueId
+  document.body.appendChild(container)
+  const app = createApp(dialogList, {
+    ...options,
+    showDatasetSelect: true,
+    isNodeSelect: true,
+    onClose: function() {
+      app.unmount()
+      console.log('this-----------', this)
+      if (document.body.contains(container)) {
+        document.body.removeChild(container)
+      }
+    },
+    onApply: (...args: unknown[]) => {
+      if (options?.onApply) {
+        ;(options.onApply as (...args: unknown[]) => void)(...args)
+        
+        app.unmount()
+        
+          
+        if (document.body.contains(container)) {
+          document.body.removeChild(container)
+        }
+      }
+    }
+  })
+
+  app.directive('debounce', {
+    mounted(el, binding) {
+      let timer: any = null
+      el.addEventListener('keyup', () => {
+        if (timer) clearTimeout(timer)
+        timer = setTimeout(
+          () => {
+            binding.value()
+          },
+          (binding.arg as unknown as number) || 500
+        )
+      })
+    },
+    unmounted(el, binding) {
+      if (binding) {
+        el.removeEventListener('keyup', binding.value)
+      }
+    }
+  })
+
+  const instance = app.mount(container)
+  
   return {
     instance
   }
