@@ -31,11 +31,7 @@
 
     try {
       const { current, page_size } = modelSelectStore.mine[currentTab.value].modelListPathParams
-      
       const currentTotal = modelSelectStore.mine[currentTab.value].modelListPathParams.total
-      console.log('current', current)
-      console.log('page_size', page_size)
-      console.log('currentTotal', currentTotal)
       if ((current * page_size) >= currentTotal) {
         hasMore.value = false
         return
