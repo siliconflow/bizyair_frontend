@@ -71,7 +71,7 @@ export const useTagsStore = defineStore('tags', {
         this.lastFetchTime = now
         this.retryCount = 0
       } catch (error) {
-        console.error('Failed to fetch tags:', error)
+        // console.error('Failed to fetch tags:', error)
       } finally {
         this.isLoading = false
       }

@@ -6,8 +6,10 @@
   import type { ModelVersion, Model } from '@/types/model'
   import { watch } from 'vue'
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
+  import { useTagsStore } from '@/stores/tags'
+  
   const modelSelectStore = useModelSelectStore()
-
+  const tagsStore = useTagsStore()
   interface Props {
     modelType?: string[]
     selectedBaseModels?: string[]
@@ -55,6 +57,8 @@
   onMounted(async () => {
     await modelSelectStore.loadFilterData(props.modelType, props.selectedBaseModels)
     modelSelectStore.showDialog = true
+
+    await tagsStore.fetchTags()
   })
 
   const handleClose = () => {
