@@ -530,13 +530,10 @@
           </div>
         </div>
         <div class="flex flex-wrap gap-2 mb-2">
-          <template v-for="(tagId, index) in (model?.tags || []).slice(0, 6)" :key="tagId">
+          <template v-for="tagId in (model?.tags || []).slice(0, 6)" :key="tagId">
             <div 
               class="px-2 py-0.5 text-xs text-[#F9FAFB] rounded cursor-pointer transition-colors"
-              :class="[
-                index === 0 ? 'bg-[#6D28D9]' : 'bg-[#4E4E4E]',
-                'hover:bg-[#6D28D9] hover:scale-105'
-              ]"
+              :class="tagsStore.getTagById(tagId)?.class || 'model-tag'"
               @click="handleTagClick(tagId)"
             >
               {{ tagsStore.getTagById(tagId)?.label }}
@@ -545,7 +542,7 @@
           
           <div 
             v-if="(model?.tags || []).length > 6 && !showAllTags" 
-            class="px-2 py-0.5 text-xs bg-[#6D28D9] text-white rounded cursor-pointer hover:bg-[#5B21B6] hover:scale-105 transition-colors"
+            class="px-2 py-0.5 text-xs bg-[rgb(105,109,118)]/80 text-white rounded cursor-pointer hover:bg-[#5B21B6] hover:scale-105 transition-colors"
             @click="handleShowAllTags"
           >
             +{{ model?.tags.length - 6 }}
@@ -555,6 +552,7 @@
             <template v-for="tagId in (model?.tags || []).slice(6)" :key="tagId">
               <div 
                 class="px-2 py-0.5 text-xs bg-[#4E4E4E] text-[#F9FAFB] rounded cursor-pointer hover:bg-[#6D28D9] hover:scale-105 transition-colors"
+                :class="tagsStore.getTagById(tagId)?.class || 'model-tag'"
                 @click="handleTagClick(tagId)"
               >
                 {{ tagsStore.getTagById(tagId)?.label }}
@@ -1219,5 +1217,41 @@
   :deep(.md-editor-preview h1),
   :deep(.md-editor-preview h2) {
     line-height: 1.2em;
+  }
+
+  
+  .newTag{
+  
+    background: #C60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
+
+  .hotTag{
+    background: #C60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
+
+
+  .model-tag {
+    background: rgba(105, 109, 118, 0.80);
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
   }
 </style>
