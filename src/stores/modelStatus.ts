@@ -11,7 +11,7 @@ interface ModelVersion {
   id?: number
   version: string
   versionError?: boolean
-  base_model: string
+  base_model: any
   baseModelError?: boolean
   intro: string
   sign: string
