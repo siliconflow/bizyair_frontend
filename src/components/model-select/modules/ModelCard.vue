@@ -142,7 +142,13 @@
         >
           <vTooltips :tips="model.name">
             <div class="flex items-center gap-2">
-              <span v-if="model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)" :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'">{{ tagsStore.getHighestOrderTag(model.tags)?.label || 'New' }}</span>
+              <span
+                v-if="
+                  model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)
+                "
+                :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'"
+                >{{ tagsStore.getHighestOrderTag(model.tags)?.label || 'New' }}</span
+              >
               <h3 class="text-base text-white font-medium mb-2 truncate">
                 {{ sliceString(model.name, 24) }}
               </h3>
@@ -271,10 +277,10 @@
     }
   }
 
-  .newTag{
+  .newTag {
     border-radius: 4px 4px 4px 0px;
-    background: #C60003;
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    background: #c60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
     padding: 0px 8px;
     color: white;
     font-size: 12px;
@@ -283,10 +289,10 @@
     height: 20px;
   }
 
-  .hotTag{
+  .hotTag {
     border-radius: 4px 4px 4px 0px;
-    background: #C60003;
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    background: #c60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
     padding: 0px 8px;
     color: white;
     font-size: 12px;
@@ -294,12 +300,11 @@
     align-items: center;
     height: 20px;
   }
-
 
   .model-tag {
     border-radius: 4px 4px 4px 0px;
-    background: #C60003;
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    background: #c60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
     padding: 0px 8px;
     color: white;
     font-size: 12px;

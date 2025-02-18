@@ -18,7 +18,7 @@
   import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
   import { Button } from '@/components/ui/button'
   import { ref, onMounted, nextTick } from 'vue'
-  import { useTagsStore } from '@/stores/tags'  
+  import { useTagsStore } from '@/stores/tags'
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { MdPreview } from 'md-editor-v3'
   import { modelStore } from '@/stores/modelStatus'
@@ -449,7 +449,7 @@
         </div>
         <div class="flex flex-wrap gap-2 mb-2">
           <template v-for="tagId in (model?.tags || []).slice(0, 6)" :key="tagId">
-            <div 
+            <div
               class="px-2 py-0.5 text-xs text-[#F9FAFB] rounded cursor-pointer transition-colors"
               :class="tagsStore.getTagById(tagId)?.class || 'model-tag'"
               @click="handleTagClick(tagId)"
@@ -457,18 +457,18 @@
               {{ tagsStore.getTagById(tagId)?.label }}
             </div>
           </template>
-          
-          <div 
-            v-if="(model?.tags || []).length > 6 && !showAllTags" 
+
+          <div
+            v-if="(model?.tags || []).length > 6 && !showAllTags"
             class="px-2 py-0.5 text-xs bg-[rgb(105,109,118)]/80 text-white rounded cursor-pointer hover:bg-[#5B21B6] hover:scale-105 transition-colors"
             @click="handleShowAllTags"
           >
             +{{ model?.tags.length - 6 }}
           </div>
-          
+
           <template v-if="showAllTags">
             <template v-for="tagId in (model?.tags || []).slice(6)" :key="tagId">
-              <div 
+              <div
                 class="px-2 py-0.5 text-xs bg-[#4E4E4E] text-[#F9FAFB] rounded cursor-pointer hover:bg-[#6D28D9] hover:scale-105 transition-colors"
                 :class="tagsStore.getTagById(tagId)?.class || 'model-tag'"
                 @click="handleTagClick(tagId)"
@@ -996,38 +996,36 @@
     background: rgba(0, 178, 255, 0.4);
   }
 
-  .newTag{
-  
-  background: #C60003;
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
-  padding: 0px 8px;
-  color: white;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  height: 20px;
-}
+  .newTag {
+    background: #c60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
 
-.hotTag{
-  background: #C60003;
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
-  padding: 0px 8px;
-  color: white;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  height: 20px;
-}
+  .hotTag {
+    background: #c60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
 
-
-.model-tag {
-  background: rgba(105, 109, 118, 0.80);
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
-  padding: 0px 8px;
-  color: white;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  height: 20px;
-}
+  .model-tag {
+    background: rgba(105, 109, 118, 0.8);
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
 </style>

@@ -13,11 +13,11 @@
     :close-on-esc="false"
     :mask-closable="false"
     preset="card"
-    :style="{maxWidth: '680px'}"
-    :on-after-leave="closeDialog">
+    :style="{ maxWidth: '680px' }"
+    :on-after-leave="closeDialog"
+  >
     <template #header>Set API Key</template>
 
-    
     <div class="comfy-modal-content-sml">
       <Input
         v-model="apiKey"
@@ -56,7 +56,7 @@
         <n-button variant="outline" @click="toClose">Close</n-button>
       </div>
     </template>
-  <!-- </v-dialog> -->
+    <!-- </v-dialog> -->
   </n-modal>
 </template>
 <script setup lang="ts">
@@ -70,7 +70,7 @@
   import { useToaster } from '@/components/modules/toats/index'
 
   import { NModal, NButton } from 'naive-ui'
- 
+
   const statusStore = useStatusStore()
 
   const apiKey = ref<string>('')
@@ -127,14 +127,14 @@
   .underline {
     text-decoration: underline;
   }
-  .comfy-modal-content-sml{
-    p{
-      a{
-        color: #F1F1F1;
+  .comfy-modal-content-sml {
+    p {
+      a {
+        color: #f1f1f1;
       }
     }
   }
-  .api-dialog-footer{
+  .api-dialog-footer {
     display: flex;
     justify-content: flex-end;
     gap: 16px;

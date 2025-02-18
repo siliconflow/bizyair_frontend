@@ -64,7 +64,11 @@
       />
       <div class="w-20 h-1 absolute left-6 top-1/2 -translate-y-1/2 bg-slate-400 rounded-md"></div>
       <div class="w-1 h-20 absolute top-6 left-1/2 -translate-x-1/2 bg-slate-400 rounded-md"></div>
-      <Trash2 class="absolute right-2 top-2 z-30 cursor-pointer" v-if="imageSrc" @click="clearVal" />
+      <Trash2
+        class="absolute right-2 top-2 z-30 cursor-pointer"
+        v-if="imageSrc"
+        @click="clearVal"
+      />
     </div>
     <div v-if="showLoading" class="fixed w-[100vw] h-[100vh] left-0 top-0 bg-black/40 z-13000">
       <div class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
