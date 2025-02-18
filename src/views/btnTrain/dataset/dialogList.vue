@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-theme>
     <n-modal
       v-model:show="datasetStore.showListDialog"
       size="huge"
@@ -111,11 +111,11 @@
 
       </n-card>
     </n-modal>
-  </div>
+  </v-theme>
 </template>
 <script setup lang="ts">
 import { useDatasetStore } from '@/stores/datasetStore'
-import { NModal, NCard, NInput, NButton, NPopover, NPagination, c } from 'naive-ui'
+import { NModal, NCard, NInput, NButton, NPopover, NPagination } from 'naive-ui'
 // NTooltip
 import { del_datasets } from '@/api/dataset'
 import datasetImage from './datasetImage.vue'
@@ -126,10 +126,11 @@ import { useToaster } from '@/components/modules/toats/index'
 // import { put_dataset, get_datasets_detail } from '@/api/dataset'
 import { put_dataset } from '@/api/dataset'
 // import vRadio from '@/components/modules/vRadio.vue'
+import vTheme from '@/components/modules/vTheme.vue'
 
 const props = defineProps<{
-  showDatasetSelect: boolean,
-  isNodeSelect: boolean
+  showDatasetSelect?: boolean,
+  isNodeSelect?: boolean
 }>()
 
 const datasetStore = useDatasetStore()
