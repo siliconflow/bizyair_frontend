@@ -43,7 +43,7 @@
               <btnApiKey v-else />
               <btnCommunity />
               <btnPublish />
-              <!-- <btnTrain /> -->
+              <btnTrain />
               <btnNews />
               <apiKeyDialog />
             </div>
@@ -59,7 +59,7 @@
   import btnProfile from '@/views/btnProfile/index.vue'
   import btnCommunity from '@/views/btnCommunity/index.vue'
   import btnPublish from '@/views/btnPublish/index.vue'
-  // import btnTrain from '@/views/btnTrain/index.vue'
+  import btnTrain from '@/views/btnTrain/index.vue'
   import btnNews from '@/views/btnNews/index.vue'
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
   import { useStatusStore } from '@/stores/userStatus'

@@ -91,11 +91,10 @@ export const showDatasetSelect = (options: { [x: string]: unknown } | null | und
   const container = document.createElement('div')
   container.id = uniqueId
   document.body.appendChild(container)
+  console.log('options----------', options)
   const app = createApp(dialogList, {
     ...options,
-    showDatasetSelect: true,
-    isNodeSelect: true,
-    onClose: function() {
+    onClose(){
       app.unmount()
       console.log('this-----------', this)
       if (document.body.contains(container)) {
@@ -103,6 +102,7 @@ export const showDatasetSelect = (options: { [x: string]: unknown } | null | und
       }
     },
     onApply: (...args: unknown[]) => {
+      console.log('args----------', args)
       if (options?.onApply) {
         ;(options.onApply as (...args: unknown[]) => void)(...args)
         

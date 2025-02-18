@@ -43,7 +43,6 @@
             </n-button>
           </div>
           <div class="dataset-list-box custom-scrollbar">
-            {{ test }}
             <ul class="dataset-list">
               <li v-for="(e, i) in datasetStore.tableData" :key="i">
                 <div class="dataset-item">
@@ -120,7 +119,7 @@ import { NModal, NCard, NInput, NButton, NPopover, NPagination, c } from 'naive-
 // NTooltip
 import { del_datasets } from '@/api/dataset'
 import datasetImage from './datasetImage.vue'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 // import { useConfirm } from '@/components/modules/vConfirm/index
 import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
 import { useToaster } from '@/components/modules/toats/index'
@@ -128,10 +127,10 @@ import { useToaster } from '@/components/modules/toats/index'
 import { put_dataset } from '@/api/dataset'
 // import vRadio from '@/components/modules/vRadio.vue'
 
-const props = defineProps ({
-  showDatasetSelect: Boolean,
-  isNodeSelect: Boolean
-})
+const props = defineProps<{
+  showDatasetSelect: boolean,
+  isNodeSelect: boolean
+}>()
 
 const datasetStore = useDatasetStore()
 const renameInput = ref(false)
@@ -203,9 +202,10 @@ const toUpload = () => {
 
 
 const addDatasetNode = (e: any) => {
-  console.log('test.value---------', test.value)
   if (props.isNodeSelect) {
     emit('apply', e.versions?.[0]?.id, e.name)
+
+    datasetStore.setListDialog(false)
     return
   }
   let nodeID = "BizyAir_TrainDatasetAdd"
@@ -244,20 +244,25 @@ const addDatasetNode = (e: any) => {
     
   }
 }
-watch(() => props.isNodeSelect, (val) => {
-  test.value = val
-}, { immediate: true })
-watch(() => props.showDatasetSelect, (val) => {
-  console.log('showDatasetSelect', val)
-  if (val) {
+// watch(() => props.isNodeSelect, (val) => {
+//   test.value = val
+// }, { immediate: true })
+// watch(() => props.showDatasetSelect, (val) => {
+//   console.log('showDatasetSelect', val)
+//   if (val) {
+//     datasetStore.setListDialog(true)
+//   } else {
+//     datasetStore.setListDialog(false)
+//   }
+// }, { immediate: true })
+onMounted(() => {
+  datasetStore.getDatasetList()
+  if (props.showDatasetSelect) {
     datasetStore.setListDialog(true)
   } else {
     datasetStore.setListDialog(false)
   }
-}, { immediate: true })
-onMounted(() => {
-  datasetStore.getDatasetList()
-  console.log('datasetStore.showListDialog', datasetStore.showListDialog)
+  test.value = props.isNodeSelect
 })
 </script>
 <style scoped lang="less">
