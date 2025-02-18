@@ -4,10 +4,12 @@
   import QuickStartContent from '@/components/community/QuickStartContent.vue'
   import WorkflowsContent from '@/components/community/WorkflowsContent.vue'
   import Mine from '@/components/community/Mine.vue'
-  import ModelDetail from '@/components/community/detail/Index.vue'
+  // import ModelDetail from '@/components/community/detail/Index.vue'
   import { useCommunityStore } from '@/stores/communityStore'
-
+  import { useTagsStore } from '@/stores/tags'
+  import { onMounted } from 'vue'
   const communityStore = useCommunityStore()
+  const tagsStore = useTagsStore()
   const PATH_TO_TAB_SOURCE = {
     '/my-models': (mineTabSource: string) => (mineTabSource === 'forked' ? 'my_fork' : 'my'),
     default: () => 'publicity'
@@ -19,7 +21,10 @@
       PATH_TO_TAB_SOURCE[item.path as keyof typeof PATH_TO_TAB_SOURCE] || PATH_TO_TAB_SOURCE.default
     communityStore.TabSource = getTabSource(communityStore.mineTabSource)
   }
-  communityStore.loadFilterData()
+  onMounted(async () => {
+    await communityStore.loadFilterData()
+    await tagsStore.fetchTags()
+  })
 </script>
 
 <template>
@@ -41,7 +46,7 @@
           "
         />
       </keep-alive>
-      <ModelDetail v-if="communityStore.showCommunityDetail" />
+      <!-- <ModelDetail v-if="communityStore.showCommunityDetail" /> -->
     </div>
   </div>
 </template>

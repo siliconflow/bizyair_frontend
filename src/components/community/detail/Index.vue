@@ -25,6 +25,7 @@
   import { modelStore } from '@/stores/modelStatus'
   import { useStatusStore } from '@/stores/userStatus'
   import { Model, ModelVersion } from '@/types/model'
+  import { useTagsStore } from '@/stores/tags'
   import vDialog from '@/components/modules/vDialog.vue'
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
   import {
@@ -38,9 +39,11 @@
   import { useToaster } from '@/components/modules/toats/index'
   import 'md-editor-v3/lib/style.css'
   import { debounce } from 'lodash-es'
+  import { create_share_code } from '@/api/model'
+
   const communityStore = useCommunityStore()
   const userStatusStore = useStatusStore()
-
+  const tagsStore = useTagsStore()
   const model = ref<Model>()
   const currentVersion = ref<ModelVersion>()
   const downloadOpen = ref(false)
@@ -51,6 +54,8 @@
   const comfyUIApp: any = inject('comfyUIApp')
 
   const activeTab = ref<number>()
+
+  const showAllTags = ref(false)
 
   const fetchModelDetail = async () => {
     try {
@@ -93,6 +98,7 @@
   }
 
   onMounted(async () => {
+    await tagsStore.fetchTags()
     isLoading.value = true
     await fetchModelDetail()
   })
@@ -134,6 +140,26 @@
       }
     }
   }, 300)
+
+  const getShareCode = async () => {
+    if (!currentVersion.value) return
+    const res = await create_share_code({ biz_id: currentVersion.value.id })
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(res.data.code)
+        useToaster.success('The share code has been copied!')
+      } else {
+        const input = document.createElement('input')
+        input.value = res.data.code
+        document.body.appendChild(input)
+        input.select()
+        document.execCommand('copy')
+        document.body.removeChild(input)
+      }
+    } catch (err) {
+      useToaster.error('Copy failed.')
+    }
+  }
 
   const handleFork = debounce(async () => {
     if (!currentVersion.value || !model.value?.versions) return
@@ -384,6 +410,15 @@
       useToaster.error('Failed to download workflow.')
     }
   }
+
+  const handleTagClick = (tagId: string) => {
+    console.log('tagId', tagId)
+    // Implement the logic to handle tag click
+  }
+
+  const handleShowAllTags = () => {
+    showAllTags.value = true
+  }
 </script>
 
 <template>
@@ -517,6 +552,37 @@
             </div>
           </div>
         </div>
+        <div class="flex flex-wrap gap-2 mb-1">
+          <template v-for="tagId in (model?.tags || []).slice(0, 6)" :key="tagId">
+            <div
+              class="px-2 py-0.5 text-xs text-[#F9FAFB] rounded cursor-pointer transition-colors"
+              :class="tagsStore.getTagById(tagId)?.class || 'model-tag'"
+              @click="handleTagClick(tagId)"
+            >
+              {{ tagsStore.getTagById(tagId)?.label }}
+            </div>
+          </template>
+
+          <div
+            v-if="(model?.tags || []).length > 6 && !showAllTags"
+            class="px-2 py-0.5 text-xs bg-[rgb(105,109,118)]/80 text-white rounded cursor-pointer hover:bg-[#5B21B6] hover:scale-105 transition-colors"
+            @click="handleShowAllTags"
+          >
+            +{{ model?.tags.length - 6 }}
+          </div>
+
+          <template v-if="showAllTags">
+            <template v-for="tagId in (model?.tags || []).slice(6)" :key="tagId">
+              <div
+                class="px-2 py-0.5 text-xs bg-[#4E4E4E] text-[#F9FAFB] rounded cursor-pointer hover:bg-[#6D28D9] hover:scale-105 transition-colors"
+                :class="tagsStore.getTagById(tagId)?.class || 'model-tag'"
+                @click="handleTagClick(tagId)"
+              >
+                {{ tagsStore.getTagById(tagId)?.label }}
+              </div>
+            </template>
+          </template>
+        </div>
         <div class="flex flex-row gap-1 items-center justify-start self-stretch shrink-0 relative">
           <div
             class="bg-[#4e4e4e] rounded-lg p-1 flex flex-row gap-4 items-start justify-start self-stretch shrink-0 relative"
@@ -546,7 +612,23 @@
           <div
             class="text-text-text-muted-foreground text-left font-['Inter-Regular',_sans-serif] text-xs leading-5 font-normal relative flex-1"
           ></div>
+
           <div class="flex gap-8">
+            <vTooltips v-if="communityStore.TabSource === 'publicity'" tips="Share">
+              <svg
+                class="cursor-pointer"
+                @click="getShareCode"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M15.991 1.035a4 4 0 1 1-.855 6.267l-6.28 3.626q.147.533.145 1.072c0 .358-.047.719-.145 1.072l6.28 3.626a4.002 4.002 0 0 1 6.32 4.803a4 4 0 0 1-7.32-3.07l-6.28-3.627a4.002 4.002 0 1 1 0-5.608l6.28-3.626a4 4 0 0 1 1.855-4.535M19.723 3.5a2 2 0 1 0-3.464 2a2 2 0 0 0 3.464-2M3.071 12.527a2.002 2.002 0 0 0 2.93 1.204a2 2 0 1 0-2.93-1.204m15.92 5.242a2 2 0 1 0-2 3.464a2 2 0 0 0 2-3.464"
+                />
+              </svg>
+            </vTooltips>
             <vTooltips :tips="currentVersion?.liked ? 'Liked' : 'Like'">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1173,5 +1255,38 @@
   :deep(.md-editor-preview h1),
   :deep(.md-editor-preview h2) {
     line-height: 1.2em;
+  }
+
+  .newTag {
+    background: #c60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
+
+  .hotTag {
+    background: #c60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+  }
+
+  .model-tag {
+    background: rgba(105, 109, 118, 0.8);
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
+    padding: 0px 8px;
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
   }
 </style>

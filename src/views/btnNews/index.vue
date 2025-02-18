@@ -19,6 +19,12 @@
   fetch('api/bizyair/news', { method: 'GET' })
     .then(response => response.json())
     .then(data => {
+      console.log(data)
+      for (const i in data) {
+        if (data[i].startsWith('https://')) {
+          data[i] += `?index=${i}`
+        }
+      }
       show_cases.value = data
     })
 </script>
