@@ -244,7 +244,7 @@
   }
 }
 .is-mini-box{
-  width: 46px;
+  width: 40px;
   overflow: hidden;
 }
 </style>
