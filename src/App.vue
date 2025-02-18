@@ -1,5 +1,5 @@
 <template>
-  <n-config-provider :theme="myDarkTheme">
+  <v-theme>
     <n-message-provider>
       <n-notification-provider>
         <div id="menu-box" :class="['menu-box', {'is-mini-box': isMini}]">
@@ -52,7 +52,7 @@
         <ModelDetail v-if="communityStore.showCommunityDetail" />
       </n-notification-provider>
     </n-message-provider>
-  </n-config-provider>
+  </v-theme>
 </template>
 <script setup lang="ts">
   import btnApiKey from '@/views/btnApiKey/index.vue'
@@ -64,26 +64,17 @@
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
   import { useStatusStore } from '@/stores/userStatus'
   import { provide, ref } from 'vue'
-  import { NInput, NTooltip, NConfigProvider, darkTheme, NMessageProvider, NNotificationProvider } from 'naive-ui'
+  import { NInput, NTooltip, NMessageProvider, NNotificationProvider } from 'naive-ui'
   
   import { useCommunityStore } from '@/stores/communityStore'
   import { get_share_code, version_get_model } from '@/api/model'
 
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { useToaster } from '@/components/modules/toats/index'
+  import vTheme from '@/components/modules/vTheme.vue'
   
-
   const communityStore = useCommunityStore()
-  // communityStore.setAndShowCommunityDetail(modelId, versionId)
 
-  const myDarkTheme = { ...darkTheme }
-  myDarkTheme.common.primaryColor = 'rgba(109, 40, 217, 1)'
-  myDarkTheme.common.primaryColorSuppl = 'rgba(109, 40, 217, 1)'
-  myDarkTheme.common.primaryColorHover = 'rgba(109, 40, 217, .8)'
-  myDarkTheme.common.inputColor = '#000'
-  myDarkTheme.common.inputColorDisabled = 'rgba(109, 40, 217, .2)'
-  myDarkTheme.common.primaryColorPressed = 'rgba(109, 40, 217, .8)'
-  myDarkTheme.common.baseColor = '#FFF'
 
   const statusStore = useStatusStore()
   statusStore.loginRefresh()
