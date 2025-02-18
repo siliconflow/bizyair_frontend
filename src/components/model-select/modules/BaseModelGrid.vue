@@ -314,6 +314,12 @@
     bottom: 80px !important;
   }
 
+  .posts :deep(.n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical--right) {
+    right: 20px !important;
+    top: 220px !important;
+    bottom: 100px !important;
+  }
+
   :deep(.v-vl:not(.v-vl--show-scrollbar)) {
     padding-bottom: 100px;
   }

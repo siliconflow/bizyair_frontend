@@ -19,6 +19,7 @@ export interface Model {
   user_id: string
   user_name: string
   counter?:any
+  tags:string[]
 }
 
 export interface ModelVersion {
@@ -42,6 +43,7 @@ export interface ModelVersion {
   id:number
   public:boolean
   updated_at:string
+  tags:string[]
 }
 
 
@@ -102,3 +104,12 @@ export interface PageState {
   };
 }
 
+
+export interface ModelTag {
+ id:number
+ label :string
+ type  :string
+ class :string
+ order :number
+ status:number
+}

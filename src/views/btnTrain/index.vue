@@ -1,5 +1,5 @@
 <template>
-  <btnMenu :show_cases="show_cases" buttonText="News" icon="book-open" :isJson="true">
+  <btnMenu :show_cases="show_cases" button-text="Train" icon="book-open" :is-json="true">
     <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 32 32">
       <path
         fill="#ddd"
@@ -7,25 +7,26 @@
       />
     </svg>
   </btnMenu>
+  <dialogList />
+  <dialogUpload />
 </template>
 <script setup lang="ts">
   import btnMenu from '@/components/modules/btnMenu.vue'
-  import { ref } from 'vue'
+  import dialogList from './dataset/dialogList.vue'
+  import dialogUpload from './dataset/dialogUpload.vue'
+  import { onMounted, ref } from 'vue'
+  import { useDatasetStore } from '@/stores/datasetStore'
+  const datasetStore = useDatasetStore()
 
   const show_cases = ref({
-    'Remote Folders': '1',
-    Upload: '2'
+    Datasets: () => {
+      datasetStore.setListDialog(true)
+    }
+    // 'Tasks': () => {
+    //   datasetStore.setUploadDialog(true)
+    // }
   })
-  fetch('api/bizyair/news', { method: 'GET' })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data)
-      for (const i in data) {
-        if (data[i].startsWith('https://')) {
-          data[i] += `?index=${i}`
-        }
-      }
-      show_cases.value = data
-    })
+
+  onMounted(() => {})
 </script>
 <style scoped></style>

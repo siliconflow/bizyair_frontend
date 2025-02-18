@@ -31,13 +31,15 @@
 
     try {
       const { current, page_size } = modelSelectStore.mine[currentTab.value].modelListPathParams
+      const currentTotal = modelSelectStore.mine[currentTab.value].modelListPathParams.total
+      if (current * page_size >= currentTotal) {
+        hasMore.value = false
+        return
+      }
 
       modelSelectStore.mine[currentTab.value].modelListPathParams.current = current + 1
       modelSelectStore.mine[currentTab.value].modelListPathParams.mode = modelSelectStore.TabSource
       await fetchData()
-
-      const newTotal = modelSelectStore.mine[currentTab.value].modelListPathParams.total
-      hasMore.value = (current + 1) * page_size < newTotal
     } catch (error) {
       console.error('fetch data error:', error)
       useToaster.error(`Failed to load more data: ${error}`)
@@ -58,6 +60,10 @@
       if (response?.data?.list) {
         modelSelectStore.mine[currentTab.value].modelListPathParams.total = response.data.total || 0
 
+        hasMore.value =
+          modelSelectStore.mine[currentTab.value].modelListPathParams.current *
+            modelSelectStore.mine[currentTab.value].modelListPathParams.page_size <
+          modelSelectStore.mine[currentTab.value].modelListPathParams.total
         if (modelSelectStore.mine[currentTab.value].modelListPathParams.current === 1) {
           modelSelectStore.mine[currentTab.value].models = response.data.list
         } else {
@@ -183,7 +189,6 @@
         </template>
       </MineTabs>
     </div>
-
     <BaseModelGrid
       :models="modelSelectStore.mine[currentTab]?.models || []"
       :loading="isGridLoading"
@@ -195,6 +200,7 @@
       :image-load-states="imageLoadStates"
       :on-image-load="handleImageLoad"
       :on-image-error="handleImageError"
+      :class="currentTab"
       @load-more="loadMore"
     />
     <ModelDetail v-if="modelSelectStore.showCommunityDetail" />
