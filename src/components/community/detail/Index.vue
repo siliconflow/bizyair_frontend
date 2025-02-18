@@ -552,7 +552,7 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-wrap gap-2 mb-2">
+        <div class="flex flex-wrap gap-2 mb-1">
           <template v-for="tagId in (model?.tags || []).slice(0, 6)" :key="tagId">
             <div 
               class="px-2 py-0.5 text-xs text-[#F9FAFB] rounded cursor-pointer transition-colors"
