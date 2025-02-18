@@ -53,7 +53,7 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
     try {
       updateMode()
       // await tagsStore.fetchTags()
-      
+
       const storeData = getStoreData()
       const response = await get_model_list(
         {

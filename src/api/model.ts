@@ -135,25 +135,26 @@ export const get_workflow_dowload_url = (model_version_id: any, sign: any) =>
     method: 'GET'
   })
 
+export const get_all_model_tags = () => customFetch('/bizyair/tags/all', { method: 'GET' })
 
-  export const get_all_model_tags = () =>
-  customFetch('/bizyair/tags/all', { method: 'GET' })
-
-  
-
-
-export const create_share_code = ({biz_id, type = 'bizy_model_version'}: {biz_id: number, type?: string}) =>
+export const create_share_code = ({
+  biz_id,
+  type = 'bizy_model_version'
+}: {
+  biz_id: number
+  type?: string
+}) =>
   customFetch(`/bizyair/community/share`, {
     method: 'POST',
     body: JSON.stringify({ biz_id, type })
   })
 
-export const get_share_code = ({code}: {code: string}) => 
+export const get_share_code = ({ code }: { code: string }) =>
   customFetch(`/bizyair/community/share/${code}`, {
     method: 'GET'
   })
-  
-export const version_get_model = ({id}: {id: string}) => 
+
+export const version_get_model = ({ id }: { id: string }) =>
   customFetch(`/bizyair/community/model_version/${id}`, {
     method: 'GET'
   })

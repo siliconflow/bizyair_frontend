@@ -19,16 +19,14 @@
   const datasetStore = useDatasetStore()
 
   const show_cases = ref({
-    'Datasets': () => {
+    Datasets: () => {
       datasetStore.setListDialog(true)
-    },
+    }
     // 'Tasks': () => {
     //   datasetStore.setUploadDialog(true)
     // }
   })
 
-  onMounted(() => {
-    
-  })
+  onMounted(() => {})
 </script>
 <style scoped></style>

@@ -2,11 +2,11 @@ import { defineStore } from 'pinia'
 import { get_datasets } from '@/api/dataset'
 
 interface DatasetVersion {
-  version: string,
-  cover_urls: any,
-  intro: string,
-  annotated : boolean,
-  files: any,
+  version: string
+  cover_urls: any
+  intro: string
+  annotated: boolean
+  files: any
 }
 interface DatasetDetail {
   id?: number
@@ -25,7 +25,7 @@ export const useDatasetStore = defineStore('dataset', {
     pageCount: 0,
     annotated: '',
     keyword: '',
-    tableData: [] as {name: string, id: number, versions: any}[],
+    tableData: [] as { name: string; id: number; versions: any }[],
     formDetail: {
       name: '',
       type: 'Dataset',
@@ -34,22 +34,26 @@ export const useDatasetStore = defineStore('dataset', {
           version: 'v1',
           cover_urls: [],
           intro: '',
-          annotated : false,
-          files: [],
+          annotated: false,
+          files: []
         }
-      ],
+      ]
     } as DatasetDetail
   }),
   actions: {
     async getDatasetList() {
-      const res = await get_datasets({
-        current: this.current,
-        page_size: this.pageSize
-      }, {
-        keyword: this.keyword,
-        annotated: this.annotated
-      })
-      this.pageCount = res.data.total/this.pageSize <= 1 ? 0 : Math.ceil(res.data.total/this.pageSize)
+      const res = await get_datasets(
+        {
+          current: this.current,
+          page_size: this.pageSize
+        },
+        {
+          keyword: this.keyword,
+          annotated: this.annotated
+        }
+      )
+      this.pageCount =
+        res.data.total / this.pageSize <= 1 ? 0 : Math.ceil(res.data.total / this.pageSize)
       this.tableData = res.data.list
     },
     fileterList(annotated: string) {
@@ -61,13 +65,15 @@ export const useDatasetStore = defineStore('dataset', {
       this.formDetail = {
         name: '',
         type: 'Dataset',
-        versions: [{
-          version: 'v1',
-          cover_urls: [],
-          intro: '',
-          annotated : false,
-          files: [],
-        }]
+        versions: [
+          {
+            version: 'v1',
+            cover_urls: [],
+            intro: '',
+            annotated: false,
+            files: []
+          }
+        ]
       }
     },
     setListDialog(status: boolean) {
@@ -75,6 +81,6 @@ export const useDatasetStore = defineStore('dataset', {
     },
     setUploadDialog(status: boolean) {
       this.showUploadDialog = status
-    },
+    }
   }
 })

@@ -8,9 +8,8 @@
     content-style="padding: 0;max-height: 70vh;overflow-y: auto;"
     header-style="padding: 20px"
     footer-style="padding: 0"
-    style="max-width: 900px;"
+    style="max-width: 900px"
   >
-
     <template #header>
       <span class="header-title" @click="handleToggleTitle">Publish a Workflow</span>
     </template>
@@ -70,10 +69,11 @@
             />
           </v-item>
           <v-item label="Base Model">
-            <n-select 
-              v-model:value="e.base_model" 
-              placeholder="Select Base Model" 
-              :options="modelStoreObject.baseTypeLis" />
+            <n-select
+              v-model:value="e.base_model"
+              placeholder="Select Base Model"
+              :options="modelStoreObject.baseTypeLis"
+            />
             <!-- <v-select
               v-model:model-value="e.base_model"
               :class="{ 'input-error': e.baseModelError }"
@@ -123,9 +123,15 @@
                   <span v-if="e.speed" class="speed-text">Speed: {{ e.speed }}</span>
                 </p>
               </div>
-              <n-button v-if="e.hideUpload" type="primary" class="cancel-button" @click="cancelFile">cancel</n-button>
+              <n-button v-if="e.hideUpload" type="primary" class="cancel-button" @click="cancelFile"
+                >cancel</n-button
+              >
               <div v-if="!e.hideUpload" :class="{ 'full-width': !e.progress }">
-                <n-button v-if="!e.progress" type="primary" class="load-button" @click="loadWorkflow()"
+                <n-button
+                  v-if="!e.progress"
+                  type="primary"
+                  class="load-button"
+                  @click="loadWorkflow()"
                   >Load from current workspace</n-button
                 >
                 <vUpload
@@ -162,7 +168,7 @@
   import { computed, inject, ref, watch } from 'vue'
   // import { SelectItem } from '@/components/ui/select'
   // import { Input } from '@/components/ui/input'
-  
+
   // import { Button } from '@/components/ui/button'
   // import { Label } from '@/components/ui/label'
   // import { Switch } from '@/components/ui/switch'
@@ -419,131 +425,129 @@
       deep: true
     }
   )
-
-  
 </script>
 
 <style scoped lang="less">
-.custom-modal {
-  max-width: 800px;
-}
-.header-title {
-  cursor: pointer;
-}
+  .custom-modal {
+    max-width: 800px;
+  }
+  .header-title {
+    cursor: pointer;
+  }
 
-.modal-content {
-  padding: 0 24px 24px 24px;
-}
+  .modal-content {
+    padding: 0 24px 24px 24px;
+  }
 
-.next-button {
-  width: 100%;
-  margin-top: 12px;
-}
+  .next-button {
+    width: 100%;
+    margin-top: 12px;
+  }
 
-.accordion-title {
-  background-color: #353535;
-  padding: 16px 24px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-top: 1px solid #444;
-  display: flex;
-  justify-content: space-between;
-  position: relative;
-}
+  .accordion-title {
+    background-color: #353535;
+    padding: 16px 24px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+  }
 
-.trash-icon {
-  width: 16px;
-  height: 16px;
-}
+  .trash-icon {
+    width: 16px;
+    height: 16px;
+  }
 
-.progress-bar {
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  left: 0;
-  height: 4px;
-}
+  .progress-bar {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+  }
 
-.accordion-content {
-  background-color: #353535;
-  padding: 0 24px 16px 24px;
-}
+  .accordion-content {
+    background-color: #353535;
+    padding: 0 24px 16px 24px;
+  }
 
-.input-error {
-  border-color: #ef4444;
-}
+  .input-error {
+    border-color: #ef4444;
+  }
 
-.switch-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-}
+  .switch-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
 
-.file-upload-container {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  position: relative;
-}
+  .file-upload-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+  }
 
-.file-name {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  font-size: 12px;
-}
+  .file-name {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 12px;
+  }
 
-.progress-container {
-  flex: 1;
-  margin-top: 54px;
-}
+  .progress-container {
+    flex: 1;
+    margin-top: 54px;
+  }
 
-.progress-text {
-  text-align: center;
-  padding-top: 8px;
-}
+  .progress-text {
+    text-align: center;
+    padding-top: 8px;
+  }
 
-.speed-text {
-  padding-left: 8px;
-}
+  .speed-text {
+    padding-left: 8px;
+  }
 
-.cancel-button {
-  margin-left: 8px;
-}
+  .cancel-button {
+    margin-left: 8px;
+  }
 
-.load-button {
-  width: 100%;
-  margin: 8px 0;
-}
+  .load-button {
+    width: 100%;
+    margin: 8px 0;
+  }
 
-.full-width {
-  width: 100%;
-}
+  .full-width {
+    width: 100%;
+  }
 
-.footer-content {
-  background-color: #353535;
-  padding: 0 24px;
-  height: 56px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-top: 1px solid #444;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: -16px;
-  position: relative;
-  z-index: 9;
-}
+  .footer-content {
+    background-color: #353535;
+    padding: 0 24px;
+    height: 56px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -16px;
+    position: relative;
+    z-index: 9;
+  }
 
-.loading-overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 50;
-}
+  .loading-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 50;
+  }
 </style>

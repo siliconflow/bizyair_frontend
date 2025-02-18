@@ -6,7 +6,6 @@ import { createPinia } from 'pinia'
 import { ModelSelect } from '@/components/model-select/'
 import dialogList from '@/views/btnTrain/dataset/dialogList.vue'
 
-
 export const showModelSelect = (options: { [x: string]: unknown } | null | undefined) => {
   let isMounted = false
   const uniqueId = `bizyair-model-select-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -95,7 +94,7 @@ export const showDatasetSelect = (options: { [x: string]: unknown } | null | und
     ...options,
     showDatasetSelect: true,
     isNodeSelect: true,
-    onClose: function() {
+    onClose: function () {
       app.unmount()
       console.log('this-----------', this)
       if (document.body.contains(container)) {
@@ -105,10 +104,9 @@ export const showDatasetSelect = (options: { [x: string]: unknown } | null | und
     onApply: (...args: unknown[]) => {
       if (options?.onApply) {
         ;(options.onApply as (...args: unknown[]) => void)(...args)
-        
+
         app.unmount()
-        
-          
+
         if (document.body.contains(container)) {
           document.body.removeChild(container)
         }
@@ -137,7 +135,7 @@ export const showDatasetSelect = (options: { [x: string]: unknown } | null | und
   })
 
   const instance = app.mount(container)
-  
+
   return {
     instance
   }
