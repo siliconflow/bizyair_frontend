@@ -98,6 +98,7 @@
   }
 
   onMounted(async () => {
+    await tagsStore.fetchTags()
     isLoading.value = true
     await fetchModelDetail()
   })
@@ -551,7 +552,7 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-wrap gap-2 mb-2">
+        <div class="flex flex-wrap gap-2 mb-1">
           <template v-for="tagId in (model?.tags || []).slice(0, 6)" :key="tagId">
             <div 
               class="px-2 py-0.5 text-xs text-[#F9FAFB] rounded cursor-pointer transition-colors"
@@ -613,7 +614,7 @@
           ></div>
           
           <div class="flex gap-8">
-            <vTooltips tips="Share" v-if="communityStore.TabSource === 'publicity'">
+            <vTooltips v-if="communityStore.TabSource === 'publicity'" tips="Share" >
               <svg class="cursor-pointer" @click="getShareCode" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M15.991 1.035a4 4 0 1 1-.855 6.267l-6.28 3.626q.147.533.145 1.072c0 .358-.047.719-.145 1.072l6.28 3.626a4.002 4.002 0 0 1 6.32 4.803a4 4 0 0 1-7.32-3.07l-6.28-3.627a4.002 4.002 0 1 1 0-5.608l6.28-3.626a4 4 0 0 1 1.855-4.535M19.723 3.5a2 2 0 1 0-3.464 2a2 2 0 0 0 3.464-2M3.071 12.527a2.002 2.002 0 0 0 2.93 1.204a2 2 0 1 0-2.93-1.204m15.92 5.242a2 2 0 1 0-2 3.464a2 2 0 0 0 2-3.464"/></svg>
             </vTooltips>
             <vTooltips :tips="currentVersion?.liked ? 'Liked' : 'Like'">

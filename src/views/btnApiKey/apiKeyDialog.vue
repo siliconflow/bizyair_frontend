@@ -1,32 +1,45 @@
 <template>
-  <v-dialog
+  <!-- <v-dialog
     v-model:open="statusStore.showApiKeyDialog"
     layoutClass="z-9000"
     class="max-w-[680px] z-9000"
     @on-close="statusStore.handleApiKeyDialog(false)"
-  >
-    <template #title>Set API Key</template>
+  > -->
+  <n-modal
+    v-model:show="statusStore.showApiKeyDialog"
+    size="huge"
+    :bordered="false"
+    :auto-focus="false"
+    :close-on-esc="false"
+    :mask-closable="false"
+    preset="card"
+    :style="{maxWidth: '680px'}"
+    :on-after-leave="closeDialog">
+    <template #header>Set API Key</template>
+
+    
     <div class="comfy-modal-content-sml">
       <Input
         v-model="apiKey"
         type="password"
         placeholder="API Key"
+        class="text-white"
         :class="[{ 'border-red-500': hasError }]"
         @input="clearError"
       />
-      <p class="py-2">
+      <p>
         Please
         <a class="underline" href="###" @click.prevent="openOAuth">click to login</a>
         and autofill the key,
       </p>
-      <p class="py-2">
+      <p>
         or visit
         <a class="underline" href="https://cloud.siliconflow.cn" target="_blank"
           >https://cloud.siliconflow.cn</a
         >
         to get your key and input manually.
       </p>
-      <p class="py-2">
+      <p>
         Setting the API Key signifies agreement to the
         <a class="underline" href="https://docs.siliconflow.cn/docs/user-agreement" target="_blank"
           >User Agreement</a
@@ -37,26 +50,35 @@
         >
       </p>
     </div>
-    <template #foot>
-      <Button type="submit" @click="toSubmit">Submit</Button>
-      <Button variant="outline" @click="toClose">Close</Button>
+    <template #footer>
+      <div class="api-dialog-footer">
+        <n-button @click="toSubmit" type="primary">Submit</n-button>
+        <n-button variant="outline" @click="toClose">Close</n-button>
+      </div>
     </template>
-  </v-dialog>
+  <!-- </v-dialog> -->
+  </n-modal>
 </template>
 <script setup lang="ts">
   import { ref } from 'vue'
 
-  import vDialog from '@/components/modules/vDialog.vue'
+  // import vDialog from '@/components/modules/vDialog.vue'
   import { Input } from '@/components/ui/input'
-  import { Button } from '@/components/ui/button'
+  // import { Button } from '@/components/ui/button'
   import { set_api_key } from '@/api/user'
   import { useStatusStore } from '@/stores/userStatus'
   import { useToaster } from '@/components/modules/toats/index'
 
+  import { NModal, NButton } from 'naive-ui'
+ 
   const statusStore = useStatusStore()
 
   const apiKey = ref<string>('')
   const hasError = ref<boolean>(false)
+
+  const closeDialog = () => {
+    statusStore.handleApiKeyDialog(false)
+  }
 
   const openOAuthPopup = async (setKey: (key: string) => void) => {
     const clientId = 'SFaJLLq0y6CAMoyDm81aMu'
@@ -101,8 +123,21 @@
     })
   }
 </script>
-<style scoped>
+<style scoped lang="less">
   .underline {
     text-decoration: underline;
+  }
+  .comfy-modal-content-sml{
+    p{
+      a{
+        color: #F1F1F1;
+      }
+    }
+  }
+  .api-dialog-footer{
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    width: 100%;
   }
 </style>
