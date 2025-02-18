@@ -171,7 +171,7 @@
   h1{
     color: #fff;
     margin: 0;
-    padding: 4px 8px;
+    padding: 4px 6px;
     display: flex;
     img{
       width: 28px;
@@ -244,7 +244,7 @@
   }
 }
 .is-mini-box{
-  width: 40px;
+  width: 38px;
   overflow: hidden;
 }
 </style>
