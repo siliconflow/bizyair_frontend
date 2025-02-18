@@ -23,6 +23,7 @@
         v-model="apiKey"
         type="password"
         placeholder="API Key"
+        class="text-white"
         :class="[{ 'border-red-500': hasError }]"
         @input="clearError"
       />
