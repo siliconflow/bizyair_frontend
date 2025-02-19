@@ -25,19 +25,27 @@
 <script setup lang="ts">
   import MessageBox from '@/components/message-box/Index.vue'
   import { ref } from 'vue'
+  import { NTooltip, NBadge } from 'naive-ui'
   const showMessage = ref(false)
   const updateMessage = (show: boolean) => {
     showMessage.value = show
   }
 </script>
 
-<style scoped>
-  :deep(.handle > .n-badge.n-badge--dot .n-badge-sup) {
-    height: 6px;
-    width: 6px;
-    padding: 0;
-    min-width: 6px;
-    left: 25px;
-    bottom: calc(100% - 12px);
+<style scoped lang="less">
+  .msg {
+    cursor: pointer;
+    display: block;
+    width: 28px;
+    height: 28px;
+    padding: 6px;
+    box-sizing: border-box;
+    border-radius: 20px;
+    margin-left: 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+    svg {
+      width: 16px;
+      height: 16px;
+    }
   }
 </style>
