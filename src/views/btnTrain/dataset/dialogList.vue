@@ -42,7 +42,7 @@
               New Dataset
             </n-button>
           </div>
-          <div class="dataset-list-box custom-scrollbar">111
+          <div class="dataset-list-box custom-scrollbar">
             <ul class="dataset-list">
               <li v-for="(e, i) in datasetStore.tableData" :key="i">
                 <div class="dataset-item">

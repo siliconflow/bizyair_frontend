@@ -9,11 +9,15 @@
   </btnMenu>
   <dialogList />
   <dialogUpload />
+  <dialogTasksList />
+  <dialogTasksUpload />
 </template>
 <script setup lang="ts">
   import btnMenu from '@/components/modules/btnMenu.vue'
   import dialogList from './dataset/dialogList.vue'
   import dialogUpload from './dataset/dialogUpload.vue'
+  import dialogTasksList from './tasks/dialogList.vue'
+  import dialogTasksUpload from './tasks/dialogUpload.vue'
   import { onMounted, ref } from 'vue'
   import { useDatasetStore } from '@/stores/datasetStore'
   const datasetStore = useDatasetStore()
@@ -22,9 +26,9 @@
     'Datasets': () => {
       datasetStore.setListDialog(true)
     },
-    // 'Tasks': () => {
-    //   datasetStore.setUploadDialog(true)
-    // }
+    'Tasks': () => {
+      datasetStore.setTasksDialog(true)
+    }
   })
 
   onMounted(() => {
