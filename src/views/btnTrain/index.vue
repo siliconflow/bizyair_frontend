@@ -10,14 +10,14 @@
   <dialogList />
   <dialogUpload />
   <dialogTasksList />
-  <dialogTasksUpload />
+  <dialogTasksDetail />
 </template>
 <script setup lang="ts">
   import btnMenu from '@/components/modules/btnMenu.vue'
   import dialogList from './dataset/dialogList.vue'
   import dialogUpload from './dataset/dialogUpload.vue'
   import dialogTasksList from './tasks/dialogList.vue'
-  import dialogTasksUpload from './tasks/dialogUpload.vue'
+  import dialogTasksDetail from './tasks/detail.vue'
   import { onMounted, ref } from 'vue'
   import { useDatasetStore } from '@/stores/datasetStore'
   const datasetStore = useDatasetStore()

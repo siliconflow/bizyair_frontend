@@ -130,7 +130,7 @@ const pageChange = (page: number) => {
 }
 
 const showDetail = () => {
-  console.log('showDetail')
+  datasetStore.setTasksDetailDialog(true)  
 }
 </script>
 <style scoped lang="less">
@@ -181,6 +181,7 @@ const showDetail = () => {
       width: 82px;
       height: 82px;
       background: #000;
+      cursor: pointer;
     }
     .task-info{
       display: flex;

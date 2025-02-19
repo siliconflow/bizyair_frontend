@@ -8,6 +8,7 @@
     content-style="padding: 0;max-height: 70vh;overflow-y: auto;"
     header-style="padding: 20px"
     footer-style="padding: 0"
+    content-class="custom-scrollbar"
     style="max-width: 900px;"
   >
 
