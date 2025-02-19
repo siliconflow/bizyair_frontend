@@ -21,7 +21,7 @@ export const useDatasetStore = defineStore('dataset', {
     showListDialog: false,
     showUploadDialog: false,
     showTasksDialog: false,
-    showTasksUploadDialog: false,
+    showTasksDetailDialog: false,
     current: 1,
     pageSize: 20,
     pageCount: 0,
@@ -81,8 +81,8 @@ export const useDatasetStore = defineStore('dataset', {
     setTasksDialog(status: boolean) {
       this.showTasksDialog = status
     },
-    setTasksUploadDialog(status: boolean) {
-      this.showTasksUploadDialog = status
+    setTasksDetailDialog(status: boolean) {
+      this.showTasksDetailDialog = status
     },
   }
 })
