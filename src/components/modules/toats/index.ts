@@ -11,6 +11,7 @@ export function useToaster(options: { [x: string]: unknown } | string) {
   }
   containerBox.style.position = 'fixed'
   containerBox.style.zIndex = '18002'
+  containerBox.style.pointerEvents = 'auto'
   containerBox.style.top = '8px'
   containerBox.style.width = '400px'
   if (typeof options === 'string') {
