@@ -1,9 +1,5 @@
 <template>
-  <div
-    @click="toshowDrawer"
-    variant="outline"
-    class="profile-container"
-  >
+  <div @click="toshowDrawer" variant="outline" class="profile-container">
     <span class="icon-container">
       <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
         <g
@@ -20,12 +16,14 @@
     </span>
     <span class="profile-text">Profile</span>
   </div>
-  <n-drawer v-model:show="showDrawer" :width="502" placement="left" >
+  <n-drawer v-model:show="showDrawer" :width="502" placement="left">
     <n-drawer-content closable>
       <template #header>
         <div class="profile-primary">
           <img :src="profileImageSrc" alt="Profile Image" />
-          <div v-if="statusStore.infoData.name" class="name-container">{{ statusStore.infoData.name }}</div>
+          <div v-if="statusStore.infoData.name" class="name-container">
+            {{ statusStore.infoData.name }}
+          </div>
         </div>
       </template>
       <div class="api-key-container">
@@ -73,10 +71,7 @@
             </vTooltips>
           </span>
           <vTooltips :tips="'Copy'">
-            <Copy
-              @click="statusStore.copyText(statusStore.infoData.share_id)"
-              class="copy-icon"
-            />
+            <Copy @click="statusStore.copyText(statusStore.infoData.share_id)" class="copy-icon" />
           </vTooltips>
         </div>
       </div>
@@ -170,7 +165,7 @@
   }
 
   .profile-container:hover {
-    background-color: #4A238E;
+    background-color: #4a238e;
   }
 
   .icon-container {

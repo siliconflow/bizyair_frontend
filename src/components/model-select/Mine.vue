@@ -32,7 +32,7 @@
     try {
       const { current, page_size } = modelSelectStore.mine[currentTab.value].modelListPathParams
       const currentTotal = modelSelectStore.mine[currentTab.value].modelListPathParams.total
-      if ((current * page_size) >= currentTotal) {
+      if (current * page_size >= currentTotal) {
         hasMore.value = false
         return
       }
@@ -60,7 +60,10 @@
       if (response?.data?.list) {
         modelSelectStore.mine[currentTab.value].modelListPathParams.total = response.data.total || 0
 
-        hasMore.value = (modelSelectStore.mine[currentTab.value].modelListPathParams.current ) * modelSelectStore.mine[currentTab.value].modelListPathParams.page_size < modelSelectStore.mine[currentTab.value].modelListPathParams.total
+        hasMore.value =
+          modelSelectStore.mine[currentTab.value].modelListPathParams.current *
+            modelSelectStore.mine[currentTab.value].modelListPathParams.page_size <
+          modelSelectStore.mine[currentTab.value].modelListPathParams.total
         if (modelSelectStore.mine[currentTab.value].modelListPathParams.current === 1) {
           modelSelectStore.mine[currentTab.value].models = response.data.list
         } else {
@@ -160,7 +163,7 @@
 <template>
   <div class="flex flex-col h-screen">
     <div class="px-6 pb-0 sticky top-0 z-20">
-      <MineTabs v-model="currentTab" @update:model-value="switchTab" >
+      <MineTabs v-model="currentTab" @update:model-value="switchTab">
         <template #posts>
           <ModelFilterBar
             v-model:show-sort-popover="showSortPopover"
