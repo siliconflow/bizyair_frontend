@@ -1,11 +1,12 @@
 <template>
   <n-dropdown
-    :show-arrow="true" 
-    trigger="hover" 
+    :show-arrow="true"
+    trigger="hover"
     key-field="value"
     label-field="name"
-    :options="objectToArray(showCases)" 
-    @select="toDo">
+    :options="objectToArray(showCases)"
+    @select="toDo"
+  >
     <div class="dropdown-container">
       <span class="slot-container">
         <slot />
@@ -34,7 +35,6 @@
   // const comfyUIApp: any = inject('comfyUIApp')
 
   const toDo = async (e: any) => {
-    
     if (typeof e === 'function') {
       e()
       return
@@ -66,35 +66,35 @@
   )
 </script>
 <style scoped>
-.dropdown-container {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  padding: 0 12px;
-  border-radius: 4px;
-  transition: all 0.3s;
-}
+  .dropdown-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    padding: 0 12px;
+    border-radius: 4px;
+    transition: all 0.3s;
+  }
 
-.dropdown-container:hover {
-  background-color: #4A238E;
-}
+  .dropdown-container:hover {
+    background-color: #4a238e;
+  }
 
-.slot-container {
-  margin-right: 4px;
-}
+  .slot-container {
+    margin-right: 4px;
+  }
 
-.button-text {
-  display: block;
-  line-height: 32px;
-  font-size: 14px;
-}
+  .button-text {
+    display: block;
+    line-height: 32px;
+    font-size: 14px;
+  }
 
-.json-icon {
-  position: absolute;
-  right: 4px;
-  bottom: 0;
-  width: 12px;
-  height: 12px;
-}
+  .json-icon {
+    position: absolute;
+    right: 4px;
+    bottom: 0;
+    width: 12px;
+    height: 12px;
+  }
 </style>

@@ -7,7 +7,7 @@
   import { watch } from 'vue'
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
   import { useTagsStore } from '@/stores/tags'
-  
+
   const modelSelectStore = useModelSelectStore()
   const tagsStore = useTagsStore()
   interface Props {

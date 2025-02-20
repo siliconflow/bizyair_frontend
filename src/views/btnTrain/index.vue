@@ -23,7 +23,7 @@
   const datasetStore = useDatasetStore()
 
   const show_cases = ref({
-    'Datasets': () => {
+    Datasets: () => {
       datasetStore.setListDialog(true)
     },
     'Tasks': () => {
@@ -31,8 +31,6 @@
     }
   })
 
-  onMounted(() => {
-    
-  })
+  onMounted(() => {})
 </script>
 <style scoped></style>

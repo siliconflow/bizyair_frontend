@@ -107,12 +107,23 @@
           @click.prevent.stop="$emit('action', model)"
         >
           <vTooltips :tips="model?.type === 'Workflow' ? 'Load Workflow' : 'Add Node'">
-            <div 
+            <div
               class="w-8 h-8 rounded-full bg-[#25252566] hover:bg-[#7C3AED] flex items-center justify-center transition-colors duration-200 cursor-pointer"
             >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-<path d="M2.91663 1.75L11.0833 7L2.91663 12.25V1.75Z" stroke="#F3F4F6" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+              >
+                <path
+                  d="M2.91663 1.75L11.0833 7L2.91663 12.25V1.75Z"
+                  stroke="#F3F4F6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             </div>
           </vTooltips>
         </div>
@@ -145,12 +156,16 @@
           </div>
         </div>
 
-        <div
-          class="absolute bottom-0 left-0 right-0 p-3  bg-gradient-to-t from-black/90 to-black/0"
-        >
+        <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/0">
           <vTooltips :tips="model.name">
             <div class="flex items-center gap-2">
-              <span v-if="model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)" :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'">{{ tagsStore.getHighestOrderTag(model.tags)?.label || 'New' }}</span>
+              <span
+                v-if="
+                  model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)
+                "
+                :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'"
+                >{{ tagsStore.getHighestOrderTag(model.tags)?.label || 'New' }}</span
+              >
               <h3 class="text-base text-white font-medium mb-2 truncate">
                 {{ sliceString(model.name, 24) }}
               </h3>
@@ -279,10 +294,10 @@
     }
   }
 
-  .newTag{
+  .newTag {
     border-radius: 4px 4px 4px 0px;
-    background: #C60003;
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    background: #c60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
     padding: 0px 8px;
     color: white;
     font-size: 12px;
@@ -291,10 +306,10 @@
     height: 20px;
   }
 
-  .hotTag{
+  .hotTag {
     border-radius: 4px 4px 4px 0px;
-    background: #C60003;
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    background: #c60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
     padding: 0px 8px;
     color: white;
     font-size: 12px;
@@ -302,12 +317,11 @@
     align-items: center;
     height: 20px;
   }
-
 
   .model-tag {
     border-radius: 4px 4px 4px 0px;
-    background: #C60003;
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.50);
+    background: #c60003;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
     padding: 0px 8px;
     color: white;
     font-size: 12px;

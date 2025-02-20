@@ -6,10 +6,10 @@
     size="huge"
     :bordered="false"
   >
-  <template #header-extra>
-    <span class="px-6 cursor-pointer" @click="handleToggleTitle">Publish a Workflow</span>
-  </template>
-  
+    <template #header-extra>
+      <span class="px-6 cursor-pointer" @click="handleToggleTitle">Publish a Workflow</span>
+    </template>
+
     <div v-show="modelBox" class="px-6 pb-6">
       <v-item label="Model Name">
         <Input
@@ -146,7 +146,6 @@
       </div>
     </template>
     <div v-if="showLayoutLoading" class="z-50 w-full h-full absolute left-0 top-0"></div>
-  
   </n-modal>
 </template>
 <script setup lang="ts">

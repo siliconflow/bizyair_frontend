@@ -14,59 +14,56 @@ export const useTagsStore = defineStore('tags', {
   }),
 
   getters: {
-    getTagById: (state) => {
+    getTagById: state => {
       return (id: string | number) => state.tagsMap[id]
     },
-    
-    getTagLabelById: (state) => {
+
+    getTagLabelById: state => {
       return (id: string | number) => state.tagsMap[id]?.label || id
     },
-    
-    getTagClassById: (state) => {
+
+    getTagClassById: state => {
       return (id: string | number) => state.tagsMap[id]?.class
     },
-    
-    getTag: (state) => {
+
+    getTag: state => {
       return (id: string | number) => {
         const tag = state.tagsMap[id]
         return tag ? { ...tag } : null
       }
-    },
+    }
   },
 
   actions: {
     async fetchTags() {
       const now = Date.now()
-      if (Object.keys(this.tagsMap).length > 0 && (now - this.lastFetchTime) < this.cacheTimeout) {
+      if (Object.keys(this.tagsMap).length > 0 && now - this.lastFetchTime < this.cacheTimeout) {
         return
       }
 
       if (this.isLoading) return
-      
+
       try {
         this.isLoading = true
         const res = await get_all_model_tags()
-        
-     
-        
+
         if (!res.data || !Array.isArray(res.data.tags)) {
           console.error('Invalid tags data format:', res)
           return
         }
-        
-       
-        this.tagsList = [...res.data.tags]  
-    
-        
-        this.tagsMap = this.tagsList.reduce((acc, tag) => {
-          if (tag && tag.id) {  
-            acc[tag.id] = { ...tag }  
-          }
-          return acc
-        }, {} as Record<string | number, ModelTag>)
-        
-    
-        
+
+        this.tagsList = [...res.data.tags]
+
+        this.tagsMap = this.tagsList.reduce(
+          (acc, tag) => {
+            if (tag && tag.id) {
+              acc[tag.id] = { ...tag }
+            }
+            return acc
+          },
+          {} as Record<string | number, ModelTag>
+        )
+
         this.lastFetchTime = now
         this.retryCount = 0
       } catch (error) {
@@ -83,13 +80,13 @@ export const useTagsStore = defineStore('tags', {
 
     async getTagWithRetry(id: string | number) {
       const tag = this.tagsMap[id]
-      
+
       if (!tag && this.retryCount < this.maxRetries) {
         this.retryCount++
         await this.fetchTags()
         return this.tagsMap[id]
       }
-      
+
       return tag
     },
 
@@ -100,4 +97,4 @@ export const useTagsStore = defineStore('tags', {
       return matchedTags[0] || null
     }
   }
-}) 
+})

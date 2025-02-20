@@ -20,7 +20,7 @@
     content: {
       type: String,
       default: ''
-    },
+    }
   })
 
   const emit = defineEmits(['continueClick', 'cancelClick'])
