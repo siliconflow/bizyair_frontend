@@ -57,35 +57,35 @@ export const formatSize = (size: number | undefined) => {
 }
 
 interface StorageData<T> {
-  value: T;
-  expires?: number;
+  value: T
+  expires?: number
 }
 
 export const setLocalStorage = <T>(key: string, value: T, expires?: number): void => {
   const data: StorageData<T> = {
     value,
     expires: expires ? Date.now() + expires : undefined
-  };
-  localStorage.setItem(key, JSON.stringify(data));
-};
+  }
+  localStorage.setItem(key, JSON.stringify(data))
+}
 
 export const getLocalStorage = <T>(key: string): T | null => {
-  const item = localStorage.getItem(key);
-  if (!item) return null;
+  const item = localStorage.getItem(key)
+  if (!item) return null
 
   try {
-    const data: StorageData<T> = JSON.parse(item);
+    const data: StorageData<T> = JSON.parse(item)
     if (data.expires && Date.now() > data.expires) {
-      localStorage.removeItem(key);
-      return null;
+      localStorage.removeItem(key)
+      return null
     }
 
-    return data.value;
+    return data.value
   } catch (error) {
-    console.error('Error parsing localStorage item:', error);
-    return null;
+    console.error('Error parsing localStorage item:', error)
+    return null
   }
-};
+}
 
 import { CommonDict } from '@/types/commonDict'
 
@@ -93,18 +93,11 @@ export const getDictData = <K extends keyof CommonDict>(
   key: string,
   field: K
 ): CommonDict[K] | null => {
-  const data = getLocalStorage<CommonDict>(key);
-  if (!data) return null;
-  return data[field];
-};
+  const data = getLocalStorage<CommonDict>(key)
+  if (!data) return null
+  return data[field]
+}
 
-export const setDictData = (
-  key: string,
-  data: CommonDict,
-  expires?: number
-): void => {
-  setLocalStorage<CommonDict>(key, data, expires);
-};
-
-
-
+export const setDictData = (key: string, data: CommonDict, expires?: number): void => {
+  setLocalStorage<CommonDict>(key, data, expires)
+}

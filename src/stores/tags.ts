@@ -42,18 +42,18 @@ export const useTagsStore = defineStore('tags', {
       try {
         this.isLoading = true
 
-        const cachedData = getLocalStorage<{tags: ModelTag[]}>('dict_cache')
-        
+        const cachedData = getLocalStorage<{ tags: ModelTag[] }>('dict_cache')
+
         let tagsData
-        
+
         if (!cachedData || Date.now() - this.lastFetchTime >= this.cacheTimeout) {
           const res = await get_all_dict()
-          
+
           if (!res.data || !Array.isArray(res.data.tags)) {
             console.error('Invalid tags data format:', res)
             return
           }
-          
+
           tagsData = res.data.tags
           setLocalStorage('dict_cache', { tags: tagsData }, this.cacheTimeout)
         } else {
@@ -61,7 +61,7 @@ export const useTagsStore = defineStore('tags', {
         }
 
         this.tagsList = [...tagsData]
-        
+
         this.tagsMap = this.tagsList.reduce(
           (acc, tag) => {
             if (tag && tag.id) {
