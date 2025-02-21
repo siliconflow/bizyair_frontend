@@ -129,11 +129,13 @@
 
   const getShareCode = async () => {
     if (!currentVersion.value) return
+    isLoading.value = true
     const res = await create_share_code({ biz_id: currentVersion.value.id })
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(res.data.code)
         useToaster.success('The share code has been copied!')
+        isLoading.value = false
       } else {
         const input = document.createElement('input')
         input.value = res.data.code
@@ -141,9 +143,11 @@
         input.select()
         document.execCommand('copy')
         document.body.removeChild(input)
+        isLoading.value = false
       }
     } catch (err) {
       useToaster.error('Copy failed.')
+      isLoading.value = false
     }
   }
 
