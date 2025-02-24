@@ -169,7 +169,10 @@
 
   const convert = async () => {
     const res = await get_share_code({ code: shareCode.value })
-    communityStore.setAndShowCommunityDetail(Number(res.data.data.bizy_model_id), Number(res.data.data.biz_id))
+    communityStore.setAndShowCommunityDetail(
+      Number(res.data.data.bizy_model_id),
+      Number(res.data.data.biz_id)
+    )
     shareCode.value = ''
   }
   const toMini = () => {
