@@ -167,6 +167,7 @@
   const isMiniMenu = ref(false)
   const shareCode = ref('')
 
+<<<<<<< HEAD
   const convert = async () => {
     const res = await get_share_code({ code: shareCode.value })
     const model = await version_get_model({ id: res.data.biz_id })
@@ -179,6 +180,22 @@
       isMini.value = true
     }, 300)
   }
+=======
+const convert = async () => {
+  const res = await get_share_code({ code: shareCode.value })
+  console.log(res)
+  const model = await version_get_model({ id: res.data.data.biz_id })
+  console.log(res.data.data.bizy_model_id, model.data.model_id, res.data.data.biz_id)
+  communityStore.setAndShowCommunityDetail(model.data.id, res.data.data.biz_id)
+  shareCode.value = ''
+}
+const toMini = () => {
+  isMiniMenu.value = true
+  setTimeout(() => {
+    isMini.value = true
+  }, 300)
+}
+>>>>>>> c09d50d (fix)
 
   const toNormal = () => {
     isMini.value = false
