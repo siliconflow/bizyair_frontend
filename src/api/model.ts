@@ -137,6 +137,8 @@ export const get_workflow_dowload_url = (model_version_id: any, sign: any) =>
 
 export const get_all_model_tags = () => customFetch('/bizyair/tags/all', { method: 'GET' })
 
+export const get_all_dict = () => customFetch('/bizyair/dict', { method: 'GET' })
+
 export const create_share_code = ({
   biz_id,
   type = 'bizy_model_version'

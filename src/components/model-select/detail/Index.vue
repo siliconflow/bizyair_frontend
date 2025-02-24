@@ -129,11 +129,13 @@
 
   const getShareCode = async () => {
     if (!currentVersion.value) return
+    isLoading.value = true
     const res = await create_share_code({ biz_id: currentVersion.value.id })
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(res.data.code)
         useToaster.success('The share code has been copied!')
+        isLoading.value = false
       } else {
         const input = document.createElement('input')
         input.value = res.data.code
@@ -141,9 +143,11 @@
         input.select()
         document.execCommand('copy')
         document.body.removeChild(input)
+        isLoading.value = false
       }
     } catch (err) {
       useToaster.error('Copy failed.')
+      isLoading.value = false
     }
   }
 
@@ -530,7 +534,9 @@
           ></div>
           <div class="flex gap-4">
             <vTooltips v-if="['publicity'].includes(modelSelectStore.TabSource)" tips="Share">
-              <div class="w-[48px] h-[48px] bg-[#4e4e4e] hover:bg-[#4e4e4e]/60 rounded-lg flex items-center justify-center cursor-pointer">
+              <div
+                class="w-[48px] h-[48px] bg-[#4e4e4e] hover:bg-[#4e4e4e]/60 rounded-lg flex items-center justify-center cursor-pointer"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -546,14 +552,14 @@
               </div>
             </vTooltips>
             <vTooltips :tips="currentVersion?.liked ? 'Liked' : 'Like'">
-              <div 
+              <div
                 class="w-[48px] h-[48px] rounded-lg flex items-center justify-center cursor-pointer"
                 :class="[
-                  currentVersion?.liked 
-                    ? 'bg-[#6D28D9] hover:bg-[#6D28D9]/80' 
+                  currentVersion?.liked
+                    ? 'bg-[#6D28D9] hover:bg-[#6D28D9]/80'
                     : 'bg-[#4e4e4e] hover:bg-[#4e4e4e]/60'
                 ]"
-                 @click="handleLike"
+                @click="handleLike"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -561,7 +567,6 @@
                   height="16"
                   viewBox="0 0 16 16"
                   fill="none"
-                 
                 >
                   <g clip-path="url(#clip0_440_1289)">
                     <path
@@ -587,7 +592,9 @@
               @update:open="handleDownload"
             >
               <PopoverTrigger class="bg-transparent">
-                <div class="w-[48px] h-[48px] bg-[#4e4e4e] hover:bg-[#4e4e4e]/60 rounded-lg flex items-center justify-center cursor-pointer  relative z-50">
+                <div
+                  class="w-[48px] h-[48px] bg-[#4e4e4e] hover:bg-[#4e4e4e]/60 rounded-lg flex items-center justify-center cursor-pointer relative z-50"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
