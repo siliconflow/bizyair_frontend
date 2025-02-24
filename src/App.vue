@@ -121,57 +121,72 @@
   </n-config-provider>
 </template>
 <script setup lang="ts">
-  import btnApiKey from '@/views/btnApiKey/index.vue'
-  import btnProfile from '@/views/btnProfile/index.vue'
-  import btnCommunity from '@/views/btnCommunity/index.vue'
-  import btnPublish from '@/views/btnPublish/index.vue'
-  // import btnTrain from '@/views/btnTrain/index.vue'
-  import btnNews from '@/views/btnNews/index.vue'
-  import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
-  import { useStatusStore } from '@/stores/userStatus'
-  import { provide, ref } from 'vue'
-  import {
-    NInput,
-    NTooltip,
-    NConfigProvider,
-    darkTheme,
-    NMessageProvider,
-    NNotificationProvider
-  } from 'naive-ui'
+    import btnApiKey from '@/views/btnApiKey/index.vue'
+    import btnProfile from '@/views/btnProfile/index.vue'
+    import btnCommunity from '@/views/btnCommunity/index.vue'
+    import btnPublish from '@/views/btnPublish/index.vue'
+    // import btnTrain from '@/views/btnTrain/index.vue'
+    import btnNews from '@/views/btnNews/index.vue'
+    import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
+    import { useStatusStore } from '@/stores/userStatus'
+    import { provide, ref } from 'vue'
+    import {
+      NInput,
+      NTooltip,
+      NConfigProvider,
+      darkTheme,
+      NMessageProvider,
+      NNotificationProvider
+    } from 'naive-ui'
 
-  import { useCommunityStore } from '@/stores/communityStore'
-  import { get_share_code, version_get_model } from '@/api/model'
+    import { useCommunityStore } from '@/stores/communityStore'
+    import { get_share_code, version_get_model } from '@/api/model'
 
-  import ModelDetail from '@/components/community/detail/Index.vue'
-  import { useToaster } from '@/components/modules/toats/index'
+    import ModelDetail from '@/components/community/detail/Index.vue'
+    import { useToaster } from '@/components/modules/toats/index'
 
-  const communityStore = useCommunityStore()
-  // communityStore.setAndShowCommunityDetail(modelId, versionId)
+    const communityStore = useCommunityStore()
+    // communityStore.setAndShowCommunityDetail(modelId, versionId)
 
-  const myDarkTheme = { ...darkTheme }
-  myDarkTheme.common.primaryColor = 'rgba(109, 40, 217, 1)'
-  myDarkTheme.common.primaryColorSuppl = 'rgba(109, 40, 217, 1)'
-  myDarkTheme.common.primaryColorHover = 'rgba(109, 40, 217, .8)'
-  myDarkTheme.common.inputColor = '#000'
-  myDarkTheme.common.inputColorDisabled = 'rgba(109, 40, 217, .2)'
-  myDarkTheme.common.primaryColorPressed = 'rgba(109, 40, 217, .8)'
-  myDarkTheme.common.baseColor = '#FFF'
+    const myDarkTheme = { ...darkTheme }
+    myDarkTheme.common.primaryColor = 'rgba(109, 40, 217, 1)'
+    myDarkTheme.common.primaryColorSuppl = 'rgba(109, 40, 217, 1)'
+    myDarkTheme.common.primaryColorHover = 'rgba(109, 40, 217, .8)'
+    myDarkTheme.common.inputColor = '#000'
+    myDarkTheme.common.inputColorDisabled = 'rgba(109, 40, 217, .2)'
+    myDarkTheme.common.primaryColorPressed = 'rgba(109, 40, 217, .8)'
+    myDarkTheme.common.baseColor = '#FFF'
 
-  const statusStore = useStatusStore()
-  statusStore.loginRefresh()
-  statusStore.sendSocket(res => {
-    provide('socket', res)
-  })
+    const statusStore = useStatusStore()
+    statusStore.loginRefresh()
+    statusStore.sendSocket(res => {
+      provide('socket', res)
+    })
 
-  const isMini = ref(false)
-  const isMiniMenu = ref(false)
-  const shareCode = ref('')
+    const isMini = ref(false)
+    const isMiniMenu = ref(false)
+    const shareCode = ref('')
 
-<<<<<<< HEAD
+  <<<<<<< HEAD
+    const convert = async () => {
+      const res = await get_share_code({ code: shareCode.value })
+      const model = await version_get_model({ id: res.data.biz_id })
+      communityStore.setAndShowCommunityDetail(model.data.bizy_model_id, res.data.biz_id)
+      shareCode.value = ''
+    }
+    const toMini = () => {
+      isMiniMenu.value = true
+      setTimeout(() => {
+        isMini.value = true
+      }, 300)
+    }
+  =======
   const convert = async () => {
     const res = await get_share_code({ code: shareCode.value })
-    const model = await version_get_model({ id: res.data.biz_id })
-    communityStore.setAndShowCommunityDetail(model.data.bizy_model_id, res.data.biz_id)
+    console.log(res)
+    const model = await version_get_model({ id: res.data.data.biz_id })
+    console.log(res.data.data.bizy_model_id, model.data.model_id, res.data.data.biz_id)
+    communityStore.setAndShowCommunityDetail(model.data.id, res.data.data.biz_id)
     shareCode.value = ''
   }
   const toMini = () => {
@@ -180,68 +195,53 @@
       isMini.value = true
     }, 300)
   }
-=======
-const convert = async () => {
-  const res = await get_share_code({ code: shareCode.value })
-  console.log(res)
-  const model = await version_get_model({ id: res.data.data.biz_id })
-  console.log(res.data.data.bizy_model_id, model.data.model_id, res.data.data.biz_id)
-  communityStore.setAndShowCommunityDetail(model.data.id, res.data.data.biz_id)
-  shareCode.value = ''
-}
-const toMini = () => {
-  isMiniMenu.value = true
-  setTimeout(() => {
-    isMini.value = true
-  }, 300)
-}
->>>>>>> c09d50d (fix)
+  >>>>>>> c09d50d (fix)
 
-  const toNormal = () => {
-    isMini.value = false
-    setTimeout(() => {
-      isMiniMenu.value = false
-    }, 400)
-  }
+    const toNormal = () => {
+      isMini.value = false
+      setTimeout(() => {
+        isMiniMenu.value = false
+      }, 400)
+    }
 
-  const runShareCode = async () => {
-    if (shareCode.value) {
-      if (shareCode.value.length != 8) {
-        useToaster({
-          type: 'error',
-          message: 'The length of the share code is incorrect.'
-        })
-        shareCode.value = ''
-        return false
-      }
-      convert()
-    } else {
-      try {
-        const clipboardText = await navigator.clipboard.readText()
-        if (!clipboardText || typeof clipboardText !== 'string') {
+    const runShareCode = async () => {
+      if (shareCode.value) {
+        if (shareCode.value.length != 8) {
           useToaster({
             type: 'error',
-            message: 'Clipboard content is empty or not a string.'
+            message: 'The length of the share code is incorrect.'
           })
+          shareCode.value = ''
           return false
         }
-        if (clipboardText.length != 8) {
-          useToaster({
-            type: 'error',
-            message: 'The length of the clipboard content is incorrect.'
-          })
-          return false
-        }
-        shareCode.value = clipboardText
         convert()
-      } catch (error) {
-        useToaster({
-          type: 'error',
-          message: error
-        })
+      } else {
+        try {
+          const clipboardText = await navigator.clipboard.readText()
+          if (!clipboardText || typeof clipboardText !== 'string') {
+            useToaster({
+              type: 'error',
+              message: 'Clipboard content is empty or not a string.'
+            })
+            return false
+          }
+          if (clipboardText.length != 8) {
+            useToaster({
+              type: 'error',
+              message: 'The length of the clipboard content is incorrect.'
+            })
+            return false
+          }
+          shareCode.value = clipboardText
+          convert()
+        } catch (error) {
+          useToaster({
+            type: 'error',
+            message: error
+          })
+        }
       }
     }
-  }
 </script>
 <style scoped lang="less">
   .menu-box {
