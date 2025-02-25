@@ -31,6 +31,7 @@
   import { useToaster } from '@/components/modules/toats/index'
   import 'md-editor-v3/lib/style.css'
   import { debounce } from 'lodash-es'
+  import { create_share_code } from '@/api/model'
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
   const modelSelectStore = useModelSelectStore()
   const userStatusStore = useStatusStore()
@@ -125,6 +126,30 @@
       }
     }
   }, 300)
+
+  const getShareCode = async () => {
+    if (!currentVersion.value) return
+    isLoading.value = true
+    const res = await create_share_code({ biz_id: currentVersion.value.id })
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(res.data.code)
+        useToaster.success('The share code has been copied!')
+        isLoading.value = false
+      } else {
+        const input = document.createElement('input')
+        input.value = res.data.code
+        document.body.appendChild(input)
+        input.select()
+        document.execCommand('copy')
+        document.body.removeChild(input)
+        isLoading.value = false
+      }
+    } catch (err) {
+      useToaster.error('Copy failed.')
+      isLoading.value = false
+    }
+  }
 
   const handleFork = debounce(async () => {
     if (!currentVersion.value || !model.value?.versions) return
@@ -507,34 +532,58 @@
           <div
             class="text-text-text-muted-foreground text-left font-['Inter-Regular',_sans-serif] text-xs leading-5 font-normal relative flex-1"
           ></div>
-          <div class="flex gap-8">
+          <div class="flex gap-4">
+            <vTooltips v-if="['publicity'].includes(modelSelectStore.TabSource)" tips="Share">
+              <div
+                class="w-[48px] h-[48px] bg-[#4e4e4e] hover:bg-[#4e4e4e]/60 rounded-lg flex items-center justify-center cursor-pointer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  @click="getShareCode"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M15.991 1.035a4 4 0 1 1-.855 6.267l-6.28 3.626q.147.533.145 1.072c0 .358-.047.719-.145 1.072l6.28 3.626a4.002 4.002 0 0 1 6.32 4.803a4 4 0 0 1-7.32-3.07l-6.28-3.627a4.002 4.002 0 1 1 0-5.608l6.28-3.626a4 4 0 0 1 1.855-4.535M19.723 3.5a2 2 0 1 0-3.464 2a2 2 0 0 0 3.464-2M3.071 12.527a2.002 2.002 0 0 0 2.93 1.204a2 2 0 1 0-2.93-1.204m15.92 5.242a2 2 0 1 0-2 3.464a2 2 0 0 0 2-3.464"
+                  />
+                </svg>
+              </div>
+            </vTooltips>
             <vTooltips :tips="currentVersion?.liked ? 'Liked' : 'Like'">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                class="cursor-pointer"
-                :style="{
-                  stroke: currentVersion?.liked ? '#6D28D9' : '#F9FAFB',
-                  fill: currentVersion?.liked ? '#6D28D9' : 'none'
-                }"
+              <div
+                class="w-[48px] h-[48px] rounded-lg flex items-center justify-center cursor-pointer"
+                :class="[
+                  currentVersion?.liked
+                    ? 'bg-[#6D28D9] hover:bg-[#6D28D9]/80'
+                    : 'bg-[#4e4e4e] hover:bg-[#4e4e4e]/60'
+                ]"
                 @click="handleLike"
               >
-                <g clip-path="url(#clip0_440_1289)">
-                  <path
-                    d="M4.66659 6.66658V14.6666M9.99992 3.91992L9.33325 6.66658H13.2199C13.4269 6.66658 13.6311 6.71478 13.8162 6.80735C14.0013 6.89992 14.1624 7.03432 14.2866 7.19992C14.4108 7.36551 14.4947 7.55775 14.5317 7.7614C14.5688 7.96506 14.5579 8.17454 14.4999 8.37325L12.9466 13.7066C12.8658 13.9835 12.6974 14.2268 12.4666 14.3999C12.2358 14.573 11.9551 14.6666 11.6666 14.6666H2.66659C2.31296 14.6666 1.97382 14.5261 1.72378 14.2761C1.47373 14.026 1.33325 13.6869 1.33325 13.3333V7.99992C1.33325 7.6463 1.47373 7.30716 1.72378 7.05711C1.97382 6.80706 2.31296 6.66658 2.66659 6.66658H4.50659C4.75464 6.66645 4.99774 6.59713 5.20856 6.4664C5.41937 6.33567 5.58953 6.14873 5.69992 5.92659L7.99992 1.33325C8.3143 1.33715 8.62374 1.41203 8.90512 1.55232C9.1865 1.6926 9.43254 1.89466 9.62486 2.14339C9.81717 2.39212 9.9508 2.68109 10.0157 2.98872C10.0807 3.29635 10.0753 3.61468 9.99992 3.91992Z"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_440_1289">
-                    <rect width="16" height="16" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                >
+                  <g clip-path="url(#clip0_440_1289)">
+                    <path
+                      d="M4.66659 6.66658V14.6666M9.99992 3.91992L9.33325 6.66658H13.2199C13.4269 6.66658 13.6311 6.71478 13.8162 6.80735C14.0013 6.89992 14.1624 7.03432 14.2866 7.19992C14.4108 7.36551 14.4947 7.55775 14.5317 7.7614C14.5688 7.96506 14.5579 8.17454 14.4999 8.37325L12.9466 13.7066C12.8658 13.9835 12.6974 14.2268 12.4666 14.3999C12.2358 14.573 11.9551 14.6666 11.6666 14.6666H2.66659C2.31296 14.6666 1.97382 14.5261 1.72378 14.2761C1.47373 14.026 1.33325 13.6869 1.33325 13.3333V7.99992C1.33325 7.6463 1.47373 7.30716 1.72378 7.05711C1.97382 6.80706 2.31296 6.66658 2.66659 6.66658H4.50659C4.75464 6.66645 4.99774 6.59713 5.20856 6.4664C5.41937 6.33567 5.58953 6.14873 5.69992 5.92659L7.99992 1.33325C8.3143 1.33715 8.62374 1.41203 8.90512 1.55232C9.1865 1.6926 9.43254 1.89466 9.62486 2.14339C9.81717 2.39212 9.9508 2.68109 10.0157 2.98872C10.0807 3.29635 10.0753 3.61468 9.99992 3.91992Z"
+                      stroke="#F9FAFB"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_440_1289">
+                      <rect width="16" height="16" fill="white" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              </div>
             </vTooltips>
             <Popover
               v-if="['my', 'my_fork'].includes(modelSelectStore.TabSource)"
@@ -543,7 +592,9 @@
               @update:open="handleDownload"
             >
               <PopoverTrigger class="bg-transparent">
-                <div class="flex justify-center items-center rounded-md w-8 relative z-50">
+                <div
+                  class="w-[48px] h-[48px] bg-[#4e4e4e] hover:bg-[#4e4e4e]/60 rounded-lg flex items-center justify-center cursor-pointer relative z-50"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"

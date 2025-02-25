@@ -23,14 +23,13 @@
               <span>BizyAir</span>
             </h1>
             <div class="handle">
-              <div class="share-input-box">
+              <div :class="['share-input-box', { 'share-input-box-has-val': shareCode }]">
                 <strong class="share-input">
                   <n-input
                     size="tiny"
                     v-model:value="shareCode"
                     class="input"
                     placeholder="Paste share code"
-                    @change="convert"
                   >
                     <template #suffix>
                       <span class="msg" @click="runShareCode">
@@ -60,22 +59,24 @@
                     </template>
                   </n-input>
                 </strong>
-                <span class="input"
-                  ><svg
+                <span class="input">
+                  <svg
+                    width="32px"
+                    height="32.00px"
+                    viewBox="0 0 1024 1024"
+                    version="1.1"
                     xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
                   >
                     <path
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                    /></svg
-                ></span>
+                      d="M136.533333 273.066667a68.266667 68.266667 0 0 0-68.266666 68.266666v204.8a34.133333 34.133333 0 0 0 34.133333 34.133334h273.066667a34.133333 34.133333 0 0 0 34.133333-34.133334V307.2a34.133333 34.133333 0 0 0-34.133333-34.133333H136.533333z m512 0a34.133333 34.133333 0 0 0-34.133333 34.133333v238.933333a34.133333 34.133333 0 0 0 34.133333 34.133334h273.066667a34.133333 34.133333 0 0 0 34.133333-34.133334v-204.8a68.266667 68.266667 0 0 0-68.266666-68.266666h-238.933334zM102.4 648.533333a34.133333 34.133333 0 0 1 34.133333-34.133333h238.933334a34.133333 34.133333 0 0 1 34.133333 34.133333v307.2a34.133333 34.133333 0 0 1-34.133333 34.133334H170.666667a68.266667 68.266667 0 0 1-68.266667-68.266667v-273.066667z m546.133333-34.133333a34.133333 34.133333 0 0 0-34.133333 34.133333v307.2a34.133333 34.133333 0 0 0 34.133333 34.133334h204.8a68.266667 68.266667 0 0 0 68.266667-68.266667v-273.066667a34.133333 34.133333 0 0 0-34.133333-34.133333h-238.933334z"
+                      fill="#FF7744"
+                    />
+                    <path
+                      d="M743.901867 79.530667a68.266667 68.266667 0 0 0-93.2864-25.019734l-133.632 77.141334-133.632-77.141334a68.266667 68.266667 0 1 0-68.266667 118.237867L443.733333 247.022933 443.733333 834.218667V955.733333a34.133333 34.133333 0 0 0 34.133334 34.133334h68.266666a34.133333 34.133333 0 0 0 34.133334-34.133334v-102.024533V307.2 252.791467l138.615466-80.042667 4.539734-2.833067a68.266667 68.266667 0 0 0 20.48-90.4192z"
+                      fill="#FFAA44"
+                    />
+                  </svg>
+                </span>
               </div>
               <!-- <span class="msg"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.019 17h-6.04m6.04 0h3.614c1.876 0 1.559-1.86.61-2.804C15.825 10.801 20.68 3 11.999 3s-3.825 7.8-7.243 11.196c-.913.908-1.302 2.804.61 2.804H8.98m6.039 0c0 1.925-.648 4-3.02 4s-3.02-2.075-3.02-4"/></svg></span>
               <span class="set"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19.9 12.66a1 1 0 0 1 0-1.32l1.28-1.44a1 1 0 0 0 .12-1.17l-2-3.46a1 1 0 0 0-1.07-.48l-1.88.38a1 1 0 0 1-1.15-.66l-.61-1.83a1 1 0 0 0-.95-.68h-4a1 1 0 0 0-1 .68l-.56 1.83a1 1 0 0 1-1.15.66L5 4.79a1 1 0 0 0-1 .48L2 8.73a1 1 0 0 0 .1 1.17l1.27 1.44a1 1 0 0 1 0 1.32L2.1 14.1a1 1 0 0 0-.1 1.17l2 3.46a1 1 0 0 0 1.07.48l1.88-.38a1 1 0 0 1 1.15.66l.61 1.83a1 1 0 0 0 1 .68h4a1 1 0 0 0 .95-.68l.61-1.83a1 1 0 0 1 1.15-.66l1.88.38a1 1 0 0 0 1.07-.48l2-3.46a1 1 0 0 0-.12-1.17ZM18.41 14l.8.9l-1.28 2.22l-1.18-.24a3 3 0 0 0-3.45 2L12.92 20h-2.56L10 18.86a3 3 0 0 0-3.45-2l-1.18.24l-1.3-2.21l.8-.9a3 3 0 0 0 0-4l-.8-.9l1.28-2.2l1.18.24a3 3 0 0 0 3.45-2L10.36 4h2.56l.38 1.14a3 3 0 0 0 3.45 2l1.18-.24l1.28 2.22l-.8.9a3 3 0 0 0 0 3.98m-6.77-6a4 4 0 1 0 4 4a4 4 0 0 0-4-4m0 6a2 2 0 1 1 2-2a2 2 0 0 1-2 2"/></svg></span> -->
@@ -168,8 +169,10 @@
 
   const convert = async () => {
     const res = await get_share_code({ code: shareCode.value })
-    const model = await version_get_model({ id: res.data.biz_id })
-    communityStore.setAndShowCommunityDetail(model.data.bizy_model_id, res.data.biz_id)
+    communityStore.setAndShowCommunityDetail(
+      Number(res.data.data.bizy_model_id),
+      Number(res.data.data.biz_id)
+    )
     shareCode.value = ''
   }
   const toMini = () => {
@@ -230,6 +233,7 @@
     border-radius: 12px;
     transition: all 0.3s cubic-bezier(0, 0, 0.1, 1.8);
     width: 410px;
+
     .bar {
       background-color: #7c3aed;
       display: flex;
@@ -238,11 +242,13 @@
       cursor: move;
       height: 36px;
     }
+
     h1 {
       color: #fff;
       margin: 0;
       padding: 4px 6px;
       display: flex;
+
       img {
         width: 28px;
         height: 28px;
@@ -251,14 +257,17 @@
         user-select: none;
         -webkit-user-select: none;
       }
+
       span {
         font-size: 16px;
         line-height: 28px;
       }
     }
+
     .handle {
       display: flex;
       padding: 4px 8px;
+
       span {
         cursor: pointer;
         display: block;
@@ -269,17 +278,20 @@
         border-radius: 20px;
         margin-left: 8px;
         background-color: rgba(0, 0, 0, 0.2);
+
         svg {
           width: 16px;
           height: 16px;
         }
       }
     }
+
     .menu {
       width: 100%;
       height: 48px;
       box-sizing: border-box;
       transition: all 0.3s;
+
       .menu-content {
         height: 40px;
         display: flex;
@@ -288,12 +300,14 @@
         border-radius: 0 0 12px 12px;
       }
     }
+
     .is-mini-menu {
       height: 0;
       opacity: 0;
       padding: 0 12px;
       overflow: hidden;
     }
+
     .share-input-box {
       display: flex;
       align-items: center;
@@ -311,9 +325,18 @@
         width: 160px;
       }
     }
+    .share-input-box-has-val {
+      .share-input {
+        width: 160px;
+      }
+    }
   }
+
   .is-mini-box {
     width: 38px;
     overflow: hidden;
+    h1 {
+      padding-left: 5px;
+    }
   }
 </style>
