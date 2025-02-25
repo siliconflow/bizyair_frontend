@@ -3,10 +3,10 @@ import { get_all_dict } from '@/api/model'
 import { ModelTag } from '@/types/model'
 import { setLocalStorage, getLocalStorage } from '@/utils/tool'
 
-export const useTagsStore = defineStore('tags', {
+export const useDictStore = defineStore('dict', {
   state: () => ({
     tagsMap: {} as Record<string | number, ModelTag>,
-    tagsList: [] as ModelTag[],
+    dictData: {} as Record<string, any[]>,
     isLoading: false,
     retryCount: 0,
     maxRetries: 1,
@@ -15,6 +15,12 @@ export const useTagsStore = defineStore('tags', {
   }),
 
   getters: {
+    getDict: state => {
+      return (dictType: string) => {
+        return state.dictData[dictType] || []
+      }
+    },
+
     getTagById: state => {
       return (id: string | number) => state.tagsMap[id]
     },
@@ -36,54 +42,56 @@ export const useTagsStore = defineStore('tags', {
   },
 
   actions: {
-    async fetchTags() {
+    async fetchDictData() {
       if (this.isLoading) return
 
       try {
         this.isLoading = true
 
-        const cachedData = getLocalStorage<{ tags: ModelTag[] }>('dict_cache')
+        const cachedData = getLocalStorage<Record<string, any[]>>('dict_cache')
 
-        let tagsData
+        let dictData
 
         if (!cachedData || Date.now() - this.lastFetchTime >= this.cacheTimeout) {
           const res = await get_all_dict()
 
-          if (!res.data || !Array.isArray(res.data.tags)) {
-            console.error('Invalid tags data format:', res)
+          if (!res.data) {
+            console.error('Invalid dictionary data format:', res)
             return
           }
 
-          tagsData = res.data.tags
-          setLocalStorage('dict_cache', { tags: tagsData }, this.cacheTimeout)
+          dictData = res.data
+          setLocalStorage('dict_cache', dictData, this.cacheTimeout)
         } else {
-          tagsData = cachedData.tags
+          dictData = cachedData
         }
 
-        this.tagsList = [...tagsData]
+        this.dictData = dictData
 
-        this.tagsMap = this.tagsList.reduce(
-          (acc, tag) => {
-            if (tag && tag.id) {
-              acc[tag.id] = { ...tag }
-            }
-            return acc
-          },
-          {} as Record<string | number, ModelTag>
-        )
+        if (Array.isArray(dictData.tags)) {
+          this.tagsMap = dictData.tags.reduce(
+            (acc, tag) => {
+              if (tag && tag.id) {
+                acc[tag.id] = { ...tag }
+              }
+              return acc
+            },
+            {} as Record<string | number, ModelTag>
+          )
+        }
 
         this.lastFetchTime = Date.now()
         this.retryCount = 0
       } catch (error) {
-        console.error('Failed to fetch tags:', error)
+        console.error('Failed to fetch dictionary data:', error)
       } finally {
         this.isLoading = false
       }
     },
 
-    async refreshTags() {
+    async refreshDictData() {
       this.lastFetchTime = 0
-      await this.fetchTags()
+      await this.fetchDictData()
     },
 
     async getTagWithRetry(id: string | number) {
@@ -91,7 +99,7 @@ export const useTagsStore = defineStore('tags', {
 
       if (!tag && this.retryCount < this.maxRetries) {
         this.retryCount++
-        await this.fetchTags()
+        await this.fetchDictData()
         return this.tagsMap[id]
       }
 
@@ -99,7 +107,8 @@ export const useTagsStore = defineStore('tags', {
     },
 
     getHighestOrderTag(tagIds: (string | number)[]) {
-      const matchedTags = this.tagsList
+      const allTags = this.dictData.tags || []
+      const matchedTags = allTags
         .filter((tag: ModelTag) => tagIds.includes(tag.id))
         .sort((a: ModelTag, b: ModelTag) => b.order - a.order)
       return matchedTags[0] || null

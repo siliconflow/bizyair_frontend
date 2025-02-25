@@ -18,7 +18,7 @@
   import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
   import { Button } from '@/components/ui/button'
   import { ref, onMounted, nextTick } from 'vue'
-  import { useTagsStore } from '@/stores/tags'
+  import { useDictStore } from '@/stores/dictStore'
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { MdPreview } from 'md-editor-v3'
   import { modelStore } from '@/stores/modelStatus'
@@ -35,7 +35,7 @@
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
   const modelSelectStore = useModelSelectStore()
   const userStatusStore = useStatusStore()
-  const tagsStore = useTagsStore()
+  const tagsStore =   useDictStore()
   const model = ref<Model>()
   const currentVersion = ref<ModelVersion>()
   const downloadOpen = ref(false)

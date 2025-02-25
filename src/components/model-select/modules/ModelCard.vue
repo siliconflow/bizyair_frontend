@@ -6,7 +6,7 @@
   import { sliceString, formatNumber } from '@/utils/tool'
   import { useModelSelectStore } from '@/stores/modelSelectStore'
   import { ref, watch, onMounted } from 'vue'
-  import { useTagsStore } from '@/stores/tags'
+  import { useDictStore } from '@/stores/dictStore'
 
   defineOptions({
     name: 'ModelCard'
@@ -14,7 +14,7 @@
 
   const modelSelectStore = useModelSelectStore()
   const imgSrc = ref('')
-  const tagsStore = useTagsStore()
+  const tagsStore = useDictStore()
 
   const props = defineProps({
     model: {
@@ -59,7 +59,6 @@
   )
 
   onMounted(async () => {
-    // await tagsStore.fetchTags()
     const coverUrls = props.model?.versions?.[0]?.cover_urls
     if (coverUrls && Array.isArray(coverUrls) && coverUrls.length > 0) {
       const timestamp = new Date().getTime()

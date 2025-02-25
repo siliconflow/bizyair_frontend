@@ -150,4 +150,5 @@
   :deep(.n-base-select-menu .n-base-select-option.n-base-select-option--selected) {
     color: #fff;
   }
+
 </style>
