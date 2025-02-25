@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import { get_all_model_tags } from '@/api/model'
+import { get_all_dict } from '@/api/model'
 import { ModelTag } from '@/types/model'
+import { setLocalStorage, getLocalStorage } from '@/utils/tool'
 
 export const useTagsStore = defineStore('tags', {
   state: () => ({
@@ -36,23 +37,30 @@ export const useTagsStore = defineStore('tags', {
 
   actions: {
     async fetchTags() {
-      const now = Date.now()
-      if (Object.keys(this.tagsMap).length > 0 && now - this.lastFetchTime < this.cacheTimeout) {
-        return
-      }
-
       if (this.isLoading) return
 
       try {
         this.isLoading = true
-        const res = await get_all_model_tags()
 
-        if (!res.data || !Array.isArray(res.data.tags)) {
-          console.error('Invalid tags data format:', res)
-          return
+        const cachedData = getLocalStorage<{ tags: ModelTag[] }>('dict_cache')
+
+        let tagsData
+
+        if (!cachedData || Date.now() - this.lastFetchTime >= this.cacheTimeout) {
+          const res = await get_all_dict()
+
+          if (!res.data || !Array.isArray(res.data.tags)) {
+            console.error('Invalid tags data format:', res)
+            return
+          }
+
+          tagsData = res.data.tags
+          setLocalStorage('dict_cache', { tags: tagsData }, this.cacheTimeout)
+        } else {
+          tagsData = cachedData.tags
         }
 
-        this.tagsList = [...res.data.tags]
+        this.tagsList = [...tagsData]
 
         this.tagsMap = this.tagsList.reduce(
           (acc, tag) => {
@@ -64,10 +72,10 @@ export const useTagsStore = defineStore('tags', {
           {} as Record<string | number, ModelTag>
         )
 
-        this.lastFetchTime = now
+        this.lastFetchTime = Date.now()
         this.retryCount = 0
       } catch (error) {
-        // console.error('Failed to fetch tags:', error)
+        console.error('Failed to fetch tags:', error)
       } finally {
         this.isLoading = false
       }

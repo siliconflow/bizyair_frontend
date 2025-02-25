@@ -1,27 +1,30 @@
 <template>
-  <v-dialog
-    v-model:open="modelStoreObject.showWorkflowDialog"
-    class="px-0 overflow-hidden pb-0 z-9000"
-    layout-class="z-9000"
-    content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
-    @on-close="onDialogClose"
+  <n-modal
+    v-model:show="modelStoreObject.showWorkflowDialog"
+    preset="card"
+    size="huge"
+    :bordered="false"
+    :on-after-leave="onDialogClose"
+    content-style="padding: 0;max-height: 70vh;overflow-y: auto;"
+    header-style="padding: 20px"
+    footer-style="padding: 0"
+    style="max-width: 900px"
   >
-    <template #title
-      ><span class="px-6 cursor-pointer" @click="handleToggleTitle"
-        >Publish a Workflow</span
-      ></template
-    >
-    <div v-show="modelBox" class="px-6 pb-6">
+    <template #header>
+      <span class="header-title" @click="handleToggleTitle">Publish a Workflow</span>
+    </template>
+
+    <div v-show="modelBox" class="modal-content">
       <v-item label="Model Name">
-        <Input
-          v-model:model-value="formData.name"
-          :class="{ 'border-red-500': formData.nameError }"
+        <n-input
+          v-model:value="formData.name"
+          :class="{ 'input-error': formData.nameError }"
           type="text"
           placeholder="Enter Model Name"
           @change="formData.nameError = false"
         />
       </v-item>
-      <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
+      <n-button type="primary" class="next-button" @click="nextStep">Next Step</n-button>
     </div>
 
     <vCustomAccordion :multiple="true" :active-index="acActiveIndex">
@@ -32,138 +35,150 @@
         @toggle="handleToggle"
       >
         <template #title>
-          <div
-            class="bg-[#353535] z-1 px-6 py-4 w-full rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px] flex justify-between relative"
-          >
+          <div class="accordion-title">
             <span v-if="acActiveIndex !== i && e.version">{{ e.version }}</span>
             <span v-else>Add Version</span>
-            <Trash2
-              v-if="formData.versions.length !== 1"
-              #icon
-              class="w-4 h-4"
-              @click.capture.stop="delVersion(i)"
-            />
-            <Progress
+            <!-- <Progress
               v-if="e.progress && acActiveIndex && acActiveIndex !== i"
               :model-value="e.progress"
-              class="absolute w-full bottom-0 left-0 h-1"
+              class="progress-bar"
+            /> -->
+            <n-progress
+              v-if="e.progress && acActiveIndex && acActiveIndex !== i"
+              type="line"
+              :show-indicator="false"
+              color="#6D28D9"
+              :percentage="e.progress"
+              class="progress-bar"
+            />
+            <Trash2
+              v-if="formData.versions.length !== 1"
+              class="trash-icon"
+              @click.capture.stop="delVersion(i)"
             />
           </div>
         </template>
-        <template #default>
-          <div class="bg-[#353535] px-6 pb-4">
-            <v-item label="Version Name">
-              <Input
-                v-model:model-value="e.version"
-                :class="{ 'border-red-500': e.versionError }"
-                type="text"
-                placeholder="Version Name"
-                @change="e.versionError = false"
-              />
-            </v-item>
-            <v-item label="Base Model">
-              <v-select
-                v-model:model-value="e.base_model"
-                :class="{ 'border-red-500': e.baseModelError }"
-                placeholder="Select Base Model"
-                @update:open="e.baseModelError = false"
+        <div class="accordion-content">
+          <v-item label="Version Name">
+            <n-input
+              v-model:value="e.version"
+              :class="{ 'input-error': e.versionError }"
+              type="text"
+              placeholder="Version Name"
+              @change="e.versionError = false"
+            />
+          </v-item>
+          <v-item label="Base Model">
+            <n-select
+              v-model:value="e.base_model"
+              placeholder="Select Base Model"
+              :options="modelStoreObject.baseTypeLis"
+            />
+            <!-- <v-select
+              v-model:model-value="e.base_model"
+              :class="{ 'input-error': e.baseModelError }"
+              placeholder="Select Base Model"
+              @update:open="e.baseModelError = false"
+            >
+              <SelectItem
+                v-for="(e, i) in modelStoreObject.baseTypeLis"
+                :key="i"
+                :value="e.value"
+                >{{ e.label }}</SelectItem
               >
-                <SelectItem
-                  v-for="(e, i) in modelStoreObject.baseTypeLis"
-                  :key="i"
-                  :value="e.value"
-                  >{{ e.label }}</SelectItem
-                >
-              </v-select>
-            </v-item>
-            <v-item label="Upload Image">
-              <vUploadImage
-                v-model.modelValue="e.cover_urls"
-                :previewPrc="e.cover_urls ? e.cover_urls[0] : ''"
-                :class-name="e.imageError ? 'border-red-500' : ''"
-                @done="imageUploadDone(i)"
-              />
-            </v-item>
-            <v-item label="Introduction">
-              <Markdown v-model.modelValue="e.intro" :editor-id="`myeditor${i}`" />
-            </v-item>
-            <v-item label="">
-              <div class="flex items-center space-x-2 mt-2">
-                <Switch
-                  id="airplane-mode"
-                  v-model:checked="e.public"
-                  @update:checked="
-                    val => {
-                      handleChange(val, i)
-                    }
-                  "
+            </v-select> -->
+          </v-item>
+          <v-item label="Upload Image">
+            <vUploadImage
+              v-model.modelValue="e.cover_urls"
+              :class-name="e.imageError ? 'input-error' : ''"
+              :preview-prc="e.cover_urls ? e.cover_urls[0] : ''"
+              @done="imageUploadDone(i)"
+            />
+          </v-item>
+          <v-item label="Introduction">
+            <Markdown v-model.modelValue="e.intro" :editor-id="`myeditor${i}`" />
+          </v-item>
+          <v-item label="">
+            <div class="switch-container">
+              <n-switch v-model:value="e.public" />
+              <label>Publicly Visible</label>
+            </div>
+          </v-item>
+          <v-item v-show="!e.showUpload" label="File">
+            <div class="file-upload-container">
+              <p v-if="e.progress && e.fileName" class="file-name">
+                {{ e.fileName }}
+              </p>
+              <div v-if="e.progress" class="progress-container">
+                <n-progress
+                  type="line"
+                  :show-indicator="false"
+                  color="#6D28D9"
+                  :percentage="e.progress"
                 />
-                <Label for="airplane-mode">Publicly Visible</Label>
-              </div>
-            </v-item>
-            <v-item v-show="!e.showUpload" label="File">
-              <div class="flex h-32 items-center justify-end relative">
-                <p v-if="e.progress && e.fileName" class="absolute top-2 left-1 text-xs">
-                  {{ e.fileName }}
+                <!-- <Progress :model-value="e.progress" class="progress-bar" /> -->
+                <p class="progress-text">
+                  {{ e.progress }}% Uploaded
+                  <span v-if="e.speed" class="speed-text">Speed: {{ e.speed }}</span>
                 </p>
-                <div v-if="e.progress" class="flex-1">
-                  <Progress :model-value="e.progress" class="mt-4 h-3" />
-                  <p class="text-center pt-2">
-                    {{ e.progress }}% Uploaded
-                    <span v-if="e.speed" class="pl-2">Speed: {{ e.speed }}</span>
-                  </p>
-                </div>
-                <Button v-if="e.hideUpload" class="ml-2" @click="cancelFile">cancel</Button>
-                <div v-if="!e.hideUpload" :class="{ 'w-full': !e.progress }">
-                  <Button v-if="!e.progress" class="w-full my-2" @click="loadWorkflow()"
-                    >Load from current workspace</Button
-                  >
-                  <vUpload
-                    :ref="e.ref"
-                    model-type="ComfyUI"
-                    accept=".json"
-                    :file-name="e.file_name"
-                    :class="{ 'border-red-500': e.filePathError }"
-                    @path="path => handlePath(path, i)"
-                    @start="() => startUpload(i)"
-                    @success="data => successUpload(data, i)"
-                    @error="() => errorUpload(i)"
-                    @upload-info="data => handleUploadInfo(data, i)"
-                    @progress="p => fnProgress(p, i)"
-                  />
-                </div>
               </div>
-            </v-item>
-          </div>
-        </template>
+              <n-button v-if="e.hideUpload" type="primary" class="cancel-button" @click="cancelFile"
+                >cancel</n-button
+              >
+              <div v-if="!e.hideUpload" :class="{ 'full-width': !e.progress }">
+                <n-button
+                  v-if="!e.progress"
+                  type="primary"
+                  class="load-button"
+                  @click="loadWorkflow()"
+                  >Load from current workspace</n-button
+                >
+                <vUpload
+                  :ref="e.ref"
+                  model-type="ComfyUI"
+                  accept=".json"
+                  :file-name="e.file_name"
+                  :class="{ 'input-error': e.filePathError }"
+                  @path="path => handlePath(path, i)"
+                  @start="() => startUpload(i)"
+                  @success="data => successUpload(data, i)"
+                  @error="() => errorUpload(i)"
+                  @upload-info="data => handleUploadInfo(data, i)"
+                  @progress="p => fnProgress(p, i)"
+                />
+              </div>
+            </div>
+          </v-item>
+        </div>
       </vCustomAccordionItem>
     </vCustomAccordion>
-    <template v-if="!modelBox" #foot>
-      <div
-        class="bg-[#353535] px-6 w-full h-14 rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px] flex justify-between items-center -mt-4"
-      >
-        <Button variant="outline" class="" @click="addVersions">Add Version</Button>
-        <Button :disabled="disabledPublish" @click="submit">Publish</Button>
+    <template v-if="!modelBox" #footer>
+      <div class="footer-content">
+        <n-button tertiary @click="addVersions">Add Version</n-button>
+        <n-button type="primary" :disabled="disabledPublish" @click="submit">Publish</n-button>
       </div>
     </template>
-    <div v-if="showLayoutLoading" class="z-50 w-full h-full absolute left-0 top-0"></div>
-  </v-dialog>
+    <div v-if="showLayoutLoading" class="loading-overlay"></div>
+  </n-modal>
 </template>
+
 <script setup lang="ts">
   import { useToaster } from '@/components/modules/toats/index'
   import { computed, inject, ref, watch } from 'vue'
-  import { SelectItem } from '@/components/ui/select'
-  import { Input } from '@/components/ui/input'
-  import { Button } from '@/components/ui/button'
-  import { Label } from '@/components/ui/label'
-  import { Switch } from '@/components/ui/switch'
-  import { Progress } from '@/components/ui/progress'
+  // import { SelectItem } from '@/components/ui/select'
+  // import { Input } from '@/components/ui/input'
+
+  // import { Button } from '@/components/ui/button'
+  // import { Label } from '@/components/ui/label'
+  // import { Switch } from '@/components/ui/switch'
+  // import { Progress } from '@/components/ui/progress'
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { modelStore } from '@/stores/modelStatus'
   import { create_models, put_model } from '@/api/model'
   import { Trash2 } from 'lucide-vue-next'
-  import vDialog from '@/components/modules/vDialog.vue'
-  import vSelect from '@/components/modules/vSelect.vue'
+  // import vDialog from '@/components/modules/vDialog.vue'
+  // import vSelect from '@/components/modules/vSelect.vue'
   import vItem from '@/components/modules/vItem.vue'
   import vCustomAccordion from '@/components/modules/vCustomAccordion.vue'
   import vCustomAccordionItem from '@/components/modules/vCustomAccordionItem.vue'
@@ -171,6 +186,8 @@
   import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import Markdown from '@/components/markdown/Index.vue'
   import { uploadFile } from '@/components/modules/vUpload/virtualUpload'
+
+  import { NModal, NButton, NInput, NProgress, NSwitch, NSelect } from 'naive-ui'
 
   const comfyUIApp: any = inject('comfyUIApp')
 
@@ -196,11 +213,11 @@
 
     return progress
   })
-  function handleChange(val: any, index: number) {
-    if (formData.value.versions) {
-      formData.value.versions[index].public = val
-    }
-  }
+  // function handleChange(val: any, index: number) {
+  //   if (formData.value.versions) {
+  //     formData.value.versions[index].public = val
+  //   }
+  // }
   async function delVersion(index: number) {
     const res = await useAlertDialog({
       title: 'Are you sure you want to delete this version?',
@@ -229,7 +246,7 @@
     tempData.versions = tempData.versions || []
     tempData.versions.push({
       version: '',
-      base_model: '',
+      base_model: null,
       intro: '',
       public: false,
       filePath: '',
@@ -409,4 +426,128 @@
     }
   )
 </script>
-<style scoped></style>
+
+<style scoped lang="less">
+  .custom-modal {
+    max-width: 800px;
+  }
+  .header-title {
+    cursor: pointer;
+  }
+
+  .modal-content {
+    padding: 0 24px 24px 24px;
+  }
+
+  .next-button {
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .accordion-title {
+    background-color: #353535;
+    padding: 16px 24px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .trash-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .progress-bar {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+  }
+
+  .accordion-content {
+    background-color: #353535;
+    padding: 0 24px 16px 24px;
+  }
+
+  .input-error {
+    border-color: #ef4444;
+  }
+
+  .switch-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .file-upload-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+  }
+
+  .file-name {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 12px;
+  }
+
+  .progress-container {
+    flex: 1;
+    margin-top: 54px;
+  }
+
+  .progress-text {
+    text-align: center;
+    padding-top: 8px;
+  }
+
+  .speed-text {
+    padding-left: 8px;
+  }
+
+  .cancel-button {
+    margin-left: 8px;
+  }
+
+  .load-button {
+    width: 100%;
+    margin: 8px 0;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .footer-content {
+    background-color: #353535;
+    padding: 0 24px;
+    height: 56px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -16px;
+    position: relative;
+    z-index: 9;
+  }
+
+  .loading-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 50;
+  }
+</style>
