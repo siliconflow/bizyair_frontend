@@ -140,7 +140,7 @@
   } from 'naive-ui'
 
   import { useCommunityStore } from '@/stores/communityStore'
-  import { get_share_code, version_get_model } from '@/api/model'
+  import { get_share_code } from '@/api/model'
 
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { useToaster } from '@/components/modules/toats/index'
