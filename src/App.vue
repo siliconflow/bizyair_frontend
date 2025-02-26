@@ -142,7 +142,7 @@
   } from 'naive-ui'
 
   import { useCommunityStore } from '@/stores/communityStore'
-  import { get_share_code, version_get_model } from '@/api/model'
+  import { get_share_code } from '@/api/model'
 
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { useToaster } from '@/components/modules/toats/index'
@@ -171,7 +171,10 @@
 
   const convert = async () => {
     const res = await get_share_code({ code: shareCode.value })
-    communityStore.setAndShowCommunityDetail(Number(res.data.data.bizy_model_id), Number(res.data.data.biz_id))
+    communityStore.setAndShowCommunityDetail(
+      Number(res.data.data.bizy_model_id),
+      Number(res.data.data.biz_id)
+    )
     shareCode.value = ''
   }
   const toMini = () => {
@@ -337,14 +340,5 @@
     h1 {
       padding-left: 5px;
     }
-  }
-
-  :deep(.handle > .n-badge.n-badge--dot .n-badge-sup) {
-    height: 6px;
-    width: 6px;
-    padding: 0;
-    min-width: 6px;
-    left: 25px;
-    bottom: calc(100% - 12px);
   }
 </style>
