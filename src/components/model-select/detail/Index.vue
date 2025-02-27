@@ -35,7 +35,7 @@
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
   const modelSelectStore = useModelSelectStore()
   const userStatusStore = useStatusStore()
-  const tagsStore =   useDictStore()
+  const tagsStore = useDictStore()
   const model = ref<Model>()
   const currentVersion = ref<ModelVersion>()
   const downloadOpen = ref(false)

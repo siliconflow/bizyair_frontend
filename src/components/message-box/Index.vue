@@ -3,7 +3,7 @@
     :show="show"
     class="w-[80vw] max-w-[1200px]"
     preset="card"
-    :style="{ width: '80vw', maxWidth: '1200px' }"
+    :style="{ width: '80vw', maxWidth: '1200px', backgroundColor: '#353535' }"
     :mask-closable="false"
     @update:show="emit('update:show', $event)"
     @negative-click="onNegativeClick"
@@ -26,8 +26,8 @@
             >
               <span>{{ menu.label }}</span>
               <n-badge
-                v-if="menu.unreadCount > 0"
-                :value="menu.unreadCount > 99 ? '99+' : menu.unreadCount"
+                v-if="getUnreadCount(menu.type) > 0"
+                :value="getUnreadCount(menu.type) > 99 ? '99+' : getUnreadCount(menu.type)"
                 :max="99"
               />
             </div>
@@ -59,10 +59,36 @@
       </div>
 
       <div class="flex-1 pl-4 border-l">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-medium"></h3>
+        <div
+          class="flex justify-end items-center gap-4 min-h-[32px]"
+          :class="activeType === NotificationType.SYSTEM_ANNOUNCEMENT ? 'mb-2' : 'mb-4'"
+        >
+      
           <v-select
-            v-model:model-value="filterType"
+            v-if="activeType === NotificationType.SYSTEM_ANNOUNCEMENT"
+            v-model:model-value="selectedNotificationType"
+            placeholder="Notification Type"
+            class="w-[200px]"
+          >
+            <SelectItem
+              value="all"
+              class="cursor-pointer hover:bg-[#4d4d4dee] transition-colors duration-200"
+              :class="selectedNotificationType === 'all' ? 'bg-[#7C3AED] text-white' : ''"
+              >All Notifications</SelectItem
+            >
+            <SelectItem
+              v-for="type in officialNotificationTypes"
+              :key="type.value"
+              :value="type.value"
+              class="cursor-pointer hover:bg-[#4d4d4dee] transition-colors duration-200"
+              :class="selectedNotificationType === type.value ? 'bg-[#7C3AED] text-white' : ''"
+              >{{ type.label }}</SelectItem
+            >
+          </v-select>
+
+          <v-select
+           v-if="activeType === NotificationType.SYSTEM_ANNOUNCEMENT"
+            v-model:model-value="readStatus"
             placeholder="Select Notice Type"
             class="w-[200px]"
           >
@@ -71,26 +97,77 @@
               :key="i"
               :value="e.value"
               class="cursor-pointer hover:bg-[#4d4d4dee] transition-colors duration-200"
-              :class="filterType === e.value ? 'bg-[#7C3AED] text-white' : ''"
+              :class="readStatus === e.value ? 'bg-[#7C3AED] text-white' : ''"
               >{{ e.label }}</SelectItem
             >
           </v-select>
+       
         </div>
 
-        <MessageList :type="activeType" :filter="filterType" @mark-read="handleMarkRead" />
+        <MessageList
+          :type="activeType"
+          :filter="readStatus"
+          :selected-type="
+            selectedNotificationType && selectedNotificationType !== 'all'
+              ? Number(selectedNotificationType)
+              : undefined
+          "
+        />
       </div>
     </div>
   </n-modal>
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { NModal, NBadge } from 'naive-ui'
   import MessageList from './modules/MessageList.vue'
   import { NotificationType } from './types'
   import vSelect from '@/components/modules/vSelect.vue'
   import { SelectItem } from '@/components/ui/select'
-  const props = defineProps<{
+  import { useNotificationStore } from '@/stores/notificationStore'
+  import { useDictStore } from '@/stores/dictStore'
+
+  const dictStore = useDictStore()
+  const notificationStore = useNotificationStore()
+
+  const officialNotificationTypes = computed(() => {
+    return dictStore.getDict('official_notification_types')
+  })
+
+  const readStatus = computed({
+    get: () => {
+      return notificationStore.officialNoticesFilter.read_status || 'all'
+    },
+    set: value => {
+      notificationStore.setOfficialNoticesFilter({
+        read_status: value === 'all' ? null : value,
+        type:
+          selectedNotificationType.value && selectedNotificationType.value !== 'all'
+            ? Number(selectedNotificationType.value)
+            : undefined
+      })
+      notificationStore.loadOfficialNotices(true)
+    }
+  })
+
+  const selectedNotificationType = computed({
+    get: () => {
+      if (notificationStore.officialNoticesFilter.types.length === 1) {
+        return String(notificationStore.officialNoticesFilter.types[0])
+      }
+      return 'all'
+    },
+    set: value => {
+      notificationStore.setOfficialNoticesFilter({
+        read_status: readStatus.value !== 'all' ? readStatus.value : undefined,
+        type: value && value !== 'all' ? Number(value) : undefined
+      })
+      notificationStore.loadOfficialNotices(true)
+    }
+  })
+
+  const { show } = defineProps<{
     show: boolean
   }>()
 
@@ -102,22 +179,21 @@
     emit('update:show', false)
   }
 
- 
-  const menus = ref([
+  const menus = computed(() => [
     {
       type: NotificationType.SYSTEM_ANNOUNCEMENT,
       label: 'Official Notices',
-      unreadCount: 3
+      unreadCount: notificationStore.officialNoticesUnReadCount
     },
     {
       type: NotificationType.USER_FORK,
       label: 'User Forks',
-      unreadCount: 2
+      unreadCount: notificationStore.userForkNoticesUnReadCount
     },
     {
       type: NotificationType.USER_LIKE,
       label: 'Received Likes',
-      unreadCount: 5
+      unreadCount: notificationStore.userLikeNoticesUnReadCount
     }
   ])
 
@@ -129,26 +205,66 @@
     { label: 'Read', value: 'read' }
   ]
 
-  const filterType = ref('all')
+  const getUnreadCount = (type: NotificationType) => {
+    switch (type) {
+      case NotificationType.SYSTEM_ANNOUNCEMENT:
+        return notificationStore.officialNoticesUnReadCount
+      case NotificationType.USER_LIKE:
+        return notificationStore.userLikeNoticesUnReadCount
+      case NotificationType.USER_FORK:
+        return notificationStore.userForkNoticesUnReadCount
+      default:
+        return 0
+    }
+  }
 
   const handleMenuClick = (type: NotificationType) => {
     activeType.value = type
+
+    if (type === NotificationType.SYSTEM_ANNOUNCEMENT) {
+      if (notificationStore.officialNoticesFilter.types.length === 0) {
+        notificationStore.setOfficialNoticesFilter({
+          read_status: undefined,
+          type: undefined 
+        })
+      }
+    } else if (type === NotificationType.USER_LIKE) {
+      const likeType = notificationStore.notificationTypes.find(
+        item => item.label === NotificationType.USER_LIKE
+      )
+      if (likeType?.value !== undefined) {
+        notificationStore.userLikeNoticesFilter.types = [101]
+      }
+    } else if (type === NotificationType.USER_FORK) {
+
+      const forkType = notificationStore.notificationTypes.find(
+        item => item.label === NotificationType.USER_FORK
+      )
+   
+      if (forkType?.value !== undefined) {
+        notificationStore.userForkNoticesFilter.types = [102]
+      }
+    }
+
+   
+    notificationStore.loadNotificationsByType(
+      type,
+      !notificationStore.getInitializedStatusByType(type)
+    )
   }
 
-  const handleMarkRead = (id: number) => {
-    // TODO: 实现标记已读逻辑
-    console.log('id', id)
+  const handleMarkAllRead = async () => {
+    await notificationStore.markAllAsRead()
   }
 
-  const handleMarkAllRead = () => {
-    // TODO: 实现全部标记已读的逻辑
-    console.log('标记全部已读')
-  }
+  onMounted(async () => {
+    await dictStore.fetchDictData()
+    await notificationStore.initialize()
+  })
 </script>
 
 <style scoped lang="less">
   :deep(.n-base-select-menu .n-base-select-option.n-base-select-option--selected) {
     color: #fff;
   }
-
 </style>

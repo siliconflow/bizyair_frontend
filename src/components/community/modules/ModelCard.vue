@@ -78,7 +78,6 @@
   )
 
   onMounted(async () => {
-
     const coverUrls = props.model?.versions?.[0]?.cover_urls
     if (coverUrls && Array.isArray(coverUrls) && coverUrls.length > 0) {
       const timestamp = new Date().getTime()
