@@ -16,7 +16,8 @@ export const get_messages_list = (params: any) => {
   //     searchParams.append('types', String(type))
   //   })
   // }
-  if (params.types && typeof params.types === 'string') {
+  console.log('params.types', params.types)
+  if (params.types && (typeof params.types === 'string' || typeof params.types === 'number')) {
     searchParams.append('types', params.types)
   }
 
