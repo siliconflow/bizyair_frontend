@@ -39,7 +39,11 @@ export const read_message = (id:  number) =>
     })
   })
 
-export const read_all_message = () =>
-  customFetch(`/bizyair/community/notifications/read_all`, {
+export const read_all_message = (type?: number) => {
+  const url = type !== undefined 
+    ? `/bizyair/community/notifications/read_all?type=${type}`
+    : '/bizyair/community/notifications/read_all'
+  return customFetch(url, {
     method: 'POST'
   })
+}

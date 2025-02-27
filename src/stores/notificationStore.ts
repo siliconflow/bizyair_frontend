@@ -295,9 +295,19 @@ export const useNotificationStore = defineStore('notification', {
           break
         case NotificationType.USER_LIKE:
           await this.loadUserLikeNotices(reset)
+          await read_all_message(101)
+          this.userLikeNotices.forEach(notice => {
+            notice.read = true
+          })
+          this.userLikeNoticesUnReadCount = 0
           break
         case NotificationType.USER_FORK:
           await this.loadUserForkNotices(reset)
+          await read_all_message(102)
+          this.userForkNotices.forEach(notice => {
+            notice.read = true
+          })
+          this.userForkNoticesUnReadCount = 0
           break
       }
     },
