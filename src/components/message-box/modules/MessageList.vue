@@ -131,9 +131,11 @@
 
   const openDetail = (item: any) => {
     selectedMessage.value = item
-    showDetail.value = true
-    if (!item.read) {
-      notificationStore.markAsRead(props.type, item.id)
+    if (props.type === NotificationType.SYSTEM_ANNOUNCEMENT) {
+      showDetail.value = true
+      if (!item.read) {
+        notificationStore.markAsRead(props.type, item.id)
+      }
     }
   }
 
