@@ -4,7 +4,7 @@
   import vTooltips from '@/components/modules/v-tooltip.vue'
   import { sliceString, formatNumber } from '@/utils/tool'
   import { useCommunityStore } from '@/stores/communityStore'
-  import { useTagsStore } from '@/stores/tags'
+  import { useDictStore } from '@/stores/dictStore'
   import { ref, watch, onMounted } from 'vue'
 
   defineOptions({
@@ -15,7 +15,7 @@
   const dialogLoading = ref(true)
   const showDialog = ref(false)
   const imgSrc = ref('')
-  const tagsStore = useTagsStore()
+  const tagsStore = useDictStore()
   const props = defineProps({
     model: {
       type: Object as () => Model | null,
@@ -78,7 +78,6 @@
   )
 
   onMounted(async () => {
-    // await tagsStore.fetchTags()
     const coverUrls = props.model?.versions?.[0]?.cover_urls
     if (coverUrls && Array.isArray(coverUrls) && coverUrls.length > 0) {
       const timestamp = new Date().getTime()
