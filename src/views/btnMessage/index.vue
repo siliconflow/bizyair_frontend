@@ -29,12 +29,12 @@
   import { useNotificationStore } from '@/stores/notificationStore'
   import { ref, computed } from 'vue'
   import { NTooltip, NBadge } from 'naive-ui'
-  
+
   const showMessage = ref(false)
   const updateMessage = (show: boolean) => {
     showMessage.value = show
   }
-  
+
   const notificationStore = useNotificationStore()
   const hasUnread = computed(() => notificationStore.hasUnreadMessages)
 </script>
@@ -44,7 +44,7 @@
     cursor: pointer;
     position: relative;
   }
-  
+
   .msg {
     display: block;
     width: 28px;

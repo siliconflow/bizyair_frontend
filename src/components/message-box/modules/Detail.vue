@@ -11,7 +11,7 @@
     @close="handleClose"
   >
     <div class="message-detail">
-      <div class="message-date">{{message?.created_at }}</div>
+      <div class="message-date">{{ message?.created_at }}</div>
       <n-divider />
       <n-scrollbar style="height: calc(80vh - 120px)">
         <div class="message-content">

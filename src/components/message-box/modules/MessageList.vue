@@ -4,13 +4,13 @@
     <div v-if="loading" class="loading-container">
       <n-spin size="large" />
     </div>
-    
+
     <!-- 有消息时显示列表 -->
-    <n-virtual-list 
-      v-if="messages.length > 0" 
-      :items="messages" 
-      :item-size="120" 
-      :min-size="10" 
+    <n-virtual-list
+      v-if="messages.length > 0"
+      :items="messages"
+      :item-size="120"
+      :min-size="10"
       @scroll="handleScroll"
     >
       <template #default="{ item }">
@@ -51,14 +51,14 @@
         </n-card>
       </template>
     </n-virtual-list>
-    
+
     <!-- 添加空状态显示 -->
     <div v-if="!loading && messages.length === 0" class="flex items-center justify-center h-full">
       <div class="text-center">
         <p class="text-gray-400">No notifications</p>
       </div>
     </div>
-    
+
     <!-- 添加详情模态框 -->
     <detail-modal
       v-model="showDetail"
@@ -83,12 +83,10 @@
     selectedType?: number
   }>()
 
-
   const messages = computed(() => {
     return notificationStore.getNotificationsByType(props.type)
   })
 
- 
   const loading = computed(() => {
     return notificationStore.getLoadingStatusByType(props.type)
   })
@@ -109,7 +107,6 @@
     }
   }
 
- 
   watch(
     () => [props.type, props.filter, props.selectedType],
     () => {
@@ -118,7 +115,7 @@
           read_status: props.filter === 'all' ? null : props.filter,
           type: props.selectedType
         })
-        
+
         notificationStore.loadOfficialNotices(true)
       } else {
         if (!notificationStore.getInitializedStatusByType(props.type)) {

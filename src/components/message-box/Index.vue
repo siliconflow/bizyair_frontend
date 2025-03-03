@@ -63,7 +63,6 @@
           class="flex justify-end items-center gap-4 min-h-[32px]"
           :class="activeType === NotificationType.SYSTEM_ANNOUNCEMENT ? 'mb-2' : 'mb-4'"
         >
-      
           <v-select
             v-if="activeType === NotificationType.SYSTEM_ANNOUNCEMENT"
             v-model:model-value="selectedNotificationType"
@@ -87,7 +86,7 @@
           </v-select>
 
           <v-select
-           v-if="activeType === NotificationType.SYSTEM_ANNOUNCEMENT"
+            v-if="activeType === NotificationType.SYSTEM_ANNOUNCEMENT"
             v-model:model-value="readStatus"
             placeholder="Select Notice Type"
             class="w-[200px]"
@@ -101,7 +100,6 @@
               >{{ e.label }}</SelectItem
             >
           </v-select>
-       
         </div>
 
         <MessageList
@@ -225,7 +223,7 @@
       if (notificationStore.officialNoticesFilter.types.length === 0) {
         notificationStore.setOfficialNoticesFilter({
           read_status: undefined,
-          type: undefined 
+          type: undefined
         })
       }
     } else if (type === NotificationType.USER_LIKE) {
@@ -236,17 +234,15 @@
         notificationStore.userLikeNoticesFilter.types = [101]
       }
     } else if (type === NotificationType.USER_FORK) {
-
       const forkType = notificationStore.notificationTypes.find(
         item => item.label === NotificationType.USER_FORK
       )
-   
+
       if (forkType?.value !== undefined) {
         notificationStore.userForkNoticesFilter.types = [102]
       }
     }
 
-   
     notificationStore.loadNotificationsByType(
       type,
       !notificationStore.getInitializedStatusByType(type)

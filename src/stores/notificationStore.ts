@@ -14,16 +14,13 @@ export const useNotificationStore = defineStore('notification', {
     userLikeNotices: [] as Notification[],
     userForkNotices: [] as Notification[],
 
- 
     officialNoticesUnReadCount: 0,
     userLikeNoticesUnReadCount: 0,
     userForkNoticesUnReadCount: 0,
 
-
     officialNoticesLoading: false,
     userLikeNoticesLoading: false,
     userForkNoticesLoading: false,
-
 
     officialNoticesInitialized: false,
     userLikeNoticesInitialized: false,
@@ -33,7 +30,7 @@ export const useNotificationStore = defineStore('notification', {
       page_size: 10,
       last_pm_id: 0,
       last_broadcast_id: 0,
-      types: [] as number[] | string[] |string,
+      types: [] as number[] | string[] | string,
       read_status: undefined as undefined | string | null
     },
 
@@ -41,14 +38,14 @@ export const useNotificationStore = defineStore('notification', {
       page_size: 10,
       last_pm_id: 0,
       last_broadcast_id: 0,
-      types: [] as number[] | string[] |string,
+      types: [] as number[] | string[] | string
     },
 
     userForkNoticesFilter: {
       page_size: 10,
       last_pm_id: 0,
       last_broadcast_id: 0,
-      types: [] as number[] | string[] |string,
+      types: [] as number[] | string[] | string
     }
   }),
 
@@ -63,7 +60,7 @@ export const useNotificationStore = defineStore('notification', {
       return dictStore.getDict('notification_types')
     },
 
-    getNotificationsByType: (state) => (type: NotificationType) => {
+    getNotificationsByType: state => (type: NotificationType) => {
       switch (type) {
         case NotificationType.SYSTEM_ANNOUNCEMENT:
           return state.officialNotices
@@ -76,7 +73,7 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    getLoadingStatusByType: (state) => (type: NotificationType) => {
+    getLoadingStatusByType: state => (type: NotificationType) => {
       switch (type) {
         case NotificationType.SYSTEM_ANNOUNCEMENT:
           return state.officialNoticesLoading
@@ -89,7 +86,7 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    getInitializedStatusByType: (state) => (type: NotificationType) => {
+    getInitializedStatusByType: state => (type: NotificationType) => {
       switch (type) {
         case NotificationType.SYSTEM_ANNOUNCEMENT:
           return state.officialNoticesInitialized
@@ -103,15 +100,19 @@ export const useNotificationStore = defineStore('notification', {
     },
 
     hasUnreadMessages(): boolean {
-      return this.officialNoticesUnReadCount > 0 || 
-             this.userLikeNoticesUnReadCount > 0 || 
-             this.userForkNoticesUnReadCount > 0
+      return (
+        this.officialNoticesUnReadCount > 0 ||
+        this.userLikeNoticesUnReadCount > 0 ||
+        this.userForkNoticesUnReadCount > 0
+      )
     },
 
     totalUnreadCount(): number {
-      return this.officialNoticesUnReadCount + 
-             this.userLikeNoticesUnReadCount + 
-             this.userForkNoticesUnReadCount
+      return (
+        this.officialNoticesUnReadCount +
+        this.userLikeNoticesUnReadCount +
+        this.userForkNoticesUnReadCount
+      )
     }
   },
 
@@ -152,16 +153,22 @@ export const useNotificationStore = defineStore('notification', {
     },
 
     initFilters() {
-      this.officialNoticesFilter.types = this.officialNotificationTypes.map(type => Number(type.value))
-      
-      const likeType = this.notificationTypes.find(item => item.label === NotificationType.USER_LIKE)
+      this.officialNoticesFilter.types = this.officialNotificationTypes.map(type =>
+        Number(type.value)
+      )
+
+      const likeType = this.notificationTypes.find(
+        item => item.label === NotificationType.USER_LIKE
+      )
       if (likeType?.value !== undefined) {
         this.userLikeNoticesFilter.types = [Number(likeType.value)]
       } else {
         this.userLikeNoticesFilter.types = [101]
       }
-      
-      const forkType = this.notificationTypes.find(item => item.label === NotificationType.USER_FORK)
+
+      const forkType = this.notificationTypes.find(
+        item => item.label === NotificationType.USER_FORK
+      )
       if (forkType?.value !== undefined) {
         this.userForkNoticesFilter.types = [Number(forkType.value)]
       } else {
@@ -320,7 +327,9 @@ export const useNotificationStore = defineStore('notification', {
       if (filter.type !== undefined) {
         this.officialNoticesFilter.types = [filter.type]
       } else {
-        this.officialNoticesFilter.types = this.officialNotificationTypes.map(type => Number(type.value))
+        this.officialNoticesFilter.types = this.officialNotificationTypes.map(type =>
+          Number(type.value)
+        )
       }
 
       this.officialNoticesFilter.last_pm_id = 0
@@ -330,7 +339,7 @@ export const useNotificationStore = defineStore('notification', {
     async markAsRead(type: NotificationType, id: number) {
       try {
         await read_message(id)
-        
+
         if (type === NotificationType.SYSTEM_ANNOUNCEMENT) {
           this.officialNotices = this.officialNotices.map(notice => {
             if (notice.id === id) {
@@ -353,7 +362,7 @@ export const useNotificationStore = defineStore('notification', {
             return notice
           })
         }
-        
+
         await this.loadUnreadCount()
       } catch (error) {
         console.error('标记已读失败', error)
@@ -363,7 +372,7 @@ export const useNotificationStore = defineStore('notification', {
     async markAllAsRead() {
       try {
         await read_all_message()
-        
+
         this.officialNotices = this.officialNotices.map(notice => ({
           ...notice,
           read: true
@@ -382,7 +391,7 @@ export const useNotificationStore = defineStore('notification', {
         this.officialNoticesUnReadCount = 0
         this.userLikeNoticesUnReadCount = 0
         this.userForkNoticesUnReadCount = 0
-        
+
         await this.loadUnreadCount()
       } catch (error) {
         console.error('标记全部已读失败', error)
@@ -396,26 +405,28 @@ export const useNotificationStore = defineStore('notification', {
           this.officialNoticesUnReadCount = 0
           this.userLikeNoticesUnReadCount = 0
           this.userForkNoticesUnReadCount = 0
-          
+
           const officialTypes = this.officialNotificationTypes.map(type => Number(type.value))
-          
-          const likeType = this.notificationTypes.find(item => item.label === NotificationType.USER_LIKE)
+
+          const likeType = this.notificationTypes.find(
+            item => item.label === NotificationType.USER_LIKE
+          )
           const likeTypeValue = likeType ? Number(likeType.value) : 101
-          
-          const forkType = this.notificationTypes.find(item => item.label === NotificationType.USER_FORK)
+
+          const forkType = this.notificationTypes.find(
+            item => item.label === NotificationType.USER_FORK
+          )
           const forkTypeValue = forkType ? Number(forkType.value) : 102
-          
+
           for (let i = 0; i < res.data.types.length; i++) {
             const type = res.data.types[i]
             const count = res.data.counts[i]
-            
+
             if (officialTypes.includes(type)) {
               this.officialNoticesUnReadCount += count
-            }
-            else if (type === likeTypeValue) {
+            } else if (type === likeTypeValue) {
               this.userLikeNoticesUnReadCount = count
-            }
-            else if (type === forkTypeValue) {
+            } else if (type === forkTypeValue) {
               this.userForkNoticesUnReadCount = count
             }
           }
