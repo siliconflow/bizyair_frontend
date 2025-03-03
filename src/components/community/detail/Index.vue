@@ -25,7 +25,7 @@
   import { modelStore } from '@/stores/modelStatus'
   import { useStatusStore } from '@/stores/userStatus'
   import { Model, ModelVersion } from '@/types/model'
-  import { useTagsStore } from '@/stores/tags'
+  import { useDictStore } from '@/stores/dictStore'
   import vDialog from '@/components/modules/vDialog.vue'
   import LoadingOverlay from '@/components/community/modules/LoadingOverlay.vue'
   import {
@@ -43,7 +43,7 @@
 
   const communityStore = useCommunityStore()
   const userStatusStore = useStatusStore()
-  const tagsStore = useTagsStore()
+  const tagsStore = useDictStore()
   const model = ref<Model>()
   const currentVersion = ref<ModelVersion>()
   const downloadOpen = ref(false)
@@ -98,7 +98,7 @@
   }
 
   onMounted(async () => {
-    await tagsStore.fetchTags()
+    await tagsStore.fetchDictData()
     isLoading.value = true
     await fetchModelDetail()
   })
