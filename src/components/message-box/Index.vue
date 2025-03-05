@@ -252,13 +252,15 @@
   const handleMarkAllRead = async () => {
     await notificationStore.markAllAsRead()
   }
-  
 
-  watch(() => show, async (newVal, oldVal) => {
-    if (newVal && !oldVal) {
-      await refreshData()
+  watch(
+    () => show,
+    async (newVal, oldVal) => {
+      if (newVal && !oldVal) {
+        await refreshData()
+      }
     }
-  })
+  )
 
   const refreshData = async () => {
     await dictStore.fetchDictData()

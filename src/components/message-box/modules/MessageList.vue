@@ -157,13 +157,11 @@
     white-space: nowrap;
   }
 
-
   .message-card:hover .unread-dot {
     width: 12px !important;
     height: 12px !important;
     transition: all 0.2s ease-in-out;
   }
-
 
   .line-clamp-1 {
     display: -webkit-box;
@@ -176,7 +174,6 @@
   :deep(.n-scrollbar-rail) {
     display: none;
   }
-
 
   .loading-container {
     position: absolute;
