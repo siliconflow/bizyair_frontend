@@ -252,14 +252,17 @@
   const handleMarkAllRead = async () => {
     await notificationStore.markAllAsRead()
   }
-  
+
   // 添加对show属性的监听
-  watch(() => show, async (newVal, oldVal) => {
-    if (newVal && !oldVal) {
-      // 当从关闭状态变为打开状态时刷新数据
-      await refreshData()
+  watch(
+    () => show,
+    async (newVal, oldVal) => {
+      if (newVal && !oldVal) {
+        // 当从关闭状态变为打开状态时刷新数据
+        await refreshData()
+      }
     }
-  })
+  )
 
   // 提取刷新数据的函数，便于复用
   const refreshData = async () => {
