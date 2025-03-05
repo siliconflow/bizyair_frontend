@@ -253,18 +253,15 @@
     await notificationStore.markAllAsRead()
   }
   
-  // 添加对show属性的监听
+
   watch(() => show, async (newVal, oldVal) => {
     if (newVal && !oldVal) {
-      // 当从关闭状态变为打开状态时刷新数据
       await refreshData()
     }
   })
 
-  // 提取刷新数据的函数，便于复用
   const refreshData = async () => {
     await dictStore.fetchDictData()
-    // 根据当前选中的类型刷新对应的数据
     notificationStore.loadNotificationsByType(activeType.value, true)
   }
 
