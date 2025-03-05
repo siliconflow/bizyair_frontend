@@ -97,11 +97,7 @@ export const useNotificationStore = defineStore('notification', {
         default:
           return false
       }
-    },
-
-
-
- 
+    }
   },
 
   actions: {
@@ -419,7 +415,10 @@ export const useNotificationStore = defineStore('notification', {
               this.userForkNoticesUnReadCount = count
             }
           }
-          this.totalUnreadCount = this.officialNoticesUnReadCount + this.userLikeNoticesUnReadCount + this.userForkNoticesUnReadCount
+          this.totalUnreadCount =
+            this.officialNoticesUnReadCount +
+            this.userLikeNoticesUnReadCount +
+            this.userForkNoticesUnReadCount
         }
       } catch (error) {
         console.error('获取未读消息计数失败', error)
@@ -429,8 +428,6 @@ export const useNotificationStore = defineStore('notification', {
     async initialize() {
       await this.loadUnreadCount()
       this.initFilters()
-    },
-
-
+    }
   }
 })
