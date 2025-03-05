@@ -70,7 +70,7 @@ export const useDictStore = defineStore('dict', {
 
         if (Array.isArray(dictData.tags)) {
           this.tagsMap = dictData.tags.reduce(
-            (acc, tag) => {
+            (acc: Record<string | number, ModelTag>, tag: ModelTag) => {
               if (tag && tag.id) {
                 acc[tag.id] = { ...tag }
               }
