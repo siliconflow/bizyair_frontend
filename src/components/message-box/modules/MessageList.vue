@@ -1,11 +1,9 @@
 <template>
   <div class="h-[calc(80vh-100px)] relative">
-    <!-- 添加加载状态显示 -->
     <div v-if="loading" class="loading-container">
       <n-spin size="large" />
     </div>
 
-    <!-- 有消息时显示列表 -->
     <n-virtual-list
       v-if="messages.length > 0"
       :items="messages"
@@ -22,12 +20,10 @@
           @click="openDetail(item)"
         >
           <div class="flex items-center">
-            <!-- 左侧图片区域 -->
             <div v-if="item.relatedType === 'IMAGE'" class="w-[10%] flex items-center">
               <img :src="item.imageUrl" class="w-16 h-16 object-cover rounded" alt="" />
             </div>
 
-            <!-- 中间内容区域 -->
             <div
               class="cursor-pointer"
               :class="['flex-1', item.relatedType === 'IMAGE' ? 'w-[80%] px-4' : 'w-[90%]']"
@@ -43,7 +39,6 @@
               </div>
             </div>
 
-            <!-- 右侧未读标记 -->
             <div class="w-[10%] flex items-center justify-end">
               <div v-if="!item.read" class="w-1.5 h-1.5 rounded-full bg-red-500 unread-dot" />
             </div>
@@ -52,14 +47,12 @@
       </template>
     </n-virtual-list>
 
-    <!-- 添加空状态显示 -->
     <div v-if="!loading && messages.length === 0" class="flex items-center justify-center h-full">
       <div class="text-center">
         <p class="text-gray-400">No notifications</p>
       </div>
     </div>
 
-    <!-- 添加详情模态框 -->
     <detail-modal
       v-model="showDetail"
       :message="selectedMessage as any"
@@ -164,14 +157,14 @@
     white-space: nowrap;
   }
 
-  /* 添加未读圆点的悬停效果 */
+
   .message-card:hover .unread-dot {
     width: 12px !important;
     height: 12px !important;
     transition: all 0.2s ease-in-out;
   }
 
-  /* 添加行截断样式 */
+
   .line-clamp-1 {
     display: -webkit-box;
     -webkit-line-clamp: 1;
@@ -184,7 +177,7 @@
     display: none;
   }
 
-  /* 添加加载状态的样式 */
+
   .loading-container {
     position: absolute;
     top: 0;
