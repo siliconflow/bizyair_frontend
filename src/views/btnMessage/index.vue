@@ -27,7 +27,7 @@
 <script setup lang="ts">
   import MessageBox from '@/components/message-box/Index.vue'
   import { useNotificationStore } from '@/stores/notificationStore'
-  import { ref, computed } from 'vue'
+  import { ref, watch } from 'vue'
   import { NTooltip, NBadge } from 'naive-ui'
 
   const showMessage = ref(false)
@@ -36,7 +36,17 @@
   }
 
   const notificationStore = useNotificationStore()
-  const hasUnread = computed(() => notificationStore.hasUnreadMessages)
+  const hasUnread = ref(notificationStore.totalUnreadCount > 0)
+  
+ 
+  watch(
+    () => notificationStore.totalUnreadCount,
+    (newVal) => {
+      console.log('未读消息状态变化:', newVal)
+      hasUnread.value = newVal > 0
+    },
+    { immediate: true }
+  )
 </script>
 
 <style scoped lang="less">
