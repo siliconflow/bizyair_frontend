@@ -68,10 +68,11 @@
   import { set_api_key } from '@/api/user'
   import { useStatusStore } from '@/stores/userStatus'
   import { useToaster } from '@/components/modules/toats/index'
-
+  import { useNotificationStore } from '@/stores/notificationStore'
   import { NModal, NButton } from 'naive-ui'
 
   const statusStore = useStatusStore()
+  const notificationStore = useNotificationStore()
 
   const apiKey = ref<string>('')
   const hasError = ref<boolean>(false)
@@ -108,6 +109,8 @@
       useToaster('API Key set successfully!')
       statusStore.handleApiKeyDialog(false)
       statusStore.loginRefresh()
+
+      notificationStore.loadUnreadCount()
     } else {
       useToaster.error(`Failed to set API Key: ${await response.text()}`)
     }
