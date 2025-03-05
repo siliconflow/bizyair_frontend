@@ -37,11 +37,10 @@
 
   const notificationStore = useNotificationStore()
   const hasUnread = ref(notificationStore.totalUnreadCount > 0)
-  
- 
+
   watch(
     () => notificationStore.totalUnreadCount,
-    (newVal) => {
+    newVal => {
       console.log('未读消息状态变化:', newVal)
       hasUnread.value = newVal > 0
     },
