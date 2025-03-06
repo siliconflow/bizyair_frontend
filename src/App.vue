@@ -193,6 +193,7 @@
 
   const runShareCode = async () => {
     if (shareCode.value) {
+      shareCode.value = shareCode.value.trim()
       if (shareCode.value.length != 8) {
         useToaster({
           type: 'error',
@@ -212,14 +213,15 @@
           })
           return false
         }
-        if (clipboardText.length != 8) {
+        const trimmedClipboardText = clipboardText.trim()
+        if (trimmedClipboardText.length != 8) {
           useToaster({
             type: 'error',
             message: 'The length of the clipboard content is incorrect.'
           })
           return false
         }
-        shareCode.value = clipboardText
+        shareCode.value = trimmedClipboardText
         convert()
       } catch (error) {
         useToaster({

@@ -124,15 +124,7 @@ export const useNotificationStore = defineStore('notification', {
         } else {
           params.types = filter.types.join(',')
         }
-        // filter.types.forEach((type: number) => {
-        //   if (!params.types) {
-        //     params.types = []
-        //   }
-        //   params.types.push(type)
-        // })
       }
-      console.log('params', params)
-
       return params
     },
 
@@ -176,8 +168,6 @@ export const useNotificationStore = defineStore('notification', {
           ...this.officialNoticesFilter,
           read_status: this.officialNoticesFilter.read_status
         })
-
-        console.log('params==>', params)
 
         const res = await get_messages_list(params)
 
@@ -386,7 +376,7 @@ export const useNotificationStore = defineStore('notification', {
     async loadUnreadCount() {
       try {
         const res = await get_message_unread_count()
-        if (res.data && res.data.types && res.data.counts) {
+        if (res?.data && res?.data.types && res?.data.counts) {
           this.officialNoticesUnReadCount = 0
           this.userLikeNoticesUnReadCount = 0
           this.userForkNoticesUnReadCount = 0
@@ -421,7 +411,7 @@ export const useNotificationStore = defineStore('notification', {
             this.userForkNoticesUnReadCount
         }
       } catch (error) {
-        console.error('获取未读消息计数失败', error)
+        console.error('Failed to get unread message count', error)
       }
     },
 
