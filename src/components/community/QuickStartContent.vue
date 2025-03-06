@@ -37,10 +37,16 @@
 
       if (workflow.data && comfyUIApp && comfyUIApp.graph) {
         comfyUIApp.graph.clear()
-        await comfyUIApp.loadGraphData(workflow.data)
-        communityStore.showDialog = false
+        if (workflow.data.templates && workflow.data.templates.length > 0) {
+          await comfyUIApp.loadTemplateData(workflow.data)
+        } else {
+          await comfyUIApp.loadGraphData(workflow.data)
+        }
         useToaster.success('Workflow loaded successfully')
+      } else {
+        useToaster.error('Failed to load workflow')
       }
+      communityStore.showDialog = false
     } catch (error) {
       console.error('Failed to load workflow:', error)
       useToaster.error(`Failed to load workflow: ${error}`)

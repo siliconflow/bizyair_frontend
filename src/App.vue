@@ -2,8 +2,8 @@
   <n-config-provider :theme="myDarkTheme">
     <n-message-provider>
       <n-notification-provider>
-        <div id="menu-box" :class="['menu-box', { 'is-mini-box': isMini }]">
-          <div class="bar">
+        <div id="bizyair-menu-box" :class="['bizyair-menu-box', { 'is-mini-box': isMini }]">
+          <div class="bizyair-bar">
             <h1>
               <n-tooltip v-if="isMini" trigger="hover">
                 <template #trigger>
@@ -97,21 +97,22 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M6 14h4m0 0v4m0-4l-6 6m14-10h-4m0 0V6m0 4l6-6"
-                      /></svg
-                  ></span>
+                      />
+                    </svg>
+                  </span>
                 </template>
                 minimize
               </n-tooltip>
             </div>
           </div>
-          <div :class="['menu', { 'is-mini-menu': isMiniMenu }]">
-            <div class="menu-content">
+          <div :class="['bizyair-menu', { 'is-mini-menu': isMiniMenu }]">
+            <div class="bizyair-menu-content">
               <btnProfile v-if="statusStore.isLogin" />
               <btnApiKey v-else />
               <btnCommunity />
               <btnPublish />
               <!-- <btnTrain /> -->
-              <btnNews />
+              <!-- <btnNews /> -->
               <apiKeyDialog />
             </div>
           </div>
@@ -127,7 +128,7 @@
   import btnCommunity from '@/views/btnCommunity/index.vue'
   import btnPublish from '@/views/btnPublish/index.vue'
   // import btnTrain from '@/views/btnTrain/index.vue'
-  import btnNews from '@/views/btnNews/index.vue'
+  // import btnNews from '@/views/btnNews/index.vue'
   import btnMessage from '@/views/btnMessage/index.vue'
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
   import { useStatusStore } from '@/stores/userStatus'
@@ -193,6 +194,7 @@
 
   const runShareCode = async () => {
     if (shareCode.value) {
+      shareCode.value = shareCode.value.trim()
       if (shareCode.value.length != 8) {
         useToaster({
           type: 'error',
@@ -212,14 +214,15 @@
           })
           return false
         }
-        if (clipboardText.length != 8) {
+        const trimmedClipboardText = clipboardText.trim()
+        if (trimmedClipboardText.length != 8) {
           useToaster({
             type: 'error',
             message: 'The length of the clipboard content is incorrect.'
           })
           return false
         }
-        shareCode.value = clipboardText
+        shareCode.value = trimmedClipboardText
         convert()
       } catch (error) {
         useToaster({
@@ -231,12 +234,12 @@
   }
 </script>
 <style scoped lang="less">
-  .menu-box {
+  .bizyair-menu-box {
     border-radius: 12px;
     transition: all 0.3s cubic-bezier(0, 0, 0.1, 1.8);
-    width: 410px;
+    width: 330px;
 
-    .bar {
+    .bizyair-bar {
       background-color: #7c3aed;
       display: flex;
       justify-content: space-between;
@@ -288,13 +291,13 @@
       }
     }
 
-    .menu {
+    .bizyair-menu {
       width: 100%;
       height: 48px;
       box-sizing: border-box;
       transition: all 0.3s;
 
-      .menu-content {
+      .bizyair-menu-content {
         height: 40px;
         display: flex;
         padding: 4px 12px;
@@ -313,6 +316,7 @@
     .share-input-box {
       display: flex;
       align-items: center;
+      position: relative;
 
       .share-input {
         border-radius: 8px;
@@ -321,15 +325,18 @@
         width: 0px;
         transition: all 0.3s;
         height: 28px;
+        position: absolute;
+        right: 32px;
+        top: 0;
       }
 
       &:hover .share-input {
-        width: 160px;
+        width: 154px;
       }
     }
     .share-input-box-has-val {
       .share-input {
-        width: 160px;
+        width: 154px;
       }
     }
   }
