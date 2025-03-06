@@ -117,7 +117,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted, computed } from 'vue'
+  import { ref, onMounted, computed, watch } from 'vue'
   import { NModal, NBadge } from 'naive-ui'
   import MessageList from './modules/MessageList.vue'
   import { NotificationType } from './types'
@@ -251,6 +251,20 @@
 
   const handleMarkAllRead = async () => {
     await notificationStore.markAllAsRead()
+  }
+
+  watch(
+    () => show,
+    async (newVal, oldVal) => {
+      if (newVal && !oldVal) {
+        await refreshData()
+      }
+    }
+  )
+
+  const refreshData = async () => {
+    await dictStore.fetchDictData()
+    notificationStore.loadNotificationsByType(activeType.value, true)
   }
 
   onMounted(async () => {

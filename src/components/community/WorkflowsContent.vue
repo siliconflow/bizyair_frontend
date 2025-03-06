@@ -35,9 +35,16 @@
       const { data } = await get_workflow_dowload_url(model.versions[0].id, model.versions[0].sign)
       if (data && comfyUIApp && comfyUIApp.graph) {
         comfyUIApp.graph.clear()
-        await comfyUIApp.loadGraphData(data)
+        if (data.templates && data.templates.length > 0) {
+          await comfyUIApp.loadTemplateData(data)
+        } else {
+          await comfyUIApp.loadGraphData(data)
+        }
         communityStore.showDialog = false
         useToaster.success('Workflow loaded successfully')
+      } else {
+        communityStore.showDialog = false
+        useToaster.error('Failed to load workflow')
       }
     } catch (error) {
       console.error('Failed to load workflow:', error)
