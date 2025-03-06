@@ -346,8 +346,7 @@
         } else {
           await comfyUIApp.loadGraphData(workflow.data)
         }
-      }
-      else{
+      } else {
         useToaster.error('Failed to load workflow')
       }
       communityStore.showDialog = false
