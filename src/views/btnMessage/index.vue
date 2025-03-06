@@ -41,7 +41,6 @@
   watch(
     () => notificationStore.totalUnreadCount,
     newVal => {
-      console.log('未读消息状态变化:', newVal)
       hasUnread.value = newVal > 0
     },
     { immediate: true }

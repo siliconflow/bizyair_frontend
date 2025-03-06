@@ -341,7 +341,11 @@
       )
       if (workflow.data && comfyUIApp && comfyUIApp.graph) {
         comfyUIApp.graph.clear()
-        await comfyUIApp.loadGraphData(workflow.data)
+        if(workflow.data.templates && workflow.data.templates.length > 0){
+          await comfyUIApp.loadTemplateData(workflow.data)
+        }else{
+          await comfyUIApp.loadGraphData(workflow.data)
+        }
       }
       communityStore.showDialog = false
       communityStore.showCommunityDetail = false
