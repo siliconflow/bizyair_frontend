@@ -25,7 +25,7 @@
     // 'Tasks': () => {
     //   datasetStore.setUploadDialog(true)
     // }
-    "Please stay tuned": () => void 0
+    "Coming soon": () => void 0
   })
 
   onMounted(() => {})
