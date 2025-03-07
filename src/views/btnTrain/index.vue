@@ -15,16 +15,17 @@
   import dialogList from './dataset/dialogList.vue'
   import dialogUpload from './dataset/dialogUpload.vue'
   import { onMounted, ref } from 'vue'
-  import { useDatasetStore } from '@/stores/datasetStore'
-  const datasetStore = useDatasetStore()
+  // import { useDatasetStore } from '@/stores/datasetStore'
+  // const datasetStore = useDatasetStore()
 
   const show_cases = ref({
-    Datasets: () => {
-      datasetStore.setListDialog(true)
-    }
+    // Datasets: () => {
+    //   datasetStore.setListDialog(true)
+    // }
     // 'Tasks': () => {
     //   datasetStore.setUploadDialog(true)
     // }
+    'Coming soon': () => void 0
   })
 
   onMounted(() => {})
