@@ -15,7 +15,7 @@
         />
       </svg>
     </span>
-    <span class="block leading h-full leading-8 text-sm">API Key</span>
+    <span class="block leading h-full leading-8 text-sm">{{ $t('buttons.apiKey') }}</span>
   </div>
 </template>
 <script setup lang="ts">

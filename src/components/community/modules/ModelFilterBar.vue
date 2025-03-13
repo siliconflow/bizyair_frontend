@@ -2,6 +2,7 @@
   import { Button } from '@/components/ui/button'
   import { Input } from '@/components/ui/input'
   import { Badge } from '@/components/ui/badge'
+  import { useI18n } from 'vue-i18n'
 
   import { useCommunityStore } from '@/stores/communityStore'
   import type { SortValue, PageType } from '@/types/model'
@@ -16,6 +17,7 @@
   } from '@/components/ui/command'
   import { onMounted, nextTick, watch } from 'vue'
 
+  const { t } = useI18n()
   const store = useCommunityStore()
 
   const props = defineProps<{
@@ -136,7 +138,7 @@
       <Input
         v-model="store[props.page].filterState.keyword"
         v-debounce="handleSearch"
-        placeholder="Filter by name"
+        :placeholder="t('community.filter.type.title')"
         class="h-[44px] border border-[#9CA3AF] w-full bg-[#222] rounded-lg pr-8 pl-8"
         @update:model-value="val => (store[props.page].filterState.keyword = String(val))"
       />
@@ -205,7 +207,7 @@
                 ]"
                 @click="handleSortChange('Recently')"
               >
-                Recently
+                {{ t('community.filter.sort.options.latest') }}
               </CommandItem>
               <CommandItem
                 value="most-forked"
@@ -218,7 +220,7 @@
                 ]"
                 @click="handleSortChange('Most Forked')"
               >
-                Most Forked
+                {{ t('community.filter.sort.options.popular') }}
               </CommandItem>
               <CommandItem
                 value="most-used"
@@ -231,7 +233,7 @@
                 ]"
                 @click="handleSortChange('Most Used')"
               >
-                Most Used
+                {{ t('community.filter.sort.options.most-used') }}
               </CommandItem>
               <CommandItem
                 v-if="props.page === 'quickStart' || props.page === 'workflows'"
@@ -245,20 +247,7 @@
                 ]"
                 @click="handleSortChange('Most Downloaded')"
               >
-                Most Downloaded
-              </CommandItem>
-              <CommandItem
-                value="most-used"
-                :class="[
-                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer',
-                  '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]',
-                  store[props.page].filterState.sort === 'Most Liked'
-                    ? '!bg-[#6D28D9] !text-[#F9FAFB]'
-                    : ''
-                ]"
-                @click="handleSortChange('Most Liked')"
-              >
-                Most Liked
+                {{ t('community.filter.sort.options.downloads') }}
               </CommandItem>
             </CommandGroup>
           </CommandList>

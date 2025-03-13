@@ -1,0 +1,133 @@
+{
+  "app": {
+    "title": "BizyAir",
+    "restore": "restore",
+    "minimize": "minimize",
+    "shareCode": {
+      "placeholder": "Paste share code",
+      "error": {
+        "empty": "Clipboard content is empty or not a string.",
+        "length": "The length of the clipboard content is incorrect.",
+        "shareCodeLength": "The length of the share code is incorrect."
+      }
+    }
+  },
+  "buttons": {
+    "profile": "Profile",
+    "apiKey": "API Key",
+    "community": "Community",
+    "publish": "Publish",
+    "train": "Train",
+    "message": "Message"
+  },
+  "common": {
+    "language": "Language",
+    "english": "English",
+    "chinese": "中文"
+  },
+  "apiKeyDialog": {
+    "title": "Set API Key",
+    "placeholder": "API Key",
+    "login": "Please click to login and autofill the key,",
+    "clickToLogin": "click to login",
+    "visitTo": "or visit",
+    "getKey": "to get your key and input manually.",
+    "agreement": "Setting the API Key signifies agreement to the",
+    "userAgreement": "User Agreement",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy.",
+    "submit": "Submit",
+    "close": "Close",
+    "success": "API Key set successfully!",
+    "failed": "Failed to set API Key:"
+  },
+  "profile": {
+    "apiKey": "API Key:",
+    "level": "Level:",
+    "edit": "Edit"
+  },
+  "messageBox": {
+    "title": "Message Box",
+    "markAllAsRead": "Mark All as Read",
+    "officialNotices": "Official Notices",
+    "userForks": "User Forks",
+    "receivedLikes": "Received Likes",
+    "allNotifications": "All Notifications",
+    "all": "All",
+    "unread": "Unread",
+    "read": "Read",
+    "noNotifications": "No notifications",
+    "notificationType": "Notification Type"
+  },
+  "community": {
+    "edit": "Edit",
+    "remove": "Remove",
+    "firstPublished": "First Published:",
+    "lastUpdated": "Last Updated:",
+    "noIntroduction": "No introduction yet",
+    "type": "Type",
+    "baseModel": "Base Model",
+    "published": "Published",
+    "explore": "Explore",
+    "quickStart": {
+      "title": "Quick Start",
+      "subtitle": "Get started quickly"
+    },
+    "workflows": {
+      "title": "Workflows", 
+      "subtitle": "Browse all workflows"
+    },
+    "models": {
+      "title": "Models",
+      "subtitle": "Browse all models",
+      "nodeTitle": {
+        "lora": "☁️BizyAir Load Lora",
+        "controlnet": "☁️BizyAir Load ControlNet Model"
+      },
+      "addNode": {
+        "success": "Node added successfully",
+        "error": "Failed to add node: {error}"
+      }
+    },
+    "mine": {
+      "title": "Mine",
+      "contents": {
+        "title": "Contents",
+        "subtitle": "View your contents"
+      }
+    },
+    "filter": {
+      "sort": {
+        "title": "Sort",
+        "options": {
+          "latest": "Latest",
+          "popular": "Popular",
+          "downloads": "Downloads",
+          "most-used": "Most Used"
+        }
+      },
+      "type": {
+        "title": "Type",
+        "all": "All",
+        "lora": "LoRA",
+        "controlnet": "ControlNet"
+      }
+    },
+    "emptyState": {
+      "title": "No Data Available",
+      "subtitle": "Try another Base Model or adjust your filters"
+    }
+  },
+  "modelSelect": {
+    "apply": "Apply",
+    "baseModels": "Base Models"
+  },
+  "defaultPic": {
+    "noCover": "No Cover"
+  },
+  "confirm": {
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "title": "Are you absolutely sure?"
+  }
+} 

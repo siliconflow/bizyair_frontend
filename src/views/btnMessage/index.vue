@@ -18,7 +18,7 @@
         </n-badge>
       </div>
     </template>
-    message
+    {{ $t('buttons.message') }}
   </n-tooltip>
 
   <MessageBox :show="showMessage" @update:show="updateMessage" />

@@ -49,7 +49,7 @@
 
     <div v-if="!loading && messages.length === 0" class="flex items-center justify-center h-full">
       <div class="text-center">
-        <p class="text-gray-400">No notifications</p>
+        <p class="text-gray-400">{{ $t('messageBox.noNotifications') }}</p>
       </div>
     </div>
 
@@ -67,7 +67,9 @@
   import { NotificationType } from '../types'
   import DetailModal from './Detail.vue'
   import { useNotificationStore } from '@/stores/notificationStore'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const notificationStore = useNotificationStore()
 
   const props = defineProps<{

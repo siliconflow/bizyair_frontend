@@ -1,0 +1,133 @@
+{
+  "app": {
+    "title": "BizyAir",
+    "restore": "恢复",
+    "minimize": "最小化",
+    "shareCode": {
+      "placeholder": "粘贴分享码",
+      "error": {
+        "empty": "剪贴板内容为空或不是字符串。",
+        "length": "剪贴板内容长度不正确。",
+        "shareCodeLength": "分享码长度不正确。"
+      }
+    }
+  },
+  "buttons": {
+    "profile": "个人资料",
+    "apiKey": "API密钥",
+    "community": "社区",
+    "publish": "发布",
+    "train": "训练",
+    "message": "消息"
+  },
+  "common": {
+    "language": "语言",
+    "english": "English",
+    "chinese": "中文"
+  },
+  "apiKeyDialog": {
+    "title": "设置API密钥",
+    "placeholder": "API密钥",
+    "login": "请点击登录并自动填充密钥，",
+    "clickToLogin": "点击登录",
+    "visitTo": "或访问",
+    "getKey": "获取您的密钥并手动输入。",
+    "agreement": "设置API密钥表示同意",
+    "userAgreement": "用户协议",
+    "and": "和",
+    "privacyPolicy": "隐私政策。",
+    "submit": "提交",
+    "close": "关闭",
+    "success": "API密钥设置成功！",
+    "failed": "设置API密钥失败："
+  },
+  "profile": {
+    "apiKey": "API密钥：",
+    "level": "等级：",
+    "edit": "编辑"
+  },
+  "messageBox": {
+    "title": "消息盒",
+    "markAllAsRead": "标记所有为已读",
+    "officialNotices": "官方通知",
+    "userForks": "用户复刻",
+    "receivedLikes": "收到的点赞",
+    "allNotifications": "所有通知",
+    "all": "全部",
+    "unread": "未读",
+    "read": "已读",
+    "noNotifications": "没有通知",
+    "notificationType": "通知类型"
+  },
+  "community": {
+    "edit": "编辑",
+    "remove": "删除",
+    "firstPublished": "首次发布：",
+    "lastUpdated": "最后更新：",
+    "noIntroduction": "暂无介绍",
+    "type": "类型",
+    "baseModel": "基础模型",
+    "published": "发布时间",
+    "explore": "探索",
+    "quickStart": {
+      "title": "快速开始",
+      "subtitle": "快速上手"
+    },
+    "workflows": {
+      "title": "工作流", 
+      "subtitle": "浏览所有工作流"
+    },
+    "models": {
+      "title": "模型",
+      "subtitle": "浏览所有模型",
+      "nodeTitle": {
+        "lora": "☁️BizyAir 加载 Lora",
+        "controlnet": "☁️BizyAir 加载 ControlNet 模型"
+      },
+      "addNode": {
+        "success": "节点添加成功",
+        "error": "添加节点失败: {error}"
+      }
+    },
+    "mine": {
+      "title": "我的",
+      "contents": {
+        "title": "内容",
+        "subtitle": "查看我的内容"
+      }
+    },
+    "filter": {
+      "sort": {
+        "title": "排序",
+        "options": {
+          "latest": "最新",
+          "popular": "最热",
+          "downloads": "下载量",
+          "most-used": "使用次数"
+        }
+      },
+      "type": {
+        "title": "类型",
+        "all": "全部",
+        "lora": "LoRA",
+        "controlnet": "ControlNet"
+      }
+    },
+    "emptyState": {
+      "title": "暂无数据",
+      "subtitle": "请尝试选择其他基础模型或调整筛选条件"
+    }
+  },
+  "modelSelect": {
+    "apply": "应用",
+    "baseModels": "基础模型"
+  },
+  "defaultPic": {
+    "noCover": "无封面"
+  },
+  "confirm": {
+    "cancel": "取消",
+    "continue": "继续",
+    "title": "您确定吗？"
+  }
+} 

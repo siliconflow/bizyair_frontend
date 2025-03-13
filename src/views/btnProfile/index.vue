@@ -14,7 +14,7 @@
         </g>
       </svg>
     </span>
-    <span class="profile-text">Profile</span>
+    <span class="profile-text">{{ $t('buttons.profile') }}</span>
   </div>
   <n-drawer v-model:show="showDrawer" :width="502" placement="left">
     <n-drawer-content closable>
@@ -27,16 +27,16 @@
         </div>
       </template>
       <div class="api-key-container">
-        <span>API Key:</span>
+        <span>{{ $t('profile.apiKey') }}</span>
         <span class="api-key-value" id="bizyair-profile-password">
           {{ statusStore.infoData.api_key }}
         </span>
-        <vTooltips tips="Edit">
+        <vTooltips :tips="$t('profile.edit')">
           <FilePenLine @click="statusStore.handleApiKeyDialog(true)" class="edit-icon" />
         </vTooltips>
       </div>
       <div class="level-container">
-        <span>Level:</span>
+        <span>{{ $t('profile.level') }}</span>
         <span class="level-value">{{ levelText }}</span>
       </div>
       <div class="share-id-container">

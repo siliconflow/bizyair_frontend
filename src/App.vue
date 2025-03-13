@@ -13,14 +13,14 @@
                     @click="toNormal"
                   />
                 </template>
-                restore
+                {{ $t('app.restore') }}
               </n-tooltip>
               <img
                 v-else
                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAAXNSR0IArs4c6QAAAARzQklUCAgICHwIZIgAAAQwSURBVHic7ZwxiFxVFIb/KyuskCLFFtNpsUIKiwgWEVKslREiWERIIOAKlhYRUgRstlC0EEQsRBKIjaQWi11IkYiCSBZslBVmIEKEWVBQ2IUtZuGzeG/g+Zz39t1z78zszL0fLAvLeeec+efed887796VMplMJpPJZDKZTCaTSQsX6gAgRiKR2Jc0kPSDpB3n3HfTDrhsAtYZSPpA0tfOueNpBFh2AcfsSrrmnBvEdpyKgJJ0KOlN59xOTKcpCShJx5JejyliagJKxUh8MdZ0fiqGkwXjjKR7wEoMZykKKEkvSboew1GKU3jMwDn3fKiTVEegJK0DG6FOUhZQkl4NdZC6gBdCHcxSwENJr7kWJD0t6avSfl/SM232E669VsbpyrmYH9AE3blygp8e8GPF/qYxn5seOc1/AeyY5wg40+LjHDCs2P8NnDXksgr0ZyngrKbwL865iVMLuCjpgaRe5c+fOef+McS5JWndw37fECMuHb/o2w3XXgQOarZHwJohj/XyWh8ehH7+WY3AX+t/AM5L2lbxaFXlS+fcX4YYX0ha9bzmJ0OcuHT8pi/Vrlnnv/e86ujrNcVqyeGq58gbsxFNCCsdE32uYr8G7DXY3THEPws8MYjXjyqElQ6JHlVsV4D7TXbYRt+nBvEANqMKYaVDov2K7VaL3ceG2C9QlEi+PCJSOyuYDsneL+0utdhY677vDeIdAD6lznTpkPBdYIP/lytVvJ86gOsG8UbUFrS50yHpIe3TbAh4lR8UC8ekVbyNg1MnnuT1LNzEpiGm78LxiNM0basEireH580cv4WjD2z6xvBh3ivRe4YdA5+rOe99Sb+peMLYcc49DMitE/NsqH7j+34WuCpp4wSzFUmUP6cf49Q9ovJ00jHOKvDYM04feGuaUzgYo4BbhjjvG2PBki0ij/EvW3q015HbHeIuTRnzhiHG3RZ/VygK9S4sZCFdZdvg/zzNZctWabPpkcPCPcqNObIkTnP3ZodyccD//rhQzYQxtwy+mxoQT6i0/YHbngLCArWzAH7G8I2X19U5AC7U7CxdmYVpqI4o3n/4+p3UbRkBlyfY/mkQEBakpb9l8LnC5Pe770ywXTOKB/BRFBFCOCHBPTxrvtLnpFX1RoNt1xJmEsGvNYNpSW5E7V7V0V999I2axCvtbwQIOAz79BFoSe4To7/q6Btx8p6aewECzr/h0JKb984nitE37jQPKbZ9tNn3sC8gUQScZjH5LfCuiv5cVy6r2CPzu4o9zH8AzzbYrkm6U/62Erw3JuU90pL00Dn3SoiD1HeoBu+NSV3A4BNLKU/hfMwhkA9jOEl1BO5KejnGGeIUBcyHDQM4VnFmONrB65QEPFTks8JSOgLuqpi2UcWTll/AgaS3VSwY0f9fgjT/vTGxmfnemEwmk8lkMplMJpPJZFLjXzMoB90iULCqAAAAAElFTkSuQmCC"
                 alt=""
               />
-              <span>BizyAir</span>
+              <span>{{ $t('app.title') }}</span>
             </h1>
             <div class="handle">
               <div :class="['share-input-box', { 'share-input-box-has-val': shareCode }]">
@@ -29,7 +29,7 @@
                     size="tiny"
                     v-model:value="shareCode"
                     class="input"
-                    placeholder="Paste share code"
+                    :placeholder="$t('app.shareCode.placeholder')"
                   >
                     <template #suffix>
                       <span class="msg" @click="runShareCode">
@@ -79,8 +79,19 @@
                 </span>
               </div>
               <btnMessage />
-              <!-- <span class="msg"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.019 17h-6.04m6.04 0h3.614c1.876 0 1.559-1.86.61-2.804C15.825 10.801 20.68 3 11.999 3s-3.825 7.8-7.243 11.196c-.913.908-1.302 2.804.61 2.804H8.98m6.039 0c0 1.925-.648 4-3.02 4s-3.02-2.075-3.02-4"/></svg></span>
-              <span class="set"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19.9 12.66a1 1 0 0 1 0-1.32l1.28-1.44a1 1 0 0 0 .12-1.17l-2-3.46a1 1 0 0 0-1.07-.48l-1.88.38a1 1 0 0 1-1.15-.66l-.61-1.83a1 1 0 0 0-.95-.68h-4a1 1 0 0 0-1 .68l-.56 1.83a1 1 0 0 1-1.15.66L5 4.79a1 1 0 0 0-1 .48L2 8.73a1 1 0 0 0 .1 1.17l1.27 1.44a1 1 0 0 1 0 1.32L2.1 14.1a1 1 0 0 0-.1 1.17l2 3.46a1 1 0 0 0 1.07.48l1.88-.38a1 1 0 0 1 1.15.66l.61 1.83a1 1 0 0 0 1 .68h4a1 1 0 0 0 .95-.68l.61-1.83a1 1 0 0 1 1.15-.66l1.88.38a1 1 0 0 0 1.07-.48l2-3.46a1 1 0 0 0-.12-1.17ZM18.41 14l.8.9l-1.28 2.22l-1.18-.24a3 3 0 0 0-3.45 2L12.92 20h-2.56L10 18.86a3 3 0 0 0-3.45-2l-1.18.24l-1.3-2.21l.8-.9a3 3 0 0 0 0-4l-.8-.9l1.28-2.2l1.18.24a3 3 0 0 0 3.45-2L10.36 4h2.56l.38 1.14a3 3 0 0 0 3.45 2l1.18-.24l1.28 2.22l-.8.9a3 3 0 0 0 0 3.98m-6.77-6a4 4 0 1 0 4 4a4 4 0 0 0-4-4m0 6a2 2 0 1 1 2-2a2 2 0 0 1-2 2"/></svg></span> -->
+              <!-- 语言切换按钮 -->
+              <n-dropdown :options="languageOptions" @select="handleLanguageChange">
+                <n-tooltip trigger="hover">
+                  <template #trigger>
+                    <span class="language-switch">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M12.87 15.07l-2.54-2.51l.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35C8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5l3.11 3.11l.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+                      </svg>
+                    </span>
+                  </template>
+                  {{ $t('common.language') }}
+                </n-tooltip>
+              </n-dropdown>
               <n-tooltip trigger="hover">
                 <template #trigger>
                   <span class="minimize" @click="toMini"
@@ -101,7 +112,7 @@
                     </svg>
                   </span>
                 </template>
-                minimize
+                {{ $t('app.minimize') }}
               </n-tooltip>
             </div>
           </div>
@@ -132,14 +143,17 @@
   import btnMessage from '@/views/btnMessage/index.vue'
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
   import { useStatusStore } from '@/stores/userStatus'
-  import { provide, ref } from 'vue'
+  import { provide, ref, computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
+  import { useLanguageStore } from '@/stores/languageStore'
   import {
     NInput,
     NTooltip,
     NConfigProvider,
     darkTheme,
     NMessageProvider,
-    NNotificationProvider
+    NNotificationProvider,
+    NDropdown
   } from 'naive-ui'
 
   import { useCommunityStore } from '@/stores/communityStore'
@@ -147,6 +161,30 @@
 
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { useToaster } from '@/components/modules/toats/index'
+
+  const { t, locale } = useI18n()
+  const languageStore = useLanguageStore()
+  
+  // 监听语言变化
+  locale.value = languageStore.locale
+
+  // 语言选项
+  const languageOptions = computed(() => [
+    {
+      label: t('common.english'),
+      key: 'en'
+    },
+    {
+      label: t('common.chinese'),
+      key: 'zh'
+    }
+  ])
+
+  // 处理语言切换
+  const handleLanguageChange = (key: string) => {
+    languageStore.setLocale(key)
+    locale.value = key
+  }
 
   const communityStore = useCommunityStore()
   // communityStore.setAndShowCommunityDetail(modelId, versionId)
@@ -198,7 +236,7 @@
       if (shareCode.value.length != 8) {
         useToaster({
           type: 'error',
-          message: 'The length of the share code is incorrect.'
+          message: t('app.shareCode.error.shareCodeLength')
         })
         shareCode.value = ''
         return false
@@ -210,7 +248,7 @@
         if (!clipboardText || typeof clipboardText !== 'string') {
           useToaster({
             type: 'error',
-            message: 'Clipboard content is empty or not a string.'
+            message: t('app.shareCode.error.empty')
           })
           return false
         }
@@ -218,7 +256,7 @@
         if (trimmedClipboardText.length != 8) {
           useToaster({
             type: 'error',
-            message: 'The length of the clipboard content is incorrect.'
+            message: t('app.shareCode.error.length')
           })
           return false
         }
@@ -288,6 +326,13 @@
           width: 16px;
           height: 16px;
         }
+      }
+      
+      .language-switch {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
 

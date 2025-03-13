@@ -16,44 +16,44 @@
     :style="{ maxWidth: '680px' }"
     :on-after-leave="closeDialog"
   >
-    <template #header>Set API Key</template>
+    <template #header>{{ $t('apiKeyDialog.title') }}</template>
 
     <div class="comfy-modal-content-sml">
       <Input
         v-model="apiKey"
         type="password"
-        placeholder="API Key"
+        :placeholder="$t('apiKeyDialog.placeholder')"
         class="text-white"
         :class="[{ 'border-red-500': hasError }]"
         @input="clearError"
       />
       <p>
-        Please
-        <a class="underline" href="###" @click.prevent="openOAuth">click to login</a>
-        and autofill the key,
+        {{ $t('apiKeyDialog.login') }}
+        <a class="underline" href="###" @click.prevent="openOAuth">{{ $t('apiKeyDialog.clickToLogin') }}</a>
+        ,
       </p>
       <p>
-        or visit
+        {{ $t('apiKeyDialog.visitTo') }}
         <a class="underline" href="https://cloud.siliconflow.cn" target="_blank"
           >https://cloud.siliconflow.cn</a
         >
-        to get your key and input manually.
+        {{ $t('apiKeyDialog.getKey') }}
       </p>
       <p>
-        Setting the API Key signifies agreement to the
+        {{ $t('apiKeyDialog.agreement') }}
         <a class="underline" href="https://docs.siliconflow.cn/docs/user-agreement" target="_blank"
-          >User Agreement</a
+          >{{ $t('apiKeyDialog.userAgreement') }}</a
         >
-        and
+        {{ $t('apiKeyDialog.and') }}
         <a class="underline" href="https://docs.siliconflow.cn/docs/privacy-policy" target="_blank"
-          >Privacy Policy.</a
+          >{{ $t('apiKeyDialog.privacyPolicy') }}</a
         >
       </p>
     </div>
     <template #footer>
       <div class="api-dialog-footer">
-        <n-button @click="toSubmit" type="primary">Submit</n-button>
-        <n-button variant="outline" @click="toClose">Close</n-button>
+        <n-button @click="toSubmit" type="primary">{{ $t('apiKeyDialog.submit') }}</n-button>
+        <n-button variant="outline" @click="toClose">{{ $t('apiKeyDialog.close') }}</n-button>
       </div>
     </template>
     <!-- </v-dialog> -->
@@ -61,6 +61,7 @@
 </template>
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
 
   // import vDialog from '@/components/modules/vDialog.vue'
   import { Input } from '@/components/ui/input'
@@ -71,6 +72,7 @@
   import { useNotificationStore } from '@/stores/notificationStore'
   import { NModal, NButton } from 'naive-ui'
 
+  const { t } = useI18n()
   const statusStore = useStatusStore()
   const notificationStore = useNotificationStore()
 
@@ -106,13 +108,13 @@
     }
     const response = await set_api_key(`api_key=${encodeURIComponent(apiKey.value)}`)
     if (response.ok) {
-      useToaster('API Key set successfully!')
+      useToaster(t('apiKeyDialog.success'))
       statusStore.handleApiKeyDialog(false)
       statusStore.loginRefresh()
 
       notificationStore.loadUnreadCount()
     } else {
-      useToaster.error(`Failed to set API Key: ${await response.text()}`)
+      useToaster.error(`${t('apiKeyDialog.failed')} ${await response.text()}`)
     }
   }
   function toClose() {
