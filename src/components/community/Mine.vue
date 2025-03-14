@@ -10,6 +10,7 @@
   import NewPostButton from '@/components/community/modules/NewPostButton.vue'
   import BaseModelGrid from '@/components/community/modules/BaseModelGrid.vue'
   import { useModelGrid } from '@/composables/useModelGrid'
+  import { useI18n } from 'vue-i18n'
 
   defineOptions({
     name: 'Mine'
@@ -17,6 +18,7 @@
 
   type TabType = 'posts' | 'forked'
 
+  const { t } = useI18n()
   const communityStore = useCommunityStore()
   const useModelStore = modelStore()
   const currentTab = ref<TabType>('posts')
@@ -44,7 +46,7 @@
 
   const handleLoadWorkflow = async (versions: any) => {
     if (!versions || versions.length === 0) {
-      useToaster.error('No workflow found')
+      useToaster.error(t('community.workflows.loadWorkflow.notFound'))
       return
     }
     const workflow = await get_workflow_dowload_url(versions[0].id, versions[0].sign)
@@ -57,7 +59,7 @@
         await comfyUIApp.loadGraphData(workflow.data)
       }
     } else {
-      useToaster.error('Failed to load workflow')
+      useToaster.error(t('community.workflows.loadWorkflow.error', { error: 'Unknown error' }))
     }
     communityStore.showDialog = false
   }
@@ -69,8 +71,9 @@
       const canvas = window.LGraphCanvas?.active_canvas
 
       if (loraLoaderNode && canvas) {
-        loraLoaderNode.title =
-          model.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
+        loraLoaderNode.title = model.type === 'LoRA' 
+          ? t('community.models.nodeTitle.lora')
+          : t('community.models.nodeTitle.controlnet')
         loraLoaderNode.color = '#7C3AED'
 
         const widgetValues =
@@ -100,11 +103,11 @@
 
         canvas.graph.add(loraLoaderNode)
         communityStore.showDialog = false
-        useToaster.success('Node added successfully')
+        useToaster.success(t('community.models.addNode.success'))
       }
     } catch (error) {
       console.error('Failed to add node:', error)
-      useToaster.error(`Failed to add node: ${error}`)
+      useToaster.error(t('community.models.addNode.error', { error }))
     }
   }
 

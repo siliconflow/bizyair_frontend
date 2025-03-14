@@ -5,12 +5,14 @@
   import { sliceString, formatNumber } from '@/utils/tool'
   import { useCommunityStore } from '@/stores/communityStore'
   import { useDictStore } from '@/stores/dictStore'
-  import { ref, watch, onMounted } from 'vue'
+  import { ref, watch, onMounted, computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
 
   defineOptions({
     name: 'ModelCard'
   })
 
+  const { t } = useI18n()
   const communityStore = useCommunityStore()
   const dialogLoading = ref(true)
   const showDialog = ref(false)
@@ -32,6 +34,13 @@
   })
 
   const emit = defineEmits(['action', 'image-load', 'image-error'])
+
+  // 计算工作流或节点的提示文本
+  const actionTooltipText = computed(() => {
+    return props.model?.type === 'Workflow' 
+      ? t('community.modelCard.tooltips.loadWorkflow')
+      : t('community.modelCard.tooltips.addNode')
+  })
 
   const handleImageLoad = (e: Event) => {
     emit('image-load', e)
@@ -105,7 +114,7 @@
           class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
           @click.prevent.stop="$emit('action', model)"
         >
-          <vTooltips :tips="model?.type === 'Workflow' ? 'Load Workflow' : 'Add Node'">
+          <vTooltips :tips="actionTooltipText">
             <div
               class="w-8 h-8 rounded-full bg-[#25252566] hover:bg-[#7C3AED] flex items-center justify-center transition-colors duration-200 cursor-pointer"
             >
@@ -163,7 +172,7 @@
                   model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)
                 "
                 :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'"
-                >{{ tagsStore.getHighestOrderTag(model.tags)?.label || 'New' }}</span
+                >{{ tagsStore.getHighestOrderTag(model.tags)?.label || t('community.modelCard.tags.new') }}</span
               >
               <h3 class="text-base text-white font-medium mb-2 truncate">
                 {{ sliceString(model.name, 24) }}
@@ -175,7 +184,7 @@
               v-if="model?.type === 'Workflow' && model?.counter?.downloaded_count"
               class="flex items-center space-x-1"
             >
-              <vTooltips tips="Downloaded">
+              <vTooltips :tips="t('community.modelCard.tooltips.downloaded')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -195,7 +204,7 @@
               <span class="opacity-80">{{ formatNumber(model?.counter?.downloaded_count) }}</span>
             </span>
             <span v-else class="flex items-center space-x-1">
-              <vTooltips tips="Used">
+              <vTooltips :tips="t('community.modelCard.tooltips.used')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="14"
@@ -214,7 +223,7 @@
               <span class="opacity-80">{{ formatNumber(model?.counter?.used_count) }}</span>
             </span>
             <span class="flex items-center space-x-1">
-              <vTooltips tips="Forked">
+              <vTooltips :tips="t('community.modelCard.tooltips.forked')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -233,7 +242,7 @@
               <span class="opacity-80">{{ formatNumber(model?.counter?.forked_count) }}</span>
             </span>
             <span class="flex items-center space-x-1">
-              <vTooltips tips="Liked">
+              <vTooltips :tips="t('community.modelCard.tooltips.liked')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="15"

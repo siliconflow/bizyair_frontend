@@ -6,11 +6,13 @@
   import { useToaster } from '@/components/modules/toats'
   import { Model } from '@/types/model'
   import { useModelGrid } from '@/composables/useModelGrid'
+  import { useI18n } from 'vue-i18n'
 
   defineOptions({
     name: 'MainContent'
   })
 
+  const { t } = useI18n()
   const communityStore = useCommunityStore()
 
   const {
@@ -31,8 +33,9 @@
       const canvas = window.LGraphCanvas?.active_canvas
 
       if (loraLoaderNode && canvas) {
-        loraLoaderNode.title =
-          model.type === 'LoRA' ? '☁️BizyAir Load Lora' : '☁️BizyAir Load ControlNet Model'
+        loraLoaderNode.title = model.type === 'LoRA' 
+          ? t('community.models.nodeTitle.lora')
+          : t('community.models.nodeTitle.controlnet')
         loraLoaderNode.color = '#7C3AED'
 
         const widgetValues =
@@ -61,11 +64,11 @@
 
         canvas.graph.add(loraLoaderNode)
         communityStore.showDialog = false
-        useToaster.success('Node added successfully')
+        useToaster.success(t('community.models.addNode.success'))
       }
     } catch (error) {
       console.error('Failed to add node:', error)
-      useToaster.error(`Failed to add node: ${error}`)
+      useToaster.error(t('community.models.addNode.error', { error }))
     }
   }
 

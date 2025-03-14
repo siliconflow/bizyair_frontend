@@ -81,7 +81,7 @@
               :value="type.value"
               class="cursor-pointer hover:bg-[#4d4d4dee] transition-colors duration-200"
               :class="selectedNotificationType === type.value ? 'bg-[#7C3AED] text-white' : ''"
-              >{{ type.label }}</SelectItem
+              >{{ $t(`messageBox.notificationTypes.${type.label}`) }}</SelectItem
             >
           </v-select>
 

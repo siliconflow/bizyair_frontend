@@ -52,7 +52,6 @@
         <p class="text-gray-400">{{ $t('messageBox.noNotifications') }}</p>
       </div>
     </div>
-
     <detail-modal
       v-model="showDetail"
       :message="selectedMessage as any"
@@ -67,9 +66,9 @@
   import { NotificationType } from '../types'
   import DetailModal from './Detail.vue'
   import { useNotificationStore } from '@/stores/notificationStore'
-  import { useI18n } from 'vue-i18n'
+ 
 
-  const { t } = useI18n()
+
   const notificationStore = useNotificationStore()
 
   const props = defineProps<{

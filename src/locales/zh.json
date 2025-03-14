@@ -47,7 +47,7 @@
     "edit": "编辑"
   },
   "messageBox": {
-    "title": "消息盒",
+    "title": "消息盒子",
     "markAllAsRead": "标记所有为已读",
     "officialNotices": "官方通知",
     "userForks": "用户复刻",
@@ -57,7 +57,14 @@
     "unread": "未读",
     "read": "已读",
     "noNotifications": "没有通知",
-    "notificationType": "通知类型"
+    "notificationType": "通知类型",
+    "notificationTypes": {
+      "ANNOUNCEMENT": "公告",
+      "BILLING": "账单",
+      "REVIEW_RESULT": "审核结果",
+      "USER_LIKE": "用户点赞",
+      "USER_FORK": "用户复刻"
+    }
   },
   "community": {
     "edit": "编辑",
@@ -75,7 +82,12 @@
     },
     "workflows": {
       "title": "工作流", 
-      "subtitle": "浏览所有工作流"
+      "subtitle": "浏览所有工作流",
+      "loadWorkflow": {
+        "success": "工作流加载成功",
+        "error": "加载工作流失败: {error}",
+        "notFound": "未找到工作流"
+      }
     },
     "models": {
       "title": "模型",
@@ -94,6 +106,14 @@
       "contents": {
         "title": "内容",
         "subtitle": "查看我的内容"
+      },
+      "tabs": {
+        "posts": "发布",
+        "forked": "复刻"
+      },
+      "newContent": {
+        "model": "新建模型",
+        "workflow": "新建工作流"
       }
     },
     "filter": {
@@ -102,20 +122,72 @@
         "options": {
           "latest": "最新",
           "popular": "最热",
-          "downloads": "下载量",
-          "most-used": "使用次数"
+          "downloads": "最多下载",
+          "most-used": "最多使用",
+          "most-liked": "最多点赞"
         }
       },
       "type": {
-        "title": "类型",
+        "title": "请输入关键字",
         "all": "全部",
         "lora": "LoRA",
-        "controlnet": "ControlNet"
+        "controlnet": "ControlNet",
+        "model-types": "模型类型",
+        "base-model": "基础模型"
       }
     },
     "emptyState": {
       "title": "暂无数据",
       "subtitle": "请尝试选择其他基础模型或调整筛选条件"
+    },
+    "modelCard": {
+      "tooltips": {
+        "loadWorkflow": "加载工作流",
+        "addNode": "添加节点",
+        "downloaded": "下载量",
+        "used": "使用量",
+        "forked": "复刻量", 
+        "liked": "点赞量"
+      },
+      "tags": {
+        "new": "新品"
+      }
+    },
+    "detail": {
+      "type": "类型",
+      "baseModel": "基础模型",
+      "unFork": "取消复刻",
+      "fork": "复刻",
+      "addNode": "添加节点",
+      "load": "加载",
+      "loading": "加载中...",
+      "share": "分享",
+      "copy": "复制",
+      "download": "下载",
+      "stats": "统计",
+      "hash": "哈希值",
+      "file": "文件",
+      "reviews": "评价",
+      "positive": "积极",
+      "negative": "消极",
+      "firstPublished": "首次发布：",
+      "lastUpdated": "最后更新：",
+      "workflow": "工作流",
+      "model": "模型",
+      "confirmUnfork": "确定要取消复刻这个{0}吗？",
+      "unforkWarning": "原始模型可能不再公开可用。",
+      "confirmUnforkBtn": "是的，取消复刻",
+      "confirmDelete": "确定要删除这个{0}吗？",
+      "deleteWarning": "此操作无法撤销。",
+      "confirmDeleteBtn": "是的，删除它",
+      "tooltips": {
+        "like": "点赞",
+        "liked": "已点赞",
+        "modelType": "模型文件类型可能是 {0}",
+        "unknownModelType": "未知基础模型类型"
+      },
+      "edit": "编辑",
+      "remove": "删除"
     }
   },
   "modelSelect": {

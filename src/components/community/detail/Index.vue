@@ -40,6 +40,7 @@
   import 'md-editor-v3/lib/style.css'
   import { debounce } from 'lodash-es'
   import { create_share_code } from '@/api/model'
+  import { useI18n } from 'vue-i18n'
 
   const communityStore = useCommunityStore()
   const userStatusStore = useStatusStore()
@@ -50,7 +51,7 @@
   const scrollViewportRef = ref<any | null>(null)
   const modelStoreInstance = modelStore()
   const isLoading = ref(false)
-
+  const { t } = useI18n()
   const comfyUIApp: any = inject('comfyUIApp')
 
   const activeTab = ref<number>()
@@ -171,10 +172,10 @@
     if (communityStore.TabSource === 'my_fork') {
       if (model.value.versions.length <= 1) {
         const res = await useAlertDialog({
-          title: `Are you sure you want to unfork  this ${model.value?.type === 'Workflow' ? 'workflow' : 'model'}?`,
-          desc: 'The original model may no longer be public.',
-          cancel: 'No, Keep It',
-          continue: 'Yes, UnFork It',
+          title: t('community.detail.confirmUnfork', [model.value?.type === 'Workflow' ? t('community.detail.workflow') : t('community.detail.model')]),
+          desc: t('community.detail.unforkWarning'),
+          cancel: t('confirm.cancel'),
+          continue: t('community.detail.confirmUnforkBtn'),
           z: 'z-12000'
         })
         if (!res) return
@@ -283,10 +284,10 @@
     if (type === 'remove') {
       downloadOpen.value = false
       const res = await useAlertDialog({
-        title: `Are you sure you want to delete this ${model.value?.type === 'Workflow' ? 'workflow' : 'model'}?`,
-        desc: 'This action cannot be undone.',
-        cancel: 'No, Keep It',
-        continue: 'Yes, Delete It',
+        title: t('community.detail.confirmDelete', [model.value?.type === 'Workflow' ? t('community.detail.workflow') : t('community.detail.model')]),
+        desc: t('community.detail.deleteWarning'),
+        cancel: t('confirm.cancel'),
+        continue: t('community.detail.confirmDeleteBtn'),
         z: 'z-12000'
       })
       if (!res) return
@@ -455,7 +456,7 @@
               v-if="model?.type !== 'Workflow'"
               class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
             >
-              <vTooltips tips="Used">
+              <vTooltips :tips="t('community.modelCard.tooltips.used')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -481,7 +482,7 @@
               v-else
               class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
             >
-              <vTooltips tips="Downloaded">
+              <vTooltips :tips="t('community.modelCard.tooltips.downloaded')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -507,7 +508,7 @@
           <div
             class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
           >
-            <vTooltips tips="Forked">
+            <vTooltips :tips="t('community.modelCard.tooltips.forked')">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -532,7 +533,7 @@
           <div
             class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
           >
-            <vTooltips tips="Liked">
+            <vTooltips :tips="t('community.modelCard.tooltips.liked')">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -624,7 +625,7 @@
           ></div>
 
           <div class="flex gap-4">
-            <vTooltips v-if="communityStore.TabSource === 'publicity'" tips="Share">
+            <vTooltips v-if="communityStore.TabSource === 'publicity'" :tips="t('community.detail.share')">
               <div
                 class="w-[48px] h-[48px] bg-[#4e4e4e] hover:bg-[#4e4e4e]/60 rounded-lg flex items-center justify-center cursor-pointer"
               >
@@ -642,7 +643,7 @@
                 </svg>
               </div>
             </vTooltips>
-            <vTooltips :tips="currentVersion?.liked ? 'Liked' : 'Like'">
+            <vTooltips :tips="currentVersion?.liked ? t('community.detail.tooltips.liked') : t('community.detail.tooltips.like')">
               <div
                 class="w-[48px] h-[48px] rounded-lg flex items-center justify-center cursor-pointer"
                 :class="[
@@ -729,7 +730,7 @@
                         class="px-2 py-1.5 mb-1 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]"
                         @click="handleModelOperation('edit', model?.id)"
                       >
-                        Edit
+                        {{ t('community.detail.edit') }}
                       </CommandItem>
                       <CommandSeparator />
                       <CommandItem
@@ -737,7 +738,7 @@
                         class="px-2 py-1.5 mb-1 mt-1 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]"
                         @click="handleModelOperation('remove', model?.id)"
                       >
-                        Remove
+                        {{ t('community.detail.remove') }}
                       </CommandItem>
                     </CommandGroup>
                   </CommandList>
@@ -750,12 +751,12 @@
           <div
             class="text-text-text-muted-foreground text-left font-['Inter-Regular',_sans-serif] text-xs leading-5 font-normal relative"
           >
-            First Published: {{ currentVersion?.created_at }}
+            {{ t('community.detail.firstPublished') }} {{ currentVersion?.created_at }}
           </div>
           <div
             class="text-text-text-muted-foreground text-left font-['Inter-Regular',_sans-serif] text-xs leading-5 font-normal relative"
           >
-            Last Updated: {{ currentVersion?.updated_at }}
+            {{ t('community.detail.lastUpdated') }} {{ currentVersion?.updated_at }}
           </div>
         </div>
       </div>
@@ -787,7 +788,7 @@
                 <div
                   class="text-text-text-muted-foreground text-left font-['Inter-Regular',_sans-serif] text-xs leading-5 font-normal relative"
                 >
-                  No introduction yet
+                  {{ t('community.noIntroduction') }}
                 </div>
               </div>
             </div>
@@ -817,9 +818,9 @@
                 class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
                 @click="handleFork"
               >
-                <template v-if="['my_fork'].includes(communityStore.TabSource)"> UnFork </template>
+                <template v-if="['my_fork'].includes(communityStore.TabSource)"> {{ t('community.detail.unFork') }} </template>
                 <template v-else>
-                  {{ currentVersion?.forked ? 'UnFork' : 'Fork' }}
+                  {{ currentVersion?.forked ? t('community.detail.unFork') : t('community.detail.fork') }}
                 </template>
               </Button>
               <Button
@@ -840,7 +841,7 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   /></svg
-                >Add Node</Button
+                >{{ t('community.detail.addNode') }}</Button
               >
 
               <Button
@@ -870,7 +871,7 @@
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  <span class="ml-1">Loading...</span>
+                  <span class="ml-1">{{ t('community.detail.loading') }}</span>
                 </template>
                 <template v-else>
                   <svg
@@ -887,7 +888,7 @@
                       stroke-linejoin="round"
                     />
                   </svg>
-                  Load
+                  {{ t('community.detail.load') }}
                 </template>
               </Button>
             </div>
@@ -896,8 +897,8 @@
             class="rounded-[6px] border-solid border-[rgba(78,78,78,0.50)] border flex flex-col gap-0 items-start justify-start self-stretch shrink-0 relative text-[#F9FAFB] font-inter text-sm font-medium leading-5"
           >
             <div className="flex w-full text-gray-300 text-sm">
-              <div className="w-[100px] bg-[#4E4E4E80] p-4   border-b border-[rgba(78,78,78,0.50)]">
-                Type
+              <div className="w-[100px] bg-[#4E4E4E80] p-4 border-b border-[rgba(78,78,78,0.50)]">
+                {{ t('community.detail.type') }}
               </div>
               <div className="flex-1 p-4 border-b text-sm border-[rgba(78,78,78,0.50)]">
                 <span
@@ -911,7 +912,7 @@
               <div
                 className="w-[100px] bg-[#4E4E4E80] p-4 text-sm  border-b border-[rgba(78,78,78,0.50)] whitespace-nowrap"
               >
-                Base Model
+                {{ t('community.detail.baseModel') }}
               </div>
               <div className="flex-1 p-4 border-b  border-[rgba(78,78,78,0.50)]">
                 {{ currentVersion?.base_model }}
@@ -919,7 +920,7 @@
             </div>
             <div className="flex w-full">
               <div className="w-[100px] bg-[#4E4E4E80] p-4  border-b border-[rgba(78,78,78,0.50)]">
-                Published
+                {{ t('community.published') }}
               </div>
               <div className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)]">
                 {{ currentVersion?.created_at }}
@@ -930,12 +931,12 @@
               className="flex w-full"
             >
               <div className="w-[100px] bg-[#4E4E4E80] p-4  border-b border-[rgba(78,78,78,0.50)]">
-                Reviews
+                {{ t('community.detail.reviews') }}
               </div>
               <div className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)]">
                 <div class="flex items-center gap-2">
                   <vTooltips
-                    :tips="`${currentVersion?.review_result !== 'Unknown' ? `The type of model file may be ${currentVersion?.review_result}` : 'Unknown base model type'}`"
+                    :tips="currentVersion?.review_result !== 'Unknown' ? t('community.detail.tooltips.modelType', [currentVersion?.review_result]) : t('community.detail.tooltips.unknownModelType')"
                   >
                     <svg
                       v-if="currentVersion?.review_state === 1"
@@ -982,19 +983,19 @@
                     </svg>
                   </vTooltips>
                   <div v-if="currentVersion?.review_state === 1" class="flex items-center gap-1">
-                    <span class="text-green-500">Positive</span>
+                    <span class="text-green-500">{{ t('community.detail.positive') }}</span>
                     <span class="text-gray-500">{{
                       currentVersion?.review_at ? currentVersion?.review_at?.replace(/-/g, '') : ''
                     }}</span>
                   </div>
-                  <span v-else class="text-red-500"> Negative </span>
+                  <span v-else class="text-red-500"> {{ t('community.detail.negative') }} </span>
                 </div>
               </div>
             </div>
 
             <div className="flex w-full">
               <div className="w-[100px] bg-[#4E4E4E80] p-4  border-b border-[rgba(78,78,78,0.50)]">
-                Hash
+                {{ t('community.detail.hash') }}
               </div>
               <div
                 className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)] flex items-center gap-2"
@@ -1002,7 +1003,7 @@
                 <span>
                   {{ currentVersion?.sign ? sliceString(currentVersion?.sign, 15) : '' }}
                 </span>
-                <vTooltips tips="Copy">
+                <vTooltips :tips="t('community.detail.copy')">
                   <svg
                     v-if="currentVersion?.sign"
                     xmlns="http://www.w3.org/2000/svg"
@@ -1034,14 +1035,14 @@
               <div
                 className="w-[100px] bg-[#4E4E4E80] p-4 text-gray-300   border-b border-[rgba(78,78,78,0.50)]"
               >
-                Stats
+                {{ t('community.detail.stats') }}
               </div>
               <div className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)] flex flex-row gap-2">
                 <div
                   v-if="model?.type !== 'Workflow'"
                   class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
                 >
-                  <vTooltips tips="Used">
+                  <vTooltips :tips="t('community.modelCard.tooltips.used')">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -1066,7 +1067,7 @@
                 <div
                   class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
                 >
-                  <vTooltips tips="Forked">
+                  <vTooltips :tips="t('community.modelCard.tooltips.forked')">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -1091,7 +1092,7 @@
                 <div
                   class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
                 >
-                  <vTooltips tips="Liked">
+                  <vTooltips :tips="t('community.modelCard.tooltips.liked')">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -1124,7 +1125,7 @@
                   v-if="model?.type === 'Workflow'"
                   class="bg-[#6D28D933] rounded-radius-rounded-xl pr-1.5 pl-1.5 flex flex-row gap-1 items-center justify-center shrink-0 min-w-[40px] relative overflow-hidden"
                 >
-                  <vTooltips tips="Downloaded">
+                  <vTooltips :tips="t('community.modelCard.tooltips.downloaded')">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -1155,7 +1156,7 @@
             <div
               class="bg-[#424242] rounded-md flex items-center justify-start self-stretch shrink-0 relative h-[44px] pl-2"
             >
-              File
+              {{ t('community.detail.file') }}
             </div>
             <div
               class="flex px-[8px] py-4 items-center self-stretch text-[#F9FAFB] font-inter text-xs font-medium leading-5"
@@ -1168,7 +1169,7 @@
                 class="cursor-pointer ml-2 hover:opacity-80"
                 @click="handleDownloadWorkFlow"
               >
-                <vTooltips tips="Download">
+                <vTooltips :tips="t('community.detail.download')">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"

@@ -249,6 +249,19 @@
               >
                 {{ t('community.filter.sort.options.downloads') }}
               </CommandItem>
+              <CommandItem
+                value="most-used"
+                :class="[
+                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer',
+                  '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]',
+                  store[props.page].filterState.sort === 'Most Liked'
+                    ? '!bg-[#6D28D9] !text-[#F9FAFB]'
+                    : ''
+                ]"
+                @click="handleSortChange('Most Liked')"
+              >
+                {{ t('community.filter.sort.options.most-liked') }}
+              </CommandItem>
             </CommandGroup>
           </CommandList>
         </Command>
@@ -299,7 +312,9 @@
           <CommandList>
             <CommandGroup v-if="props.page !== 'quickStart' && props.page !== 'workflows'">
               <div class="p-2">
-                <div class="text-sm font-medium text-[#F9FAFB] mb-2">Model Types</div>
+                <div class="text-sm font-medium text-[#F9FAFB] mb-2">
+                  {{ t('community.filter.type.model-types') }}
+                </div>
               </div>
               <CommandItem value="model-types" class="p-2">
                 <div class="flex flex-wrap gap-2">
@@ -323,7 +338,9 @@
             <CommandSeparator v-if="props.page !== 'quickStart' && props.page !== 'workflows'" />
             <CommandGroup>
               <div class="p-2">
-                <div class="text-sm font-medium text-[#F9FAFB] mb-2">Base Models</div>
+                <div class="text-sm font-medium text-[#F9FAFB] mb-2">
+                  {{ t('community.filter.type.base-model') }}
+                </div>
               </div>
               <CommandItem value="base-models" class="p-2">
                 <div class="flex flex-wrap gap-2">
