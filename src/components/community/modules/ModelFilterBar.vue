@@ -220,7 +220,7 @@
                 ]"
                 @click="handleSortChange('Most Forked')"
               >
-                {{ t('community.filter.sort.options.popular') }}
+                {{ t('community.filter.sort.options.most-forked') }}
               </CommandItem>
               <CommandItem
                 value="most-used"

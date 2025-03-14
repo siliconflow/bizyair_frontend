@@ -18,7 +18,7 @@
         </n-badge>
       </div>
     </template>
-    {{ $t('buttons.message') }}
+    {{ t('buttons.message') }}
   </n-tooltip>
 
   <MessageBox :show="showMessage" @update:show="updateMessage" />
@@ -29,7 +29,9 @@
   import { useNotificationStore } from '@/stores/notificationStore'
   import { ref, watch } from 'vue'
   import { NTooltip, NBadge } from 'naive-ui'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const showMessage = ref(false)
   const updateMessage = (show: boolean) => {
     showMessage.value = show

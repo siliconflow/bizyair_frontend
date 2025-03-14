@@ -16,44 +16,44 @@
     :style="{ maxWidth: '680px' }"
     :on-after-leave="closeDialog"
   >
-    <template #header>{{ $t('apiKeyDialog.title') }}</template>
+    <template #header>{{ t('apiKeyDialog.title') }}</template>
 
     <div class="comfy-modal-content-sml">
       <Input
         v-model="apiKey"
         type="password"
-        :placeholder="$t('apiKeyDialog.placeholder')"
+        :placeholder="t('apiKeyDialog.placeholder')"
         class="text-white"
         :class="[{ 'border-red-500': hasError }]"
         @input="clearError"
       />
       <p>
-        {{ $t('apiKeyDialog.login') }}
-        <a class="underline" href="###" @click.prevent="openOAuth">{{ $t('apiKeyDialog.clickToLogin') }}</a>
+        {{ t('apiKeyDialog.login') }}
+        <a class="underline" href="###" @click.prevent="openOAuth">{{ t('apiKeyDialog.clickToLogin') }}</a>
         ,
       </p>
       <p>
-        {{ $t('apiKeyDialog.visitTo') }}
+        {{ t('apiKeyDialog.visitTo') }}
         <a class="underline" href="https://cloud.siliconflow.cn" target="_blank"
           >https://cloud.siliconflow.cn</a
         >
-        {{ $t('apiKeyDialog.getKey') }}
+        {{ t('apiKeyDialog.getKey') }}
       </p>
       <p>
-        {{ $t('apiKeyDialog.agreement') }}
+        {{ t('apiKeyDialog.agreement') }}
         <a class="underline" href="https://docs.siliconflow.cn/docs/user-agreement" target="_blank"
-          >{{ $t('apiKeyDialog.userAgreement') }}</a
+          >{{ t('apiKeyDialog.userAgreement') }}</a
         >
-        {{ $t('apiKeyDialog.and') }}
+        {{ t('apiKeyDialog.and') }}
         <a class="underline" href="https://docs.siliconflow.cn/docs/privacy-policy" target="_blank"
-          >{{ $t('apiKeyDialog.privacyPolicy') }}</a
+          >{{ t('apiKeyDialog.privacyPolicy') }}</a
         >
       </p>
     </div>
     <template #footer>
       <div class="api-dialog-footer">
-        <n-button @click="toSubmit" type="primary">{{ $t('apiKeyDialog.submit') }}</n-button>
-        <n-button variant="outline" @click="toClose">{{ $t('apiKeyDialog.close') }}</n-button>
+        <n-button type="primary" @click="toSubmit">{{ t('apiKeyDialog.submit') }}</n-button>
+        <n-button variant="outline" @click="toClose">{{ t('apiKeyDialog.close') }}</n-button>
       </div>
     </template>
     <!-- </v-dialog> -->

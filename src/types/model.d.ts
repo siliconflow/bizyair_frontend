@@ -18,6 +18,7 @@ export interface Model {
   versions?: ModelVersion[]
   user_id: string
   user_name: string
+  user_avatar?: string
   counter?:any
   tags:string[]
 }

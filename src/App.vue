@@ -143,7 +143,7 @@
   import btnMessage from '@/views/btnMessage/index.vue'
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
   import { useStatusStore } from '@/stores/userStatus'
-  import { provide, ref, computed } from 'vue'
+  import { provide, ref, computed, onMounted } from 'vue'
   import { useI18n } from 'vue-i18n'
   import { useLanguageStore } from '@/stores/languageStore'
   import {
@@ -158,6 +158,7 @@
 
   import { useCommunityStore } from '@/stores/communityStore'
   import { get_share_code } from '@/api/model'
+  import { get_user_language_profile, put_user_language_profile } from '@/api/user'
 
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { useToaster } from '@/components/modules/toats/index'
@@ -165,10 +166,28 @@
   const { t, locale } = useI18n()
   const languageStore = useLanguageStore()
   
-  // 监听语言变化
+  const getUserLanguageProfile = async () => {
+    try {
+      const res = await get_user_language_profile()
+      if (res.data?.global?.lang) {
+        const userLang = res.data.global.lang
+        languageStore.setLocale(userLang)
+        locale.value = userLang
+      } else {
+        languageStore.setLocale('zh')
+        locale.value = 'zh'
+      }
+    } catch (error) {
+      languageStore.setLocale('zh')
+      locale.value = 'zh'
+    }
+  }
+  onMounted(() => {
+    getUserLanguageProfile()
+  })
+
   locale.value = languageStore.locale
 
-  // 语言选项
   const languageOptions = computed(() => [
     {
       label: t('common.english'),
@@ -180,10 +199,22 @@
     }
   ])
 
-  // 处理语言切换
-  const handleLanguageChange = (key: string) => {
+  const handleLanguageChange = async (key: string) => {
     languageStore.setLocale(key)
     locale.value = key
+    
+    try {
+      await put_user_language_profile({
+        global: {
+          lang: key
+        }
+      })
+    } catch (error) {
+      useToaster({
+        type: 'error',
+        message: t('common.languageUpdateFailed')
+      })
+    }
   }
 
   const communityStore = useCommunityStore()

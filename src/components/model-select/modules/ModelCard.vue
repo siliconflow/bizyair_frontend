@@ -2,11 +2,14 @@
   import { Model } from '@/types/model'
   import vDefaultPic from '@/components/modules/vDefaultPic.vue'
   import vTooltips from '@/components/modules/v-tooltip.vue'
+  import { useI18n } from 'vue-i18n'
 
   import { sliceString, formatNumber } from '@/utils/tool'
   import { useModelSelectStore } from '@/stores/modelSelectStore'
   import { ref, watch, onMounted } from 'vue'
   import { useDictStore } from '@/stores/dictStore'
+
+  const { t } = useI18n()
 
   defineOptions({
     name: 'ModelCard'
@@ -86,7 +89,7 @@
           class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
           @click.prevent.stop="$emit('action', model)"
         >
-          <vTooltips tips="Apply">
+          <vTooltips :tips="t('modelSelect.apply')">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -146,7 +149,7 @@
                   model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)
                 "
                 :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'"
-                >{{ tagsStore.getHighestOrderTag(model.tags)?.label || 'New' }}</span
+                >{{ tagsStore.getHighestOrderTag(model.tags)?.label || t('community.modelCard.tags.new') }}</span
               >
               <h3 class="text-base text-white font-medium mb-2 truncate">
                 {{ sliceString(model.name, 24) }}
@@ -158,7 +161,7 @@
               v-if="model?.type === 'Workflow' && model?.counter?.downloaded_count"
               class="flex items-center space-x-1"
             >
-              <vTooltips tips="Downloaded">
+              <vTooltips :tips="t('community.modelCard.tooltips.downloaded')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -178,7 +181,7 @@
               <span class="opacity-80">{{ formatNumber(model?.counter?.downloaded_count) }}</span>
             </span>
             <span v-else class="flex items-center space-x-1">
-              <vTooltips tips="Used">
+              <vTooltips :tips="t('community.modelCard.tooltips.used')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="14"
@@ -197,7 +200,7 @@
               <span class="opacity-80">{{ formatNumber(model?.counter?.used_count) }}</span>
             </span>
             <span class="flex items-center space-x-1">
-              <vTooltips tips="Forked">
+              <vTooltips :tips="t('community.modelCard.tooltips.forked')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -216,7 +219,7 @@
               <span class="opacity-80">{{ formatNumber(model?.counter?.forked_count) }}</span>
             </span>
             <span class="flex items-center space-x-1">
-              <vTooltips tips="Liked">
+              <vTooltips :tips="t('community.modelCard.tooltips.liked')">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="15"

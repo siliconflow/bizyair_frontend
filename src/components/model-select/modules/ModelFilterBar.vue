@@ -2,6 +2,7 @@
   import { Button } from '@/components/ui/button'
   import { Input } from '@/components/ui/input'
   import { Badge } from '@/components/ui/badge'
+  import { useI18n } from 'vue-i18n'
 
   import { useModelSelectStore } from '@/stores/modelSelectStore'
   import type { SortValue, ModeTabType } from '@/types/model'
@@ -16,6 +17,7 @@
   } from '@/components/ui/command'
   import { onMounted, nextTick } from 'vue'
 
+  const { t } = useI18n()
   const store = useModelSelectStore()
 
   const props = defineProps<{
@@ -93,7 +95,7 @@
       <Input
         v-model="store[props.page].filterState.keyword"
         v-debounce="handleSearch"
-        placeholder="Filter by name"
+        :placeholder="t('community.filter.type.title')"
         class="h-[44px] border border-[#9CA3AF] w-full bg-[#222] rounded-lg pr-8 pl-8"
         @update:model-value="val => (store[props.page].filterState.keyword = String(val))"
       />
@@ -162,7 +164,7 @@
                 ]"
                 @click="handleSortChange('Recently')"
               >
-                Recently
+                {{ t('community.filter.sort.options.latest') }}
               </CommandItem>
               <CommandItem
                 value="most-forked"
@@ -175,7 +177,7 @@
                 ]"
                 @click="handleSortChange('Most Forked')"
               >
-                Most Forked
+                {{ t('community.filter.sort.options.downloads') }}
               </CommandItem>
               <CommandItem
                 value="most-used"
@@ -188,7 +190,7 @@
                 ]"
                 @click="handleSortChange('Most Used')"
               >
-                Most Used
+                {{ t('community.filter.sort.options.most-used') }}
               </CommandItem>
               <CommandItem
                 value="most-used"
@@ -201,7 +203,7 @@
                 ]"
                 @click="handleSortChange('Most Liked')"
               >
-                Most Liked
+                {{ t('community.filter.sort.options.most-liked') }}
               </CommandItem>
             </CommandGroup>
           </CommandList>
@@ -237,7 +239,7 @@
           <CommandList>
             <CommandGroup>
               <div class="p-2">
-                <div class="text-sm font-medium text-[#F9FAFB] mb-2">Model Types</div>
+                <div class="text-sm font-medium text-[#F9FAFB] mb-2">{{ t('community.filter.type.model-types') }}</div>
               </div>
               <CommandItem value="model-types" class="p-2">
                 <div class="flex flex-wrap gap-2">
@@ -260,7 +262,7 @@
             <CommandSeparator v-if="props.page !== 'posts' && props.page !== 'community'" />
             <CommandGroup>
               <div class="p-2">
-                <div class="text-sm font-medium text-[#F9FAFB] mb-2">Base Models</div>
+                <div class="text-sm font-medium text-[#F9FAFB] mb-2">{{ t('community.filter.type.base-model') }}</div>
               </div>
               <CommandItem value="base-models" class="p-2">
                 <div class="flex flex-wrap gap-2">

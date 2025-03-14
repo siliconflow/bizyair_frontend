@@ -1,5 +1,5 @@
 <template>
-  <btnMenu :show_cases="show_cases" :buttonText="$t('buttons.publish')" icon="book-open" :isJson="true">
+  <btnMenu :show_cases="localizedShowCases" :buttonText="$t('buttons.publish')" icon="book-open" :isJson="true">
     <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 32 32">
       <path
         fill="#ddd"
@@ -14,16 +14,22 @@
   import btnMenu from '@/components/modules/btnMenu.vue'
   import dialogModel from './dialogModel.vue'
   import dialogWorkflow from './dialogWorkflow.vue'
-  import { onMounted, ref } from 'vue'
+  import { onMounted, computed } from 'vue'
   import { modelStore } from '@/stores/modelStatus'
+  import { useI18n } from 'vue-i18n'
+  
   const modelStoreObject = modelStore()
+  const { t } = useI18n()
 
-  const show_cases = ref({
-    Model: () => {
-      modelStoreObject.setDialogStatus(true)
-    },
-    Workflow: () => {
-      modelStoreObject.setDialogStatusWorkflow(true)
+  // 创建本地化的菜单项
+  const localizedShowCases = computed(() => {
+    return {
+      [t('buttons.model')]: () => {
+        modelStoreObject.setDialogStatus(true)
+      },
+      [t('buttons.workflow')]: () => {
+        modelStoreObject.setDialogStatusWorkflow(true)
+      }
     }
   })
 

@@ -11,7 +11,7 @@
         stroke-linejoin="round"
       />
     </svg>
-    <span class="block leading h-full leading-8 text-sm">PublishModel</span>
+    <span class="block leading h-full leading-8 text-sm">{{ t('buttons.publishModel') }}</span>
   </div>
   <v-dialog
     v-if="modelStoreObject.showDialog"
@@ -22,29 +22,29 @@
     @on-close="onDialogClose"
   >
     <template #title
-      ><span class="px-6 cursor-pointer" @click="handleToggleTitle">Publish a Model</span></template
+      ><span class="px-6 cursor-pointer" @click="handleToggleTitle">{{ t('publish.model.title') }}</span></template
     >
     <div v-show="modelBox" class="px-6 pb-6">
-      <v-item label="Model Name">
+      <v-item :label="t('publish.model.name.label')">
         <Input
           v-model:model-value="formData.name"
           :class="{ 'border-red-500': formData.nameError }"
           type="text"
-          placeholder="Enter Model Name"
+          :placeholder="t('publish.model.name.placeholder')"
           @change="formData.nameError = false"
         />
       </v-item>
-      <v-item label="Model Type">
+      <v-item :label="t('publish.model.type.label')">
         <v-select
           v-model:model-value="formData.type"
           :class="{ 'border-red-500': formData.typeError }"
-          placeholder="Select Model Type"
+          :placeholder="t('publish.model.type.placeholder')"
           @update:open="formData.typeError = false"
         >
           <SelectItem v-for="(e, i) in typeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
         </v-select>
       </v-item>
-      <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
+      <Button class="w-full mt-3" @click="nextStep">{{ t('publish.model.nextStep') }}</Button>
     </div>
     <vCustomAccordion :multiple="true" :active-index="acActiveIndex">
       <vCustomAccordionItem
@@ -58,13 +58,14 @@
             class="bg-[#353535] z-1 px-6 py-4 w-full rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px] flex justify-between relative"
           >
             <span v-if="acActiveIndex !== i && e.version">{{ e.version }}</span>
-            <span v-else>Add Version</span>
+            <span v-else>{{ t('publish.model.addVersion') }}</span>
             <Trash2
               v-if="formData.versions.length !== 1"
-              #icon
               class="w-4 h-4"
               @click.capture.stop="delVersion(i)"
-            />
+            >
+              <template #icon></template>
+            </Trash2>
             <Progress
               v-if="e.progress && acActiveIndex && acActiveIndex !== i"
               :model-value="e.progress"
@@ -74,31 +75,31 @@
         </template>
         <template #default>
           <div class="bg-[#353535] px-6 pb-4">
-            <v-item label="Version Name">
+            <v-item :label="t('publish.model.version.name')">
               <Input
                 v-model:model-value="e.version"
                 :class="{ 'border-red-500': e.versionError }"
                 type="text"
-                placeholder="Version Name"
+                :placeholder="t('publish.model.version.placeholder')"
                 @change="e.versionError = false"
               />
             </v-item>
-            <v-item label="Base Model">
+            <v-item :label="t('publish.model.baseModel')">
               <v-select
                 v-model:model-value="e.base_model"
                 :class="{ 'border-red-500': e.baseModelError }"
-                placeholder="Select Base Model"
+                :placeholder="t('publish.model.baseModelPlaceholder')"
                 @update:open="e.baseModelError = false"
               >
-                <SelectItem v-for="(e, i) in baseTypeLis" :key="i" :value="e.value">{{
-                  e.label
+                <SelectItem v-for="(item, index) in baseTypeLis" :key="index" :value="item.value">{{
+                  item.label
                 }}</SelectItem>
               </v-select>
             </v-item>
-            <v-item label="Upload Image">
+            <v-item :label="t('publish.model.uploadImage')">
               <vUploadImage v-model.modelValue="e.cover_urls" />{{ e.cover_urls }}
             </v-item>
-            <v-item label="Introduction">
+            <v-item :label="t('publish.model.introduction')">
               <Markdown v-model.modelValue="e.intro" :editor-id="`myeditor${i}`" />
             </v-item>
             <v-item label="">
@@ -112,10 +113,10 @@
                     }
                   "
                 />
-                <Label for="airplane-mode">Publicly Visible</Label>
+                <Label for="airplane-mode">{{ t('publish.model.publicVisible') }}</Label>
               </div>
             </v-item>
-            <v-item v-show="!e.showUpload" label="File">
+            <v-item v-show="!e.showUpload" :label="t('publish.model.file')">
               <div class="flex h-28 items-center justify-end relative">
                 <p v-if="e.progress && e.fileName" class="absolute top-2 left-1 text-xs">
                   {{ e.fileName }}
@@ -123,8 +124,8 @@
                 <div v-if="e.progress" class="flex-1">
                   <Progress :model-value="e.progress" class="mt-4 h-3" />
                   <p class="text-center pt-2">
-                    {{ e.progress }}% Uploaded
-                    <span v-if="e.speed" class="pl-2">Speed: {{ e.speed }}</span>
+                    {{ e.progress }}% {{ t('publish.model.uploaded') }}
+                    <span v-if="e.speed" class="pl-2">{{ t('publish.model.speed') }}: {{ e.speed }}</span>
                   </p>
                 </div>
                 <vUpload
@@ -148,8 +149,8 @@
       <div
         class="bg-[#353535] px-6 w-full h-14 rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px] flex justify-between items-center -mt-4"
       >
-        <Button variant="outline" class="" @click="addVersions">Add Version</Button>
-        <Button :disabled="disabledPublish" @click="submit">Publish</Button>
+        <Button variant="outline" class="" @click="addVersions">{{ t('publish.model.addVersion') }}</Button>
+        <Button :disabled="disabledPublish" @click="submit">{{ t('publish.model.publish') }}</Button>
       </div>
     </template>
     <div v-if="showLayoutLoading" class="z-50 w-full h-full absolute left-0 top-0"></div>
@@ -177,7 +178,9 @@
   import vUpload from '@/components/modules/vUpload/index.vue'
   import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import Markdown from '@/components/markdown/Index.vue'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const modelStoreObject = modelStore()
   const modelBox = ref(true)
   const typeLis = ref([{ value: '', label: '' }])
@@ -209,10 +212,10 @@
   }
   async function delVersion(index: number) {
     const res = await useAlertDialog({
-      title: 'Are you sure you want to delete this version?',
-      desc: 'This action cannot be undone.',
-      cancel: 'No, Keep It',
-      continue: 'Yes, Delete It',
+      title: t('publish.model.confirmDelete.title'),
+      desc: t('publish.model.confirmDelete.desc'),
+      cancel: t('publish.model.confirmDelete.cancel'),
+      continue: t('publish.model.confirmDelete.continue'),
       z: 'z-9000'
     })
     if (!res) return
@@ -248,12 +251,12 @@
   }
   function nextStep() {
     if (!formData.value.name) {
-      useToaster.error('Please enter the model name')
+      useToaster.error(t('publish.model.errors.enterName'))
       formData.value.nameError = true
       return
     }
     if (!formData.value.type) {
-      useToaster.error('Please select the model type')
+      useToaster.error(t('publish.model.errors.selectType'))
       formData.value.typeError = true
       return
     }
@@ -271,19 +274,19 @@
       const e = tempData.versions[i]
       if (!e.version) {
         e.versionError = true
-        useToaster.error(`Please enter the version name for version ${i + 1}`)
+        useToaster.error(t('publish.model.errors.enterVersion', { index: i + 1 }))
         acActiveIndex.value = i
         break
       }
       if (!e.base_model) {
         e.baseModelError = true
-        useToaster.error(`Please select the base model for version ${i + 1}`)
+        useToaster.error(t('publish.model.errors.selectBaseModel', { index: i + 1 }))
         acActiveIndex.value = i
         break
       }
       if (!e.sign) {
         e.filePathError = true
-        useToaster.error(`Please enter the file path for version ${i + 1}`)
+        useToaster.error(t('publish.model.errors.enterFilePath', { index: i + 1 }))
         acActiveIndex.value = i
         break
       }

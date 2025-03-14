@@ -14,7 +14,7 @@
         </g>
       </svg>
     </span>
-    <span class="profile-text">{{ $t('buttons.profile') }}</span>
+    <span class="profile-text">{{ t('buttons.profile') }}</span>
   </div>
   <n-drawer v-model:show="showDrawer" :width="502" placement="left">
     <n-drawer-content closable>
@@ -27,21 +27,21 @@
         </div>
       </template>
       <div class="api-key-container">
-        <span>{{ $t('profile.apiKey') }}</span>
+        <span>{{ t('profile.apiKey') }}</span>
         <span class="api-key-value" id="bizyair-profile-password">
           {{ statusStore.infoData.api_key }}
         </span>
-        <vTooltips :tips="$t('profile.edit')">
+        <vTooltips :tips="t('profile.edit')">
           <FilePenLine @click="statusStore.handleApiKeyDialog(true)" class="edit-icon" />
         </vTooltips>
       </div>
       <div class="level-container">
-        <span>{{ $t('profile.level') }}</span>
+        <span>{{ t('profile.level') }}</span>
         <span class="level-value">{{ levelText }}</span>
       </div>
       <div class="share-id-container">
         <div class="share-id-input-container">
-          <span class="share-id-label">Share ID:</span>
+          <span class="share-id-label">{{ t('profile.shareId.label') }}</span>
           <span class="share-id-value" v-if="!isEditingShareId">
             {{ statusStore.infoData.share_id }}
           </span>
@@ -55,7 +55,7 @@
         </div>
         <div class="share-id-actions">
           <span v-show="!isEditingShareId">
-            <vTooltips tips="Edit" v-if="canEditShareId">
+            <vTooltips :tips="t('profile.shareId.edit')" v-if="canEditShareId">
               <FilePenLine @click="editShareId" class="edit-icon" />
             </vTooltips>
             <vTooltips
@@ -66,11 +66,11 @@
             </vTooltips>
           </span>
           <span v-show="isEditingShareId">
-            <vTooltips :tips="'Save'">
+            <vTooltips :tips="t('profile.shareId.save')">
               <Save @click="saveShareId" class="save-icon" />
             </vTooltips>
           </span>
-          <vTooltips :tips="'Copy'">
+          <vTooltips :tips="t('profile.shareId.copy')">
             <Copy @click="statusStore.copyText(statusStore.infoData.share_id)" class="copy-icon" />
           </vTooltips>
         </div>
@@ -87,9 +87,10 @@
   import { useAlertDialog } from '@/components/modules/vAlertDialog'
   import { ref, computed } from 'vue'
   import { NDrawer, NDrawerContent } from 'naive-ui'
-
   import { useStatusStore } from '@/stores/userStatus'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const statusStore = useStatusStore()
 
   const profileImageSrc =
@@ -120,10 +121,10 @@
   const saveShareId = async () => {
     isEditingShareId.value = false
     const res = await useAlertDialog({
-      title: 'Are you sure you want to modify it?',
-      desc: 'If you make this change, it will render any models you have previously shared unavailable, and you are only allowed to make this modification once per year.',
-      cancel: 'No, Keep It',
-      continue: 'Yes, Delete It',
+      title: t('profile.shareId.confirmModify.title'),
+      desc: t('profile.shareId.confirmModify.desc'),
+      cancel: t('profile.shareId.confirmModify.cancel'),
+      continue: t('profile.shareId.confirmModify.continue'),
       z: 'z-9000'
     })
     if (!res) {
@@ -145,10 +146,12 @@
       hour: '2-digit',
       minute: '2-digit'
     }
-    return `You can only change your share ID once a year. You need to wait until ${nextYear.toLocaleDateString(
-      'en-US',
-      options
-    )} to make the modification.`
+    return t('profile.shareId.waitMessage', {
+      date: nextYear.toLocaleDateString(
+        'en-US',
+        options
+      )
+    })
   }
   const toshowDrawer = async () => {
     statusStore.loginRefresh()

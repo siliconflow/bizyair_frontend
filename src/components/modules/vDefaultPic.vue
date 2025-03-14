@@ -11,7 +11,7 @@
       alt=""
     />
     <p class="absolute w-full left-0 top-1/2 -translate-y-1/2 text-center text-4xl text-[#7c3aed]">
-      {{ $t('defaultPic.noCover') }}
+      {{ t('defaultPic.noCover') }}
     </p>
   </div>
 </template>

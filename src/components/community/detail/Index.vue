@@ -306,7 +306,7 @@
   const handleRemoveModel = async (id: number | string) => {
     try {
       await remove_model(id)
-      useToaster.success('Removed successfully.')
+      useToaster.success(t('community.detail.modelRemovedSuccessfully'))
       communityStore.showCommunityDetail = false
       communityStore.reload++
     } catch (error) {
@@ -319,7 +319,7 @@
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(sign || '')
-        useToaster.success('Copied successfully.')
+        useToaster.success(t('community.detail.copiedSuccessfully'))
       } else {
         const input = document.createElement('input')
         input.value = sign || ''
@@ -329,7 +329,7 @@
         document.body.removeChild(input)
       }
     } catch (err) {
-      useToaster.error('Copy failed.')
+      useToaster.error(t('community.detail.copyFailed'))
     }
   }
 
@@ -348,12 +348,12 @@
           await comfyUIApp.loadGraphData(workflow.data)
         }
       } else {
-        useToaster.error('Failed to load workflow')
+        useToaster.error(t('community.detail.failedLoadWorkflow'))
       }
       communityStore.showDialog = false
       communityStore.showCommunityDetail = false
     } catch (error) {
-      useToaster.error('Failed to load workflow')
+      useToaster.error(t('community.detail.failedLoadWorkflow'))
     } finally {
       isLoading.value = false
     }
@@ -396,10 +396,10 @@
 
       canvas.graph.add(loraLoaderNode)
       communityStore.showDialog = false
-      useToaster.success('Node added successfully')
+      useToaster.success(t('community.detail.nodeAddedSuccessfully'))
     } catch (error) {
       console.error('Failed to add node:', error)
-      useToaster.error(`Failed to add node: ${error}`)
+      useToaster.error(t('community.detail.failedAddNode' + error))
     }
   }
 
@@ -418,7 +418,7 @@
       a.click()
       URL.revokeObjectURL(url)
     } else {
-      useToaster.error('Failed to download workflow.')
+      useToaster.error(t('community.detail.failedDownloadWorkflow'))
     }
   }
 
@@ -800,7 +800,7 @@
           >
             <div class="flex flex-row gap-2 items-center justify-start shrink-0 relative">
               <Avatar>
-                <AvatarImage src="https://github.com/radix-vue.png" alt="@radix-vue" />
+                <AvatarImage :src="`${model?.user_avatar || 'https://github.com/radix-vue.png'}`" alt="user avatar" />
                 <AvatarFallback>{{ model?.user_name?.slice(0, 2) }}</AvatarFallback>
               </Avatar>
               {{ model?.user_name }}

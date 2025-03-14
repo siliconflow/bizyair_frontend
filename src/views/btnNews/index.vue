@@ -1,5 +1,5 @@
 <template>
-  <btnMenu :show_cases="show_cases" buttonText="News" icon="book-open" :isJson="true">
+  <btnMenu :show_cases="show_cases" :button-text="t('buttons.news')" icon="book-open" :isJson="true">
     <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 32 32">
       <path
         fill="#ddd"
@@ -11,7 +11,10 @@
 <script setup lang="ts">
   import btnMenu from '@/components/modules/btnMenu.vue'
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
+  
   const show_cases = ref({
     'Remote Folders': '1',
     Upload: '2'

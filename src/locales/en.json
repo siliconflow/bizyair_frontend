@@ -18,7 +18,12 @@
     "community": "Community",
     "publish": "Publish",
     "train": "Train",
-    "message": "Message"
+    "message": "Message",
+    "news": "News",
+    "examples": "Examples",
+    "publishModel": "PublishModel",
+    "model": "Model",
+    "workflow": "Workflow"
   },
   "common": {
     "language": "Language",
@@ -44,7 +49,20 @@
   "profile": {
     "apiKey": "API Key:",
     "level": "Level:",
-    "edit": "Edit"
+    "edit": "Edit",
+    "shareId": {
+      "label": "Share ID:",
+      "edit": "Edit",
+      "save": "Save",
+      "copy": "Copy",
+      "confirmModify": {
+        "title": "Are you sure you want to modify it?",
+        "desc": "If you make this change, it will render any models you have previously shared unavailable, and you are only allowed to make this modification once per year.",
+        "cancel": "No, Keep It",
+        "continue": "Yes, Delete It"
+      },
+      "waitMessage": "You can only change your share ID once a year. You need to wait until {date} to make the modification."
+    }
   },
   "messageBox": {
     "title": "Message Box",
@@ -124,7 +142,8 @@
           "popular": "Popular",
           "downloads": "Downloads",
           "most-used": "Most Used",
-          "most-liked": "Most Liked"
+          "most-liked": "Most Liked",
+          "most-forked": "Most Forked"
         }
       },
       "type": {
@@ -187,7 +206,99 @@
         "unknownModelType": "Unknown base model type"
       },
       "edit": "Edit",
-      "remove": "Remove"
+      "remove": "Remove",
+      "modelNotFound": "Model not found.",
+      "failedFetchModelDetails": "Failed to fetch model details",
+      "shareCodeCopied": "The share code has been copied!",
+      "copyFailed": "Copy failed.",
+      "publicVersionWarning": "Model has public version, cannot remove.",
+      "modelRemovedSuccessfully": "Model removed successfully.",
+      "failedRemoveModel": "Failed to remove model.",
+      "noModelVersionsFound": "No model versions found",
+      "copiedSuccessfully": "Copied successfully.",
+      "failedLoadWorkflow": "Failed to load workflow.",
+      "nodeAddedSuccessfully": "Node added successfully.",
+      "failedDownloadWorkflow": "Failed to download workflow.",
+      "failedAddNode": "Failed to add node."
+    }
+  },
+  "publish": {
+    "model": {
+      "title": "Publish a Model",
+      "name": {
+        "label": "Model Name",
+        "placeholder": "Enter Model Name"
+      },
+      "type": {
+        "label": "Model Type",
+        "placeholder": "Select Model Type"
+      },
+      "nextStep": "Next Step",
+      "addVersion": "Add Version",
+      "version": {
+        "name": "Version Name",
+        "placeholder": "Version Name"
+      },
+      "baseModel": "Base Model",
+      "baseModelPlaceholder": "Select Base Model",
+      "uploadImage": "Upload Image",
+      "introduction": "Introduction",
+      "publicVisible": "Publicly Visible",
+      "file": "File",
+      "uploaded": "Uploaded",
+      "speed": "Speed",
+      "publish": "Publish",
+      "confirmDelete": {
+        "title": "Are you sure you want to delete this version?",
+        "desc": "This action cannot be undone.",
+        "cancel": "No, Keep It",
+        "continue": "Yes, Delete It"
+      },
+      "errors": {
+        "enterName": "Please enter the model name",
+        "selectType": "Please select the model type",
+        "enterVersion": "Please enter the version name for version {index}",
+        "selectBaseModel": "Please select the base model for version {index}",
+        "enterFilePath": "Please enter the file path for version {index}"
+      },
+      "success": "Model published successfully"
+    },
+    "workflow": {
+      "title": "Publish a Workflow",
+      "name": {
+        "label": "Workflow Name",
+        "placeholder": "Enter Workflow Name"
+      },
+      "nextStep": "Next Step",
+      "addVersion": "Add Version",
+      "version": {
+        "name": "Version Name",
+        "placeholder": "Version Name"
+      },
+      "baseModel": "Base Model",
+      "baseModelPlaceholder": "Select Base Model",
+      "uploadImage": "Upload Image",
+      "introduction": "Introduction",
+      "publicVisible": "Publicly Visible",
+      "file": "File",
+      "uploaded": "Uploaded",
+      "speed": "Speed",
+      "publish": "Publish",
+      "cancel": "Cancel",
+      "loadFromWorkspace": "Load from current workspace",
+      "confirmDelete": {
+        "title": "Are you sure you want to delete this version?",
+        "desc": "This action cannot be undone.",
+        "cancel": "No, Keep It",
+        "continue": "Yes, Delete It"
+      },
+      "errors": {
+        "enterName": "Please enter the workflow name",
+        "enterVersion": "Please enter the version name for version {index}",
+        "selectBaseModel": "Please select the base model for version {index}",
+        "enterFilePath": "Please enter the file path for version {index}"
+      },
+      "success": "Workflow published successfully"
     }
   },
   "modelSelect": {
@@ -201,5 +312,23 @@
     "cancel": "Cancel",
     "continue": "Continue",
     "title": "Are you absolutely sure?"
+  },
+  "vUpload": {
+    "clickOrDrag": "Click or drag file to this area to upload",
+    "interrupt": "Interrupt",
+    "cancel": "Cancel",
+    "invalidFileFormat": "Invalid file format.",
+    "inHashCalculation": "In hash calculation",
+    "uploadFailed": "Upload to OSS failed:",
+    "clickToUpload": "Click to upload, please select a folder.",
+    "supportFormats": "You can add up to 600 images, with support for PNG, JPG, and JPEG formats.",
+    "fileNumber": "File Number",
+    "uploadConfirm": "You are about to upload {0} images and {1} texts.",
+    "missingCaptions": "Some of your images are missing captions. Please provide the caption files.",
+    "modalTitle": "Tips",
+    "uploadButton": "Upload",
+    "cancelButton": "Cancel",
+    "uploadImage": "Upload Image",
+    "loading": "Loading"
   }
 } 

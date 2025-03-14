@@ -8,20 +8,20 @@
   >
     <template #title
       ><span class="px-6 cursor-pointer" @click="handleToggleTitle"
-        >Publish a Workflow</span
+        >{{ t('publish.workflow.title') }}</span
       ></template
     >
     <div v-show="modelBox" class="px-6 pb-6">
-      <v-item label="Model Name">
+      <v-item :label="t('publish.workflow.name.label')">
         <Input
           v-model:model-value="formData.name"
           :class="{ 'border-red-500': formData.nameError }"
           type="text"
-          placeholder="Enter Model Name"
+          :placeholder="t('publish.workflow.name.placeholder')"
           @change="formData.nameError = false"
         />
       </v-item>
-      <Button class="w-full mt-3" @click="nextStep">Next Step</Button>
+      <Button class="w-full mt-3" @click="nextStep">{{ t('publish.workflow.nextStep') }}</Button>
     </div>
 
     <vCustomAccordion :multiple="true" :active-index="acActiveIndex">
@@ -36,13 +36,14 @@
             class="bg-[#353535] z-1 px-6 py-4 w-full rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px] flex justify-between relative"
           >
             <span v-if="acActiveIndex !== i && e.version">{{ e.version }}</span>
-            <span v-else>Add Version</span>
+            <span v-else>{{ t('publish.workflow.addVersion') }}</span>
             <Trash2
               v-if="formData.versions.length !== 1"
-              #icon
               class="w-4 h-4"
               @click.capture.stop="delVersion(i)"
-            />
+            >
+              <template #icon></template>
+            </Trash2>
             <Progress
               v-if="e.progress && acActiveIndex && acActiveIndex !== i"
               :model-value="e.progress"
@@ -52,20 +53,20 @@
         </template>
         <template #default>
           <div class="bg-[#353535] px-6 pb-4">
-            <v-item label="Version Name">
+            <v-item :label="t('publish.workflow.version.name')">
               <Input
                 v-model:model-value="e.version"
                 :class="{ 'border-red-500': e.versionError }"
                 type="text"
-                placeholder="Version Name"
+                :placeholder="t('publish.workflow.version.placeholder')"
                 @change="e.versionError = false"
               />
             </v-item>
-            <v-item label="Base Model">
+            <v-item :label="t('publish.workflow.baseModel')">
               <v-select
                 v-model:model-value="e.base_model"
                 :class="{ 'border-red-500': e.baseModelError }"
-                placeholder="Select Base Model"
+                :placeholder="t('publish.workflow.baseModelPlaceholder')"
                 @update:open="e.baseModelError = false"
               >
                 <SelectItem
@@ -76,7 +77,7 @@
                 >
               </v-select>
             </v-item>
-            <v-item label="Upload Image">
+            <v-item :label="t('publish.workflow.uploadImage')">
               <vUploadImage
                 v-model.modelValue="e.cover_urls"
                 :previewPrc="e.cover_urls ? e.cover_urls[0] : ''"
@@ -84,7 +85,7 @@
                 @done="imageUploadDone(i)"
               />
             </v-item>
-            <v-item label="Introduction">
+            <v-item :label="t('publish.workflow.introduction')">
               <Markdown v-model.modelValue="e.intro" :editor-id="`myeditor${i}`" />
             </v-item>
             <v-item label="">
@@ -98,10 +99,10 @@
                     }
                   "
                 />
-                <Label for="airplane-mode">Publicly Visible</Label>
+                <Label for="airplane-mode">{{ t('publish.workflow.publicVisible') }}</Label>
               </div>
             </v-item>
-            <v-item v-show="!e.showUpload" label="File">
+            <v-item v-show="!e.showUpload" :label="t('publish.workflow.file')">
               <div class="flex h-32 items-center justify-end relative">
                 <p v-if="e.progress && e.fileName" class="absolute top-2 left-1 text-xs">
                   {{ e.fileName }}
@@ -109,14 +110,14 @@
                 <div v-if="e.progress" class="flex-1">
                   <Progress :model-value="e.progress" class="mt-4 h-3" />
                   <p class="text-center pt-2">
-                    {{ e.progress }}% Uploaded
-                    <span v-if="e.speed" class="pl-2">Speed: {{ e.speed }}</span>
+                    {{ e.progress }}% {{ t('publish.workflow.uploaded') }}
+                    <span v-if="e.speed" class="pl-2">{{ t('publish.workflow.speed') }}: {{ e.speed }}</span>
                   </p>
                 </div>
-                <Button v-if="e.hideUpload" class="ml-2" @click="cancelFile">cancel</Button>
+                <Button v-if="e.hideUpload" class="ml-2" @click="cancelFile">{{ t('publish.workflow.cancel') }}</Button>
                 <div v-if="!e.hideUpload" :class="{ 'w-full': !e.progress }">
                   <Button v-if="!e.progress" class="w-full my-2" @click="loadWorkflow()"
-                    >Load from current workspace</Button
+                    >{{ t('publish.workflow.loadFromWorkspace') }}</Button
                   >
                   <vUpload
                     :ref="e.ref"
@@ -142,8 +143,8 @@
       <div
         class="bg-[#353535] px-6 w-full h-14 rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px] flex justify-between items-center -mt-4"
       >
-        <Button variant="outline" class="" @click="addVersions">Add Version</Button>
-        <Button :disabled="disabledPublish" @click="submit">Publish</Button>
+        <Button variant="outline" class="" @click="addVersions">{{ t('publish.workflow.addVersion') }}</Button>
+        <Button :disabled="disabledPublish" @click="submit">{{ t('publish.workflow.publish') }}</Button>
       </div>
     </template>
     <div v-if="showLayoutLoading" class="z-50 w-full h-full absolute left-0 top-0"></div>
@@ -171,7 +172,9 @@
   import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import Markdown from '@/components/markdown/Index.vue'
   import { uploadFile } from '@/components/modules/vUpload/virtualUpload'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const comfyUIApp: any = inject('comfyUIApp')
 
   const modelStoreObject = modelStore()
@@ -203,10 +206,10 @@
   }
   async function delVersion(index: number) {
     const res = await useAlertDialog({
-      title: 'Are you sure you want to delete this version?',
-      desc: 'This action cannot be undone.',
-      cancel: 'No, Keep It',
-      continue: 'Yes, Delete It',
+      title: t('publish.workflow.confirmDelete.title'),
+      desc: t('publish.workflow.confirmDelete.desc'),
+      cancel: t('publish.workflow.confirmDelete.cancel'),
+      continue: t('publish.workflow.confirmDelete.continue'),
       z: 'z-9000'
     })
     if (!res) return
@@ -242,7 +245,7 @@
   }
   function nextStep() {
     if (!formData.value.name) {
-      useToaster.error('Please enter the model name')
+      useToaster.error(t('publish.workflow.errors.enterName'))
       formData.value.nameError = true
       return
     }
@@ -264,13 +267,13 @@
       const e = tempData.versions[i]
       if (!e.version) {
         e.versionError = true
-        useToaster.error(`Please enter the version name for version ${i + 1}`)
+        useToaster.error(t('publish.workflow.errors.enterVersion', {index: i + 1}))
         acActiveIndex.value = i
         break
       }
       if (!e.base_model) {
         e.baseModelError = true
-        useToaster.error(`Please select the base model for version ${i + 1}`)
+        useToaster.error(t('publish.workflow.errors.selectBaseModel', {index: i + 1}))
         acActiveIndex.value = i
         break
       }
@@ -282,7 +285,7 @@
       // }
       if (!e.sign) {
         e.filePathError = true
-        useToaster.error(`Please enter the file path for version ${i + 1}`)
+        useToaster.error(t('publish.workflow.errors.enterFilePath', {index: i + 1}))
         acActiveIndex.value = i
         break
       }
@@ -366,7 +369,7 @@
       await create_models(tempData)
     }
 
-    useToaster.success('published successfully')
+    useToaster.success(t('publish.workflow.success'))
     onDialogClose()
   }
   const onDialogClose = () => {
