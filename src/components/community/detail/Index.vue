@@ -800,10 +800,21 @@
           >
             <div class="flex flex-row gap-2 items-center justify-start shrink-0 relative">
               <Avatar>
-                <AvatarImage :src="`${model?.user_avatar || 'https://github.com/radix-vue.png'}`" alt="user avatar" />
-                <AvatarFallback>{{ model?.user_name?.slice(0, 2) }}</AvatarFallback>
+                <AvatarImage 
+                  :src="currentVersion && currentVersion.parent_id > 0 
+                    ? currentVersion.original_user_avatar || 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp' 
+                    : currentVersion?.user_avatar || 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp'" 
+                  alt="user avatar" 
+                />
+                <AvatarFallback>{{ 
+                  currentVersion && currentVersion.parent_id > 0 
+                    ? (currentVersion.original_user_name?.slice(0, 2) || '') 
+                    : (currentVersion?.user_name?.slice(0, 2) || '')
+                }}</AvatarFallback>
               </Avatar>
-              {{ model?.user_name }}
+              {{ currentVersion && currentVersion.parent_id > 0 
+                ? currentVersion.original_user_name 
+                : currentVersion?.user_name }}
             </div>
             <div
               class="flex flex-row gap-1.5 items-start justify-start self-stretch shrink-0 relative"

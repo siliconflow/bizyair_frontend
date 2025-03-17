@@ -122,7 +122,7 @@
     "mine": {
       "title": "我的",
       "contents": {
-        "title": "内容",
+        "title": "我的",
         "subtitle": "查看我的内容"
       },
       "tabs": {
@@ -186,9 +186,9 @@
       "stats": "统计",
       "hash": "哈希值",
       "file": "文件",
-      "reviews": "评价",
-      "positive": "积极",
-      "negative": "消极",
+      "reviews": "审查结果",
+      "positive": "已验证",
+      "negative": "未验证",
       "firstPublished": "首次发布：",
       "lastUpdated": "最后更新：",
       "workflow": "工作流",
