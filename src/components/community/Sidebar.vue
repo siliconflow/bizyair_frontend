@@ -52,7 +52,7 @@
     <div class="flex flex-col p-2 pl-8 pr-2 h-full">
       <div class="flex-1">
         <h3 class="pt-2 pb-4 text-[#F9FAFB] font-['Inter'] text-[14px] font-medium leading-[14px]">
-          {{ t('community.explore') }}
+          <!-- {{ t('community.explore') }} -->
         </h3>
         <div class="space-y-4">
           <div
@@ -95,11 +95,11 @@
 
       <div class="mb-6">
         <div class="mb-3 w-52 h-[1px] bg-[#6E6E6E80]"></div>
-        <div class="mb-4">
+        <!-- <div class="mb-4">
           <h3 class="text-[#F9FAFB] font-['Inter'] text-[14px] font-medium leading-[14px]">
             {{ t('community.mine.title') }}
           </h3>
-        </div>
+        </div> -->
         <div
           :class="[
             'flex items-center space-x-3 p-3 w-52 h-14 rounded-lg cursor-pointer bg-[#222] text-gray-300 hover:bg-gray-800 hover:text-white',
