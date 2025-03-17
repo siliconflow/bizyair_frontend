@@ -71,7 +71,7 @@
             </vTooltips>
           </span>
           <vTooltips :tips="t('profile.shareId.copy')">
-            <Copy @click="statusStore.copyText(statusStore.infoData.share_id)" class="copy-icon" />
+            <Copy @click="handleCopy(statusStore.infoData.share_id)" class="copy-icon" />
           </vTooltips>
         </div>
       </div>
@@ -89,6 +89,7 @@
   import { NDrawer, NDrawerContent } from 'naive-ui'
   import { useStatusStore } from '@/stores/userStatus'
   import { useI18n } from 'vue-i18n'
+  import { useToaster } from '@/components/modules/toats'
 
   const { t } = useI18n()
   const statusStore = useStatusStore()
@@ -132,6 +133,24 @@
     } else {
       await put_share_id({ share_id: statusStore.infoData.share_id })
       statusStore.loginRefresh()
+    }
+  }
+
+  const handleCopy = async (shareId: string) => {
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareId || '')
+        useToaster.success(t('community.detail.copiedSuccessfully'))
+      } else {
+        const input = document.createElement('input')
+        input.value = shareId || ''
+        document.body.appendChild(input)
+        input.select()
+        document.execCommand('copy')
+        document.body.removeChild(input)
+      }
+    } catch (err) {
+      useToaster.error(t('community.detail.copyFailed'))
     }
   }
 

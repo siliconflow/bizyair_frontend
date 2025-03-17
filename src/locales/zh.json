@@ -136,9 +136,9 @@
     },
     "filter": {
       "sort": {
-        "title": "排序",
+        "title": "筛选",
         "options": {
-          "latest": "最新",
+          "recently": "最近",
           "popular": "最热",
           "downloads": "最多下载",
           "most-used": "最多使用",

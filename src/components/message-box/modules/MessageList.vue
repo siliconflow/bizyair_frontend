@@ -13,7 +13,7 @@
     >
       <template #default="{ item }">
         <n-card
-          class="mb-4 message-card"
+          class="mb-2 message-card"
           :bordered="false"
           :style="cardStyle"
           :color="!item.read ? 'rgba(249, 250, 251, 0.05)' : undefined"
@@ -141,6 +141,7 @@
     border-radius: 0.375rem;
     transition: all 0.2s ease-in-out;
     border-radius: 4px;
+   
   }
 
   .message-card:hover :deep(.n-card__content) {

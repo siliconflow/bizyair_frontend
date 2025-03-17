@@ -136,9 +136,9 @@
     },
     "filter": {
       "sort": {
-        "title": "Sort",
+        "title": "Filter",
         "options": {
-          "latest": "Latest",
+          "recently": "Recently",
           "popular": "Popular",
           "downloads": "Downloads",
           "most-used": "Most Used",

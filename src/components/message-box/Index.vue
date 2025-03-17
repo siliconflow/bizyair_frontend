@@ -10,7 +10,7 @@
   >
     <div class="flex h-[80vh]">
       <div style="border-right: 1px solid rgba(110, 110, 110, 0.6)">
-        <h1 class="text-2xl font-bold mb-6 pr-4 -mt-2">{{ $t('messageBox.title') }}</h1>
+        <!-- <h1 class="text-2xl font-bold mb-6 pr-4 -mt-2">{{ $t('messageBox.title') }}</h1> -->
         <div class="w-[200px] pr-4">
           <div class="space-y-4">
             <div
@@ -60,8 +60,8 @@
 
       <div class="flex-1 pl-4 border-l">
         <div
-          class="flex justify-end items-center gap-4 min-h-[32px]"
-          :class="activeType === NotificationType.SYSTEM_ANNOUNCEMENT ? 'mb-2' : 'mb-4'"
+          class="flex justify-end items-center gap-4"
+          :class="activeType === NotificationType.SYSTEM_ANNOUNCEMENT ? 'mb-2' : ''"
         >
           <v-select
             v-if="activeType === NotificationType.SYSTEM_ANNOUNCEMENT"

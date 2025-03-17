@@ -27,7 +27,7 @@
 <script setup lang="ts">
   import MessageBox from '@/components/message-box/Index.vue'
   import { useNotificationStore } from '@/stores/notificationStore'
-  import { ref, watch } from 'vue'
+  import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
   import { NTooltip, NBadge } from 'naive-ui'
   import { useI18n } from 'vue-i18n'
 
@@ -47,6 +47,42 @@
     },
     { immediate: true }
   )
+  
+  const INITIAL_INTERVAL = 10000 
+  const currentInterval = ref(INITIAL_INTERVAL)
+  let pollTimer: number | null = null
+  
+  const setupPolling = () => {
+    if (pollTimer !== null) {
+      clearTimeout(pollTimer)
+      pollTimer = null
+    }
+    pollTimer = window.setTimeout(fetchUnreadCount, currentInterval.value);
+  }
+
+  const fetchUnreadCount = async () => {
+   
+    try {
+      await notificationStore.loadUnreadCountWithError();
+      currentInterval.value = INITIAL_INTERVAL;
+    } catch (error) {
+      const oldInterval = currentInterval.value;
+      currentInterval.value = Math.min(currentInterval.value * 2, 300000);
+      console.error(`Failed to fetch unread message count, interval increased from ${oldInterval / 1000}s to ${currentInterval.value / 1000}s`);
+    } finally {
+      setupPolling();
+    }
+  }
+  
+  onMounted(() => {
+    fetchUnreadCount()
+  })
+  onBeforeUnmount(() => {
+    if (pollTimer !== null) {
+      clearTimeout(pollTimer)
+      pollTimer = null
+    }
+  })
 </script>
 
 <style scoped lang="less">

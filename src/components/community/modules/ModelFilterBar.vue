@@ -117,6 +117,23 @@
     emit('filter-data-ready')
   }
 
+  const getSortLabel = (sort: SortValue) => {
+    switch (sort) {
+      case 'Recently':
+        return t('community.filter.sort.options.recently')
+      case 'Most Forked':
+        return t('community.filter.sort.options.most-forked')
+      case 'Most Used':
+        return t('community.filter.sort.options.most-used')
+      case 'Most Downloaded':
+        return t('community.filter.sort.options.downloads')
+      case 'Most Liked':
+        return t('community.filter.sort.options.most-liked')
+      default:
+        return t('community.filter.sort.options.recently')
+    }
+  }
+
   watch(
     () => props.page,
     async (newVal: string) => {
@@ -169,8 +186,9 @@
       <PopoverTrigger class="bg-transparent">
         <Button
           variant="default"
-          class="w-[44px] h-[44px] hover:border-2 hover:border-white cursor-pointer group"
+          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer group flex items-center "
         >
+          <span>{{ getSortLabel(store[props.page].filterState.sort) }}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -179,7 +197,7 @@
             fill="none"
           >
             <path
-              d="M2 10.6667L4.66667 13.3334M4.66667 13.3334L7.33333 10.6667M4.66667 13.3334V2.66675M7.33333 2.66675H14M7.33333 5.33341H12M7.33333 8.00008H10"
+              d="M4 6.66675L8 10.6667L12 6.66675"
               stroke="#F9FAFB"
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -207,7 +225,7 @@
                 ]"
                 @click="handleSortChange('Recently')"
               >
-                {{ t('community.filter.sort.options.latest') }}
+                {{ t('community.filter.sort.options.recently') }}
               </CommandItem>
               <CommandItem
                 value="most-forked"
@@ -272,25 +290,9 @@
       <PopoverTrigger class="bg-transparent">
         <Button
           variant="default"
-          class="w-[44px] h-[44px] hover:border-2 hover:border-white cursor-pointer"
+          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer flex items-center "
         >
-          <!-- <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            class="mr-2"
-          >
-            <path
-              d="M14.6666 2H1.33325L6.66658 8.30667V12.6667L9.33325 14V8.30667L14.6666 2Z"
-              stroke="#F9FAFB"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg> -->
-
-          <svg
+           <svg
             width="16"
             height="14"
             viewBox="0 0 16 14"
@@ -304,6 +306,8 @@
               stroke-linejoin="round"
             />
           </svg>
+          <span>{{ t('community.filter.sort.title') }}</span>
+       
         </Button>
       </PopoverTrigger>
 
