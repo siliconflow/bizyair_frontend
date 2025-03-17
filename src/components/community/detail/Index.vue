@@ -947,7 +947,7 @@
               <div className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)]">
                 <div class="flex items-center gap-2">
                   <vTooltips
-                    :tips="currentVersion?.review_result !== 'Unknown' ? t('community.detail.tooltips.modelType', [currentVersion?.review_result]) : t('community.detail.tooltips.unknownModelType')"
+                    :tips="currentVersion?.review_result !== 'Unknown' && currentVersion?.review_state !== -1 ? t('community.detail.tooltips.modelType', [currentVersion?.review_result]) : t('community.detail.tooltips.unknownModelType')"
                   >
                     <svg
                       v-if="currentVersion?.review_state === 1"
@@ -1027,7 +1027,7 @@
                   >
                     <g clip-path="url(#clip0_315_3710)">
                       <path
-                        d="M2.66659 10.6666C1.93325 10.6666 1.33325 10.0666 1.33325 9.33325V2.66659C1.33325 1.93325 1.93325 1.33325 2.66659 1.33325H9.33325C10.0666 1.33325 10.6666 1.93325 10.6666 2.66659M6.66658 5.33325H13.3333C14.0696 5.33325 14.6666 5.93021 14.6666 6.66658V13.3333C14.6666 14.0696 14.0696 14.6666 13.3333 14.6666H6.66658C5.93021 14.6666 5.33325 14.0696 5.33325 13.3333V6.66658C5.33325 5.93021 5.93021 5.33325 6.66658 5.33325Z"
+                        d="M2.66659 10.6666C1.93325 10.6666 1.33325 10.0666 1.33325 9.33325V2.66659C1.33325 1.93325 1.93325 1.33325 2.66659 1.33325H9.33325C10.0666 1.33325 10.6666 1.93325 10.6666 2.66659V13.3333C10.6666 14.0696 10.0696 14.6666 9.33333 14.6666H6.66658C5.93021 14.6666 5.33325 14.0696 5.33325 13.3333V6.66658C5.33325 5.93021 5.93021 5.33325 6.66658 5.33325Z"
                         stroke="#9CA3AF"
                         stroke-linecap="round"
                         stroke-linejoin="round"

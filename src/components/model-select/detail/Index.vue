@@ -810,7 +810,7 @@
               <div className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)]">
                 <div class="flex items-center gap-2">
                   <vTooltips
-                    :tips="currentVersion?.review_result !== 'Unknown' ? t('community.detail.tooltips.modelType', [currentVersion?.review_result]) : t('community.detail.tooltips.unknownModelType')"
+                    :tips="currentVersion?.review_result !== 'Unknown' && currentVersion?.review_state !== -1 ? t('community.detail.tooltips.modelType', [currentVersion?.review_result]) : t('community.detail.tooltips.unknownModelType')"
                   >
                     <svg
                       v-if="currentVersion?.review_state === 1"
