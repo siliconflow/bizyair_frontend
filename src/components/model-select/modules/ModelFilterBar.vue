@@ -145,7 +145,7 @@
           variant="default"
           class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer group flex items-center "
         >
-          <span>{{ getSortLabel(store[props.page].filterState.sort) }}</span>
+          <span class="w-[60px] truncate">{{ getSortLabel(store[props.page].filterState.sort) }}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -195,7 +195,7 @@
                 ]"
                 @click="handleSortChange('Most Forked')"
               >
-                {{ t('community.filter.sort.options.downloads') }}
+                {{ t('community.filter.sort.options.most-forked') }}
               </CommandItem>
               <CommandItem
                 value="most-used"

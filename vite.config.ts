@@ -29,7 +29,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'D:/workspace/ComfyUI-master/2025-3-11 164916/ComfyUI-master/custom_nodes/BizyAir/js',
+    outDir: '../frontend/js',
     cssCodeSplit: false,
     lib: {
       entry: 'src/main.ts',
