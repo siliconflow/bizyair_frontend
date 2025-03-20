@@ -10,11 +10,11 @@ export const set_api_key = (data: any) =>
     body: data
   })
 
-export const get_user_info = () => customFetch('/bizyair/user/info?v=1', { method: 'get' })
+export const get_user_info = () => customFetch('/bizyair/user/info?v=1', { method: 'GET' })
 
 export const put_share_id = (data: any) =>
   customFetch('/bizyair/user/share_id', {
-    method: 'put',
+    method: 'PUT',
     body: JSON.stringify(data)
   })
 
@@ -27,3 +27,19 @@ export const put_user_language_profile = (data: any) => customFetch('/bizyair/us
 
 
 
+export const get_metadata = () => customFetch('/bizyair/user/metadata', { method: 'GET' })
+
+export const put_metadata = (data: any) =>
+  customFetch('/bizyair/user/metadata', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  })
+
+export const post_real_name = () => customFetch('/bizyair/user/real_name', { method: 'POST' })
+
+export const get_wallet = () => customFetch('/bizyair/user/wallet', { method: 'GET' })
+
+export const get_coins = (param: any) =>
+  customFetch(`/bizyair/user/coins?${new URLSearchParams(param).toString()}`, { method: 'GET' })
+
+export const logout = () => customFetch(`/bizyair/user/logout`, { method: 'POST' })

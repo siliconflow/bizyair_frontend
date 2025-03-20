@@ -1,7 +1,7 @@
 <template>
   <div
-    class="hover:bg-[#4A238E] cursor-pointer relative px-3 flex items-center"
     @click="statusStore.handleApiKeyDialog(true)"
+    class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3 rounded-sm"
   >
     <span class="mr-1 leading h-full leading-8 text-sm">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
