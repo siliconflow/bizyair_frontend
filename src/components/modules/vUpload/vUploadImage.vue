@@ -60,10 +60,14 @@
       />
       <vImage
         :src="imageSrc"
-        class="block object-cover w-32 h-32 rounded-lg absolute left-0 top-0 z-10"
+        class="block object-cover w-full h-full rounded-lg absolute left-0 top-0 z-10"
       />
-      <div class="w-20 h-1 absolute left-6 top-1/2 -translate-y-1/2 bg-slate-400 rounded-md"></div>
-      <div class="w-1 h-20 absolute top-6 left-1/2 -translate-x-1/2 bg-slate-400 rounded-md"></div>
+      <div
+        class="w-[64%] h-1 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-400 rounded-md"
+      ></div>
+      <div
+        class="w-1 h-[64%] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-400 rounded-md"
+      ></div>
       <Trash2
         class="absolute right-2 top-2 z-30 cursor-pointer"
         v-if="imageSrc"
