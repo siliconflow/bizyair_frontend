@@ -1,6 +1,6 @@
 <template>
   <div class="info-container">
-    <p>查看您即将过期的BZ币列表，并进行筛选查看。</p>
+    <p>{{ t('btnProfile.coinsInfo.title') }}</p>
     <div class="total-amount">
       <div class="total-amount-item">
         <p class="total-amount-title">
@@ -8,7 +8,7 @@
             src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/AdLFMb6DyYnpsJArdSpbPz8P7SzMFw3u.webp"
             alt=""
           />
-          即过期的金币总额
+          {{ t('btnProfile.coinsInfo.goldCoins') }}
         </p>
         <p class="amount gold">{{ statusStore.userWallte.charge_balance || 0 }}</p>
       </div>
@@ -18,7 +18,7 @@
             src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/FLrDPYmbuUnXSygQF1iePicnQwbPSWXD.webp"
             alt=""
           />
-          即过期的银币总额
+          {{ t('btnProfile.coinsInfo.silverCoins') }}
         </p>
         <p class="amount">{{ statusStore.userWallte.gift_balance || 0 }}</p>
       </div>
@@ -31,16 +31,16 @@
         v-model:value="statusStore.coinsParam.coin_type"
         @update:value="statusStore.get_coins"
       >
-        <n-tab name="">全部</n-tab>
+        <n-tab name="">{{ t('btnProfile.coinsInfo.allCoins') }}</n-tab>
         <n-tab name="1">
-          银币
+          {{ t('btnProfile.coinsInfo.silverCoins') }}
           <img
             class="coin-icon"
             src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/FLrDPYmbuUnXSygQF1iePicnQwbPSWXD.webp"
           />
         </n-tab>
         <n-tab name="2">
-          金币
+          {{ t('btnProfile.coinsInfo.goldCoins') }}
           <img
             class="coin-icon"
             src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/AdLFMb6DyYnpsJArdSpbPz8P7SzMFw3u.webp"
@@ -76,7 +76,9 @@
   import { useStatusStore } from '@/stores/userStatus'
   import { NDataTable, NSelect, NPagination, NTabs, NTab } from 'naive-ui'
   import { computed, h, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const statusStore = useStatusStore()
 
   const pageCount = computed(() => {
@@ -91,9 +93,9 @@
     return ''
   }
 
-  const columns = [
+  const columns = computed(() => [
     {
-      title: '数额',
+      title: t('btnProfile.coinsInfo.coin'),
       key: 'amount',
       render(row: any) {
         return h(
@@ -123,11 +125,12 @@
       }
     },
     {
-      title: '过期时间',
+      title: t('btnProfile.coinsInfo.expirationTime'),
       key: 'expired_at',
       width: 120
     }
-  ]
+  ])
+  
   const filterOptions = ref([
     { label: '1天内', value: 1 },
     { label: '7天内', value: 7 },

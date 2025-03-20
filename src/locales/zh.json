@@ -330,5 +330,93 @@
     "cancelButton": "取消",
     "uploadImage": "上传封面",
     "loading": "加载中"
+  },
+  "btnProfile": {
+    "profile": "个人资料",
+    "myCoins": "我的 BZ 币",
+    "coinsRecharge": "Bz币充值",
+    "userInfo": {
+      "noIntroduction": "这家伙很懒，什么也没留下",
+      "id": "ID",
+      "balance": "余额",
+      "coin": "币",
+      "recharge": "充值",
+      "giftSilverCoins": "赠送银币",
+      "rechargeGoldCoins": "充值金币"
+    },
+    "actions": {
+      "switchApiKey": "切换 API 密钥",
+      "myWallet": "我的钱包",
+      "rechargeRecord": "充值记录"
+    },
+    "uploadInfo": {
+      "title": "个人信息",
+      "name": "昵称",
+      "introduction": "个人简介",
+      "nameRequired": "昵称不能为空",
+      "nameLengthLimit": "昵称不超过12个字符",
+      "introductionLengthLimit": "简介不超过25个字符",
+      "save": "保存",
+      "cancel": "取消",
+      "success": "保存成功",
+      "failed": "保存失败"
+    },
+    "uploadAvatar": {
+      "title": "上传头像",
+      "uploadTips": "支持jpg、png、jpeg格式，文件小于1MB",
+      "cropTips": "拖拽调整图片位置",
+      "confirm": "确认",
+      "cancel": "取消",
+      "success": "头像上传成功",
+      "failed": "头像上传失败"
+    },
+    "coinsInfo": {
+      "title": "账号币量明细",
+      "coin": "币",
+      "allCoins": "全部币种",
+      "goldCoins": "金币",
+      "silverCoins": "银币",
+      "expirationTime": "过期时间",
+      "coinStatus": "状态",
+      "available": "可用",
+      "used": "已用",
+      "expired": "已过期",
+      "recharge": "充值",
+      "noBzCoins": "暂无Bz币数据"
+    },
+    "rechargeRecord": {
+      "all": "全部",
+      "pending": "待支付",
+      "success": "支付成功",
+      "failed": "支付失败",
+      "rechargeAmount": "充值金额",
+      "rechargeTime": "充值时间",
+      "rechargeMethod": "充值方式",
+      "rechargeStatus": "充值状态",
+      "transactionId": "交易单号",
+      "continuePayment": "继续支付",
+      "cancelOrder": "取消订单",
+      "noRecords": "暂无充值记录"
+    },
+    "product": {
+      "coins": "Bz币",
+      "amount": "金额",
+      "payNow": "立即支付",
+      "wechatPay": "微信支付",
+      "alipay": "支付宝",
+      "discount": "折扣",
+      "scanQrCode": "请使用微信扫一扫",
+      "scanToPayAmount": "扫描二维码支付 ¥",
+      "paySuccess": "支付成功",
+      "payFailed": "支付失败",
+      "cancelPayment": "取消支付",
+      "confirmPayment": "确认已支付",
+      "paymentExpired": "支付已过期，请重新下单"
+    },
+    "wechat": {
+      "title": "关注公众号",
+      "description": "及时获取账户余额变动，活动推送等信息",
+      "skip": "跳过"
+    }
   }
 } 

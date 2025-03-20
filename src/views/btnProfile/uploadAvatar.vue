@@ -3,7 +3,7 @@
     v-model:show="statusStore.showUploadAvatarDialog"
     preset="card"
     style="width: 580px"
-    title="avatar"
+    :title="t('btnProfile.uploadAvatar.title')"
     :auto-focus="false"
     :mask-closable="false"
     :bordered="false"
@@ -27,8 +27,10 @@
   import { useStatusStore } from '@/stores/userStatus'
   import { ref } from 'vue'
   import vImage from '@/components/modules/vImage.vue'
+  import { useI18n } from 'vue-i18n'
   // import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
 
+  const { t } = useI18n()
   const statusStore = useStatusStore()
   const avatar = ref([
     'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp',

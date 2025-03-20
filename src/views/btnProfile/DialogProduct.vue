@@ -16,7 +16,7 @@
           />
           <span>
             {{ item.benefits[0].amount }}
-            <span class="coin-unit">币</span>
+            <span class="coin-unit">{{ t('btnProfile.userInfo.coin') }}</span>
           </span>
         </p>
         <div class="divider"></div>
@@ -26,28 +26,28 @@
   </ul>
   <div class="footer">
     <div class="agreement">
-      <n-checkbox v-model:checked="checked">确认支付即代表同意本平台</n-checkbox>
-      <span class="protocol">「充值协议」</span>
+      <n-checkbox v-model:checked="checked">{{ t('btnProfile.product.confirmPayment') }}</n-checkbox>
+      <span class="protocol">「{{ t('btnProfile.product.payNow') }}」</span>
     </div>
-    <span class="note">注：金币有效期为 1 年</span>
+    <span class="note">{{ t('btnProfile.coinsInfo.expirationTime') }}</span>
   </div>
   <div class="payment">
     <div class="payment-content">
-      <span class="label">实付款</span>
+      <span class="label">{{ t('btnProfile.product.amount') }}</span>
       <span class="amount">¥ {{ amount }}</span>
-      <n-button class="pay-button" type="primary" @click="handlePay">支付</n-button>
+      <n-button class="pay-button" type="primary" @click="handlePay">{{ t('btnProfile.product.payNow') }}</n-button>
     </div>
   </div>
   <n-modal
     v-model:show="orderStore.showWechat"
     preset="card"
     :auto-focus="false"
-    title="微信支付"
+    :title="t('btnProfile.product.wechatPay')"
     style="width: 288px"
     :bordered="false"
   >
     <wechat :text="wechatText" />
-    <p class="code-hint">二维码将于{{ orderStore.wechatExpireAt }}后过期</p>
+    <p class="code-hint">{{ t('btnProfile.product.scanQrCode') }}</p>
     <div class="expire_at_layout" v-if="orderStore.wechatExpireAtStamp <= 0">
       <span class="refresh" @click="handlePay">
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@
           />
         </svg>
       </span>
-      <p>二维码已过期，请点击刷新</p>
+      <p>{{ t('btnProfile.product.paymentExpired') }}</p>
     </div>
   </n-modal>
 </template>
@@ -69,7 +69,9 @@
   import { payProduct } from '@/api/order'
   import wechat from './wechat.vue'
   import { useToaster } from '@/components/modules/toats/index'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const orderStore = useOrderStore()
   const statusStore = useStatusStore()
 
@@ -85,7 +87,7 @@
 
   const handlePay = async () => {
     if (!checked.value) {
-      useToaster.error('请先同意充值协议')
+      useToaster.error(t('btnProfile.product.confirmPayment'))
       return
     }
     localStorage.removeItem('expire_at')
