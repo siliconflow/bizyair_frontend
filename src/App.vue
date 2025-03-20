@@ -367,6 +367,7 @@
       .bizyair-menu-content {
         height: 40px;
         display: flex;
+        justify-content: space-between;
         padding: 4px 12px;
         background-color: rgb(72, 72, 78);
         border-radius: 0 0 12px 12px;
