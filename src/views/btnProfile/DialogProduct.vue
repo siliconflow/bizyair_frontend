@@ -7,16 +7,20 @@
       class="item"
       @click="handleAmount(index)"
     >
-      <div :class="['item-content', {'active': activeIndex === index}]">
+      <div :class="['item-content', { active: activeIndex === index }]">
         <p class="coin">
-          <img src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/BRVnojLT9cfbb3p0zdxKJkBVdB7amSPB.webp" alt="coin" class="coin-icon" />
+          <img
+            src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/BRVnojLT9cfbb3p0zdxKJkBVdB7amSPB.webp"
+            alt="coin"
+            class="coin-icon"
+          />
           <span>
             {{ item.benefits[0].amount }}
             <span class="coin-unit">币</span>
           </span>
         </p>
         <div class="divider"></div>
-        <p class="price">￥{{ item.price/100 }}</p>
+        <p class="price">￥{{ item.price / 100 }}</p>
       </div>
     </li>
   </ul>
@@ -34,227 +38,234 @@
       <n-button class="pay-button" type="primary" @click="handlePay">支付</n-button>
     </div>
   </div>
-  <n-modal 
-    v-model:show="orderStore.showWechat" 
-    preset="card" 
-    :auto-focus="false" 
-    title="微信支付" 
-    style="width: 288px;"
-    :bordered="false">
+  <n-modal
+    v-model:show="orderStore.showWechat"
+    preset="card"
+    :auto-focus="false"
+    title="微信支付"
+    style="width: 288px"
+    :bordered="false"
+  >
     <wechat :text="wechatText" />
     <p class="code-hint">二维码将于{{ orderStore.wechatExpireAt }}后过期</p>
     <div class="expire_at_layout" v-if="orderStore.wechatExpireAtStamp <= 0">
       <span class="refresh" @click="handlePay">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#fff" d="M5.463 4.433A9.96 9.96 0 0 1 12 2c5.523 0 10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3A8 8 0 0 0 6.46 6.228zm13.074 15.134A9.96 9.96 0 0 1 12 22C6.477 22 2 17.523 2 12c0-2.136.67-4.116 1.81-5.74L7 12H4a8 8 0 0 0 13.54 5.772z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+          <path
+            fill="#fff"
+            d="M5.463 4.433A9.96 9.96 0 0 1 12 2c5.523 0 10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3A8 8 0 0 0 6.46 6.228zm13.074 15.134A9.96 9.96 0 0 1 12 22C6.477 22 2 17.523 2 12c0-2.136.67-4.116 1.81-5.74L7 12H4a8 8 0 0 0 13.54 5.772z"
+          />
+        </svg>
       </span>
       <p>二维码已过期，请点击刷新</p>
     </div>
   </n-modal>
 </template>
 <script setup lang="ts">
-import { NCheckbox, NButton, NModal } from "naive-ui"
-import { useOrderStore } from "@/stores/orderStore"
-import { useStatusStore } from "@/stores/userStatus"
-import { onMounted, onUnmounted, ref } from "vue";
-import { payProduct } from "@/api/order"
-import wechat from "./wechat.vue";
-import { useToaster } from '@/components/modules/toats/index'
+  import { NCheckbox, NButton, NModal } from 'naive-ui'
+  import { useOrderStore } from '@/stores/orderStore'
+  import { useStatusStore } from '@/stores/userStatus'
+  import { onMounted, onUnmounted, ref } from 'vue'
+  import { payProduct } from '@/api/order'
+  import wechat from './wechat.vue'
+  import { useToaster } from '@/components/modules/toats/index'
 
-const orderStore = useOrderStore()
-const statusStore = useStatusStore()
+  const orderStore = useOrderStore()
+  const statusStore = useStatusStore()
 
-const activeIndex = ref(0);
-const checked = ref(false);
-const amount = ref(0);
-const wechatText = ref('')
+  const activeIndex = ref(0)
+  const checked = ref(false)
+  const amount = ref(0)
+  const wechatText = ref('')
 
-const handleAmount = (index: number) => {
-  activeIndex.value = index;
-  amount.value = orderStore.products[index] && orderStore.products[index].price/100;
-};
-
-const handlePay = async () => {
-  if (!checked.value) {
-    useToaster.error('请先同意充值协议');
-    return;
+  const handleAmount = (index: number) => {
+    activeIndex.value = index
+    amount.value = orderStore.products[index] && orderStore.products[index].price / 100
   }
-  localStorage.removeItem('expire_at');
-  localStorage.removeItem('code_url');
-  const res = await payProduct(orderStore.products[activeIndex.value].id, 'wechat');
-  orderStore.showWechat = true;
-  wechatText.value = res.data.code_url;
-  localStorage.setItem('expire_at', res.data.expire_at);
-  localStorage.setItem('code_url', res.data.code_url);
-  localStorage.setItem('order_no', res.data.order_no);
-  orderStore.countExpire(res.data.expire_at);
-  orderStore.intervalTimer(statusStore.loginRefresh);
-};
 
+  const handlePay = async () => {
+    if (!checked.value) {
+      useToaster.error('请先同意充值协议')
+      return
+    }
+    localStorage.removeItem('expire_at')
+    localStorage.removeItem('code_url')
+    const res = await payProduct(orderStore.products[activeIndex.value].id, 'wechat')
+    orderStore.showWechat = true
+    wechatText.value = res.data.code_url
+    localStorage.setItem('expire_at', res.data.expire_at)
+    localStorage.setItem('code_url', res.data.code_url)
+    localStorage.setItem('order_no', res.data.order_no)
+    orderStore.countExpire(res.data.expire_at)
+    orderStore.intervalTimer(statusStore.loginRefresh)
+  }
 
-onMounted(async () => {
-  await orderStore.getProducts()
-  handleAmount(0)
-  // const expireAt = localStorage.getItem('expire_at');
-  // if (expireAt && new Date(expireAt).getTime() > new Date().getTime() && localStorage.getItem('code_url')) {
-  //   orderStore.showWechat = true;
-  //   wechatText.value = localStorage.getItem('code_url') || '';
-    
-  //   orderStore.countExpire(expireAt);
-  //   orderStore.intervalTimer(statusStore.loginRefresh);
-  // }
-})
-onUnmounted(() => {
-  if (orderStore.iTimer) {
-    clearInterval(orderStore.iTimer);
-  }
-  if (orderStore.timerStatus) {
-    clearInterval(orderStore.timerStatus);
-  }
-})
+  onMounted(async () => {
+    await orderStore.getProducts()
+    handleAmount(0)
+    // const expireAt = localStorage.getItem('expire_at');
+    // if (expireAt && new Date(expireAt).getTime() > new Date().getTime() && localStorage.getItem('code_url')) {
+    //   orderStore.showWechat = true;
+    //   wechatText.value = localStorage.getItem('code_url') || '';
+
+    //   orderStore.countExpire(expireAt);
+    //   orderStore.intervalTimer(statusStore.loginRefresh);
+    // }
+  })
+  onUnmounted(() => {
+    if (orderStore.iTimer) {
+      clearInterval(orderStore.iTimer)
+    }
+    if (orderStore.timerStatus) {
+      clearInterval(orderStore.timerStatus)
+    }
+  })
 </script>
 <style scoped lang="less">
-ul, li, p {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.title {
-  margin-top: 28px;
-  text-align: center;
-  font-size: 28px;
-  font-weight: bold;
-}
-.list {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 16px;
-  list-style: none;
-}
-
-.item {
-  width: 25%;
-  padding: 8px;
-  box-sizing: border-box;
-
-  .item-content {
+  ul,
+  li,
+  p {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .title {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  .list {
     width: 100%;
-    background-color: rgba(109, 40, 217, 0.1);
-    border: 2px solid rgba(109, 40, 217, 0.5);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    list-style: none;
+  }
 
-    &:hover {
-      border: 2px solid #7c3aed;
+  .item {
+    width: 25%;
+    padding: 8px;
+    box-sizing: border-box;
+
+    .item-content {
+      width: 100%;
+      background-color: rgba(109, 40, 217, 0.1);
+      border: 2px solid rgba(109, 40, 217, 0.5);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+
+      &:hover {
+        border: 2px solid #7c3aed;
+        box-shadow: 0 0 20px 0 #7c3aed;
+      }
+    }
+    .active {
+      border-color: #7c3aed;
       box-shadow: 0 0 20px 0 #7c3aed;
     }
-  }
-  .active {
-    border-color: #7c3aed;
-    box-shadow: 0 0 20px 0 #7c3aed;
+
+    .coin {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 30px;
+      margin-top: 4px;
+
+      .coin-icon {
+        width: 28px;
+        height: 28px;
+      }
+
+      .coin-unit {
+        font-size: 12px;
+        margin-left: 4px;
+      }
+    }
+
+    .divider {
+      width: 150px;
+      height: 2px;
+      background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.5), transparent);
+      margin: 0 auto;
+    }
+
+    .price {
+      color: #d48806;
+      font-size: 26px;
+      text-align: center;
+      padding-bottom: 4px;
+    }
   }
 
-  .coin {
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    font-size: 14px;
+
+    .agreement {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .protocol {
+        color: #94a3b8;
+      }
+    }
+
+    .note {
+      font-size: 12px;
+    }
+  }
+
+  .payment {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding: 16px 24px;
+    background-color: rgba(109, 40, 217, 0.1);
+    border-radius: 40px;
+
+    .payment-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .label {
+        font-size: 12px;
+      }
+
+      .amount {
+        color: #d48806;
+        font-size: 32px;
+      }
+
+      .pay-button {
+        border-radius: 20px;
+        padding: 0 32px;
+      }
+    }
+  }
+  .code-hint {
+    text-align: center;
+  }
+  .expire_at_layout {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
-    font-size: 30px;
-    margin-top: 4px;
-
-    .coin-icon {
-      width: 28px;
-      height: 28px;
-    }
-
-    .coin-unit {
-      font-size: 12px;
-      margin-left: 4px;
+    flex-direction: column;
+    .refresh {
+      cursor: pointer;
     }
   }
-
-  .divider {
-    width: 150px;
-    height: 2px;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.5), transparent);
-    margin: 0 auto;
-  }
-
-  .price {
-    color: #d48806;
-    font-size: 26px;
-    text-align: center;
-    padding-bottom: 4px;
-  }
-}
-
-.footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 24px;
-  font-size: 14px;
-
-  .agreement {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .protocol {
-      color: #94a3b8;
-    }
-  }
-
-  .note {
-    font-size: 12px;
-  }
-}
-
-.payment {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 24px;
-  padding: 16px 24px;
-  background-color: rgba(109, 40, 217, 0.1);
-  border-radius: 40px;
-
-  .payment-content {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .label {
-      font-size: 12px;
-    }
-
-    .amount {
-      color: #d48806;
-      font-size: 32px;
-    }
-
-    .pay-button {
-      border-radius: 20px;
-      padding: 0 32px;
-    }
-  }
-}
-.code-hint{
-  text-align: center;
-}
-.expire_at_layout{
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  .refresh{
-    cursor: pointer;
-  }
-}
 </style>

@@ -17,12 +17,12 @@ interface typeUsersMetadata {
   id: number
   name: string
   shareId?: string | number
-  status: "normal" | "disable"
+  status: 'normal' | 'disable'
   last_share_id_update_at?: string
   avatar?: string
   Introducation: string
   auth: 0 | 1 | 2
-  auth_type:  0 | 1
+  auth_type: 0 | 1
   introduction?: string
 }
 interface typeUserWallte {
@@ -66,23 +66,23 @@ export const useStatusStore = defineStore('userStatus', {
     showUploadAvatarDialog: false,
     showPropertyDialog: false,
     showRecordDialog: false,
-    userAvatar: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp',
+    userAvatar:
+      'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp',
     usersMetadata: {} as typeUsersMetadata,
     userWallte: {} as typeUserWallte,
     userCoinsData: {} as typeUserCoinsData,
     coinsParam: {
       current: 1,
       page_size: 20,
-      
-      expire_days: 365,
+
+      expire_days: 365
     } as typeCoinsParam,
     recordParam: {
       current: 1,
       page_size: 20,
-      order: 'desc',
+      order: 'desc'
     },
-    recordOptions: [
-    ],
+    recordOptions: [],
     coinsListTitle: ''
   }),
   actions: {
@@ -140,7 +140,7 @@ export const useStatusStore = defineStore('userStatus', {
         useToaster.error('Copy failed')
       }
     },
-    handleShowInfoDialog (bool: boolean) {
+    handleShowInfoDialog(bool: boolean) {
       this.showInfoDialog = bool
       if (bool) {
         this.get_metadata()
@@ -182,7 +182,6 @@ export const useStatusStore = defineStore('userStatus', {
       await logout()
       this.isLogin = false
       useToaster.success('Logout success')
-    },
-
+    }
   }
 })

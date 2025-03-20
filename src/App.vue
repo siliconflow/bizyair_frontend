@@ -134,12 +134,7 @@
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
   import { useStatusStore } from '@/stores/userStatus'
   import { provide, ref } from 'vue'
-  import {
-    NInput,
-    NTooltip,
-    NMessageProvider,
-    NNotificationProvider
-  } from 'naive-ui'
+  import { NInput, NTooltip, NMessageProvider, NNotificationProvider } from 'naive-ui'
 
   import { useCommunityStore } from '@/stores/communityStore'
   import { get_share_code } from '@/api/model'
@@ -151,7 +146,6 @@
 
   const communityStore = useCommunityStore()
   // communityStore.setAndShowCommunityDetail(modelId, versionId)
-
 
   const statusStore = useStatusStore()
   statusStore.loginRefresh('loading')
