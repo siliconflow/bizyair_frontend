@@ -627,6 +627,7 @@
           <div class="flex gap-4">
             <vTooltips v-if="communityStore.TabSource === 'publicity'" :tips="t('community.detail.share')">
               <div
+                @click="getShareCode"
                 class="w-[48px] h-[48px] bg-[#4e4e4e] hover:bg-[#4e4e4e]/60 rounded-lg flex items-center justify-center cursor-pointer"
               >
                 <svg
@@ -634,7 +635,6 @@
                   width="16"
                   height="16"
                   viewBox="0 0 24 24"
-                  @click="getShareCode"
                 >
                   <path
                     fill="currentColor"
