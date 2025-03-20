@@ -2,7 +2,7 @@ import { useToaster } from '@/components/modules/toats/index'
 
 const fetchCache = new Map()
 
-export function customFetch(url: string, options = {}, needDebounce = true) {
+export function customFetch(url: string, options = {}, needDebounce = true, needError = true) {
   const now = Date.now()
   if (needDebounce) {
     if (fetchCache.has(url)) {
@@ -28,8 +28,12 @@ export function customFetch(url: string, options = {}, needDebounce = true) {
     .then(data => {
       const { code, message } = data
       if (code !== 20000) {
-        useToaster.error(message)
-        throw new Error(message)
+        if (needError) {
+          useToaster.error(message)
+          throw new Error(message)
+        } else {
+          return data
+        }
         // return
       }
       return data
