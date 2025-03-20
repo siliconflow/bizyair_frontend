@@ -1,9 +1,9 @@
 <template>
   <div
-    class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3"
+    class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3 rounded-sm"
     @click="handleMenuClick"
   >
-    <span class="mr-1">
+    <span class="mr-1 h-4 w-4">
       <svg
         width="14"
         height="14"
@@ -19,7 +19,7 @@
         />
       </svg>
     </span>
-    <span class="block leading h-full leading-8 text-sm">Community</span>
+    <span class="block leading leading-8 text-sm">Community</span>
   </div>
   <v-dialog
     v-model:open="communityStore.showDialog"

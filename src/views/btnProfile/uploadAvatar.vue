@@ -32,19 +32,19 @@ import vImage from '@/components/modules/vImage.vue'
 
 const statusStore = useStatusStore()
 const avatar = ref([
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/YDP6ZVq41yj9HCn4oQklNps7gkYXmYtF.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/am4o3LW21fiCtkHBn6sVcJQCabyXPRpP.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/SoEIUUVIlRI4jmS0oJGksF2oYWTXiFRH.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/neWI6jKICQYZmhGjrr4EEQ3ayyP9mTZr.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/5YPQStbsKrGqkZzwGvkHXzGhy2XX5bcb.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/yXPbljOblCjqRTWgbcHIhV6Qmtbo3Q3M.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/6GjafFtlRKO0Tb7j4pQFSUHBsRinI8Fl.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/qcVtbtFeBtk1bejEQ2lik4uUfvF6grKK.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/BRuIn69IDL74l0K5qqi4HA3GEqLSS209.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/NXywfJUeDimurtmtVmVM8PrkuFwyafoN.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/8JHxWscVaxw3at3uzhKqb2HR6V1O2YGr.webp',
-  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/McHuaZdFjCoqUf57m4j5XVanuDDRJTo1.webp'
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/YDP6ZVq41yj9HCn4oQklNps7gkYXmYtF.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/am4o3LW21fiCtkHBn6sVcJQCabyXPRpP.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/SoEIUUVIlRI4jmS0oJGksF2oYWTXiFRH.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/neWI6jKICQYZmhGjrr4EEQ3ayyP9mTZr.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/5YPQStbsKrGqkZzwGvkHXzGhy2XX5bcb.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/yXPbljOblCjqRTWgbcHIhV6Qmtbo3Q3M.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/6GjafFtlRKO0Tb7j4pQFSUHBsRinI8Fl.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/qcVtbtFeBtk1bejEQ2lik4uUfvF6grKK.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/BRuIn69IDL74l0K5qqi4HA3GEqLSS209.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/NXywfJUeDimurtmtVmVM8PrkuFwyafoN.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/8JHxWscVaxw3at3uzhKqb2HR6V1O2YGr.webp',
+  'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/McHuaZdFjCoqUf57m4j5XVanuDDRJTo1.webp'
 ])
 // const cover_url = ref('')
 const selectThis = (e: string) => {

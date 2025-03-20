@@ -1,5 +1,5 @@
 <template>
-  <div @click="statusStore.showInfoDialog = true" variant="outline" class="profile-container">
+  <div @click="statusStore.handleShowInfoDialog(true)" variant="outline" class="profile-container">
     <span class="icon-container">
       <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
         <g
@@ -18,7 +18,45 @@
     <dialogInfo />
     <DialogUploadInfo />
     <uploadAvatar />
-    <DialogCoinsLis />
+    <n-modal 
+      v-model:show="statusStore.showPropertyDialog" 
+      preset="card" 
+      style="width: 652px;" 
+      content-style="padding: 0 32px 20px 32px;" 
+      :mask-closable="false"
+      :on-after-leave="closeInfoDialog"
+      :auto-focus="false"
+      :bordered="false">
+      <template #header>
+        <div class="coins-lis-title">
+          <img src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp">
+          <span>我的 BZ 币</span>
+        </div>
+      </template>
+      <DialogCoinsLis />
+    </n-modal>
+    <n-modal 
+      v-model:show="statusStore.showRecordDialog" 
+      preset="card" 
+      style="width: 960px;" 
+      title="充值记录"
+      content-style="padding: 0 32px 20px 32px;" 
+      :mask-closable="false"
+      :on-after-leave="closeInfoDialog"
+      :auto-focus="false"
+      :bordered="false">
+      <DialogRecord />
+    </n-modal>
+    <n-modal 
+      v-model:show="orderStore.showProduct" 
+      preset="card" 
+      style="width: 960px;" 
+      :auto-focus="false"
+      title="Bz币充值"
+      content-style="padding: 0 32px 24px 32px;" 
+      :bordered="false">
+      <DialogProduct />
+    </n-modal>
   </div>
 
 </template>
@@ -29,14 +67,21 @@
   import DialogUploadInfo from './DialogUploadInfo.vue'
   import uploadAvatar from './uploadAvatar.vue'
   import DialogCoinsLis from './DialogCoinsLis.vue'
+  import DialogRecord from './DialogRecord.vue'
+  import DialogProduct from './DialogProduct.vue'
   import { useStatusStore } from '@/stores/userStatus'
-  
+  import { NModal } from 'naive-ui'
+  import { useOrderStore } from "@/stores/orderStore"
 
   const statusStore = useStatusStore()
+  const orderStore = useOrderStore()
   
-  
+  const closeInfoDialog = () => {
+    statusStore.showUploadInfoDialog = false
+    statusStore.showInfoDialog = true
+  }
 </script>
-<style scoped>
+<style scoped lang="less">
 
 .profile-container {
   display: flex;
@@ -44,10 +89,25 @@
   cursor: pointer;
   position: relative;
   padding: 0 12px;
+  border-radius: 4px;
 }
 
 .profile-container:hover {
   background-color: #4a238e;
 }
 
+.icon-container{
+  width: 16px;
+  height: 16px;
+}
+
+.coins-lis-title{
+  display: flex;
+  align-items: center;
+  img{
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+  }
+}
 </style>

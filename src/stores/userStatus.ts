@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import { get_user_info, get_smetadata, get_coins, get_wallet } from '@/api/user'
+import { get_user_info, get_metadata, get_coins, get_wallet, logout } from '@/api/user'
 // , put_smetadata, post_real_name, get_wallet, get_coins
 import { WebSocketClient } from '@/utils/socket.ts'
-import useClipboard from 'vue-clipboard3'
+// import useClipboard from 'vue-clipboard3'
 import { useToaster } from '@/components/modules/toats/index'
-const { toClipboard } = useClipboard()
+// const { toClipboard } = useClipboard()
 interface UserInfo {
   level: number
   name: string
@@ -31,6 +31,9 @@ interface typeUserWallte {
   total_balance: string
   charge_today_expired: boolean
   gift_today_expired: boolean
+  total_balance_amount: string
+  charge_balance_amount: string
+  gift_balance_amount: string
 }
 interface typeList {
   id: number
@@ -46,6 +49,12 @@ interface typeUserCoinsData {
   total_gift_coins: number
   list: typeList[]
 }
+interface typeCoinsParam {
+  current: number
+  page_size: number
+  coin_type?: number
+  expire_days: number
+}
 export const useStatusStore = defineStore('userStatus', {
   state: () => ({
     infoData: {} as UserInfo,
@@ -56,20 +65,28 @@ export const useStatusStore = defineStore('userStatus', {
     showUploadInfoDialog: false,
     showUploadAvatarDialog: false,
     showPropertyDialog: false,
-    userAvatar: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp',
+    showRecordDialog: false,
+    userAvatar: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp',
     usersMetadata: {} as typeUsersMetadata,
     userWallte: {} as typeUserWallte,
     userCoinsData: {} as typeUserCoinsData,
     coinsParam: {
       current: 1,
       page_size: 20,
-      coin_type: 1,
-      expire_days: 30,
-    }
-    // showInfoDialog: false,
+      
+      expire_days: 365,
+    } as typeCoinsParam,
+    recordParam: {
+      current: 1,
+      page_size: 20,
+      order: 'desc',
+    },
+    recordOptions: [
+    ],
+    coinsListTitle: ''
   }),
   actions: {
-    loginRefresh() {
+    loginRefresh(isLoading?: string) {
       get_user_info()
         .then((info: { data: any }) => {
           if (info !== null) {
@@ -81,6 +98,10 @@ export const useStatusStore = defineStore('userStatus', {
         .catch(() => {
           this.isLogin = false
         })
+      if (!isLoading || isLoading != 'loading') {
+        this.get_metadata()
+        this.get_wallet()
+      }
     },
     sendSocket(fn: (res: any) => void) {
       const wsClient = new WebSocketClient(
@@ -102,17 +123,32 @@ export const useStatusStore = defineStore('userStatus', {
     handleApiKeyDialog(val: boolean) {
       this.showApiKeyDialog = val
     },
-    copyText(text: string) {
-      toClipboard(text)
-        .then(() => {
+    async copyText(text: string) {
+      try {
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(text)
           useToaster.success('Copy success')
-        })
-        .catch(() => {
-          useToaster.error('Copy failed')
-        })
+        } else {
+          const input = document.createElement('input')
+          input.value = text
+          document.body.appendChild(input)
+          input.select()
+          document.execCommand('copy')
+          document.body.removeChild(input)
+        }
+      } catch (err) {
+        useToaster.error('Copy failed')
+      }
     },
-    async get_smetadata() {
-      let res = await get_smetadata()
+    handleShowInfoDialog (bool: boolean) {
+      this.showInfoDialog = bool
+      if (bool) {
+        this.get_metadata()
+        this.get_wallet()
+      }
+    },
+    async get_metadata() {
+      let res = await get_metadata()
       this.usersMetadata = res.data
       return res.data
     },
@@ -121,12 +157,32 @@ export const useStatusStore = defineStore('userStatus', {
       this.userWallte = res.data
       return res.data
     },
+    async get_coins() {
+      const temp = { ...this.coinsParam }
+      if (!temp.coin_type) {
+        delete temp.coin_type
+      }
+      const res = await get_coins(temp)
+      this.userCoinsData = res.data
+      return res.data
+    },
     async handlePropertyDialog(bool: boolean) {
       this.showPropertyDialog = bool
       if (bool) {
-        const res = await get_coins({ ...this.coinsParam })
-        this.userCoinsData = res.data
+        this.get_coins()
       }
-    }
+    },
+    async handleRecordDialog(bool: boolean) {
+      this.showRecordDialog = bool
+      if (bool) {
+        this.get_coins()
+      }
+    },
+    async logout() {
+      await logout()
+      this.isLogin = false
+      useToaster.success('Logout success')
+    },
+
   }
 })

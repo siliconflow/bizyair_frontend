@@ -40,7 +40,7 @@
       />
     </div>
     <div v-if="disableUpload" class="pl-2">
-      <n-button type="primary" @click="interrupt()" v-if="!uploadSuccessful">interrupt</n-button>
+      <n-button type="primary" @click="interrupt()" v-if="!uploadSuccessful">Interrupt</n-button>
       <n-button type="primary" @click="cancel()" v-else>cancel</n-button>
     </div>
   </div>

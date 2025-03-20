@@ -24,13 +24,13 @@
         :rules="rules"
       >
         <n-form-item label="昵称" path="name">
-          <n-input v-model:value="statusStore.usersMetadata.name" placeholder="name" />
+          <n-input v-model:value="statusStore.usersMetadata.name" placeholder="name" maxlength="50" />
         </n-form-item>
         <n-form-item label="个性签名" path="introduction">
-          <n-input v-model:value="statusStore.usersMetadata.introduction" type="textarea" placeholder="introduction" />
+          <n-input v-model:value="statusStore.usersMetadata.introduction" type="textarea" placeholder="introduction" maxlength="50" />
         </n-form-item>
         <n-form-item label="实名认证" path="introduction">
-          <span v-if="statusStore.usersMetadata.auth !== 1" class="auth-status">
+          <span v-if="statusStore.usersMetadata.auth == 1" class="auth-status">
             已认证
             <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-green-400 ml-1" height="20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm106.5 150.5L228.8 332.8h-.1c-1.7 1.7-6.3 5.5-11.6 5.5-3.8 0-8.1-2.1-11.7-5.7l-56-56c-1.6-1.6-1.6-4.1 0-5.7l17.8-17.8c.8-.8 1.8-1.2 2.8-1.2 1 0 2 .4 2.8 1.2l44.4 44.4 122-122.9c.8-.8 1.8-1.2 2.8-1.2 1.1 0 2.1.4 2.8 1.2l17.5 18.1c1.8 1.7 1.8 4.2.2 5.8z"></path></svg>
           </span>
@@ -48,18 +48,16 @@
 import { NModal, NButton } from "naive-ui"
 import { useStatusStore } from "@/stores/userStatus"
 import { NForm, NFormItem, NInput } from "naive-ui"
-import { put_smetadata, post_real_name } from '@/api/user'
+import { put_metadata, post_real_name } from '@/api/user'
 import { ref } from "vue"
+import { useConfirm } from "@/components/modules/vConfirm"
 
 const statusStore = useStatusStore()
 const formRef = ref()
 
 const rules = {
   name: [
-    { required: true, message: 'Please enter name', trigger: 'blur' }
-  ],
-  introduction: [
-    { required: true, message: 'Please enter introduction', trigger: 'blur', max: 50 }
+    { required: true, message: 'Please enter name', trigger: 'blur', max: 50 }
   ]
 }
 const closeInfoDialog = () => {
@@ -67,19 +65,44 @@ const closeInfoDialog = () => {
   statusStore.showInfoDialog = true
 }
 const toRealName = async () => {
-  const res = await post_real_name()
-  console.log(res.data.auth == 1)
+  const res = await post_real_name();
+  console.log(res.data.auth == 1);
   if (res && res.data && res.data.auth == 1) {
-    statusStore.usersMetadata.auth = 1
+    statusStore.usersMetadata.auth = 1;
   } else {
+    const res = await useConfirm({
+      title: '认证失败',
+      content: '需要去siliconflow进行认证',
+      continueText: '前往',
+      cancelText: '取消'
+    });
 
+    if (res) {
+      window.open('https://cloud.siliconflow.cn/account/authentication', '_blank');
+      await handleSecondConfirmation();
+    }
   }
-}
+};
+
+const handleSecondConfirmation = async () => {
+  const resSecond = await useConfirm({
+    content: '我已完成认证',
+    continueText: '已完成',
+    cancelText: '重试'
+  });
+
+  if (resSecond) {
+    toRealName();
+  } else {
+    window.open('https://cloud.siliconflow.cn/account/authentication', '_blank');
+    await handleSecondConfirmation();
+  }
+};
 const toSubmit = () => {
   formRef.value?.validate(async (errors: any) => {
     if (!errors) {
       const temp = { ...statusStore.usersMetadata }
-      await put_smetadata(temp)
+      await put_metadata(temp)
       statusStore.showUploadInfoDialog = false
       statusStore.showInfoDialog = true
     } else {
@@ -88,7 +111,7 @@ const toSubmit = () => {
   })
 }
 const cancel = async () => {
-  await statusStore.get_smetadata()
+  await statusStore.get_metadata()
   statusStore.showUploadInfoDialog = false
 }
 

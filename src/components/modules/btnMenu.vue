@@ -82,6 +82,7 @@
 
   .slot-container {
     margin-right: 4px;
+    height: 16px;
   }
 
   .button-text {
