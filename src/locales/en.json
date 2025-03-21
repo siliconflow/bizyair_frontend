@@ -341,13 +341,13 @@
       "balance": "Balance",
       "coin": "Coin",
       "recharge": "Recharge",
-      "giftSilverCoins": "Gift Silver Coins",
-      "rechargeGoldCoins": "Recharge Gold Coins"
+      "giftSilverCoins": "Silver Coins",
+      "rechargeGoldCoins": "Gold Coins"
     },
     "actions": {
       "switchApiKey": "Switch API Key",
       "myWallet": "My Wallet",
-      "rechargeRecord": "Recharge Records"
+      "rechargeRecord": "Top-up History"
     },
     "uploadInfo": {
       "title": "Personal Information",
