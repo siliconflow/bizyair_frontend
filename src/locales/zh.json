@@ -376,7 +376,7 @@
     },
     "record": {
       "rechargeRecord": "充值记录",
-      "bzCoinRecharge": "Bz币充值",
+      "bzCoinRecharge": "BZ币充值",
       "orderStatus": "订单状态",
       "selectOrder": "选择订单",
       "orderNumber": "订单编号",
@@ -416,7 +416,8 @@
       "agreementWarning": "请先同意充值协议",
       "wechatPay": "微信支付",
       "expireQrCode": "二维码将于{0}后过期",
-      "qrCodeExpired": "二维码已过期，请点击刷新"
+      "qrCodeExpired": "二维码已过期，请点击刷新",
+      "paySuccess": "支付成功"
     },
     "avatar": {
       "avatar": "头像"
