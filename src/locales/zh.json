@@ -360,8 +360,8 @@
     },
     "coinsList": {
       "viewExpiring": "查看您即将过期的BZ币列表，并进行筛选查看。",
-      "expiringGoldTotal": "即过期的金币总额",
-      "expiringSilverTotal": "即过期的银币总额",
+      "expiringGoldTotal": "即将过期的金币总额",
+      "expiringSilverTotal": "即将过期的银币总额",
       "all": "全部",
       "silverCoin": "银币",
       "goldCoin": "金币",
@@ -397,7 +397,14 @@
       "refundProcessing": "退款处理中",
       "refundSuccess": "退款成功",
       "refundClosed": "退款关闭",
-      "refundAbnormal": "退款异常"
+      "refundAbnormal": "退款异常",
+      "refundOrder": "退单",
+      "minute": "分",
+      "second": "秒",
+      "orderCreationFailed": "订单创建失败",
+      "confirmCancel": "你确定要取消这个订单吗？",
+      "proceed": "确定",
+      "cancel": "取消"
     },
     "product": {
       "coin": "币",

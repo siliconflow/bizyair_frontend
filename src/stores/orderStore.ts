@@ -17,7 +17,6 @@ export const useOrderStore = defineStore('userOrder', {
     payListParms: {
       current: 1,
       page_size: 10,
-      status: '全部'
     } as typePayListParms,
     wechatExpireAt: '',
     wechatExpireAtStamp: 0,
@@ -33,7 +32,7 @@ export const useOrderStore = defineStore('userOrder', {
     },
     async getPayPage() {
       const temp = { ...this.payListParms }
-      if (temp.status == '' || temp.status == '全部') {
+      if (temp.status == '' || temp.status == 'all') {
         delete temp.status
       }
       const res = await getPayPage(temp)
@@ -85,13 +84,13 @@ export const useOrderStore = defineStore('userOrder', {
           }
           this.showWechat = false
           if (res.data.status == 'success') {
-            useToaster.success('支付成功')
+            useToaster.success('Payment Success')
             if (fn) {
               fn()
             }
           }
           if (res.data.status == 'failed') {
-            useToaster.error('订单创建失败')
+            useToaster.error('Order creation failed')
           }
         }
       }, 2000)

@@ -34,7 +34,13 @@
     :bordered="false"
   >
     <wechat :text="wechatText" />
-    <p class="code-hint">{{ $t('btnProfile.record.expireQrCode', [orderStore.wechatExpireAt]) }}</p>
+    <p class="code-hint">{{ $t('btnProfile.record.expireQrCode', [(
+       locale == 'en' 
+        ? 
+        orderStore.wechatExpireAt.replace('分', 'minutes').replace('秒', 'seconds')
+        : 
+        orderStore.wechatExpireAt
+    )]) }}</p>
     <div class="expire_at_layout" v-if="orderStore.wechatExpireAtStamp <= 0">
       <span class="refresh" @click="toPay(tempOrderNo)">
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -58,7 +64,7 @@
   import { useConfirm } from '@/components/modules/vConfirm/index'
   import { useI18n } from 'vue-i18n'
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const orderStore = useOrderStore()
   const statusStore = useStatusStore()
 
@@ -129,7 +135,6 @@
   }
 
   const clearTimer = () => {
-    console.log('clearTimer')
     orderStore.iTimer && clearInterval(orderStore.iTimer)
     orderStore.timerStatus && clearInterval(orderStore.timerStatus)
   }
@@ -223,6 +228,7 @@
     {
       title: t('btnProfile.record.operations'),
       key: '',
+      width: 150,
       render(row: any) {
         const option = orderOptions.find(option => option.value === row.status)
         return h(
@@ -291,7 +297,7 @@
     align-items: center;
     margin-bottom: 20px;
     span {
-      width: 72px;
+      width: 84px;
     }
     .filter-select {
       width: 180px;

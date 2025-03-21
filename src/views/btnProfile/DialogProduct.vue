@@ -47,7 +47,13 @@
     :bordered="false"
   >
     <wechat :text="wechatText" />
-    <p class="code-hint">{{ $t('btnProfile.product.expireQrCode', [orderStore.wechatExpireAt]) }}</p>
+    <p class="code-hint">{{ $t('btnProfile.product.expireQrCode', [(
+      locale == 'en' 
+        ? 
+        orderStore.wechatExpireAt.replace('分', 'minutes').replace('秒', 'seconds')
+        : 
+        orderStore.wechatExpireAt
+    )]) }}</p>
     <div class="expire_at_layout" v-if="orderStore.wechatExpireAtStamp <= 0">
       <span class="refresh" @click="handlePay">
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -71,7 +77,7 @@
   import { useToaster } from '@/components/modules/toats/index'
   import { useI18n } from 'vue-i18n'
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const orderStore = useOrderStore()
   const statusStore = useStatusStore()
 

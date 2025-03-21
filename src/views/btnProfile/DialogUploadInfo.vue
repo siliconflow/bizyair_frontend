@@ -26,7 +26,7 @@
         ref="formRef"
         :model="statusStore.usersMetadata"
         label-placement="left"
-        :label-width="80"
+        :label-width="locale === 'en' ? '110px' : '80px'"
         :rules="rules"
       >
         <n-form-item :label="$t('btnProfile.uploadInfo.nickname')" path="name">
@@ -81,7 +81,7 @@
   import { useConfirm } from '@/components/modules/vConfirm'
   import { useI18n } from 'vue-i18n'
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const statusStore = useStatusStore()
   const formRef = ref()
 

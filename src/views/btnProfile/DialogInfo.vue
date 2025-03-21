@@ -318,9 +318,9 @@
       }
 
       .btn {
-        width: 62px;
+        // width: 62px;
         height: 32px;
-        // padding: 10px;
+        padding: 10px;
         padding-top: 4px;
         border-radius: 40px;
         color: #fff;
@@ -382,8 +382,7 @@
     padding-top: 24px;
     justify-content: space-between;
     .handles-item {
-      flex: 1;
-      padding: 8px 0;
+      padding: 6px;
       cursor: pointer;
       transition: all 0.3s;
       user-select: none;
