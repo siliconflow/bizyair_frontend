@@ -2,6 +2,7 @@
   import { Button } from '@/components/ui/button'
   import { Input } from '@/components/ui/input'
   import { Badge } from '@/components/ui/badge'
+  import { useI18n } from 'vue-i18n'
 
   import { useModelSelectStore } from '@/stores/modelSelectStore'
   import type { SortValue, ModeTabType } from '@/types/model'
@@ -16,6 +17,7 @@
   } from '@/components/ui/command'
   import { onMounted, nextTick } from 'vue'
 
+  const { t } = useI18n()
   const store = useModelSelectStore()
 
   const props = defineProps<{
@@ -82,6 +84,23 @@
     emit('filter-data-ready')
   }
 
+  const getSortLabel = (sort: SortValue) => {
+    switch (sort) {
+      case 'Recently':
+        return t('community.filter.sort.options.recently')
+      case 'Most Forked':
+        return t('community.filter.sort.options.most-forked')
+      case 'Most Used':
+        return t('community.filter.sort.options.most-used')
+      case 'Most Downloaded':
+        return t('community.filter.sort.options.downloads')
+      case 'Most Liked':
+        return t('community.filter.sort.options.most-liked')
+      default:
+        return t('community.filter.sort.options.recently')
+    }
+  }
+
   onMounted(async () => {
     await initializeState()
   })
@@ -93,7 +112,7 @@
       <Input
         v-model="store[props.page].filterState.keyword"
         v-debounce="handleSearch"
-        placeholder="Filter by name"
+        :placeholder="t('community.filter.type.title')"
         class="h-[44px] border border-[#9CA3AF] w-full bg-[#222] rounded-lg pr-8 pl-8"
         @update:model-value="val => (store[props.page].filterState.keyword = String(val))"
       />
@@ -124,8 +143,11 @@
       <PopoverTrigger class="bg-transparent">
         <Button
           variant="default"
-          class="w-[44px] h-[44px] hover:border-2 hover:border-white cursor-pointer group"
+          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer group flex items-center"
         >
+          <span class="w-[60px] truncate">{{
+            getSortLabel(store[props.page].filterState.sort)
+          }}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -134,7 +156,7 @@
             fill="none"
           >
             <path
-              d="M2 10.6667L4.66667 13.3334M4.66667 13.3334L7.33333 10.6667M4.66667 13.3334V2.66675M7.33333 2.66675H14M7.33333 5.33341H12M7.33333 8.00008H10"
+              d="M4 6.66675L8 10.6667L12 6.66675"
               stroke="#F9FAFB"
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -162,7 +184,7 @@
                 ]"
                 @click="handleSortChange('Recently')"
               >
-                Recently
+                {{ t('community.filter.sort.options.recently') }}
               </CommandItem>
               <CommandItem
                 value="most-forked"
@@ -175,7 +197,7 @@
                 ]"
                 @click="handleSortChange('Most Forked')"
               >
-                Most Forked
+                {{ t('community.filter.sort.options.most-forked') }}
               </CommandItem>
               <CommandItem
                 value="most-used"
@@ -188,7 +210,7 @@
                 ]"
                 @click="handleSortChange('Most Used')"
               >
-                Most Used
+                {{ t('community.filter.sort.options.most-used') }}
               </CommandItem>
               <CommandItem
                 value="most-used"
@@ -201,7 +223,7 @@
                 ]"
                 @click="handleSortChange('Most Liked')"
               >
-                Most Liked
+                {{ t('community.filter.sort.options.most-liked') }}
               </CommandItem>
             </CommandGroup>
           </CommandList>
@@ -213,7 +235,7 @@
       <PopoverTrigger class="bg-transparent">
         <Button
           variant="default"
-          class="w-[44px] h-[44px] hover:border-2 hover:border-white cursor-pointer"
+          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer flex items-center"
         >
           <svg
             width="16"
@@ -229,6 +251,7 @@
               stroke-linejoin="round"
             />
           </svg>
+          <span>{{ t('community.filter.sort.title') }}</span>
         </Button>
       </PopoverTrigger>
 
@@ -237,7 +260,9 @@
           <CommandList>
             <CommandGroup>
               <div class="p-2">
-                <div class="text-sm font-medium text-[#F9FAFB] mb-2">Model Types</div>
+                <div class="text-sm font-medium text-[#F9FAFB] mb-2">
+                  {{ t('community.filter.type.model-types') }}
+                </div>
               </div>
               <CommandItem value="model-types" class="p-2">
                 <div class="flex flex-wrap gap-2">
@@ -260,7 +285,9 @@
             <CommandSeparator v-if="props.page !== 'posts' && props.page !== 'community'" />
             <CommandGroup>
               <div class="p-2">
-                <div class="text-sm font-medium text-[#F9FAFB] mb-2">Base Models</div>
+                <div class="text-sm font-medium text-[#F9FAFB] mb-2">
+                  {{ t('community.filter.type.base-model') }}
+                </div>
               </div>
               <CommandItem value="base-models" class="p-2">
                 <div class="flex flex-wrap gap-2">

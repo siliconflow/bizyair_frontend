@@ -5,6 +5,20 @@ import App from './App.vue'
 import { createPinia } from 'pinia'
 import { ModelSelect } from '@/components/model-select/'
 import dialogList from '@/views/btnTrain/dataset/dialogList.vue'
+import { createI18n } from 'vue-i18n'
+import enMessages from './locales/en.json'
+import zhMessages from './locales/zh.json'
+
+// 创建i18n实例
+const i18n = createI18n({
+  legacy: false,
+  locale: localStorage.getItem('locale') || 'en',
+  fallbackLocale: 'en',
+  messages: {
+    en: enMessages,
+    zh: zhMessages
+  }
+})
 
 export const showModelSelect = (options: { [x: string]: unknown } | null | undefined) => {
   let isMounted = false
@@ -77,7 +91,7 @@ export const showModelSelect = (options: { [x: string]: unknown } | null | undef
       el.removeEventListener('input', binding.value)
     }
   })
-
+  app.use(i18n)
   const instance = app.mount(container)
   isMounted = true
   return {
@@ -133,7 +147,7 @@ export const showDatasetSelect = (options: { [x: string]: unknown } | null | und
       }
     }
   })
-
+  app.use(i18n)
   const instance = app.mount(container)
 
   return {
@@ -143,6 +157,7 @@ export const showDatasetSelect = (options: { [x: string]: unknown } | null | und
 
 const app = createApp(App)
 app.use(createPinia())
+app.use(i18n)
 app.directive('debounce', {
   mounted(el, binding) {
     let timer: any = null
@@ -187,7 +202,7 @@ app.directive('debounce', {
 
 export function mount(container: string | Element, comfyUIApp?: any) {
   app.provide('comfyUIApp', comfyUIApp)
-
+  app.use(i18n)
   app.mount(container)
 }
 

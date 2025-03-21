@@ -10,7 +10,7 @@
   >
     <div class="flex h-[80vh]">
       <div style="border-right: 1px solid rgba(110, 110, 110, 0.6)">
-        <h1 class="text-2xl font-bold mb-6 pr-4 -mt-2">Message Box</h1>
+        <!-- <h1 class="text-2xl font-bold mb-6 pr-4 -mt-2">{{ $t('messageBox.title') }}</h1> -->
         <div class="w-[200px] pr-4">
           <div class="space-y-4">
             <div
@@ -37,7 +37,7 @@
               style="margin-top: auto; position: absolute; bottom: 20px; width: calc(200px - 1rem)"
               @click="handleMarkAllRead"
             >
-              <span>Mark All as Read</span>
+              <span>{{ $t('messageBox.markAllAsRead') }}</span>
               <span class="flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -60,20 +60,20 @@
 
       <div class="flex-1 pl-4 border-l">
         <div
-          class="flex justify-end items-center gap-4 min-h-[32px]"
-          :class="activeType === NotificationType.SYSTEM_ANNOUNCEMENT ? 'mb-2' : 'mb-4'"
+          class="flex justify-end items-center gap-4"
+          :class="activeType === NotificationType.SYSTEM_ANNOUNCEMENT ? 'mb-2' : ''"
         >
           <v-select
             v-if="activeType === NotificationType.SYSTEM_ANNOUNCEMENT"
             v-model:model-value="selectedNotificationType"
-            placeholder="Notification Type"
+            :placeholder="$t('messageBox.notificationType')"
             class="w-[200px]"
           >
             <SelectItem
               value="all"
               class="cursor-pointer hover:bg-[#4d4d4dee] transition-colors duration-200"
               :class="selectedNotificationType === 'all' ? 'bg-[#7C3AED] text-white' : ''"
-              >All Notifications</SelectItem
+              >{{ $t('messageBox.allNotifications') }}</SelectItem
             >
             <SelectItem
               v-for="type in officialNotificationTypes"
@@ -81,7 +81,7 @@
               :value="type.value"
               class="cursor-pointer hover:bg-[#4d4d4dee] transition-colors duration-200"
               :class="selectedNotificationType === type.value ? 'bg-[#7C3AED] text-white' : ''"
-              >{{ type.label }}</SelectItem
+              >{{ $t(`messageBox.notificationTypes.${type.label}`) }}</SelectItem
             >
           </v-select>
 
@@ -97,7 +97,7 @@
               :value="e.value"
               class="cursor-pointer hover:bg-[#4d4d4dee] transition-colors duration-200"
               :class="readStatus === e.value ? 'bg-[#7C3AED] text-white' : ''"
-              >{{ e.label }}</SelectItem
+              >{{ $t(`messageBox.${e.value}`) }}</SelectItem
             >
           </v-select>
         </div>
@@ -125,7 +125,9 @@
   import { SelectItem } from '@/components/ui/select'
   import { useNotificationStore } from '@/stores/notificationStore'
   import { useDictStore } from '@/stores/dictStore'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const dictStore = useDictStore()
   const notificationStore = useNotificationStore()
 
@@ -180,17 +182,17 @@
   const menus = computed(() => [
     {
       type: NotificationType.SYSTEM_ANNOUNCEMENT,
-      label: 'Official Notices',
+      label: t('messageBox.officialNotices'),
       unreadCount: notificationStore.officialNoticesUnReadCount
     },
     {
       type: NotificationType.USER_FORK,
-      label: 'User Forks',
+      label: t('messageBox.userForks'),
       unreadCount: notificationStore.userForkNoticesUnReadCount
     },
     {
       type: NotificationType.USER_LIKE,
-      label: 'Received Likes',
+      label: t('messageBox.receivedLikes'),
       unreadCount: notificationStore.userLikeNoticesUnReadCount
     }
   ])
@@ -198,9 +200,9 @@
   const activeType = ref<NotificationType>(NotificationType.SYSTEM_ANNOUNCEMENT)
 
   const filterOptions = [
-    { label: 'All', value: 'all' },
-    { label: 'Unread', value: 'unread' },
-    { label: 'Read', value: 'read' }
+    { label: t('messageBox.all'), value: 'all' },
+    { label: t('messageBox.unread'), value: 'unread' },
+    { label: t('messageBox.read'), value: 'read' }
   ]
 
   const getUnreadCount = (type: NotificationType) => {

@@ -18,6 +18,7 @@ export interface Model {
   versions?: ModelVersion[]
   user_id: string
   user_name: string
+  user_avatar?: string
   counter?:any
   tags:string[]
 }
@@ -44,6 +45,13 @@ export interface ModelVersion {
   public:boolean
   updated_at:string
   tags:string[]
+  original_user_avatar:string
+  original_user_name:string
+  parent_id:number
+  user_avatar:string
+  user_name:string
+  
+
 }
 
 

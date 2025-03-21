@@ -29,7 +29,7 @@
         </svg>
       </div>
       <p class="text-[rgba(156, 163, 175, 1)] text-center">
-        Click or drag file to this area to upload
+        {{ $t('vUpload.clickOrDrag') }}
       </p>
       <input
         :accept="ALLOW_UPLOADABLE_EXT_NAMES"
@@ -40,8 +40,10 @@
       />
     </div>
     <div v-if="disableUpload" class="pl-2">
-      <n-button type="primary" @click="interrupt()" v-if="!uploadSuccessful">Interrupt</n-button>
-      <n-button type="primary" @click="cancel()" v-else>cancel</n-button>
+      <n-button type="primary" @click="interrupt()" v-if="!uploadSuccessful">{{
+        $t('vUpload.interrupt')
+      }}</n-button>
+      <n-button type="primary" @click="cancel()" v-else>{{ $t('vUpload.cancel') }}</n-button>
     </div>
   </div>
 </template>
@@ -53,8 +55,11 @@
   // import { Button } from '@/components/ui/button'
   import { commit_file } from '@/api/model'
   import { creatClient } from './ossClient'
+  import { useI18n } from 'vue-i18n'
 
   import { NButton } from 'naive-ui'
+
+  const { t } = useI18n()
 
   const props = defineProps({
     modelType: String,
@@ -187,13 +192,13 @@
     // uploadText.value = file.name
     const fileExtension = file.name.split('.').pop()
     if (fileExtension && ALLOW_UPLOADABLE_EXT_NAMES.value.search(fileExtension) === -1) {
-      useToaster.error('Invalid file format.')
+      useToaster.error(t('vUpload.invalidFileFormat'))
       return
     }
     emit('path', file.name)
     disableUpload.value = true
     calculatingDialog = useShadet({
-      content: 'In hash calculation',
+      content: t('vUpload.inHashCalculation'),
       z: 'z-12000'
     })
     const { oss, objectKey, md5Hash, sha256sum, fileId } = await creatClient(
@@ -244,7 +249,7 @@
       disableUpload.value = false
       uploadSuccessful.value = true
       emit('progress', '')
-      throw new Error(`Upload to OSS failed: ${result.res.statusText}`)
+      throw new Error(`${t('vUpload.uploadFailed')}${result.res.statusText}`)
     }
   }
   onMounted(() => {

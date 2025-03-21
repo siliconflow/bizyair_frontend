@@ -1,0 +1,428 @@
+{
+  "app": {
+    "title": "BizyAir",
+    "restore": "恢复",
+    "minimize": "最小化",
+    "shareCode": {
+      "placeholder": "粘贴分享码",
+      "error": {
+        "empty": "剪贴板内容为空或不是字符串。",
+        "length": "剪贴板内容长度不正确。",
+        "shareCodeLength": "分享码长度不正确。"
+      }
+    }
+  },
+  "buttons": {
+    "profile": "个人资料",
+    "apiKey": "API密钥",
+    "community": "社区",
+    "publish": "发布",
+    "train": "训练",
+    "message": "消息",
+    "news": "新闻",
+    "examples": "示例",
+    "publishModel": "发布模型",
+    "model": "模型",
+    "workflow": "工作流"
+  },
+  "common": {
+    "language": "语言",
+    "english": "English",
+    "chinese": "中文"
+  },
+  "apiKeyDialog": {
+    "title": "设置API密钥",
+    "placeholder": "API密钥",
+    "login": "请点击登录并自动填充密钥，",
+    "clickToLogin": "点击登录",
+    "visitTo": "或访问",
+    "getKey": "获取您的密钥并手动输入。",
+    "agreement": "设置API密钥表示同意",
+    "userAgreement": "用户协议",
+    "and": "和",
+    "privacyPolicy": "隐私政策。",
+    "submit": "提交",
+    "close": "关闭",
+    "success": "API密钥设置成功！",
+    "failed": "设置API密钥失败："
+  },
+  "profile": {
+    "apiKey": "API密钥：",
+    "level": "等级：",
+    "edit": "编辑",
+    "shareId": {
+      "label": "分享ID：",
+      "edit": "编辑",
+      "save": "保存",
+      "copy": "复制",
+      "confirmModify": {
+        "title": "您确定要修改它吗？",
+        "desc": "如果您进行此更改，将导致您之前共享的任何模型不可用，并且您每年只能进行一次此修改。",
+        "cancel": "否，保持不变",
+        "continue": "是，删除它"
+      },
+      "waitMessage": "您每年只能更改一次分享ID。您需要等到 {date} 才能进行修改。"
+    }
+  },
+  "messageBox": {
+    "title": "消息盒子",
+    "markAllAsRead": "标记所有为已读",
+    "officialNotices": "官方通知",
+    "userForks": "用户收藏",
+    "receivedLikes": "收到的点赞",
+    "allNotifications": "所有通知",
+    "all": "全部",
+    "unread": "未读",
+    "read": "已读",
+    "noNotifications": "没有通知",
+    "notificationType": "通知类型",
+    "notificationTypes": {
+      "ANNOUNCEMENT": "公告",
+      "BILLING": "账单",
+      "REVIEW_RESULT": "审核结果",
+      "USER_LIKE": "用户点赞",
+      "USER_FORK": "用户收藏"
+    }
+  },
+  "community": {
+    "edit": "编辑",
+    "remove": "删除",
+    "firstPublished": "首次发布：",
+    "lastUpdated": "最后更新：",
+    "noIntroduction": "暂无介绍",
+    "type": "类型",
+    "baseModel": "基础模型",
+    "published": "发布时间",
+    "explore": "广场",
+    "quickStart": {
+      "title": "快速开始",
+      "subtitle": "快速上手"
+    },
+    "workflows": {
+      "title": "工作流",
+      "subtitle": "浏览所有工作流",
+      "loadWorkflow": {
+        "success": "工作流加载成功",
+        "error": "加载工作流失败: {error}",
+        "notFound": "未找到工作流"
+      }
+    },
+    "models": {
+      "title": "模型",
+      "subtitle": "浏览所有模型",
+      "nodeTitle": {
+        "lora": "☁️BizyAir 加载 Lora",
+        "controlnet": "☁️BizyAir 加载 ControlNet 模型"
+      },
+      "addNode": {
+        "success": "节点添加成功",
+        "error": "添加节点失败: {error}"
+      }
+    },
+    "mine": {
+      "title": "我的",
+      "contents": {
+        "title": "我的",
+        "subtitle": "查看我的内容"
+      },
+      "tabs": {
+        "posts": "发布",
+        "forked": "收藏"
+      },
+      "newContent": {
+        "model": "新建模型",
+        "workflow": "新建工作流"
+      }
+    },
+    "filter": {
+      "sort": {
+        "title": "筛选",
+        "options": {
+          "recently": "最近",
+          "popular": "最热",
+          "downloads": "最多下载",
+          "most-used": "最多使用",
+          "most-liked": "最多点赞",
+          "most-forked": "最多收藏"
+        }
+      },
+      "type": {
+        "title": "请输入关键字",
+        "all": "全部",
+        "lora": "LoRA",
+        "controlnet": "ControlNet",
+        "model-types": "模型类型",
+        "base-model": "基础模型"
+      }
+    },
+    "emptyState": {
+      "title": "暂无数据",
+      "subtitle": "请尝试选择其他基础模型或调整筛选条件"
+    },
+    "modelCard": {
+      "tooltips": {
+        "loadWorkflow": "加载工作流",
+        "addNode": "添加节点",
+        "downloaded": "下载量",
+        "used": "使用量",
+        "forked": "收藏量",
+        "liked": "点赞量"
+      },
+      "tags": {
+        "new": "新品"
+      }
+    },
+    "detail": {
+      "type": "类型",
+      "baseModel": "基础模型",
+      "unFork": "取消收藏",
+      "fork": "收藏",
+      "addNode": "添加节点",
+      "load": "加载",
+      "loading": "加载中...",
+      "share": "分享",
+      "copy": "复制",
+      "download": "下载",
+      "stats": "统计",
+      "hash": "哈希值",
+      "file": "文件",
+      "reviews": "审查结果",
+      "positive": "已验证",
+      "negative": "未验证",
+      "firstPublished": "首次发布：",
+      "lastUpdated": "最后更新：",
+      "workflow": "工作流",
+      "model": "模型",
+      "confirmUnfork": "确定要取消收藏这个{0}吗？",
+      "unforkWarning": "原始模型可能不再公开可用",
+      "confirmUnforkBtn": "是的，取消收藏",
+      "confirmDelete": "确定要删除这个{0}吗？",
+      "deleteWarning": "此操作无法撤销",
+      "confirmDeleteBtn": "是的，删除它",
+      "tooltips": {
+        "like": "点赞",
+        "liked": "已点赞",
+        "modelType": "模型文件类型可能是 {0}",
+        "unknownModelType": "未知基础模型类型"
+      },
+      "edit": "编辑",
+      "remove": "删除",
+      "modelNotFound": "未找到模型",
+      "failedFetchModelDetails": "获取模型详情失败",
+      "shareCodeCopied": "分享码已复制",
+      "copyFailed": "复制失败",
+      "publicVersionWarning": "模型有公开版本，无法删除",
+      "modelRemovedSuccessfully": "模型已成功删除",
+      "failedRemoveModel": "删除模型失败",
+      "noModelVersionsFound": "未找到模型版本",
+      "copiedSuccessfully": "复制成功",
+      "failedLoadWorkflow": "加载工作流失败",
+      "nodeAddedSuccessfully": "节点添加成功",
+      "failedDownloadWorkflow": "下载工作流失败",
+      "failedAddNode": "添加节点失败"
+    }
+  },
+  "publish": {
+    "model": {
+      "title": "发布模型",
+      "name": {
+        "label": "模型名称",
+        "placeholder": "输入模型名称"
+      },
+      "type": {
+        "label": "模型类型",
+        "placeholder": "选择模型类型"
+      },
+      "nextStep": "下一步",
+      "addVersion": "添加版本",
+      "version": {
+        "name": "版本名称",
+        "placeholder": "输入版本名称"
+      },
+      "baseModel": "基础模型",
+      "baseModelPlaceholder": "选择基础模型",
+      "uploadImage": "上传封面",
+      "introduction": "介绍",
+      "publicVisible": "公开可见",
+      "file": "文件",
+      "uploaded": "已上传",
+      "speed": "速度",
+      "publish": "发布",
+      "confirmDelete": {
+        "title": "确定要删除此版本吗？",
+        "desc": "此操作无法撤销。",
+        "cancel": "否，保留它",
+        "continue": "是，删除它"
+      },
+      "errors": {
+        "enterName": "请输入模型名称",
+        "selectType": "请选择模型类型",
+        "enterVersion": "请为版本 {index} 输入版本名称",
+        "selectBaseModel": "请为版本 {index} 选择基础模型",
+        "enterFilePath": "请为版本 {index} 输入文件路径"
+      },
+      "success": "模型发布成功"
+    },
+    "workflow": {
+      "title": "发布工作流",
+      "name": {
+        "label": "工作流名称",
+        "placeholder": "输入工作流名称"
+      },
+      "nextStep": "下一步",
+      "addVersion": "添加版本",
+      "version": {
+        "name": "版本名称",
+        "placeholder": "输入版本名称"
+      },
+      "baseModel": "基础模型",
+      "baseModelPlaceholder": "选择基础模型",
+      "uploadImage": "上传封面",
+      "introduction": "介绍",
+      "publicVisible": "公开可见",
+      "file": "文件",
+      "uploaded": "已上传",
+      "speed": "速度",
+      "publish": "发布",
+      "cancel": "取消",
+      "loadFromWorkspace": "从当前工作区加载",
+      "confirmDelete": {
+        "title": "确定要删除此版本吗？",
+        "desc": "此操作无法撤销。",
+        "cancel": "否，保留它",
+        "continue": "是，删除它"
+      },
+      "errors": {
+        "enterName": "请输入工作流名称",
+        "enterVersion": "请为版本 {index} 输入版本名称",
+        "selectBaseModel": "请为版本 {index} 选择基础模型",
+        "enterFilePath": "请为版本 {index} 输入文件路径"
+      },
+      "success": "工作流发布成功"
+    }
+  },
+  "modelSelect": {
+    "apply": "应用",
+    "baseModels": "基础模型"
+  },
+  "defaultPic": {
+    "noCover": "无封面"
+  },
+  "confirm": {
+    "cancel": "取消",
+    "continue": "继续",
+    "title": "您确定吗？"
+  },
+  "vUpload": {
+    "clickOrDrag": "点击或拖拽文件到此区域上传",
+    "interrupt": "中断",
+    "cancel": "取消",
+    "invalidFileFormat": "无效的文件格式。",
+    "inHashCalculation": "正在计算哈希值",
+    "uploadFailed": "上传到OSS失败：",
+    "clickToUpload": "点击上传，请选择一个文件夹。",
+    "supportFormats": "您最多可以添加600张图片，支持PNG、JPG和JPEG格式。",
+    "fileNumber": "文件数量",
+    "uploadConfirm": "您即将上传{0}张图片和{1}个文本文件。",
+    "missingCaptions": "一些图片缺少说明文件。请提供说明文件。",
+    "modalTitle": "提示",
+    "uploadButton": "上传",
+    "cancelButton": "取消",
+    "uploadImage": "上传封面",
+    "loading": "加载中"
+  },
+  "btnProfile": {
+    "userInfo": {
+      "lazyText": "这家伙很懒，什么也没留下",
+      "balance": "余额",
+      "coin": "币",
+      "recharge": "充值",
+      "giftSilverCoin": "赠送银币",
+      "rechargeCoin": "充值金币",
+      "switchApiKey": "切换 API 密钥",
+      "myWallet": "我的钱包",
+      "rechargeRecord": "充值记录"
+    },
+    "uploadInfo": {
+      "nickname": "昵称",
+      "signature": "个性签名",
+      "nameValidation": "请输入名称",
+      "realNameAuth": "实名认证",
+      "authenticated": "已认证",
+      "authenticate": "去认证",
+      "authFailed": "认证失败",
+      "needAuthOnSiliconflow": "需要去siliconflow进行认证",
+      "goTo": "前往",
+      "cancel": "取消",
+      "completed": "我已完成认证",
+      "retry": "重试",
+      "confirm": "确认"
+    },
+    "coinsList": {
+      "viewExpiring": "查看您即将过期的BZ币列表，并进行筛选查看。",
+      "expiringGoldTotal": "即将过期的金币总额",
+      "expiringSilverTotal": "即将过期的银币总额",
+      "all": "全部",
+      "silverCoin": "银币",
+      "goldCoin": "金币",
+      "amount": "数额",
+      "expiryTime": "过期时间",
+      "inOneDay": "1天内",
+      "inSevenDays": "7天内",
+      "inFifteenDays": "15天内",
+      "inThirtyDays": "30天内",
+      "inOneYear": "1年内",
+      "myBZCoins": "我的 BZ 币"
+    },
+    "record": {
+      "rechargeRecord": "充值记录",
+      "bzCoinRecharge": "Bz币充值",
+      "orderStatus": "订单状态",
+      "selectOrder": "选择订单",
+      "orderNumber": "订单编号",
+      "productName": "商品名称",
+      "transactionTime": "交易时间",
+      "transactionAmount": "交易金额",
+      "status": "订单状态",
+      "operations": "操作",
+      "pay": "支付",
+      "unknown": "未知",
+      "wechatPay": "微信支付",
+      "expireQrCode": "二维码将于{0}后过期",
+      "qrCodeExpired": "二维码已过期，请点击刷新",
+      "all": "全部",
+      "paySuccess": "支付成功",
+      "notPaid": "未支付",
+      "refund": "转入退款",
+      "refundProcessing": "退款处理中",
+      "refundSuccess": "退款成功",
+      "refundClosed": "退款关闭",
+      "refundAbnormal": "退款异常",
+      "refundOrder": "退单",
+      "minute": "分",
+      "second": "秒",
+      "orderCreationFailed": "订单创建失败",
+      "confirmCancel": "你确定要取消这个订单吗？",
+      "proceed": "确定",
+      "cancel": "取消"
+    },
+    "product": {
+      "coin": "币",
+      "confirmAgreement": "确认支付即代表同意本平台",
+      "rechargeAgreement": "「充值协议」",
+      "coinValidityNote": "注：金币有效期为 1 年",
+      "actualPayment": "实付款",
+      "pay": "支付",
+      "agreementWarning": "请先同意充值协议",
+      "wechatPay": "微信支付",
+      "expireQrCode": "二维码将于{0}后过期",
+      "qrCodeExpired": "二维码已过期，请点击刷新"
+    },
+    "avatar": {
+      "avatar": "头像"
+    },
+    "index": {
+      "profile": "个人资料"
+    }
+  }
+}

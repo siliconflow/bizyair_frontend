@@ -26,17 +26,17 @@
         ref="formRef"
         :model="statusStore.usersMetadata"
         label-placement="left"
-        :label-width="80"
+        :label-width="locale === 'en' ? '120px' : '80px'"
         :rules="rules"
       >
-        <n-form-item label="昵称" path="name">
+        <n-form-item :label="$t('btnProfile.uploadInfo.nickname')" path="name">
           <n-input
             v-model:value="statusStore.usersMetadata.name"
             placeholder="name"
             maxlength="50"
           />
         </n-form-item>
-        <n-form-item label="个性签名" path="introduction">
+        <n-form-item :label="$t('btnProfile.uploadInfo.signature')" path="introduction">
           <n-input
             v-model:value="statusStore.usersMetadata.introduction"
             type="textarea"
@@ -44,9 +44,9 @@
             maxlength="50"
           />
         </n-form-item>
-        <n-form-item label="实名认证" path="introduction">
+        <n-form-item :label="$t('btnProfile.uploadInfo.realNameAuth')" path="introduction">
           <span v-if="statusStore.usersMetadata.auth == 1" class="auth-status">
-            已认证
+            {{ $t('btnProfile.uploadInfo.authenticated') }}
             <svg
               stroke="currentColor"
               fill="currentColor"
@@ -62,13 +62,17 @@
               ></path>
             </svg>
           </span>
-          <n-button v-else tertiary @click="toRealName">去认证</n-button>
+          <n-button v-else tertiary @click="toRealName">{{
+            $t('btnProfile.uploadInfo.authenticate')
+          }}</n-button>
         </n-form-item>
       </n-form>
     </div>
     <div class="sunbmit-container">
-      <span class="btn" @click="cancel">取消</span>
-      <span class="btn btn-submit" @click="toSubmit">确认</span>
+      <span class="btn" @click="cancel">{{ $t('btnProfile.uploadInfo.cancel') }}</span>
+      <span class="btn btn-submit" @click="toSubmit">{{
+        $t('btnProfile.uploadInfo.confirm')
+      }}</span>
     </div>
   </n-modal>
 </template>
@@ -79,12 +83,21 @@
   import { put_metadata, post_real_name } from '@/api/user'
   import { ref } from 'vue'
   import { useConfirm } from '@/components/modules/vConfirm'
+  import { useI18n } from 'vue-i18n'
 
+  const { t, locale } = useI18n()
   const statusStore = useStatusStore()
   const formRef = ref()
 
   const rules = {
-    name: [{ required: true, message: 'Please enter name', trigger: 'blur', max: 50 }]
+    name: [
+      {
+        required: true,
+        message: t('btnProfile.uploadInfo.nameValidation'),
+        trigger: 'blur',
+        max: 50
+      }
+    ]
   }
   const closeInfoDialog = () => {
     statusStore.showUploadInfoDialog = false
@@ -97,10 +110,10 @@
       statusStore.usersMetadata.auth = 1
     } else {
       const res = await useConfirm({
-        title: '认证失败',
-        content: '需要去siliconflow进行认证',
-        continueText: '前往',
-        cancelText: '取消'
+        title: t('btnProfile.uploadInfo.authFailed'),
+        content: t('btnProfile.uploadInfo.needAuthOnSiliconflow'),
+        continueText: t('btnProfile.uploadInfo.goTo'),
+        cancelText: t('btnProfile.uploadInfo.cancel')
       })
 
       if (res) {
@@ -112,9 +125,9 @@
 
   const handleSecondConfirmation = async () => {
     const resSecond = await useConfirm({
-      content: '我已完成认证',
-      continueText: '已完成',
-      cancelText: '重试'
+      content: t('btnProfile.uploadInfo.completed'),
+      continueText: t('btnProfile.uploadInfo.completed'),
+      cancelText: t('btnProfile.uploadInfo.retry')
     })
 
     if (resSecond) {

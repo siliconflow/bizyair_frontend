@@ -1,0 +1,428 @@
+{
+  "app": {
+    "title": "BizyAir",
+    "restore": "restore",
+    "minimize": "minimize",
+    "shareCode": {
+      "placeholder": "Paste share code",
+      "error": {
+        "empty": "Clipboard content is empty or not a string.",
+        "length": "The length of the clipboard content is incorrect.",
+        "shareCodeLength": "The length of the share code is incorrect."
+      }
+    }
+  },
+  "buttons": {
+    "profile": "Profile",
+    "apiKey": "API Key",
+    "community": "Community",
+    "publish": "Publish",
+    "train": "Train",
+    "message": "Message",
+    "news": "News",
+    "examples": "Examples",
+    "publishModel": "PublishModel",
+    "model": "Model",
+    "workflow": "Workflow"
+  },
+  "common": {
+    "language": "Language",
+    "english": "English",
+    "chinese": "中文"
+  },
+  "apiKeyDialog": {
+    "title": "Set API Key",
+    "placeholder": "API Key",
+    "login": "Please click to login and autofill the key,",
+    "clickToLogin": "click to login",
+    "visitTo": "or visit",
+    "getKey": "to get your key and input manually.",
+    "agreement": "Setting the API Key signifies agreement to the",
+    "userAgreement": "User Agreement",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy.",
+    "submit": "Submit",
+    "close": "Close",
+    "success": "API Key set successfully!",
+    "failed": "Failed to set API Key:"
+  },
+  "profile": {
+    "apiKey": "API Key:",
+    "level": "Level:",
+    "edit": "Edit",
+    "shareId": {
+      "label": "Share ID:",
+      "edit": "Edit",
+      "save": "Save",
+      "copy": "Copy",
+      "confirmModify": {
+        "title": "Are you sure you want to modify it?",
+        "desc": "If you make this change, it will render any models you have previously shared unavailable, and you are only allowed to make this modification once per year.",
+        "cancel": "No, Keep It",
+        "continue": "Yes, Delete It"
+      },
+      "waitMessage": "You can only change your share ID once a year. You need to wait until {date} to make the modification."
+    }
+  },
+  "messageBox": {
+    "title": "Message Box",
+    "markAllAsRead": "Mark All as Read",
+    "officialNotices": "Official Notices",
+    "userForks": "User Forks",
+    "receivedLikes": "Received Likes",
+    "allNotifications": "All Notifications",
+    "all": "All",
+    "unread": "Unread",
+    "read": "Read",
+    "noNotifications": "No notifications",
+    "notificationType": "Notification Type",
+    "notificationTypes": {
+      "ANNOUNCEMENT": "Announcement",
+      "BILLING": "Billing",
+      "REVIEW_RESULT": "Review Result",
+      "USER_LIKE": "User Like",
+      "USER_FORK": "User Fork"
+    }
+  },
+  "community": {
+    "edit": "Edit",
+    "remove": "Remove",
+    "firstPublished": "First Published:",
+    "lastUpdated": "Last Updated:",
+    "noIntroduction": "No introduction yet",
+    "type": "Type",
+    "baseModel": "Base Model",
+    "published": "Published",
+    "explore": "Explore",
+    "quickStart": {
+      "title": "Quick Start",
+      "subtitle": "Get started quickly"
+    },
+    "workflows": {
+      "title": "Workflows",
+      "subtitle": "Browse all workflows",
+      "loadWorkflow": {
+        "success": "Workflow loaded successfully",
+        "error": "Failed to load workflow: {error}",
+        "notFound": "No workflow found"
+      }
+    },
+    "models": {
+      "title": "Models",
+      "subtitle": "Browse all models",
+      "nodeTitle": {
+        "lora": "☁️BizyAir Load Lora",
+        "controlnet": "☁️BizyAir Load ControlNet Model"
+      },
+      "addNode": {
+        "success": "Node added successfully",
+        "error": "Failed to add node: {error}"
+      }
+    },
+    "mine": {
+      "title": "Mine",
+      "contents": {
+        "title": "Contents",
+        "subtitle": "View your contents"
+      },
+      "tabs": {
+        "posts": "Posts",
+        "forked": "Forked"
+      },
+      "newContent": {
+        "model": "New Model",
+        "workflow": "New Workflow"
+      }
+    },
+    "filter": {
+      "sort": {
+        "title": "Filter",
+        "options": {
+          "recently": "Recently",
+          "popular": "Popular",
+          "downloads": "Downloads",
+          "most-used": "Most Used",
+          "most-liked": "Most Liked",
+          "most-forked": "Most Forked"
+        }
+      },
+      "type": {
+        "title": "Filter by name",
+        "all": "All",
+        "lora": "LoRA",
+        "controlnet": "ControlNet",
+        "model-types": "Model Types",
+        "base-model": "Base Model"
+      }
+    },
+    "emptyState": {
+      "title": "No Data Available",
+      "subtitle": "Try another Base Model or adjust your filters"
+    },
+    "modelCard": {
+      "tooltips": {
+        "loadWorkflow": "Load Workflow",
+        "addNode": "Add Node",
+        "downloaded": "Downloaded",
+        "used": "Used",
+        "forked": "Forked",
+        "liked": "Liked"
+      },
+      "tags": {
+        "new": "New"
+      }
+    },
+    "detail": {
+      "type": "Type",
+      "baseModel": "Base Model",
+      "unFork": "UnFork",
+      "fork": "Fork",
+      "addNode": "Add Node",
+      "load": "Load",
+      "loading": "Loading...",
+      "share": "Share",
+      "copy": "Copy",
+      "download": "Download",
+      "stats": "Stats",
+      "hash": "Hash",
+      "file": "File",
+      "reviews": "Reviews",
+      "positive": "Positive",
+      "negative": "Negative",
+      "firstPublished": "First Published:",
+      "lastUpdated": "Last Updated:",
+      "workflow": "workflow",
+      "model": "model",
+      "confirmUnfork": "Are you sure you want to unfork this {0}?",
+      "unforkWarning": "The original model may no longer be public.",
+      "confirmUnforkBtn": "Yes, UnFork It",
+      "confirmDelete": "Are you sure you want to delete this {0}?",
+      "deleteWarning": "This action cannot be undone.",
+      "confirmDeleteBtn": "Yes, Delete It",
+      "tooltips": {
+        "like": "Like",
+        "liked": "Liked",
+        "modelType": "The type of model file may be {0}",
+        "unknownModelType": "Unknown base model type"
+      },
+      "edit": "Edit",
+      "remove": "Remove",
+      "modelNotFound": "Model not found.",
+      "failedFetchModelDetails": "Failed to fetch model details",
+      "shareCodeCopied": "The share code has been copied!",
+      "copyFailed": "Copy failed.",
+      "publicVersionWarning": "Model has public version, cannot remove.",
+      "modelRemovedSuccessfully": "Model removed successfully.",
+      "failedRemoveModel": "Failed to remove model.",
+      "noModelVersionsFound": "No model versions found",
+      "copiedSuccessfully": "Copied successfully.",
+      "failedLoadWorkflow": "Failed to load workflow.",
+      "nodeAddedSuccessfully": "Node added successfully.",
+      "failedDownloadWorkflow": "Failed to download workflow.",
+      "failedAddNode": "Failed to add node."
+    }
+  },
+  "publish": {
+    "model": {
+      "title": "Publish a Model",
+      "name": {
+        "label": "Model Name",
+        "placeholder": "Enter Model Name"
+      },
+      "type": {
+        "label": "Model Type",
+        "placeholder": "Select Model Type"
+      },
+      "nextStep": "Next Step",
+      "addVersion": "Add Version",
+      "version": {
+        "name": "Version Name",
+        "placeholder": "Version Name"
+      },
+      "baseModel": "Base Model",
+      "baseModelPlaceholder": "Select Base Model",
+      "uploadImage": "Upload Image",
+      "introduction": "Introduction",
+      "publicVisible": "Publicly Visible",
+      "file": "File",
+      "uploaded": "Uploaded",
+      "speed": "Speed",
+      "publish": "Publish",
+      "confirmDelete": {
+        "title": "Are you sure you want to delete this version?",
+        "desc": "This action cannot be undone.",
+        "cancel": "No, Keep It",
+        "continue": "Yes, Delete It"
+      },
+      "errors": {
+        "enterName": "Please enter the model name",
+        "selectType": "Please select the model type",
+        "enterVersion": "Please enter the version name for version {index}",
+        "selectBaseModel": "Please select the base model for version {index}",
+        "enterFilePath": "Please enter the file path for version {index}"
+      },
+      "success": "Model published successfully"
+    },
+    "workflow": {
+      "title": "Publish a Workflow",
+      "name": {
+        "label": "Workflow Name",
+        "placeholder": "Enter Workflow Name"
+      },
+      "nextStep": "Next Step",
+      "addVersion": "Add Version",
+      "version": {
+        "name": "Version Name",
+        "placeholder": "Version Name"
+      },
+      "baseModel": "Base Model",
+      "baseModelPlaceholder": "Select Base Model",
+      "uploadImage": "Upload Image",
+      "introduction": "Introduction",
+      "publicVisible": "Publicly Visible",
+      "file": "File",
+      "uploaded": "Uploaded",
+      "speed": "Speed",
+      "publish": "Publish",
+      "cancel": "Cancel",
+      "loadFromWorkspace": "Load from current workspace",
+      "confirmDelete": {
+        "title": "Are you sure you want to delete this version?",
+        "desc": "This action cannot be undone.",
+        "cancel": "No, Keep It",
+        "continue": "Yes, Delete It"
+      },
+      "errors": {
+        "enterName": "Please enter the workflow name",
+        "enterVersion": "Please enter the version name for version {index}",
+        "selectBaseModel": "Please select the base model for version {index}",
+        "enterFilePath": "Please enter the file path for version {index}"
+      },
+      "success": "Workflow published successfully"
+    }
+  },
+  "modelSelect": {
+    "apply": "Apply",
+    "baseModels": "Base Models"
+  },
+  "defaultPic": {
+    "noCover": "No Cover"
+  },
+  "confirm": {
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "title": "Are you absolutely sure?"
+  },
+  "vUpload": {
+    "clickOrDrag": "Click or drag file to this area to upload",
+    "interrupt": "Interrupt",
+    "cancel": "Cancel",
+    "invalidFileFormat": "Invalid file format.",
+    "inHashCalculation": "In hash calculation",
+    "uploadFailed": "Upload to OSS failed:",
+    "clickToUpload": "Click to upload, please select a folder.",
+    "supportFormats": "You can add up to 600 images, with support for PNG, JPG, and JPEG formats.",
+    "fileNumber": "File Number",
+    "uploadConfirm": "You are about to upload {0} images and {1} texts.",
+    "missingCaptions": "Some of your images are missing captions. Please provide the caption files.",
+    "modalTitle": "Tips",
+    "uploadButton": "Upload",
+    "cancelButton": "Cancel",
+    "uploadImage": "Upload Image",
+    "loading": "Loading"
+  },
+  "btnProfile": {
+    "userInfo": {
+      "lazyText": "This person is lazy and left nothing behind",
+      "balance": "Balance",
+      "coin": "Coins",
+      "recharge": "Purchase",
+      "giftSilverCoin": "Silver",
+      "rechargeCoin": "Gold",
+      "switchApiKey": "Set API Key",
+      "myWallet": "My Wallet",
+      "rechargeRecord": "Purchase"
+    },
+    "uploadInfo": {
+      "nickname": "Nickname",
+      "signature": "Signature",
+      "nameValidation": "Please enter a name",
+      "realNameAuth": "Real Name Authentication",
+      "authenticated": "Authenticated",
+      "authenticate": "Authenticate",
+      "authFailed": "Authentication Failed",
+      "needAuthOnSiliconflow": "Need to authenticate on siliconflow",
+      "goTo": "Go to",
+      "cancel": "Cancel",
+      "completed": "I have completed authentication",
+      "retry": "Retry",
+      "confirm": "Confirm"
+    },
+    "coinsList": {
+      "viewExpiring": "View your expiring BZ coins list and filter the view.",
+      "expiringGoldTotal": "Expiring Gold Coins Total",
+      "expiringSilverTotal": "Expiring Silver Coins Total",
+      "all": "All",
+      "silverCoin": "Silver",
+      "goldCoin": "Gold",
+      "amount": "Amount",
+      "expiryTime": "Expiry Time",
+      "inOneDay": "In 1 Day",
+      "inSevenDays": "In 7 Days",
+      "inFifteenDays": "In 15 Days",
+      "inThirtyDays": "In 30 Days",
+      "inOneYear": "In 1 Year",
+      "myBZCoins": "My BZ Coins"
+    },
+    "record": {
+      "rechargeRecord": "Purchase",
+      "bzCoinRecharge": "Purchase BZ Coin",
+      "orderStatus": "Order Status",
+      "selectOrder": "Select Order",
+      "orderNumber": "Order Number",
+      "productName": "Product Name",
+      "transactionTime": "Transaction Time",
+      "transactionAmount": "Transaction Amount",
+      "status": "Status",
+      "operations": "Operations",
+      "pay": "Pay",
+      "unknown": "Unknown",
+      "wechatPay": "WeChat Pay",
+      "expireQrCode": "QR code will expire after {0}",
+      "qrCodeExpired": "QR code has expired, please click to refresh",
+      "all": "All",
+      "paySuccess": "Payment Success",
+      "notPaid": "Not Paid",
+      "refund": "Refund",
+      "refundProcessing": "Refund Processing",
+      "refundSuccess": "Refund Success",
+      "refundClosed": "Refund Closed",
+      "refundAbnormal": "Refund Abnormal",
+      "refundOrder": "Refund",
+      "minute": "Minutes",
+      "second": "Seconds",
+      "orderCreationFailed": "Order creation failed",
+      "confirmCancel": "Are you sure you want to cancel this order?",
+      "proceed": "Proceed",
+      "cancel": "Cancel"
+    },
+    "product": {
+      "coin": "Coins",
+      "confirmAgreement": "By confirming payment, you agree to the platform's",
+      "rechargeAgreement": "「Recharge Agreement」",
+      "coinValidityNote": "Note: Gold coins are valid for 1 year",
+      "actualPayment": "Actual Payment",
+      "pay": "Pay",
+      "agreementWarning": "Please agree to the recharge agreement first",
+      "wechatPay": "WeChat Pay",
+      "expireQrCode": "QR code will expire after {0}",
+      "qrCodeExpired": "QR code has expired, please click to refresh"
+    },
+    "avatar": {
+      "avatar": "Avatar"
+    },
+    "index": {
+      "profile": "Profile"
+    }
+  }
+}

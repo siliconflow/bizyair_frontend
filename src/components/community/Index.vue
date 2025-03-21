@@ -8,6 +8,7 @@
   import { useCommunityStore } from '@/stores/communityStore'
   import { useDictStore } from '@/stores/dictStore'
   import { onMounted } from 'vue'
+
   const communityStore = useCommunityStore()
   const tagsStore = useDictStore()
   const PATH_TO_TAB_SOURCE = {

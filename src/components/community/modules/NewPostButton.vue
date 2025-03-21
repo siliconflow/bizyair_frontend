@@ -3,10 +3,13 @@
   import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
   import { Button } from '@/components/ui/button'
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
 
   defineOptions({
     name: 'NewPostButton'
   })
+
+  const { t } = useI18n()
 
   interface NewPostButtonProps {
     disabled?: boolean
@@ -41,7 +44,7 @@
 
 <template>
   <div class="flex items-center justify-between">
-    <div class="text-white text-base font-medium">My Posts</div>
+    <div class="text-white text-base font-medium">{{ t('community.mine.tabs.posts') }}</div>
     <Popover class="bg-[#353535]" :open="downloadOpen" @update:open="handleDownload">
       <PopoverTrigger class="bg-transparent" :disabled="disabled">
         <Button
@@ -64,7 +67,7 @@
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            New Post
+            {{ t('community.mine.tabs.posts') }}
           </span>
         </Button>
       </PopoverTrigger>
@@ -101,7 +104,7 @@
                       d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
                     />
                   </svg>
-                  Model
+                  {{ t('community.mine.newContent.model') }}
                 </span>
               </CommandItem>
               <CommandItem
@@ -129,7 +132,7 @@
                       d="M2 13.381h20M8.66 19.05V22m6.68-2.95V22m-8.67-9.571h12.65m-12.65 0c-.76 0-1.375-.616-1.375-1.376m1.375 1.376L9.305 9.057M18.66 12.429c.759 0 1.375-.616 1.375-1.376m-1.375 1.376L17.016 9.057m-7.711 0h8.39m-8.39 0c-.759 0-1.375-.616-1.375-1.376v-.19c0-.76.616-1.376 1.375-1.376h8.39c.76 0 1.375.616 1.375 1.376v.19c0 .76-.616 1.376-1.375 1.376m-9.765 2.996v.19c0 .76.616 1.376 1.375 1.376m8.39-1.566v.19c0 .76-.616 1.376-1.375 1.376"
                     />
                   </svg>
-                  Workflow
+                  {{ t('community.mine.newContent.workflow') }}
                 </span>
               </CommandItem>
             </CommandGroup>

@@ -50,6 +50,7 @@
     "vue": "^3.5.12",
     "vue-clipboard2": "^0.3.3",
     "vue-clipboard3": "^2.0.0",
+    "vue-i18n": "^9.14.3",
     "vue-sonner": "^1.2.5",
     "vue-virtual-scroll-grid": "^1.11.0",
     "zod": "^3.23.8"

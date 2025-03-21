@@ -13,7 +13,7 @@
     >
       <template #default="{ item }">
         <n-card
-          class="mb-4 message-card"
+          class="mb-2 message-card"
           :bordered="false"
           :style="cardStyle"
           :color="!item.read ? 'rgba(249, 250, 251, 0.05)' : undefined"
@@ -49,10 +49,9 @@
 
     <div v-if="!loading && messages.length === 0" class="flex items-center justify-center h-full">
       <div class="text-center">
-        <p class="text-gray-400">No notifications</p>
+        <p class="text-gray-400">{{ $t('messageBox.noNotifications') }}</p>
       </div>
     </div>
-
     <detail-modal
       v-model="showDetail"
       :message="selectedMessage as any"

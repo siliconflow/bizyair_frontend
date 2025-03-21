@@ -1,9 +1,11 @@
 <script setup lang="ts">
   import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
   import { useCommunityStore } from '@/stores/communityStore'
+  import { useI18n } from 'vue-i18n'
 
   type TabType = 'posts' | 'forked'
 
+  const { t } = useI18n()
   const communityStore = useCommunityStore()
 
   const { modelValue } = defineProps<{
@@ -27,10 +29,10 @@
     emit('update:modelValue', value as TabType)
   }
 
-  const modes = ['posts', 'forked']
-  const tabLabels: { [key: string]: string } = {
-    posts: 'My Posts',
-    forked: 'My Forked'
+  const modes = ['posts', 'forked'] as const
+  const tabLabels: Record<TabType, string> = {
+    posts: t('community.mine.tabs.posts'),
+    forked: t('community.mine.tabs.forked')
   }
 </script>
 

@@ -2,7 +2,8 @@
   import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
   import { ModeTabType } from '@/types/model'
   import { useModelSelectStore } from '@/stores/modelSelectStore'
-
+  import { useI18n } from 'vue-i18n'
+  const { t } = useI18n()
   const modelSelectStore = useModelSelectStore()
 
   const { modelValue } = defineProps<{
@@ -26,9 +27,9 @@
 
   const modes = ['posts', 'forked', 'community']
   const tabLabels: { [key: string]: string } = {
-    posts: 'My Posts',
-    forked: 'My Forked',
-    community: 'Community'
+    posts: t('community.mine.tabs.posts'),
+    forked: t('community.mine.tabs.forked'),
+    community: t('community.explore')
   }
 </script>
 

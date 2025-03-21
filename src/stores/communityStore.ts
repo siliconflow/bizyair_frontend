@@ -280,7 +280,6 @@ export const useCommunityStore = defineStore('community', {
       return null
     },
     setAndShowCommunityDetail(modelId: number, versionId: number) {
-      console.log('setAndShowCommunityDetail', modelId, versionId)
       this.modelId = modelId
       this.versionId = versionId
       this.showCommunityDetail = true

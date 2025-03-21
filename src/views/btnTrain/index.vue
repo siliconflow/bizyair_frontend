@@ -1,5 +1,10 @@
 <template>
-  <btnMenu :show_cases="show_cases" button-text="Train" icon="book-open" :is-json="true">
+  <btnMenu
+    :show_cases="show_cases"
+    :button-text="$t('buttons.train')"
+    icon="book-open"
+    :is-json="true"
+  >
     <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 32 32">
       <path
         fill="#ddd"

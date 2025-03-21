@@ -19,7 +19,7 @@
         />
       </svg>
     </span>
-    <span class="block leading leading-8 text-sm">Community</span>
+    <span class="block leading leading-8 text-sm">{{ $t('buttons.community') }}</span>
   </div>
   <v-dialog
     v-model:open="communityStore.showDialog"
