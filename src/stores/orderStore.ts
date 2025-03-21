@@ -27,7 +27,7 @@ export const useOrderStore = defineStore('userOrder', {
   actions: {
     async getProducts() {
       const res = await getProducts()
-      this.products = res.data.products
+      this.products = res.data.products.sort((a: { sort: number }, b: { sort: number }) => a.sort - b.sort)
       return res.data
     },
     async getPayPage() {
