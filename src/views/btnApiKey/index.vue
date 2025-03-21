@@ -3,23 +3,31 @@
     @click="statusStore.handleApiKeyDialog(true)"
     class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3 rounded-sm"
   >
-    <span class="mr-1">
-      <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
-        <path
+    <span class="mr-1 h-4 w-4">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+        <g
           fill="none"
-          stroke="#ddd"
+          stroke="#fff"
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="1.5"
-          d="m15.362 9.065l1.32 1.32c.995.995 1.345-.84 2.734-1.07c.466-.078.877-.236 1.053-.752c.156-.456-.021-.885-.574-1.438L18.5 5.731M7.5 21a4.5 4.5 0 1 0 0-9a4.5 4.5 0 0 0 0 9m3.5-8L21 3"
-        />
+          stroke-width="2"
+        >
+          <path d="m15.5 7.5l2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4m2-2l-9.6 9.6" />
+          <circle cx="7.5" cy="15.5" r="5.5" />
+        </g>
       </svg>
     </span>
-    <span class="block leading h-full leading-8 text-sm">API Key</span>
+    <span class="block leading leading-8 text-sm">{{ t('buttons.apiKey') }}</span>
   </div>
+  <apiKeyDialog />
 </template>
 <script setup lang="ts">
+  import apiKeyDialog from './apiKeyDialog.vue'
   import { useStatusStore } from '@/stores/userStatus'
+
+  import { useI18n } from 'vue-i18n'
+  const { t } = useI18n()
+
   const statusStore = useStatusStore()
 </script>
 <style scoped></style>

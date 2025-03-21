@@ -17,13 +17,17 @@
       />
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 10h8M8 14h4" />
     </svg>
-    <p class="text-lg font-medium">No Data Available</p>
-    <p class="text-sm mt-2">Try another Base Model or adjust your filters</p>
+    <p class="text-lg font-medium">{{ t('community.emptyState.title') }}</p>
+    <p class="text-sm mt-2">{{ t('community.emptyState.subtitle') }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
+  import { useI18n } from 'vue-i18n'
+
   defineOptions({
     name: 'EmptyState'
   })
+
+  const { t } = useI18n()
 </script>

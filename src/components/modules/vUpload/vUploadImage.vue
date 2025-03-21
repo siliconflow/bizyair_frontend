@@ -4,6 +4,12 @@
   import { Trash2 } from 'lucide-vue-next'
   import { formatToWebp, imageToOss } from './imageToOss'
   import { cn } from '@/lib/utils'
+  import { useI18n } from 'vue-i18n'
+
+  // 导入useI18n以启用模板中的$t函数
+  // 在setup script中我们不需要使用t函数，所以不需要解构它
+  useI18n()
+
   const imageSrc = ref('')
   const fileInput = ref<any>()
   const showLoading = ref(false)
@@ -50,6 +56,7 @@
           props.className
         )
       "
+      :title="$t('vUpload.uploadImage')"
     >
       <input
         ref="fileInput"
@@ -166,6 +173,9 @@
             />
           </circle>
         </svg>
+      </div>
+      <div class="fixed left-1/2 top-[60%] -translate-x-1/2 text-white">
+        {{ $t('vUpload.loading') }}
       </div>
     </div>
   </div>

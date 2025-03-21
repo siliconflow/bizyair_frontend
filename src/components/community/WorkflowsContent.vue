@@ -7,11 +7,13 @@
   import { useToaster } from '@/components/modules/toats'
   import { Model } from '@/types/model'
   import { useModelGrid } from '@/composables/useModelGrid'
+  import { useI18n } from 'vue-i18n'
 
   defineOptions({
     name: 'WorkflowsContent'
   })
 
+  const { t } = useI18n()
   const communityStore = useCommunityStore()
   const comfyUIApp: any = inject('comfyUIApp')
 
@@ -29,7 +31,7 @@
   const handleLoadWorkflow = async (model: Model) => {
     try {
       if (!model.versions?.[0]) {
-        useToaster.error('No workflow found')
+        useToaster.error(t('community.workflows.loadWorkflow.notFound'))
         return
       }
       const { data } = await get_workflow_dowload_url(model.versions[0].id, model.versions[0].sign)
@@ -41,14 +43,14 @@
           await comfyUIApp.loadGraphData(data)
         }
         communityStore.showDialog = false
-        useToaster.success('Workflow loaded successfully')
+        useToaster.success(t('community.workflows.loadWorkflow.success'))
       } else {
         communityStore.showDialog = false
-        useToaster.error('Failed to load workflow')
+        useToaster.error(t('community.workflows.loadWorkflow.error', { error: 'Unknown error' }))
       }
     } catch (error) {
       console.error('Failed to load workflow:', error)
-      useToaster.error(`Failed to load workflow: ${error}`)
+      useToaster.error(t('community.workflows.loadWorkflow.error', { error }))
     }
   }
 

@@ -1,12 +1,12 @@
 <template>
   <div class="condition-container">
-    <span>订单状态</span>
+    <span>{{ $t('btnProfile.record.orderStatus') }}</span>
     <n-select
       v-model:value="orderStore.payListParms.status"
       :options="orderOptions"
       class="filter-select"
       @update:value="orderStore.getPayPage"
-      placeholder="选择订单"
+      :placeholder="$t('btnProfile.record.selectOrder')"
     >
     </n-select>
   </div>
@@ -28,13 +28,21 @@
     v-model:show="orderStore.showWechat"
     preset="card"
     :auto-focus="false"
-    title="微信支付"
+    :title="$t('btnProfile.record.wechatPay')"
     style="width: 288px"
     v-on:before-leave="clearTimer"
     :bordered="false"
   >
     <wechat :text="wechatText" />
-    <p class="code-hint">二维码将于{{ orderStore.wechatExpireAt }}后过期</p>
+    <p class="code-hint">
+      {{
+        $t('btnProfile.record.expireQrCode', [
+          locale == 'en'
+            ? orderStore.wechatExpireAt.replace('分', 'minutes').replace('秒', 'seconds')
+            : orderStore.wechatExpireAt
+        ])
+      }}
+    </p>
     <div class="expire_at_layout" v-if="orderStore.wechatExpireAtStamp <= 0">
       <span class="refresh" @click="toPay(tempOrderNo)">
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -44,7 +52,7 @@
           />
         </svg>
       </span>
-      <p>二维码已过期，请点击刷新</p>
+      <p>{{ $t('btnProfile.record.qrCodeExpired') }}</p>
     </div>
   </n-modal>
 </template>
@@ -56,7 +64,9 @@
   import { getOrdersStatus, delOrder } from '@/api/order'
   import wechat from './wechat.vue'
   import { useConfirm } from '@/components/modules/vConfirm/index'
+  import { useI18n } from 'vue-i18n'
 
+  const { t, locale } = useI18n()
   const orderStore = useOrderStore()
   const statusStore = useStatusStore()
 
@@ -69,41 +79,41 @@
   const orderOptions = [
     {
       value: '',
-      label: '全部'
+      label: t('btnProfile.record.all')
     },
     {
       value: 'success',
-      label: '支付成功',
+      label: t('btnProfile.record.paySuccess'),
       color: '#16A34A'
     },
     {
       value: 'not_pay',
-      label: '未支付',
+      label: t('btnProfile.record.notPaid'),
       color: '#F59E0B'
     },
     {
       value: 'refund',
-      label: '转入退款',
+      label: t('btnProfile.record.refund'),
       color: '#3B82F6'
     },
     {
       value: 'refund_processing',
-      label: '退款处理中',
+      label: t('btnProfile.record.refundProcessing'),
       color: '#F59E0B'
     },
     {
       value: 'refund_success',
-      label: '退款成功',
+      label: t('btnProfile.record.refundSuccess'),
       color: '#16A34A'
     },
     {
       value: 'refund_closed',
-      label: '退款关闭',
+      label: t('btnProfile.record.refundClosed'),
       color: '#16A34A'
     },
     {
       value: 'refund_abnormal',
-      label: '退款异常',
+      label: t('btnProfile.record.refundAbnormal'),
       color: '#EF4444'
     }
   ]
@@ -127,14 +137,13 @@
   }
 
   const clearTimer = () => {
-    console.log('clearTimer')
     orderStore.iTimer && clearInterval(orderStore.iTimer)
     orderStore.timerStatus && clearInterval(orderStore.timerStatus)
   }
 
   const columns = [
     {
-      title: '订单编号',
+      title: t('btnProfile.record.orderNumber'),
       key: 'amount',
       render(row: any) {
         return h(
@@ -165,15 +174,15 @@
       }
     },
     {
-      title: '商品名称',
+      title: t('btnProfile.record.productName'),
       key: 'product_name'
     },
     {
-      title: '交易时间',
+      title: t('btnProfile.record.transactionTime'),
       key: 'created_at'
     },
     {
-      title: '交易金额',
+      title: t('btnProfile.record.transactionAmount'),
       key: 'expired_at',
       render(row: any) {
         return h(
@@ -203,8 +212,8 @@
       }
     },
     {
-      title: '订单状态',
-      key: 'expired_at',
+      title: t('btnProfile.record.orderStatus'),
+      key: 'status',
       render(row: any) {
         const option = orderOptions.find(option => option.value === row.status)
         return h(
@@ -214,13 +223,14 @@
               color: option ? option['color'] : 'inherit'
             }
           },
-          option ? option['label'] : '未知'
+          option ? option['label'] : t('btnProfile.record.unknown')
         )
       }
     },
     {
-      title: '操作',
+      title: t('btnProfile.record.operations'),
       key: '',
+      width: 150,
       render(row: any) {
         const option = orderOptions.find(option => option.value === row.status)
         return h(
@@ -241,7 +251,7 @@
                     type: 'info',
                     onClick: () => toPay(row)
                   },
-                  () => '支付'
+                  () => t('btnProfile.record.pay')
                 ),
                 h(
                   NButton,
@@ -252,9 +262,9 @@
                     size: 'small',
                     onClick: async () => {
                       const res = await useConfirm({
-                        title: '确定要取消订单吗？',
-                        continueText: '前往',
-                        cancelText: '取消'
+                        title: t('btnProfile.record.confirmCancel'),
+                        continueText: t('btnProfile.record.proceed'),
+                        cancelText: t('btnProfile.record.cancel')
                       })
                       if (res) {
                         await delOrder(row.order_no)
@@ -265,7 +275,7 @@
                       }
                     }
                   },
-                  () => '退单'
+                  () => t('btnProfile.record.refundOrder')
                 )
               ]
             : ''
@@ -289,7 +299,7 @@
     align-items: center;
     margin-bottom: 20px;
     span {
-      width: 72px;
+      width: 90px;
     }
     .filter-select {
       width: 180px;

@@ -4,6 +4,9 @@
   import { creatClient } from './ossClient'
   import { commit_file } from '@/api/model'
   import { computed, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   interface UploadFile extends File {
     progress?: number
@@ -144,7 +147,7 @@
           if (!text.includes(image)) {
             useToaster({
               type: 'error',
-              message: 'Some of your images are missing captions. Please provide the caption files.'
+              message: t('vUpload.missingCaptions')
             })
             target.value = ''
             isValid = false
@@ -157,7 +160,7 @@
       }
 
       showConfirm.value = true
-      tipsText.value = `You are about to upload ${newFilesImage.length} images and ${newFilesText.length} texts.`
+      tipsText.value = t('vUpload.uploadConfirm', [newFilesImage.length, newFilesText.length])
 
       fileList.value.push(...newFiles)
       uploadQueue.value.push(...newFiles)
@@ -183,12 +186,6 @@
     e.client?.cancel()
     emit('update:value', fileList.value)
   }
-  // const clearAll = () => {
-  //   fileList.value.forEach((e) => {
-  //     e.client?.cancel()
-  //   })
-  //   cancelUpload()
-  // }
 
   const uploadRatio = computed(() => uploadedNumber.value / fileList.value.length)
   watch(uploadRatio, val => {
@@ -238,14 +235,14 @@
         </svg>
       </span>
       <span class="word">
-        Click to upload, please select a folder.<br />
-        You can add up to 600 images, with support for PNG, JPG, and JPEG formats.
+        {{ $t('vUpload.clickToUpload') }}<br />
+        {{ $t('vUpload.supportFormats') }}
       </span>
       <input ref="fileInput" webkitdirectory type="file" @change="changeFiles" />
     </div>
     <div v-show="isUploading" class="v-upload-progress">
       <p>
-        <span>File Number</span>
+        <span>{{ $t('vUpload.fileNumber') }}</span>
         <span>{{ uploadedNumber }}/{{ fileList.length }}</span>
       </p>
       <n-progress
@@ -281,17 +278,14 @@
           </svg>
         </span>
       </li>
-      <!-- <li class="clear-btn" @click="clearAll">
-        <n-button>clear</n-button>
-      </li> -->
     </ul>
     <n-modal
       v-model:show="showConfirm"
       preset="dialog"
-      title="Tips"
+      :title="$t('vUpload.modalTitle')"
       :content="tipsText"
-      positive-text="Upload"
-      negative-text="Cancel"
+      :positive-text="$t('vUpload.uploadButton')"
+      :negative-text="$t('vUpload.cancelButton')"
       @positive-click="toUpload"
       @negative-click="cancelUpload"
     />

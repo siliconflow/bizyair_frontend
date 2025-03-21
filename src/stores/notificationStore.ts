@@ -187,7 +187,7 @@ export const useNotificationStore = defineStore('notification', {
 
         this.officialNoticesInitialized = true
       } catch (error) {
-        console.error('加载官方通知失败', error)
+        console.error('Failed to load official notifications', error)
       } finally {
         this.officialNoticesLoading = false
       }
@@ -225,7 +225,7 @@ export const useNotificationStore = defineStore('notification', {
 
         this.userLikeNoticesInitialized = true
       } catch (error) {
-        console.error('加载用户点赞通知失败', error)
+        console.error('Failed to load user like notifications', error)
       } finally {
         this.userLikeNoticesLoading = false
       }
@@ -263,7 +263,7 @@ export const useNotificationStore = defineStore('notification', {
 
         this.userForkNoticesInitialized = true
       } catch (error) {
-        console.error('加载用户复刻通知失败', error)
+        console.error('Failed to load user fork notifications', error)
       } finally {
         this.userForkNoticesLoading = false
       }
@@ -340,7 +340,7 @@ export const useNotificationStore = defineStore('notification', {
 
         await this.loadUnreadCount()
       } catch (error) {
-        console.error('标记已读失败', error)
+        console.error('Failed to mark as read', error)
       }
     },
 
@@ -369,7 +369,7 @@ export const useNotificationStore = defineStore('notification', {
 
         await this.loadUnreadCount()
       } catch (error) {
-        console.error('标记全部已读失败', error)
+        console.error('Failed to mark all as read', error)
       }
     },
 
@@ -412,6 +412,49 @@ export const useNotificationStore = defineStore('notification', {
         }
       } catch (error) {
         console.error('Failed to get unread message count', error)
+      }
+    },
+    async loadUnreadCountWithError() {
+      try {
+        const res = await get_message_unread_count()
+        if (res?.data && res?.data.types && res?.data.counts) {
+          this.officialNoticesUnReadCount = 0
+          this.userLikeNoticesUnReadCount = 0
+          this.userForkNoticesUnReadCount = 0
+
+          const officialTypes = this.officialNotificationTypes.map(type => Number(type.value))
+
+          const likeType = this.notificationTypes.find(
+            item => item.label === NotificationType.USER_LIKE
+          )
+          const likeTypeValue = likeType ? Number(likeType.value) : 101
+
+          const forkType = this.notificationTypes.find(
+            item => item.label === NotificationType.USER_FORK
+          )
+          const forkTypeValue = forkType ? Number(forkType.value) : 102
+
+          for (let i = 0; i < res.data.types.length; i++) {
+            const type = res.data.types[i]
+            const count = res.data.counts[i]
+
+            if (officialTypes.includes(type)) {
+              this.officialNoticesUnReadCount += count
+            } else if (type === likeTypeValue) {
+              this.userLikeNoticesUnReadCount = count
+            } else if (type === forkTypeValue) {
+              this.userForkNoticesUnReadCount = count
+            }
+          }
+          this.totalUnreadCount =
+            this.officialNoticesUnReadCount +
+            this.userLikeNoticesUnReadCount +
+            this.userForkNoticesUnReadCount
+        }
+        return res
+      } catch (error) {
+        console.error('loadUnreadCountWithError', error)
+        throw error
       }
     },
 

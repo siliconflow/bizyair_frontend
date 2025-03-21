@@ -18,6 +18,15 @@ export const put_share_id = (data: any) =>
     body: JSON.stringify(data)
   })
 
+export const get_user_language_profile = () =>
+  customFetch('/bizyair/user/profile', { method: 'get' })
+
+export const put_user_language_profile = (data: any) =>
+  customFetch('/bizyair/user/profile', {
+    method: 'put',
+    body: JSON.stringify(data)
+  })
+
 export const get_metadata = () => customFetch('/bizyair/user/metadata', { method: 'GET' })
 
 export const put_metadata = (data: any) =>
