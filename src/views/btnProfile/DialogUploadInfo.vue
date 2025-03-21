@@ -29,18 +29,18 @@
         :label-width="80"
         :rules="rules"
       >
-        <n-form-item :label="t('btnProfile.uploadInfo.name')" path="name">
+        <n-form-item label="昵称" path="name">
           <n-input
             v-model:value="statusStore.usersMetadata.name"
-            :placeholder="t('btnProfile.uploadInfo.name')"
+            placeholder="name"
             maxlength="50"
           />
         </n-form-item>
-        <n-form-item :label="t('btnProfile.uploadInfo.introduction')" path="introduction">
+        <n-form-item label="个性签名" path="introduction">
           <n-input
             v-model:value="statusStore.usersMetadata.introduction"
             type="textarea"
-            :placeholder="t('btnProfile.uploadInfo.introduction')"
+            placeholder="introduction"
             maxlength="50"
           />
         </n-form-item>
@@ -67,8 +67,8 @@
       </n-form>
     </div>
     <div class="sunbmit-container">
-      <span class="btn" @click="cancel">{{ t('btnProfile.uploadInfo.cancel') }}</span>
-      <span class="btn btn-submit" @click="toSubmit">{{ t('btnProfile.uploadInfo.save') }}</span>
+      <span class="btn" @click="cancel">取消</span>
+      <span class="btn btn-submit" @click="toSubmit">确认</span>
     </div>
   </n-modal>
 </template>
@@ -79,19 +79,12 @@
   import { put_metadata, post_real_name } from '@/api/user'
   import { ref } from 'vue'
   import { useConfirm } from '@/components/modules/vConfirm'
-  import { useI18n } from 'vue-i18n'
 
-  const { t } = useI18n()
   const statusStore = useStatusStore()
   const formRef = ref()
 
   const rules = {
-    name: [{ 
-      required: true, 
-      message: t('btnProfile.uploadInfo.nameRequired'), 
-      trigger: 'blur', 
-      max: 50 
-    }]
+    name: [{ required: true, message: 'Please enter name', trigger: 'blur', max: 50 }]
   }
   const closeInfoDialog = () => {
     statusStore.showUploadInfoDialog = false

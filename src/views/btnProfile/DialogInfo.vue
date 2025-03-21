@@ -13,10 +13,10 @@
       <div class="info" @click="toUploadInfo">
         <p class="user-name">{{ statusStore.usersMetadata.name }}</p>
         <p class="user-title">
-          {{ statusStore.usersMetadata.introduction || t('btnProfile.userInfo.noIntroduction') }}
+          {{ statusStore.usersMetadata.introduction || '这家伙很懒，什么也没留下' }}
         </p>
         <p class="user-title" @click.stop="copyID">
-          {{ t('btnProfile.userInfo.id') }}: <span>{{ statusStore.usersMetadata.id }}</span>
+          ID: <span>{{ statusStore.usersMetadata.id }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
             <g
               fill="none"
@@ -56,16 +56,16 @@
           class="coin-icon"
           src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp"
         />
-        <span>{{ t('btnProfile.userInfo.balance') }}</span>
+        <span>余额</span>
       </div>
       <div class="balance">
         <n-tooltip placement="top-start" trigger="hover">
           <template #trigger>
-            <span class="num">{{ statusStore.userWallte.total_balance || 0 }}<span>{{ t('btnProfile.userInfo.coin') }}</span></span>
+            <span class="num">{{ statusStore.userWallte.total_balance || 0 }}<span>币</span></span>
           </template>
-          {{ statusStore.userWallte.total_balance_amount || 0 }}<span>{{ t('btnProfile.userInfo.coin') }}</span>
+          {{ statusStore.userWallte.total_balance_amount || 0 }}<span>币</span>
         </n-tooltip>
-        <span class="btn" @click="orderStore.showProduct = true">{{ t('btnProfile.userInfo.recharge') }}</span>
+        <span class="btn" @click="orderStore.showProduct = true">充值</span>
       </div>
       <div class="balance-detail-box">
         <div class="balance-detail">
@@ -75,7 +75,7 @@
                 class="coin-icon"
                 src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/FLrDPYmbuUnXSygQF1iePicnQwbPSWXD.webp"
               />
-              {{ t('btnProfile.userInfo.giftSilverCoins') }}
+              赠送银币
               <!-- gift_today_expired 银币今天是否有过期的 -->
             </span>
             <n-tooltip placement="top-start" trigger="hover">
@@ -84,7 +84,7 @@
                   statusStore.userWallte.gift_balance || 0
                 }}</span>
               </template>
-              {{ statusStore.userWallte.gift_balance_amount || 0 }}<span>{{ t('btnProfile.userInfo.coin') }}</span>
+              {{ statusStore.userWallte.gift_balance_amount || 0 }}<span>币</span>
             </n-tooltip>
           </div>
           <div>
@@ -93,7 +93,7 @@
                 class="coin-icon"
                 src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/AdLFMb6DyYnpsJArdSpbPz8P7SzMFw3u.webp"
               />
-              {{ t('btnProfile.userInfo.rechargeGoldCoins') }}
+              充值金币
             </span>
             <n-tooltip placement="top-start" trigger="hover">
               <template #trigger>
@@ -101,7 +101,7 @@
                   statusStore.userWallte.charge_balance || 0
                 }}</span>
               </template>
-              {{ statusStore.userWallte.charge_balance_amount || 0 }}<span>{{ t('btnProfile.userInfo.coin') }}</span>
+              {{ statusStore.userWallte.charge_balance_amount || 0 }}<span>币</span>
             </n-tooltip>
           </div>
         </div>
@@ -125,7 +125,7 @@
             </g>
           </svg>
         </span>
-        <span class="word">{{ t('btnProfile.actions.switchApiKey') }}</span>
+        <span class="word">切换 API 密钥</span>
       </div>
       <div class="handles-item" @click="toAllCoinList('all')">
         <span class="icon">
@@ -142,7 +142,7 @@
             </g>
           </svg>
         </span>
-        <span class="word">{{ t('btnProfile.actions.myWallet') }}</span>
+        <span class="word">我的钱包</span>
       </div>
       <div class="handles-item" @click="statusStore.showRecordDialog = true">
         <span class="icon">
@@ -157,7 +157,7 @@
             />
           </svg>
         </span>
-        <span class="word">{{ t('btnProfile.actions.rechargeRecord') }}</span>
+        <span class="word">充值记录</span>
       </div>
     </div>
   </n-modal>
@@ -166,9 +166,7 @@
   import { NModal, NTooltip } from 'naive-ui'
   import { useStatusStore } from '@/stores/userStatus'
   import { useOrderStore } from '@/stores/orderStore'
-  import { useI18n } from 'vue-i18n'
 
-  const { t } = useI18n()
   const statusStore = useStatusStore()
   const orderStore = useOrderStore()
   const toUploadInfo = () => {

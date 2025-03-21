@@ -14,7 +14,7 @@
         </g>
       </svg>
     </span>
-    <span class="profile-text">{{ t('btnProfile.profile') }}</span>
+    <span class="profile-text">Profile</span>
     <dialogInfo />
     <DialogUploadInfo />
     <uploadAvatar />
@@ -33,7 +33,7 @@
           <img
             src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp"
           />
-          <span>{{ t('btnProfile.myCoins') }}</span>
+          <span>我的 BZ 币</span>
         </div>
       </template>
       <DialogCoinsLis />
@@ -42,7 +42,7 @@
       v-model:show="statusStore.showRecordDialog"
       preset="card"
       style="width: 960px"
-      :title="t('btnProfile.actions.rechargeRecord')"
+      title="充值记录"
       content-style="padding: 0 32px 20px 32px;"
       :mask-closable="false"
       :on-after-leave="closeInfoDialog"
@@ -56,7 +56,7 @@
       preset="card"
       style="width: 960px"
       :auto-focus="false"
-      :title="t('btnProfile.coinsRecharge')"
+      title="Bz币充值"
       content-style="padding: 0 32px 24px 32px;"
       :bordered="false"
     >
@@ -76,9 +76,8 @@
   import { useStatusStore } from '@/stores/userStatus'
   import { NModal } from 'naive-ui'
   import { useOrderStore } from '@/stores/orderStore'
-  import { useI18n } from 'vue-i18n'
 
-  const { t } = useI18n()
+  // const { t } = useI18n()
   const statusStore = useStatusStore()
   const orderStore = useOrderStore()
 
