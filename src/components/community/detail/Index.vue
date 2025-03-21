@@ -172,7 +172,11 @@
     if (communityStore.TabSource === 'my_fork') {
       if (model.value.versions.length <= 1) {
         const res = await useAlertDialog({
-          title: t('community.detail.confirmUnfork', [model.value?.type === 'Workflow' ? t('community.detail.workflow') : t('community.detail.model')]),
+          title: t('community.detail.confirmUnfork', [
+            model.value?.type === 'Workflow'
+              ? t('community.detail.workflow')
+              : t('community.detail.model')
+          ]),
           desc: t('community.detail.unforkWarning'),
           cancel: t('confirm.cancel'),
           continue: t('community.detail.confirmUnforkBtn'),
@@ -284,7 +288,11 @@
     if (type === 'remove') {
       downloadOpen.value = false
       const res = await useAlertDialog({
-        title: t('community.detail.confirmDelete', [model.value?.type === 'Workflow' ? t('community.detail.workflow') : t('community.detail.model')]),
+        title: t('community.detail.confirmDelete', [
+          model.value?.type === 'Workflow'
+            ? t('community.detail.workflow')
+            : t('community.detail.model')
+        ]),
         desc: t('community.detail.deleteWarning'),
         cancel: t('confirm.cancel'),
         continue: t('community.detail.confirmDeleteBtn'),
@@ -625,17 +633,15 @@
           ></div>
 
           <div class="flex gap-4">
-            <vTooltips v-if="communityStore.TabSource === 'publicity'" :tips="t('community.detail.share')">
+            <vTooltips
+              v-if="communityStore.TabSource === 'publicity'"
+              :tips="t('community.detail.share')"
+            >
               <div
                 @click="getShareCode"
                 class="w-[48px] h-[48px] bg-[#4e4e4e] hover:bg-[#4e4e4e]/60 rounded-lg flex items-center justify-center cursor-pointer"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
                     d="M15.991 1.035a4 4 0 1 1-.855 6.267l-6.28 3.626q.147.533.145 1.072c0 .358-.047.719-.145 1.072l6.28 3.626a4.002 4.002 0 0 1 6.32 4.803a4 4 0 0 1-7.32-3.07l-6.28-3.627a4.002 4.002 0 1 1 0-5.608l6.28-3.626a4 4 0 0 1 1.855-4.535M19.723 3.5a2 2 0 1 0-3.464 2a2 2 0 0 0 3.464-2M3.071 12.527a2.002 2.002 0 0 0 2.93 1.204a2 2 0 1 0-2.93-1.204m15.92 5.242a2 2 0 1 0-2 3.464a2 2 0 0 0 2-3.464"
@@ -643,7 +649,13 @@
                 </svg>
               </div>
             </vTooltips>
-            <vTooltips :tips="currentVersion?.liked ? t('community.detail.tooltips.liked') : t('community.detail.tooltips.like')">
+            <vTooltips
+              :tips="
+                currentVersion?.liked
+                  ? t('community.detail.tooltips.liked')
+                  : t('community.detail.tooltips.like')
+              "
+            >
               <div
                 class="w-[48px] h-[48px] rounded-lg flex items-center justify-center cursor-pointer"
                 :class="[
@@ -800,21 +812,27 @@
           >
             <div class="flex flex-row gap-2 items-center justify-start shrink-0 relative">
               <Avatar>
-                <AvatarImage 
-                  :src="currentVersion && currentVersion.parent_id > 0 
-                    ? currentVersion.original_user_avatar || 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp' 
-                    : currentVersion?.user_avatar || 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp'" 
-                  alt="user avatar" 
+                <AvatarImage
+                  :src="
+                    currentVersion && currentVersion.parent_id > 0
+                      ? currentVersion.original_user_avatar ||
+                        'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp'
+                      : currentVersion?.user_avatar ||
+                        'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/img/20250311/ViKdyI5vrD7XGNCXHuVTW4sPUXNusj3W.webp'
+                  "
+                  alt="user avatar"
                 />
-                <AvatarFallback>{{ 
-                  currentVersion && currentVersion.parent_id > 0 
-                    ? (currentVersion.original_user_name?.slice(0, 2) || '') 
-                    : (currentVersion?.user_name?.slice(0, 2) || '')
+                <AvatarFallback>{{
+                  currentVersion && currentVersion.parent_id > 0
+                    ? currentVersion.original_user_name?.slice(0, 2) || ''
+                    : currentVersion?.user_name?.slice(0, 2) || ''
                 }}</AvatarFallback>
               </Avatar>
-              {{ currentVersion && currentVersion.parent_id > 0 
-                ? currentVersion.original_user_name 
-                : currentVersion?.user_name }}
+              {{
+                currentVersion && currentVersion.parent_id > 0
+                  ? currentVersion.original_user_name
+                  : currentVersion?.user_name
+              }}
             </div>
             <div
               class="flex flex-row gap-1.5 items-start justify-start self-stretch shrink-0 relative"
@@ -829,9 +847,15 @@
                 class="w-[124px] flex h-9 px-3 py-2 justify-center items-center gap-2 flex-1 rounded-md bg-[#6D28D9]"
                 @click="handleFork"
               >
-                <template v-if="['my_fork'].includes(communityStore.TabSource)"> {{ t('community.detail.unFork') }} </template>
+                <template v-if="['my_fork'].includes(communityStore.TabSource)">
+                  {{ t('community.detail.unFork') }}
+                </template>
                 <template v-else>
-                  {{ currentVersion?.forked ? t('community.detail.unFork') : t('community.detail.fork') }}
+                  {{
+                    currentVersion?.forked
+                      ? t('community.detail.unFork')
+                      : t('community.detail.fork')
+                  }}
                 </template>
               </Button>
               <Button
@@ -947,7 +971,12 @@
               <div className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)]">
                 <div class="flex items-center gap-2">
                   <vTooltips
-                    :tips="currentVersion?.review_result !== 'Unknown' && currentVersion?.review_state !== -1 ? t('community.detail.tooltips.modelType', [currentVersion?.review_result]) : t('community.detail.tooltips.unknownModelType')"
+                    :tips="
+                      currentVersion?.review_result !== 'Unknown' &&
+                      currentVersion?.review_state !== -1
+                        ? t('community.detail.tooltips.modelType', [currentVersion?.review_result])
+                        : t('community.detail.tooltips.unknownModelType')
+                    "
                   >
                     <svg
                       v-if="currentVersion?.review_state === 1"

@@ -7,9 +7,9 @@
     @on-close="onDialogClose"
   >
     <template #title
-      ><span class="px-6 cursor-pointer" @click="handleToggleTitle"
-        >{{ t('publish.workflow.title') }}</span
-      ></template
+      ><span class="px-6 cursor-pointer" @click="handleToggleTitle">{{
+        t('publish.workflow.title')
+      }}</span></template
     >
     <div v-show="modelBox" class="px-6 pb-6">
       <v-item :label="t('publish.workflow.name.label')">
@@ -111,14 +111,18 @@
                   <Progress :model-value="e.progress" class="mt-4 h-3" />
                   <p class="text-center pt-2">
                     {{ e.progress }}% {{ t('publish.workflow.uploaded') }}
-                    <span v-if="e.speed" class="pl-2">{{ t('publish.workflow.speed') }}: {{ e.speed }}</span>
+                    <span v-if="e.speed" class="pl-2"
+                      >{{ t('publish.workflow.speed') }}: {{ e.speed }}</span
+                    >
                   </p>
                 </div>
-                <Button v-if="e.hideUpload" class="ml-2" @click="cancelFile">{{ t('publish.workflow.cancel') }}</Button>
+                <Button v-if="e.hideUpload" class="ml-2" @click="cancelFile">{{
+                  t('publish.workflow.cancel')
+                }}</Button>
                 <div v-if="!e.hideUpload" :class="{ 'w-full': !e.progress }">
-                  <Button v-if="!e.progress" class="w-full my-2" @click="loadWorkflow()"
-                    >{{ t('publish.workflow.loadFromWorkspace') }}</Button
-                  >
+                  <Button v-if="!e.progress" class="w-full my-2" @click="loadWorkflow()">{{
+                    t('publish.workflow.loadFromWorkspace')
+                  }}</Button>
                   <vUpload
                     :ref="e.ref"
                     model-type="ComfyUI"
@@ -143,8 +147,12 @@
       <div
         class="bg-[#353535] px-6 w-full h-14 rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px] flex justify-between items-center -mt-4"
       >
-        <Button variant="outline" class="" @click="addVersions">{{ t('publish.workflow.addVersion') }}</Button>
-        <Button :disabled="disabledPublish" @click="submit">{{ t('publish.workflow.publish') }}</Button>
+        <Button variant="outline" class="" @click="addVersions">{{
+          t('publish.workflow.addVersion')
+        }}</Button>
+        <Button :disabled="disabledPublish" @click="submit">{{
+          t('publish.workflow.publish')
+        }}</Button>
       </div>
     </template>
     <div v-if="showLayoutLoading" class="z-50 w-full h-full absolute left-0 top-0"></div>
@@ -267,13 +275,13 @@
       const e = tempData.versions[i]
       if (!e.version) {
         e.versionError = true
-        useToaster.error(t('publish.workflow.errors.enterVersion', {index: i + 1}))
+        useToaster.error(t('publish.workflow.errors.enterVersion', { index: i + 1 }))
         acActiveIndex.value = i
         break
       }
       if (!e.base_model) {
         e.baseModelError = true
-        useToaster.error(t('publish.workflow.errors.selectBaseModel', {index: i + 1}))
+        useToaster.error(t('publish.workflow.errors.selectBaseModel', { index: i + 1 }))
         acActiveIndex.value = i
         break
       }
@@ -285,7 +293,7 @@
       // }
       if (!e.sign) {
         e.filePathError = true
-        useToaster.error(t('publish.workflow.errors.enterFilePath', {index: i + 1}))
+        useToaster.error(t('publish.workflow.errors.enterFilePath', { index: i + 1 }))
         acActiveIndex.value = i
         break
       }

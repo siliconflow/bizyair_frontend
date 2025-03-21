@@ -99,7 +99,7 @@
       "subtitle": "快速上手"
     },
     "workflows": {
-      "title": "工作流", 
+      "title": "工作流",
       "subtitle": "浏览所有工作流",
       "loadWorkflow": {
         "success": "工作流加载成功",
@@ -165,7 +165,7 @@
         "addNode": "添加节点",
         "downloaded": "下载量",
         "used": "使用量",
-        "forked": "收藏量", 
+        "forked": "收藏量",
         "liked": "点赞量"
       },
       "tags": {
@@ -425,4 +425,4 @@
       "profile": "个人资料"
     }
   }
-} 
+}

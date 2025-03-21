@@ -66,8 +66,6 @@
   import { NotificationType } from '../types'
   import DetailModal from './Detail.vue'
   import { useNotificationStore } from '@/stores/notificationStore'
- 
-
 
   const notificationStore = useNotificationStore()
 
@@ -141,7 +139,6 @@
     border-radius: 0.375rem;
     transition: all 0.2s ease-in-out;
     border-radius: 4px;
-   
   }
 
   .message-card:hover :deep(.n-card__content) {

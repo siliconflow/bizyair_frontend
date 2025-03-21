@@ -9,7 +9,7 @@
   // 导入useI18n以启用模板中的$t函数
   // 在setup script中我们不需要使用t函数，所以不需要解构它
   useI18n()
-  
+
   const imageSrc = ref('')
   const fileInput = ref<any>()
   const showLoading = ref(false)

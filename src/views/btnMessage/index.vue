@@ -47,33 +47,34 @@
     },
     { immediate: true }
   )
-  
-  const INITIAL_INTERVAL = 10000 
+
+  const INITIAL_INTERVAL = 10000
   const currentInterval = ref(INITIAL_INTERVAL)
   let pollTimer: number | null = null
-  
+
   const setupPolling = () => {
     if (pollTimer !== null) {
       clearTimeout(pollTimer)
       pollTimer = null
     }
-    pollTimer = window.setTimeout(fetchUnreadCount, currentInterval.value);
+    pollTimer = window.setTimeout(fetchUnreadCount, currentInterval.value)
   }
 
   const fetchUnreadCount = async () => {
-   
     try {
-      await notificationStore.loadUnreadCountWithError();
-      currentInterval.value = INITIAL_INTERVAL;
+      await notificationStore.loadUnreadCountWithError()
+      currentInterval.value = INITIAL_INTERVAL
     } catch (error) {
-      const oldInterval = currentInterval.value;
-      currentInterval.value = Math.min(currentInterval.value * 2, 300000);
-      console.error(`Failed to fetch unread message count, interval increased from ${oldInterval / 1000}s to ${currentInterval.value / 1000}s`);
+      const oldInterval = currentInterval.value
+      currentInterval.value = Math.min(currentInterval.value * 2, 300000)
+      console.error(
+        `Failed to fetch unread message count, interval increased from ${oldInterval / 1000}s to ${currentInterval.value / 1000}s`
+      )
     } finally {
-      setupPolling();
+      setupPolling()
     }
   }
-  
+
   onMounted(() => {
     fetchUnreadCount()
   })

@@ -62,13 +62,17 @@
               ></path>
             </svg>
           </span>
-          <n-button v-else tertiary @click="toRealName">{{ $t('btnProfile.uploadInfo.authenticate') }}</n-button>
+          <n-button v-else tertiary @click="toRealName">{{
+            $t('btnProfile.uploadInfo.authenticate')
+          }}</n-button>
         </n-form-item>
       </n-form>
     </div>
     <div class="sunbmit-container">
       <span class="btn" @click="cancel">{{ $t('btnProfile.uploadInfo.cancel') }}</span>
-      <span class="btn btn-submit" @click="toSubmit">{{ $t('btnProfile.uploadInfo.confirm') }}</span>
+      <span class="btn btn-submit" @click="toSubmit">{{
+        $t('btnProfile.uploadInfo.confirm')
+      }}</span>
     </div>
   </n-modal>
 </template>
@@ -86,7 +90,14 @@
   const formRef = ref()
 
   const rules = {
-    name: [{ required: true, message: t('btnProfile.uploadInfo.nameValidation'), trigger: 'blur', max: 50 }]
+    name: [
+      {
+        required: true,
+        message: t('btnProfile.uploadInfo.nameValidation'),
+        trigger: 'blur',
+        max: 50
+      }
+    ]
   }
   const closeInfoDialog = () => {
     statusStore.showUploadInfoDialog = false

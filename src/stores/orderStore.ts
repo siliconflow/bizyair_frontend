@@ -16,7 +16,7 @@ export const useOrderStore = defineStore('userOrder', {
     payList: {} as any,
     payListParms: {
       current: 1,
-      page_size: 10,
+      page_size: 10
     } as typePayListParms,
     wechatExpireAt: '',
     wechatExpireAtStamp: 0,

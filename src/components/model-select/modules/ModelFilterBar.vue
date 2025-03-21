@@ -140,12 +140,14 @@
       :open="showSortPopover"
       @update:open="emit('update:showSortPopover', $event)"
     >
-    <PopoverTrigger class="bg-transparent">
+      <PopoverTrigger class="bg-transparent">
         <Button
           variant="default"
-          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer group flex items-center "
+          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer group flex items-center"
         >
-          <span class="w-[60px] truncate">{{ getSortLabel(store[props.page].filterState.sort) }}</span>
+          <span class="w-[60px] truncate">{{
+            getSortLabel(store[props.page].filterState.sort)
+          }}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -233,9 +235,9 @@
       <PopoverTrigger class="bg-transparent">
         <Button
           variant="default"
-          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer flex items-center "
+          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer flex items-center"
         >
-           <svg
+          <svg
             width="16"
             height="14"
             viewBox="0 0 16 14"
@@ -250,7 +252,6 @@
             />
           </svg>
           <span>{{ t('community.filter.sort.title') }}</span>
-       
         </Button>
       </PopoverTrigger>
 
@@ -259,7 +260,9 @@
           <CommandList>
             <CommandGroup>
               <div class="p-2">
-                <div class="text-sm font-medium text-[#F9FAFB] mb-2">{{ t('community.filter.type.model-types') }}</div>
+                <div class="text-sm font-medium text-[#F9FAFB] mb-2">
+                  {{ t('community.filter.type.model-types') }}
+                </div>
               </div>
               <CommandItem value="model-types" class="p-2">
                 <div class="flex flex-wrap gap-2">
@@ -282,7 +285,9 @@
             <CommandSeparator v-if="props.page !== 'posts' && props.page !== 'community'" />
             <CommandGroup>
               <div class="p-2">
-                <div class="text-sm font-medium text-[#F9FAFB] mb-2">{{ t('community.filter.type.base-model') }}</div>
+                <div class="text-sm font-medium text-[#F9FAFB] mb-2">
+                  {{ t('community.filter.type.base-model') }}
+                </div>
               </div>
               <CommandItem value="base-models" class="p-2">
                 <div class="flex flex-wrap gap-2">

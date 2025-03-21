@@ -26,7 +26,9 @@
   </ul>
   <div class="footer">
     <div class="agreement">
-      <n-checkbox v-model:checked="checked">{{ $t('btnProfile.product.confirmAgreement') }}</n-checkbox>
+      <n-checkbox v-model:checked="checked">{{
+        $t('btnProfile.product.confirmAgreement')
+      }}</n-checkbox>
       <span class="protocol">{{ $t('btnProfile.product.rechargeAgreement') }}</span>
     </div>
     <span class="note">{{ $t('btnProfile.product.coinValidityNote') }}</span>
@@ -35,7 +37,9 @@
     <div class="payment-content">
       <span class="label">{{ $t('btnProfile.product.actualPayment') }}</span>
       <span class="amount">¥ {{ amount }}</span>
-      <n-button class="pay-button" type="primary" @click="handlePay">{{ $t('btnProfile.product.pay') }}</n-button>
+      <n-button class="pay-button" type="primary" @click="handlePay">{{
+        $t('btnProfile.product.pay')
+      }}</n-button>
     </div>
   </div>
   <n-modal
@@ -47,13 +51,15 @@
     :bordered="false"
   >
     <wechat :text="wechatText" />
-    <p class="code-hint">{{ $t('btnProfile.product.expireQrCode', [(
-      locale == 'en' 
-        ? 
-        orderStore.wechatExpireAt.replace('分', 'minutes').replace('秒', 'seconds')
-        : 
-        orderStore.wechatExpireAt
-    )]) }}</p>
+    <p class="code-hint">
+      {{
+        $t('btnProfile.product.expireQrCode', [
+          locale == 'en'
+            ? orderStore.wechatExpireAt.replace('分', 'minutes').replace('秒', 'seconds')
+            : orderStore.wechatExpireAt
+        ])
+      }}
+    </p>
     <div class="expire_at_layout" v-if="orderStore.wechatExpireAtStamp <= 0">
       <span class="refresh" @click="handlePay">
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">

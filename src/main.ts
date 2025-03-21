@@ -9,7 +9,6 @@ import { createI18n } from 'vue-i18n'
 import enMessages from './locales/en.json'
 import zhMessages from './locales/zh.json'
 
-
 // 创建i18n实例
 const i18n = createI18n({
   legacy: false,

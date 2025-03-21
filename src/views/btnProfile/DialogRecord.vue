@@ -34,13 +34,15 @@
     :bordered="false"
   >
     <wechat :text="wechatText" />
-    <p class="code-hint">{{ $t('btnProfile.record.expireQrCode', [(
-       locale == 'en' 
-        ? 
-        orderStore.wechatExpireAt.replace('分', 'minutes').replace('秒', 'seconds')
-        : 
-        orderStore.wechatExpireAt
-    )]) }}</p>
+    <p class="code-hint">
+      {{
+        $t('btnProfile.record.expireQrCode', [
+          locale == 'en'
+            ? orderStore.wechatExpireAt.replace('分', 'minutes').replace('秒', 'seconds')
+            : orderStore.wechatExpireAt
+        ])
+      }}
+    </p>
     <div class="expire_at_layout" v-if="orderStore.wechatExpireAtStamp <= 0">
       <span class="refresh" @click="toPay(tempOrderNo)">
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">

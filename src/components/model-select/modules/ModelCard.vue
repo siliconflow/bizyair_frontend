@@ -149,7 +149,10 @@
                   model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)
                 "
                 :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'"
-                >{{ tagsStore.getHighestOrderTag(model.tags)?.label || t('community.modelCard.tags.new') }}</span
+                >{{
+                  tagsStore.getHighestOrderTag(model.tags)?.label ||
+                  t('community.modelCard.tags.new')
+                }}</span
               >
               <h3 class="text-base text-white font-medium mb-2 truncate">
                 {{ sliceString(model.name, 24) }}

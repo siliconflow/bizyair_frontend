@@ -37,7 +37,7 @@
 
   // 计算工作流或节点的提示文本
   const actionTooltipText = computed(() => {
-    return props.model?.type === 'Workflow' 
+    return props.model?.type === 'Workflow'
       ? t('community.modelCard.tooltips.loadWorkflow')
       : t('community.modelCard.tooltips.addNode')
   })
@@ -172,7 +172,10 @@
                   model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)
                 "
                 :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'"
-                >{{ tagsStore.getHighestOrderTag(model.tags)?.label || t('community.modelCard.tags.new') }}</span
+                >{{
+                  tagsStore.getHighestOrderTag(model.tags)?.label ||
+                  t('community.modelCard.tags.new')
+                }}</span
               >
               <h3 class="text-base text-white font-medium mb-2 truncate">
                 {{ sliceString(model.name, 24) }}

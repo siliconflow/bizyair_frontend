@@ -186,9 +186,11 @@
       <PopoverTrigger class="bg-transparent">
         <Button
           variant="default"
-          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer group flex items-center "
+          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer group flex items-center"
         >
-          <span class="w-[60px] truncate">{{ getSortLabel(store[props.page].filterState.sort) }}</span>
+          <span class="w-[60px] truncate">{{
+            getSortLabel(store[props.page].filterState.sort)
+          }}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -290,9 +292,9 @@
       <PopoverTrigger class="bg-transparent">
         <Button
           variant="default"
-          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer flex items-center "
+          class="h-[44px] px-4 bg-[#222] border border-transparent hover:bg-[#222] hover:border hover:border-[#9CA3AF] cursor-pointer flex items-center"
         >
-           <svg
+          <svg
             width="16"
             height="14"
             viewBox="0 0 16 14"
@@ -307,11 +309,10 @@
             />
           </svg>
           <span>{{ t('community.filter.sort.title') }}</span>
-       
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent side="bottom" align="end" class="w-[200px]  p-0 bg-[#222] rounded-lg z-12000">
+      <PopoverContent side="bottom" align="end" class="w-[200px] p-0 bg-[#222] rounded-lg z-12000">
         <Command>
           <CommandList>
             <CommandGroup v-if="props.page !== 'quickStart' && props.page !== 'workflows'">

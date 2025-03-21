@@ -61,11 +61,17 @@
       <div class="balance">
         <n-tooltip placement="top-start" trigger="hover">
           <template #trigger>
-            <span class="num">{{ statusStore.userWallte.total_balance || 0 }}<span>{{ $t('btnProfile.userInfo.coin') }}</span></span>
+            <span class="num"
+              >{{ statusStore.userWallte.total_balance || 0
+              }}<span>{{ $t('btnProfile.userInfo.coin') }}</span></span
+            >
           </template>
-          {{ statusStore.userWallte.total_balance_amount || 0 }}<span>{{ $t('btnProfile.userInfo.coin') }}</span>
+          {{ statusStore.userWallte.total_balance_amount || 0
+          }}<span>{{ $t('btnProfile.userInfo.coin') }}</span>
         </n-tooltip>
-        <span class="btn" @click="orderStore.showProduct = true">{{ $t('btnProfile.userInfo.recharge') }}</span>
+        <span class="btn" @click="orderStore.showProduct = true">{{
+          $t('btnProfile.userInfo.recharge')
+        }}</span>
       </div>
       <div class="balance-detail-box">
         <div class="balance-detail">
@@ -84,7 +90,8 @@
                   statusStore.userWallte.gift_balance || 0
                 }}</span>
               </template>
-              {{ statusStore.userWallte.gift_balance_amount || 0 }}<span>{{ $t('btnProfile.userInfo.coin') }}</span>
+              {{ statusStore.userWallte.gift_balance_amount || 0
+              }}<span>{{ $t('btnProfile.userInfo.coin') }}</span>
             </n-tooltip>
           </div>
           <div>
@@ -101,7 +108,8 @@
                   statusStore.userWallte.charge_balance || 0
                 }}</span>
               </template>
-              {{ statusStore.userWallte.charge_balance_amount || 0 }}<span>{{ $t('btnProfile.userInfo.coin') }}</span>
+              {{ statusStore.userWallte.charge_balance_amount || 0
+              }}<span>{{ $t('btnProfile.userInfo.coin') }}</span>
             </n-tooltip>
           </div>
         </div>

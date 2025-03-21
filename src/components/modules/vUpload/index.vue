@@ -40,7 +40,9 @@
       />
     </div>
     <div v-if="disableUpload" class="pl-2">
-      <n-button type="primary" @click="interrupt()" v-if="!uploadSuccessful">{{ $t('vUpload.interrupt') }}</n-button>
+      <n-button type="primary" @click="interrupt()" v-if="!uploadSuccessful">{{
+        $t('vUpload.interrupt')
+      }}</n-button>
       <n-button type="primary" @click="cancel()" v-else>{{ $t('vUpload.cancel') }}</n-button>
     </div>
   </div>
@@ -58,7 +60,7 @@
   import { NButton } from 'naive-ui'
 
   const { t } = useI18n()
-  
+
   const props = defineProps({
     modelType: String,
     fileName: String,

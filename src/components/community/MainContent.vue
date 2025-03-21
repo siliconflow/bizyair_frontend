@@ -33,9 +33,10 @@
       const canvas = window.LGraphCanvas?.active_canvas
 
       if (loraLoaderNode && canvas) {
-        loraLoaderNode.title = model.type === 'LoRA' 
-          ? t('community.models.nodeTitle.lora')
-          : t('community.models.nodeTitle.controlnet')
+        loraLoaderNode.title =
+          model.type === 'LoRA'
+            ? t('community.models.nodeTitle.lora')
+            : t('community.models.nodeTitle.controlnet')
         loraLoaderNode.color = '#7C3AED'
 
         const widgetValues =

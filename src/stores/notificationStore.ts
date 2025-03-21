@@ -416,7 +416,7 @@ export const useNotificationStore = defineStore('notification', {
     },
     async loadUnreadCountWithError() {
       try {
-        const res = await get_message_unread_count();
+        const res = await get_message_unread_count()
         if (res?.data && res?.data.types && res?.data.counts) {
           this.officialNoticesUnReadCount = 0
           this.userLikeNoticesUnReadCount = 0
@@ -451,10 +451,10 @@ export const useNotificationStore = defineStore('notification', {
             this.userLikeNoticesUnReadCount +
             this.userForkNoticesUnReadCount
         }
-        return res;
+        return res
       } catch (error) {
-        console.error('loadUnreadCountWithError', error);
-        throw error; 
+        console.error('loadUnreadCountWithError', error)
+        throw error
       }
     },
 

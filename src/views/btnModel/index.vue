@@ -22,7 +22,9 @@
     @on-close="onDialogClose"
   >
     <template #title
-      ><span class="px-6 cursor-pointer" @click="handleToggleTitle">{{ t('publish.model.title') }}</span></template
+      ><span class="px-6 cursor-pointer" @click="handleToggleTitle">{{
+        t('publish.model.title')
+      }}</span></template
     >
     <div v-show="modelBox" class="px-6 pb-6">
       <v-item :label="t('publish.model.name.label')">
@@ -125,7 +127,9 @@
                   <Progress :model-value="e.progress" class="mt-4 h-3" />
                   <p class="text-center pt-2">
                     {{ e.progress }}% {{ t('publish.model.uploaded') }}
-                    <span v-if="e.speed" class="pl-2">{{ t('publish.model.speed') }}: {{ e.speed }}</span>
+                    <span v-if="e.speed" class="pl-2"
+                      >{{ t('publish.model.speed') }}: {{ e.speed }}</span
+                    >
                   </p>
                 </div>
                 <vUpload
@@ -149,8 +153,12 @@
       <div
         class="bg-[#353535] px-6 w-full h-14 rounded-tl-lg rounded-tr-lg custom-shadow border-t-[1px] flex justify-between items-center -mt-4"
       >
-        <Button variant="outline" class="" @click="addVersions">{{ t('publish.model.addVersion') }}</Button>
-        <Button :disabled="disabledPublish" @click="submit">{{ t('publish.model.publish') }}</Button>
+        <Button variant="outline" class="" @click="addVersions">{{
+          t('publish.model.addVersion')
+        }}</Button>
+        <Button :disabled="disabledPublish" @click="submit">{{
+          t('publish.model.publish')
+        }}</Button>
       </div>
     </template>
     <div v-if="showLayoutLoading" class="z-50 w-full h-full absolute left-0 top-0"></div>

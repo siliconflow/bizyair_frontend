@@ -1,5 +1,10 @@
 <template>
-  <btnMenu :show_cases="show_cases" :button-text="t('buttons.examples')" icon="book-open" :isJson="true">
+  <btnMenu
+    :show_cases="show_cases"
+    :button-text="t('buttons.examples')"
+    icon="book-open"
+    :isJson="true"
+  >
     <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24">
       <path
         fill="none"
@@ -18,7 +23,7 @@
   import { useI18n } from 'vue-i18n'
 
   const { t } = useI18n()
-  
+
   const show_cases = ref({})
   fetch('api/bizyair/showcases', { method: 'GET' })
     .then(response => response.json())

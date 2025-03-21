@@ -29,7 +29,9 @@
       />
       <p>
         {{ t('apiKeyDialog.login') }}
-        <a class="underline" href="###" @click.prevent="openOAuth">{{ t('apiKeyDialog.clickToLogin') }}</a>
+        <a class="underline" href="###" @click.prevent="openOAuth">{{
+          t('apiKeyDialog.clickToLogin')
+        }}</a>
         ,
       </p>
       <p>
@@ -41,11 +43,17 @@
       </p>
       <p>
         {{ t('apiKeyDialog.agreement') }}
-        <a class="underline" href="https://docs.siliconflow.cn/docs/user-agreement" target="_blank"
+        <a
+          class="underline"
+          href="https://docs.siliconflow.cn/docs/user-agreement"
+          target="_blank"
           >{{ t('apiKeyDialog.userAgreement') }}</a
         >
         {{ t('apiKeyDialog.and') }}
-        <a class="underline" href="https://docs.siliconflow.cn/docs/privacy-policy" target="_blank"
+        <a
+          class="underline"
+          href="https://docs.siliconflow.cn/docs/privacy-policy"
+          target="_blank"
           >{{ t('apiKeyDialog.privacyPolicy') }}</a
         >
       </p>

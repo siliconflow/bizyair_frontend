@@ -15,4 +15,4 @@ export const useLanguageStore = defineStore('language', () => {
     locale,
     setLocale
   }
-}) 
+})

@@ -48,12 +48,13 @@
         </n-tab>
       </n-tabs>
       <span class="filter-select-box">
-        <span>{{  t('btnProfile.coinsList.expiryTime') }}:</span>
+        <span>{{ t('btnProfile.coinsList.expiryTime') }}:</span>
         <n-select
           class="filter-select"
           :options="filterOptions"
           v-model:value="statusStore.coinsParam.expire_days"
-          @update:value="statusStore.get_coins" />
+          @update:value="statusStore.get_coins"
+        />
       </span>
     </div>
     <n-data-table
@@ -194,7 +195,7 @@
         margin-left: 4px;
       }
     }
-    .filter-select-box{
+    .filter-select-box {
       display: flex;
       align-items: center;
       span {

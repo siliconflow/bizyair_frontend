@@ -99,7 +99,7 @@
       "subtitle": "Get started quickly"
     },
     "workflows": {
-      "title": "Workflows", 
+      "title": "Workflows",
       "subtitle": "Browse all workflows",
       "loadWorkflow": {
         "success": "Workflow loaded successfully",
@@ -165,7 +165,7 @@
         "addNode": "Add Node",
         "downloaded": "Downloaded",
         "used": "Used",
-        "forked": "Forked", 
+        "forked": "Forked",
         "liked": "Liked"
       },
       "tags": {
@@ -425,4 +425,4 @@
       "profile": "Profile"
     }
   }
-} 
+}

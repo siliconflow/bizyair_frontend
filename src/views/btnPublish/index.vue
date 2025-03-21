@@ -1,5 +1,10 @@
 <template>
-  <btnMenu :show_cases="localizedShowCases" :buttonText="$t('buttons.publish')" icon="book-open" :isJson="true">
+  <btnMenu
+    :show_cases="localizedShowCases"
+    :buttonText="$t('buttons.publish')"
+    icon="book-open"
+    :isJson="true"
+  >
     <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 32 32">
       <path
         fill="#ddd"
@@ -17,7 +22,7 @@
   import { onMounted, computed } from 'vue'
   import { modelStore } from '@/stores/modelStatus'
   import { useI18n } from 'vue-i18n'
-  
+
   const modelStoreObject = modelStore()
   const { t } = useI18n()
 
