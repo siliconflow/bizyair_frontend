@@ -12,6 +12,7 @@ interface typePayListParms {
 export const useOrderStore = defineStore('userOrder', {
   state: () => ({
     showProduct: false,
+    showPayResult: false,
     products: [] as any[],
     payList: {} as any,
     payListParms: {
@@ -86,7 +87,12 @@ export const useOrderStore = defineStore('userOrder', {
           }
           this.showWechat = false
           if (res.data.status == 'success') {
-            useToaster.success('Payment Success')
+            // useToaster.success('Payment Success')
+            this.showPayResult = true
+            setTimeout(() => {
+              this.showPayResult = false
+              this.showProduct = false
+            }, 2000)
             if (fn) {
               fn()
             }
