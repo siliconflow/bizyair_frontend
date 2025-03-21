@@ -297,7 +297,7 @@
     align-items: center;
     margin-bottom: 20px;
     span {
-      width: 84px;
+      width: 90px;
     }
     .filter-select {
       width: 180px;

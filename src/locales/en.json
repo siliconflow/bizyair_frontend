@@ -336,12 +336,12 @@
       "lazyText": "This person is lazy and left nothing behind",
       "balance": "Balance",
       "coin": "Coins",
-      "recharge": "Recharge",
+      "recharge": "Purchase",
       "giftSilverCoin": "Silver",
       "rechargeCoin": "Gold",
       "switchApiKey": "Set API Key",
       "myWallet": "My Wallet",
-      "rechargeRecord": "Recharge Records"
+      "rechargeRecord": "Purchase"
     },
     "uploadInfo": {
       "nickname": "Nickname",
@@ -375,8 +375,8 @@
       "myBZCoins": "My BZ Coins"
     },
     "record": {
-      "rechargeRecord": "Recharge Records",
-      "bzCoinRecharge": "BZ Coin Recharge",
+      "rechargeRecord": "Purchase",
+      "bzCoinRecharge": "Purchase BZ Coin",
       "orderStatus": "Order Status",
       "selectOrder": "Select Order",
       "orderNumber": "Order Number",
