@@ -26,7 +26,7 @@
         ref="formRef"
         :model="statusStore.usersMetadata"
         label-placement="left"
-        :label-width="locale === 'en' ? '110px' : '80px'"
+        :label-width="locale === 'en' ? '120px' : '80px'"
         :rules="rules"
       >
         <n-form-item :label="$t('btnProfile.uploadInfo.nickname')" path="name">
