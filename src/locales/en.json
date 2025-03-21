@@ -416,7 +416,8 @@
       "agreementWarning": "Please agree to the recharge agreement first",
       "wechatPay": "WeChat Pay",
       "expireQrCode": "QR code will expire after {0}",
-      "qrCodeExpired": "QR code has expired, please click to refresh"
+      "qrCodeExpired": "QR code has expired, please click to refresh",
+      "paySuccess": "Payment Success"
     },
     "avatar": {
       "avatar": "Avatar"

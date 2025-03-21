@@ -72,9 +72,12 @@
       <p>{{ $t('btnProfile.product.qrCodeExpired') }}</p>
     </div>
   </n-modal>
+  <n-modal v-model:show="orderStore.showPayResult">
+    <n-result status="success" :description="$t('btnProfile.product.paySuccess')" />
+  </n-modal>
 </template>
 <script setup lang="ts">
-  import { NCheckbox, NButton, NModal } from 'naive-ui'
+  import { NCheckbox, NButton, NModal, NResult } from 'naive-ui'
   import { useOrderStore } from '@/stores/orderStore'
   import { useStatusStore } from '@/stores/userStatus'
   import { onMounted, onUnmounted, ref } from 'vue'
