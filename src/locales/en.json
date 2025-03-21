@@ -330,5 +330,92 @@
     "cancelButton": "Cancel",
     "uploadImage": "Upload Image",
     "loading": "Loading"
+  },
+  "btnProfile": {
+    "userInfo": {
+      "lazyText": "This person is lazy and left nothing behind",
+      "balance": "Balance",
+      "coin": "Coins",
+      "recharge": "Recharge",
+      "giftSilverCoin": "Gift Silver Coins",
+      "rechargeCoin": "Recharge Gold Coins",
+      "switchApiKey": "Switch API Key",
+      "myWallet": "My Wallet",
+      "rechargeRecord": "Recharge Records"
+    },
+    "uploadInfo": {
+      "nickname": "Nickname",
+      "signature": "Signature",
+      "nameValidation": "Please enter a name",
+      "realNameAuth": "Real Name Authentication",
+      "authenticated": "Authenticated",
+      "authenticate": "Authenticate",
+      "authFailed": "Authentication Failed",
+      "needAuthOnSiliconflow": "Need to authenticate on siliconflow",
+      "goTo": "Go to",
+      "cancel": "Cancel",
+      "completed": "I have completed authentication",
+      "retry": "Retry",
+      "confirm": "Confirm"
+    },
+    "coinsList": {
+      "viewExpiring": "View your expiring BZ coins list and filter the view.",
+      "expiringGoldTotal": "Expiring Gold Coins Total",
+      "expiringSilverTotal": "Expiring Silver Coins Total",
+      "all": "All",
+      "silverCoin": "Silver Coins",
+      "goldCoin": "Gold Coins",
+      "amount": "Amount",
+      "expiryTime": "Expiry Time",
+      "inOneDay": "In 1 Day",
+      "inSevenDays": "In 7 Days",
+      "inFifteenDays": "In 15 Days",
+      "inThirtyDays": "In 30 Days",
+      "inOneYear": "In 1 Year",
+      "myBZCoins": "My BZ Coins"
+    },
+    "record": {
+      "rechargeRecord": "Recharge Records",
+      "bzCoinRecharge": "BZ Coin Recharge",
+      "orderStatus": "Order Status",
+      "selectOrder": "Select Order",
+      "orderNumber": "Order Number",
+      "productName": "Product Name",
+      "transactionTime": "Transaction Time",
+      "transactionAmount": "Transaction Amount",
+      "status": "Status",
+      "operations": "Operations",
+      "pay": "Pay",
+      "unknown": "Unknown",
+      "wechatPay": "WeChat Pay",
+      "expireQrCode": "QR code will expire after {0}",
+      "qrCodeExpired": "QR code has expired, please click to refresh",
+      "all": "All",
+      "paySuccess": "Payment Success",
+      "notPaid": "Not Paid",
+      "refund": "Refund",
+      "refundProcessing": "Refund Processing",
+      "refundSuccess": "Refund Success",
+      "refundClosed": "Refund Closed",
+      "refundAbnormal": "Refund Abnormal"
+    },
+    "product": {
+      "coin": "Coins",
+      "confirmAgreement": "By confirming payment, you agree to the platform's",
+      "rechargeAgreement": "「Recharge Agreement」",
+      "coinValidityNote": "Note: Gold coins are valid for 1 year",
+      "actualPayment": "Actual Payment",
+      "pay": "Pay",
+      "agreementWarning": "Please agree to the recharge agreement first",
+      "wechatPay": "WeChat Pay",
+      "expireQrCode": "QR code will expire after {0}",
+      "qrCodeExpired": "QR code has expired, please click to refresh"
+    },
+    "avatar": {
+      "avatar": "Avatar"
+    },
+    "index": {
+      "profile": "Profile"
+    }
   }
 } 

@@ -330,5 +330,92 @@
     "cancelButton": "取消",
     "uploadImage": "上传封面",
     "loading": "加载中"
+  },
+  "btnProfile": {
+    "userInfo": {
+      "lazyText": "这家伙很懒，什么也没留下",
+      "balance": "余额",
+      "coin": "币",
+      "recharge": "充值",
+      "giftSilverCoin": "赠送银币",
+      "rechargeCoin": "充值金币",
+      "switchApiKey": "切换 API 密钥",
+      "myWallet": "我的钱包",
+      "rechargeRecord": "充值记录"
+    },
+    "uploadInfo": {
+      "nickname": "昵称",
+      "signature": "个性签名",
+      "nameValidation": "请输入名称",
+      "realNameAuth": "实名认证",
+      "authenticated": "已认证",
+      "authenticate": "去认证",
+      "authFailed": "认证失败",
+      "needAuthOnSiliconflow": "需要去siliconflow进行认证",
+      "goTo": "前往",
+      "cancel": "取消",
+      "completed": "我已完成认证",
+      "retry": "重试",
+      "confirm": "确认"
+    },
+    "coinsList": {
+      "viewExpiring": "查看您即将过期的BZ币列表，并进行筛选查看。",
+      "expiringGoldTotal": "即过期的金币总额",
+      "expiringSilverTotal": "即过期的银币总额",
+      "all": "全部",
+      "silverCoin": "银币",
+      "goldCoin": "金币",
+      "amount": "数额",
+      "expiryTime": "过期时间",
+      "inOneDay": "1天内",
+      "inSevenDays": "7天内",
+      "inFifteenDays": "15天内",
+      "inThirtyDays": "30天内",
+      "inOneYear": "1年内",
+      "myBZCoins": "我的 BZ 币"
+    },
+    "record": {
+      "rechargeRecord": "充值记录",
+      "bzCoinRecharge": "Bz币充值",
+      "orderStatus": "订单状态",
+      "selectOrder": "选择订单",
+      "orderNumber": "订单编号",
+      "productName": "商品名称",
+      "transactionTime": "交易时间",
+      "transactionAmount": "交易金额",
+      "status": "订单状态",
+      "operations": "操作",
+      "pay": "支付",
+      "unknown": "未知",
+      "wechatPay": "微信支付",
+      "expireQrCode": "二维码将于{0}后过期",
+      "qrCodeExpired": "二维码已过期，请点击刷新",
+      "all": "全部",
+      "paySuccess": "支付成功",
+      "notPaid": "未支付",
+      "refund": "转入退款",
+      "refundProcessing": "退款处理中",
+      "refundSuccess": "退款成功",
+      "refundClosed": "退款关闭",
+      "refundAbnormal": "退款异常"
+    },
+    "product": {
+      "coin": "币",
+      "confirmAgreement": "确认支付即代表同意本平台",
+      "rechargeAgreement": "「充值协议」",
+      "coinValidityNote": "注：金币有效期为 1 年",
+      "actualPayment": "实付款",
+      "pay": "支付",
+      "agreementWarning": "请先同意充值协议",
+      "wechatPay": "微信支付",
+      "expireQrCode": "二维码将于{0}后过期",
+      "qrCodeExpired": "二维码已过期，请点击刷新"
+    },
+    "avatar": {
+      "avatar": "头像"
+    },
+    "index": {
+      "profile": "个人资料"
+    }
   }
 } 

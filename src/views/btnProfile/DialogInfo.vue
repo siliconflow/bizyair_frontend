@@ -13,7 +13,7 @@
       <div class="info" @click="toUploadInfo">
         <p class="user-name">{{ statusStore.usersMetadata.name }}</p>
         <p class="user-title">
-          {{ statusStore.usersMetadata.introduction || '这家伙很懒，什么也没留下' }}
+          {{ statusStore.usersMetadata.introduction || $t('btnProfile.userInfo.lazyText') }}
         </p>
         <p class="user-title" @click.stop="copyID">
           ID: <span>{{ statusStore.usersMetadata.id }}</span>
@@ -56,16 +56,16 @@
           class="coin-icon"
           src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp"
         />
-        <span>余额</span>
+        <span>{{ $t('btnProfile.userInfo.balance') }}</span>
       </div>
       <div class="balance">
         <n-tooltip placement="top-start" trigger="hover">
           <template #trigger>
-            <span class="num">{{ statusStore.userWallte.total_balance || 0 }}<span>币</span></span>
+            <span class="num">{{ statusStore.userWallte.total_balance || 0 }}<span>{{ $t('btnProfile.userInfo.coin') }}</span></span>
           </template>
-          {{ statusStore.userWallte.total_balance_amount || 0 }}<span>币</span>
+          {{ statusStore.userWallte.total_balance_amount || 0 }}<span>{{ $t('btnProfile.userInfo.coin') }}</span>
         </n-tooltip>
-        <span class="btn" @click="orderStore.showProduct = true">充值</span>
+        <span class="btn" @click="orderStore.showProduct = true">{{ $t('btnProfile.userInfo.recharge') }}</span>
       </div>
       <div class="balance-detail-box">
         <div class="balance-detail">
@@ -75,7 +75,7 @@
                 class="coin-icon"
                 src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/FLrDPYmbuUnXSygQF1iePicnQwbPSWXD.webp"
               />
-              赠送银币
+              {{ $t('btnProfile.userInfo.giftSilverCoin') }}
               <!-- gift_today_expired 银币今天是否有过期的 -->
             </span>
             <n-tooltip placement="top-start" trigger="hover">
@@ -84,7 +84,7 @@
                   statusStore.userWallte.gift_balance || 0
                 }}</span>
               </template>
-              {{ statusStore.userWallte.gift_balance_amount || 0 }}<span>币</span>
+              {{ statusStore.userWallte.gift_balance_amount || 0 }}<span>{{ $t('btnProfile.userInfo.coin') }}</span>
             </n-tooltip>
           </div>
           <div>
@@ -93,7 +93,7 @@
                 class="coin-icon"
                 src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/AdLFMb6DyYnpsJArdSpbPz8P7SzMFw3u.webp"
               />
-              充值金币
+              {{ $t('btnProfile.userInfo.rechargeCoin') }}
             </span>
             <n-tooltip placement="top-start" trigger="hover">
               <template #trigger>
@@ -101,7 +101,7 @@
                   statusStore.userWallte.charge_balance || 0
                 }}</span>
               </template>
-              {{ statusStore.userWallte.charge_balance_amount || 0 }}<span>币</span>
+              {{ statusStore.userWallte.charge_balance_amount || 0 }}<span>{{ $t('btnProfile.userInfo.coin') }}</span>
             </n-tooltip>
           </div>
         </div>
@@ -125,7 +125,7 @@
             </g>
           </svg>
         </span>
-        <span class="word">切换 API 密钥</span>
+        <span class="word">{{ $t('btnProfile.userInfo.switchApiKey') }}</span>
       </div>
       <div class="handles-item" @click="toAllCoinList('all')">
         <span class="icon">
@@ -142,7 +142,7 @@
             </g>
           </svg>
         </span>
-        <span class="word">我的钱包</span>
+        <span class="word">{{ $t('btnProfile.userInfo.myWallet') }}</span>
       </div>
       <div class="handles-item" @click="statusStore.showRecordDialog = true">
         <span class="icon">
@@ -157,7 +157,7 @@
             />
           </svg>
         </span>
-        <span class="word">充值记录</span>
+        <span class="word">{{ $t('btnProfile.userInfo.rechargeRecord') }}</span>
       </div>
     </div>
   </n-modal>
@@ -166,7 +166,9 @@
   import { NModal, NTooltip } from 'naive-ui'
   import { useStatusStore } from '@/stores/userStatus'
   import { useOrderStore } from '@/stores/orderStore'
+  import { useI18n } from 'vue-i18n'
 
+  useI18n()
   const statusStore = useStatusStore()
   const orderStore = useOrderStore()
   const toUploadInfo = () => {
