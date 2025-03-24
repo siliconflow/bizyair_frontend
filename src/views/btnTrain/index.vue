@@ -24,7 +24,6 @@
   // import { useDatasetStore } from '@/stores/datasetStore'
   // const datasetStore = useDatasetStore()
 
-
   const { locale } = useI18n()
   const show_cases = ref<Record<string, () => void>>({
     // Datasets: () => {
@@ -44,11 +43,11 @@
       }
     } else {
       show_cases.value = {
-        '敬请期待': () => void 0
+        敬请期待: () => void 0
       }
     }
   })
-  watch(locale, (newVal) => {
+  watch(locale, newVal => {
     console.log('locale:', newVal)
     if (newVal == 'en') {
       show_cases.value = {
@@ -56,7 +55,7 @@
       }
     } else {
       show_cases.value = {
-        '敬请期待': () => void 0
+        敬请期待: () => void 0
       }
     }
   })
