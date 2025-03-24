@@ -19,11 +19,13 @@
   import btnMenu from '@/components/modules/btnMenu.vue'
   import dialogList from './dataset/dialogList.vue'
   import dialogUpload from './dataset/dialogUpload.vue'
-  import { onMounted, ref } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   // import { useDatasetStore } from '@/stores/datasetStore'
   // const datasetStore = useDatasetStore()
 
-  const show_cases = ref({
+  const { locale } = useI18n()
+  const show_cases = ref<Record<string, () => void>>({
     // Datasets: () => {
     //   datasetStore.setListDialog(true)
     // }
@@ -33,6 +35,29 @@
     'Coming soon': () => void 0
   })
 
-  onMounted(() => {})
+  onMounted(() => {
+    console.log('locale:', locale.value)
+    if (locale.value == 'en') {
+      show_cases.value = {
+        'Coming soon': () => void 0
+      }
+    } else {
+      show_cases.value = {
+        敬请期待: () => void 0
+      }
+    }
+  })
+  watch(locale, newVal => {
+    console.log('locale:', newVal)
+    if (newVal == 'en') {
+      show_cases.value = {
+        'Coming soon': () => void 0
+      }
+    } else {
+      show_cases.value = {
+        敬请期待: () => void 0
+      }
+    }
+  })
 </script>
 <style scoped></style>
