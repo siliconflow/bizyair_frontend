@@ -398,7 +398,7 @@
       "refundSuccess": "Refund Success",
       "refundClosed": "Refund Closed",
       "refundAbnormal": "Refund Abnormal",
-      "refundOrder": "Refund",
+      "refundOrder": "Cancel",
       "minute": "Minutes",
       "second": "Seconds",
       "orderCreationFailed": "Order creation failed",

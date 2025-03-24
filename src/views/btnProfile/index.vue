@@ -41,7 +41,7 @@
     <n-modal
       v-model:show="statusStore.showRecordDialog"
       preset="card"
-      style="width: 960px"
+      style="width: 1048px"
       :title="$t('btnProfile.record.rechargeRecord')"
       content-style="padding: 0 32px 20px 32px;"
       :mask-closable="false"
