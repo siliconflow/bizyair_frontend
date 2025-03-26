@@ -341,7 +341,20 @@
       "rechargeCoin": "Gold",
       "switchApiKey": "Set API Key",
       "myWallet": "My Wallet",
-      "rechargeRecord": "Purchase"
+      "rechargeRecord": "Purchase",
+      "consumptionBill": "Consumption Bill"
+    },
+    "consumptionBill": {
+      "title": "Consumption Bill",
+      "enterApiKey": "Please enter API Key",
+      "search": "Search",
+      "billingPeriod": "Billing Period",
+      "totalAmount": "Total Amount",
+      "goldCoinDeduction": "Gold Coin Deduction",
+      "silverCoinDeduction": "Silver Coin Deduction",
+      "success": "Success",
+      "failed": "Failed",
+      "pending": "Pending"
     },
     "uploadInfo": {
       "nickname": "Nickname",

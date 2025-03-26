@@ -341,7 +341,8 @@
       "rechargeCoin": "充值金币",
       "switchApiKey": "切换 API 密钥",
       "myWallet": "我的钱包",
-      "rechargeRecord": "充值记录"
+      "rechargeRecord": "充值记录",
+      "consumptionBill": "消费账单"
     },
     "uploadInfo": {
       "nickname": "昵称",
@@ -424,6 +425,18 @@
     },
     "index": {
       "profile": "个人资料"
+    },
+    "consumptionBill": {
+      "title": "消费账单",
+      "enterApiKey": "请输入API Key",
+      "search": "搜索",
+      "billingPeriod": "账期",
+      "totalAmount": "消费总额",
+      "goldCoinDeduction": "金币抵扣",
+      "silverCoinDeduction": "银币抵扣",
+      "success": "成功",
+      "failed": "失败",
+      "pending": "处理中"
     }
   }
 }

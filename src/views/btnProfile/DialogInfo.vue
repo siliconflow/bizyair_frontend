@@ -167,6 +167,23 @@
         </span>
         <span class="word">{{ $t('btnProfile.userInfo.rechargeRecord') }}</span>
       </div>
+      <div class="handles-item" @click="statusStore.showConsumptionBillDialog = true">
+        <span class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+            <g
+              fill="none"
+              stroke="#CBD5E1"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+            >
+              <path d="M3 3h18v18H3z" />
+              <path d="M7 7h10M7 11h10M7 15h10" />
+            </g>
+          </svg>
+        </span>
+        <span class="word">{{ $t('btnProfile.userInfo.consumptionBill') }}</span>
+      </div>
     </div>
   </n-modal>
 </template>
@@ -388,8 +405,12 @@
   .handles {
     display: flex;
     padding-top: 24px;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
     .handles-item {
+      width: 33.33%;
+      box-sizing: border-box;
       padding: 6px;
       cursor: pointer;
       transition: all 0.3s;
@@ -407,6 +428,8 @@
       display: block;
       width: 100%;
       text-align: center;
+      font-size: 12px;
+      // margin-top: 4px;
     }
   }
 </style>

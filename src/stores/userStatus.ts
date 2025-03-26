@@ -64,6 +64,7 @@ export const useStatusStore = defineStore('userStatus', {
     showInfoDialog: false,
     showUploadInfoDialog: false,
     showUploadAvatarDialog: false,
+    showConsumptionBillDialog: false,
     showPropertyDialog: false,
     showRecordDialog: false,
     userAvatar:
