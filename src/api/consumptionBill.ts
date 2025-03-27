@@ -22,12 +22,11 @@ export interface BillItem {
 }
 
 //查询年度消费账单
-export function get_year_cost(params: ConsumptionBillParams) {
+export function get_year_cost(params: any) {
     console.log(params,'params');
     
-  return customFetch('/bizyair/invoices/year_cost', {
-    method: 'GET',
-    params
+  return customFetch(`/bizyair/invoices/year_cost?${new URLSearchParams(params).toString()}`, {
+    method: 'GET'
   })
 }
 

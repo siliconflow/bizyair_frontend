@@ -105,9 +105,10 @@
 <script setup lang="ts">
 import { ref, computed, h, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NModal, NDataTable, NPagination, NInput, NButton, NTabs, NTabPane, NSelect, useMessage } from 'naive-ui'
+import { NModal, NDataTable, NPagination, NInput, NButton, NSelect } from 'naive-ui'
+// import { NModal, NDataTable, NPagination, NInput, NButton, NTabs, NTabPane, NSelect, useMessage } from 'naive-ui'
 import { useStatusStore } from '@/stores/userStatus'
-import { get_year_cost, get_month_cost, get_day_cost, get_recent_consumption, type BillItem, type ConsumptionBillParams } from '@/api/consumptionBill'
+import { get_year_cost, get_month_cost, get_day_cost, get_recent_consumption } from '@/api/consumptionBill'
 
 const { t } = useI18n()
 const statusStore = useStatusStore()
