@@ -438,5 +438,133 @@
     "index": {
       "profile": "Profile"
     }
+  },
+  "purchaseDoc": {
+    "title": "BizyAir Recharge Service Agreement",
+    "service": {
+      "title": "I. Service Definition",
+      "platform": "BizyAir platform (hereinafter referred to as 'platform') authorizes users to use platform functions including but not limited to BizyAir node services and task execution by providing 'BZ Coins' virtual products.",
+      "types": "BZ Coins are divided into two categories:",
+      "gold": "Gold Coins: BZ coins directly purchased by users through recharge, with validity period and limited refund rights;",
+      "silver": "Silver Coins: BZ coins given by the platform through activities, membership benefits, etc., with validity period and non-refundable or withdrawable."
+    },
+    "rules": {
+      "title": "II. BZ Coin Rules",
+      "acquisition": {
+        "title": "1. Acquisition and Usage",
+        "methods": "Users can purchase gold coins through recharge, or obtain silver coins through platform activities, membership, etc.",
+        "usage": "BZ coins can only be used for designated platform services (such as node resource consumption, task execution, etc.), and cannot be transferred, traded or exchanged for cash."
+      },
+      "validity": {
+        "title": "2. Validity Period and Refund",
+        "table": {
+          "type": "Type",
+          "validPeriod": "Validity Period",
+          "refundRule": "Refund Rule",
+          "gold": {
+            "period": "1 year (from recharge date)",
+            "rule": "Can apply for refund based on remaining ratio within 180 days after recharge (handling fee required)"
+          },
+          "silver": {
+            "period": "According to activity rules",
+            "rule": "Non-refundable, non-withdrawable"
+          }
+        }
+      },
+      "billing": {
+        "title": "3. Billing Rules",
+        "nodeTypes": {
+          "title": "3.1 Node Classification Billing",
+          "desc": "The platform implements differentiated billing strategies for various nodes, specifically divided into two categories:",
+          "goldOnly": "Gold Coin Only Nodes: Only accept gold coin payments (node details page will clearly state 'Gold Coins Only');",
+          "mixed": "Mixed Payment Nodes: Support both gold and silver coin payments (default deduction follows the 'Silver Coins First' principle)."
+        },
+        "execution": {
+          "title": "3.2 Billing Execution Rules",
+          "rule1": "For mixed payment nodes, the system prioritizes deducting silver coins, automatically deducting gold coins when silver coin balance is insufficient;",
+          "rule2": "For gold coin only nodes, only gold coin balance is deducted;",
+          "rule3": "If the corresponding coin balance is insufficient, the system will immediately suspend the node service and push a balance warning notification."
+        },
+        "special": {
+          "title": "3.3 Special Notes",
+          "desc": "Node types and billing methods may change due to operational adjustments. Actual billing rules are subject to the node details page at the time of service use."
+        }
+      }
+    },
+    "userRights": {
+      "title": "III. User Rights and Obligations",
+      "recharge": {
+        "title": "Recharge Confirmation",
+        "content": "After successful recharge, users can check BZ coin balance and validity period in their account."
+      },
+      "refund": {
+        "title": "Refund Application",
+        "content": "Gold coin refunds must be applied through platform customer service, refund amount calculated based on remaining validity period ratio (handling fee details as announced on platform)."
+      },
+      "restriction": {
+        "title": "Usage Restrictions",
+        "content": "Obtaining BZ coins through unofficial channels or exploiting system vulnerabilities for profit is prohibited. Violators' accounts may be frozen and held accountable."
+      }
+    },
+    "platformRights": {
+      "title": "IV. Platform Rights and Obligations",
+      "service": {
+        "title": "Service Adjustments",
+        "content": "The platform reserves the right to adjust BZ coin rules, pricing, or service content due to operational or policy reasons, with notification via announcements/in-site messages."
+      },
+      "abnormal": {
+        "title": "Abnormal Handling",
+        "content": "If account abnormalities are detected (such as malicious coin farming), the platform may suspend services and recover illegal gains."
+      },
+      "disclaimer": {
+        "title": "Disclaimer",
+        "content": "The platform is not liable for losses caused by force majeure or user violations."
+      }
+    },
+    "userBehavior": {
+      "title": "V. User Behavior Standards and Breach Liability",
+      "prohibited": {
+        "title": "1. Prohibited Conduct",
+        "desc": "Users must strictly comply with the following conduct guidelines when using BizyAir platform services:",
+        "item1": "Strictly prohibited to modify platform service content, service period, transaction amount, or consumption records through any technical means.",
+        "item2": "Prohibited to provide account or service privileges to third parties through any platform-unauthorized means (including but not limited to lending, renting, selling, sharing, etc.).",
+        "item3": "Strictly prohibited to crack, tamper with, reverse engineer, or perform other destructive operations on the platform's security protection system.",
+        "item4": "Without platform written authorization, service content may not be displayed or distributed in any public venue (online or offline) (except for fair use cases).",
+        "item5": "Must not engage in any behavior that violates laws, regulations, this agreement, or infringes upon the legitimate rights of the platform and third parties."
+      },
+      "breach": {
+        "title": "2. Breach Handling Measures",
+        "desc": "If users violate this agreement or relevant laws and regulations, BizyAir platform has the right to take the following measures based on severity:",
+        "item1": "Handle according to special provisions in this agreement.",
+        "item2": "Take necessary technical measures to stop violations, including but not limited to deleting violating content, restricting account functions, or suspending service access.",
+        "item3": "Unilaterally terminate part or all services, with paid fees non-refundable and users having no right to claim any form of compensation."
+      }
+    },
+    "other": {
+      "title": "VI. Other Terms",
+      "agreement": {
+        "title": "Agreement Changes",
+        "content": "Continued use of services after agreement revision is deemed acceptance of new terms."
+      },
+      "dispute": {
+        "title": "Dispute Resolution",
+        "content": "Disputes should be resolved through negotiation; if unsuccessful, submit to the court where the platform is located."
+      }
+    },
+    "keyPoints": {
+      "title": "Appendix: Key Terms Explanation",
+      "refund": {
+        "title": "Refund Example",
+        "content": "If a user recharges 100 gold coins and uses 30% before requesting a refund, within 180 days of order effectiveness, they can receive the amount corresponding to the remaining 70 gold coins (minus handling fee); beyond 180 days, no refund is available."
+      },
+      "goldExpire": {
+        "title": "Gold Coin Expiration",
+        "content": "Unused gold coins will automatically expire and cannot be recovered after the validity period."
+      },
+      "silverExpire": {
+        "title": "Silver Coin Expiration",
+        "content": "Unused silver coins will automatically expire and cannot be recovered after the validity period."
+      }
+    }
   }
 }

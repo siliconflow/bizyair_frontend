@@ -22,6 +22,7 @@ export const useOrderStore = defineStore('userOrder', {
     wechatExpireAt: '',
     wechatExpireAtStamp: 0,
     showWechat: false,
+    showPurchaseDoc: false,
     iTimer: null as ReturnType<typeof setInterval> | null,
     timerStatus: null as ReturnType<typeof setInterval> | null
   }),
