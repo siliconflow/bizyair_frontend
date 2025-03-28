@@ -36,6 +36,33 @@ export const formatNumber = (num: number | undefined) => {
   return (num / 10000).toFixed(1) + 'w'
 }
 
+/**
+ * 将金额转换为合适的字符串表示
+ * @param amount 金额数值
+ * @returns 格式化后的字符串，例如：0=>0, 300=>300, 1200=>1200, 10001=>1w
+ */
+export const formatCoinAmount = (amount: number): string => {
+  if (amount === 0) {
+    return '0'
+  }
+  
+  // 处理万级别
+  if (amount >= 10000) {
+    const w = amount / 10000.0
+    // 使用 Math.floor 来处理小数位，避免四舍五入
+    const intPart = parseInt(w.toString())
+    const decimalPart = parseInt((w - intPart).toString())
+    
+    if (decimalPart === 0) {
+      return `${intPart}w`
+    }
+    return `${(intPart + decimalPart).toFixed(1)}w`
+  }
+  
+  // 小于10000直接返回数字
+  return `${amount}`
+}
+
 export const formatSize = (size: number | undefined) => {
   if (!size) {
     return '-'

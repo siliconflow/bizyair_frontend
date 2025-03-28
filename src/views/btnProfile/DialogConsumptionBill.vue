@@ -9,62 +9,58 @@
   >
     <template #header>{{ $t('btnProfile.consumptionBill.title') }}</template>
 
-    <div class="condition-container">
-      <span>API Key：</span>
-      <n-input
-        v-model:value="queryParams.apiKey"
-        class="filter-input"
-        :placeholder="$t('btnProfile.consumptionBill.enterApiKey')"
-        @keydown.enter="handleSearch"
-      />
-      <n-button type="primary" class="search-btn" @click="handleSearch">
-        {{ $t('btnProfile.consumptionBill.search') }}
-      </n-button>
-    </div>
-
-    <div class="tabs-container">
-      <div
-        class="tab-item"
-        :class="{ active: activeTab === 'yearly' }"
-        @click="activeTab = 'yearly'"
-      >
-        {{ $t('btnProfile.consumptionBill.yearlyBill') }}
-      </div>
-      <div
-        class="tab-item"
-        :class="{ active: activeTab === 'recent' }"
-        @click="activeTab = 'recent'"
-      >
-        {{ $t('btnProfile.consumptionBill.recentConsumption') }}
-      </div>
-    </div>
+    <n-tabs
+      class="filter-tab"
+      type="segment"
+      animated
+      v-model:value="activeTab"
+    >
+      <n-tab name="yearly">{{ $t('btnProfile.consumptionBill.yearlyBill') }}</n-tab>
+      <n-tab name="recent">{{ $t('btnProfile.consumptionBill.recentConsumption') }}</n-tab>
+    </n-tabs>
 
     <template v-if="activeTab === 'yearly'">
       <div class="tab-header">
         <div class="tab-title-wrapper">
-          <template v-if="currentBillLevel === 'yearly'">
-            <span class="tab-title">{{ $t('btnProfile.consumptionBill.yearlyBill') }}</span>
-          </template>
-          <template v-else-if="currentBillLevel === 'monthly'">
-            <span class="back-link" @click="backToYearly">
-              <span class="back-text">{{ $t('btnProfile.consumptionBill.back') }}</span>
-            </span>
-            <span class="tab-title">{{ selectedYear }} {{ $t('btnProfile.consumptionBill.monthlyBill') }}</span>
-          </template>
-          <template v-else-if="currentBillLevel === 'daily'">
-            <span class="back-link" @click="backToMonthly">
-              <span class="back-text">{{ $t('btnProfile.consumptionBill.back') }}</span>
-            </span>
-            <span class="tab-title">{{ selectedMonth }} {{ $t('btnProfile.consumptionBill.dailyBill') }}</span>
-          </template>
+          <n-breadcrumb>
+            <n-breadcrumb-item @click="backToYearly">
+              {{ $t('btnProfile.consumptionBill.yearlyBill') }}
+            </n-breadcrumb-item>
+            <n-breadcrumb-item v-if="currentBillLevel === 'monthly' || currentBillLevel === 'daily'" @click="backToMonthly">
+              {{ selectedMonth }} {{ $t('btnProfile.consumptionBill.monthlyBill') }}
+            </n-breadcrumb-item>
+            <n-breadcrumb-item v-if="currentBillLevel === 'daily'" @click="backToDaily">
+              {{ selectedDay }} {{ $t('btnProfile.consumptionBill.dailyBill') }}
+            </n-breadcrumb-item>
+          </n-breadcrumb>
         </div>
-        <n-select
-          v-if="currentBillLevel === 'yearly'"
-          class="year-select"
-          v-model:value="selectedYear"
-          :options="yearOptions"
-          size="small"
-        />
+        <div class="header-right">
+          <n-select
+            v-if="currentBillLevel === 'yearly'"
+            class="year-select"
+            v-model:value="selectedYear"
+            :options="yearOptions"
+            size="small"
+          />
+          <n-popover trigger="click" placement="bottom-end">
+            <template #trigger>
+              <n-button size="small" type="primary" ghost>
+                选择API Key
+              </n-button>
+            </template>
+            <div class="api-key-popover">
+              <n-input
+                v-model:value="queryParams.apiKey"
+                class="filter-input"
+                :placeholder="$t('btnProfile.consumptionBill.enterApiKey')"
+                @keydown.enter="handleSearch"
+              />
+              <n-button type="primary" size="small" @click="handleSearch">
+                {{ $t('btnProfile.consumptionBill.search') }}
+              </n-button>
+            </div>
+          </n-popover>
+        </div>
       </div>
       <n-data-table
         :columns="currentColumns"
@@ -76,7 +72,7 @@
       />
     </template>
 
-    <template v-else-if="activeTab === 'recent'">
+    <template v-if="activeTab === 'recent'">
       <div class="tab-header">
         <div class="tab-title-wrapper">
           <span class="tab-title">{{ $t('btnProfile.consumptionBill.recentBillDetails') }}</span>
@@ -105,10 +101,10 @@
 <script setup lang="ts">
 import { ref, computed, h, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NModal, NDataTable, NPagination, NInput, NButton, NSelect } from 'naive-ui'
-// import { NModal, NDataTable, NPagination, NInput, NButton, NTabs, NTabPane, NSelect, useMessage } from 'naive-ui'
+import { NModal, NDataTable, NPagination, NInput, NButton, NSelect, NTooltip, NPopover, NBreadcrumb, NBreadcrumbItem, NTabs, NTab } from 'naive-ui'
 import { useStatusStore } from '@/stores/userStatus'
 import { get_year_cost, get_month_cost, get_day_cost, get_recent_consumption } from '@/api/consumptionBill'
+import { formatCoinAmount } from '@/utils/tool'
 
 const { t } = useI18n()
 const statusStore = useStatusStore()
@@ -187,18 +183,45 @@ const yearlyColumns = [
             },
             src: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp'
           }),
-          total
+          h(
+            NTooltip,
+            { trigger: 'hover', placement: 'top' },
+            {
+              default: () => `${total}`,
+              trigger: () => formatCoinAmount(total)
+            }
+          )
         ]
       )
     }
   },
   {
     title: t('btnProfile.consumptionBill.goldCoinDeduction'),
-    key: 'charge_amount'
+    key: 'charge_amount',
+    render(row: any) {
+      return h(
+        NTooltip,
+        { trigger: 'hover', placement: 'top' },
+        {
+          default: () => `${row.charge_amount || 0}`,
+          trigger: () => formatCoinAmount(row.charge_amount || 0)
+        }
+      )
+    }
   },
   {
     title: t('btnProfile.consumptionBill.silverCoinDeduction'),
-    key: 'gift_amount'
+    key: 'gift_amount',
+    render(row: any) {
+      return h(
+        NTooltip,
+        { trigger: 'hover', placement: 'top' },
+        {
+          default: () => `${row.gift_amount || 0}`,
+          trigger: () => formatCoinAmount(row.gift_amount || 0)
+        }
+      )
+    }
   }
 ]
 
@@ -231,18 +254,45 @@ const monthlyColumns = [
             },
             src: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp'
           }),
-          total
+          h(
+            NTooltip,
+            { trigger: 'hover', placement: 'top' },
+            {
+              default: () => `${total}`,
+              trigger: () => formatCoinAmount(total)
+            }
+          )
         ]
       )
     }
   },
   {
     title: t('btnProfile.consumptionBill.goldCoinDeduction'),
-    key: 'charge_amount'
+    key: 'charge_amount',
+    render(row: any) {
+      return h(
+        NTooltip,
+        { trigger: 'hover', placement: 'top' },
+        {
+          default: () => `${row.charge_amount || 0}`,
+          trigger: () => formatCoinAmount(row.charge_amount || 0)
+        }
+      )
+    }
   },
   {
     title: t('btnProfile.consumptionBill.silverCoinDeduction'),
-    key: 'gift_amount'
+    key: 'gift_amount',
+    render(row: any) {
+      return h(
+        NTooltip,
+        { trigger: 'hover', placement: 'top' },
+        {
+          default: () => `${row.gift_amount || 0}`,
+          trigger: () => formatCoinAmount(row.gift_amount || 0)
+        }
+      )
+    }
   }
 ]
 
@@ -275,18 +325,45 @@ const dailyColumns = [
             },
             src: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp'
           }),
-          total
+          h(
+            NTooltip,
+            { trigger: 'hover', placement: 'top' },
+            {
+              default: () => `${total}`,
+              trigger: () => formatCoinAmount(total)
+            }
+          )
         ]
       )
     }
   },
   {
     title: t('btnProfile.consumptionBill.goldCoinDeduction'),
-    key: 'charge_amount'
+    key: 'charge_amount',
+    render(row: any) {
+      return h(
+        NTooltip,
+        { trigger: 'hover', placement: 'top' },
+        {
+          default: () => `${row.charge_amount || 0}`,
+          trigger: () => formatCoinAmount(row.charge_amount || 0)
+        }
+      )
+    }
   },
   {
     title: t('btnProfile.consumptionBill.silverCoinDeduction'),
-    key: 'gift_amount'
+    key: 'gift_amount',
+    render(row: any) {
+      return h(
+        NTooltip,
+        { trigger: 'hover', placement: 'top' },
+        {
+          default: () => `${row.gift_amount || 0}`,
+          trigger: () => formatCoinAmount(row.gift_amount || 0)
+        }
+      )
+    }
   }
 ]
 // 最近消费
@@ -318,18 +395,45 @@ const recentColumns = [
             },
             src: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp'
           }),
-          total
+          h(
+            NTooltip,
+            { trigger: 'hover', placement: 'top' },
+            {
+              default: () => `${total}`,
+              trigger: () => formatCoinAmount(total)
+            }
+          )
         ]
       )
     }
   },
   {
     title: t('btnProfile.consumptionBill.goldCoinDeduction'),
-    key: 'charge_amount'
+    key: 'charge_amount',
+    render(row: any) {
+      return h(
+        NTooltip,
+        { trigger: 'hover', placement: 'top' },
+        {
+          default: () => `${row.charge_amount || 0}`,
+          trigger: () => formatCoinAmount(row.charge_amount || 0)
+        }
+      )
+    }
   },
   {
     title: t('btnProfile.consumptionBill.silverCoinDeduction'),
-    key: 'gift_amount'
+    key: 'gift_amount',
+    render(row: any) {
+      return h(
+        NTooltip,
+        { trigger: 'hover', placement: 'top' },
+        {
+          default: () => `${row.gift_amount || 0}`,
+          trigger: () => formatCoinAmount(row.gift_amount || 0)
+        }
+      )
+    }
   }
 ]
 // 根据当前层级选择不同的列定义
@@ -387,7 +491,12 @@ const fetchBillByLevel = async (level: string, timeParam?: string) => {
     case 'yearly':
       params.year = `${selectedYear.value}`
       data = await get_year_cost(params)
-      
+      //把这个数据乘100倍
+    //   data.data.by_time_results.forEach((item: any) => {
+    //     item.charge_amount = item.charge_amount * 10
+    //     item.gift_amount = item.gift_amount * 10
+    //   })
+
       if (data && data.data) {
         yearlyBillList.value = formatBillData(data.data.by_time_results)
       } else {
@@ -399,6 +508,12 @@ const fetchBillByLevel = async (level: string, timeParam?: string) => {
       params.month = timeParam || selectedMonth.value
       data = await get_month_cost(params)
       
+      //把这个数据乘100倍
+    //   data.data.by_time_results.forEach((item: any) => {
+    //     item.charge_amount = item.charge_amount * 1000
+    //     item.gift_amount = item.gift_amount * 1000
+    //   })
+
       if (data && data.data) {
         monthlyBillList.value = formatBillData(data.data.by_time_results, 'day')
       } else {
@@ -448,6 +563,11 @@ const backToYearly = () => {
 const backToMonthly = () => {
   currentBillLevel.value = 'monthly'
   fetchBillByLevel('monthly')
+}
+
+const backToDaily = () => {
+  currentBillLevel.value = 'daily'
+  fetchBillByLevel('daily')
 }
 
 const handleSearch = () => {
@@ -521,52 +641,19 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-.condition-container {
-  display: flex;
-  align-items: center;
+.filter-tab {
+  width: 240px;
   margin-bottom: 16px;
-  gap: 12px;
-  width: 100%;
 
-  span {
-    white-space: nowrap;
+  :deep(.n-tabs-rail) {
+    // background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
-  .filter-input {
-    flex: 1;
-    max-width: 400px;
-  }
-
-  .search-btn {
-    margin-left: 8px;
-    min-width: 80px;
-  }
-}
-
-.tabs-container {
-  display: flex;
-  margin: 16px 0;
-  padding: 2px;
-  border-radius: 4px;
-  background-color: #1E293B;
-  width: fit-content;
-  
-  .tab-item {
-    padding: 6px 16px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
-    border-radius: 4px;
-    color: #94A3B8;
-    
-    &.active {
-      background-color: #334155;
-      color: #FFF;
-    }
-    
-    &:hover:not(.active) {
-      color: #FFF;
-    }
+  .coin-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
   }
 }
 
@@ -580,25 +667,29 @@ onMounted(() => {
     display: flex;
     align-items: center;
     
-    .back-link {
-      cursor: pointer;
-      margin-right: 10px;
-      display: flex;
-      align-items: center;
+    :deep(.n-breadcrumb) {
+      font-size: 14px;
       
-      &:hover {
-        opacity: 0.7;
+      .n-breadcrumb-item {
+        cursor: pointer;
+        
+        &:hover {
+          color: #18A058;
+        }
+        
+        &.n-breadcrumb-item--link {
+          color: #18A058;
+        }
+
+        &:last-child {
+          color: #94A3B8;
+          cursor: default;
+          
+          &:hover {
+            color: #94A3B8;
+          }
+        }
       }
-      
-      .back-text {
-        font-size: 14px;
-        color: #64748B;
-      }
-    }
-    
-    .tab-title {
-      font-size: 16px;
-      font-weight: 500;
     }
   }
   
@@ -619,5 +710,33 @@ onMounted(() => {
 
 .copy-icon, .coin-icon {
   cursor: pointer;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.api-key-popover {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background-color: #1E293B;
+  border-radius: 4px;
+  width: 300px;
+
+  .filter-input {
+    flex: 1;
+    margin-right: 8px;
+  }
+
+  .n-button {
+    flex-shrink: 0;
+  }
+}
+
+:deep(.n-tabs .n-tabs-rail .n-tabs-capsule) {
+//   background-color: rgba(255, 255, 255, 0.2);
 }
 </style>
