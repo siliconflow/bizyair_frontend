@@ -354,7 +354,13 @@
       "silverCoinDeduction": "Silver Coin Deduction",
       "success": "Success",
       "failed": "Failed",
-      "pending": "Pending"
+      "pending": "Pending",
+      "yearlyBill": "Yearly Bill",
+      "monthlyBill": "Monthly Bill",
+      "dailyBill": "Daily Bill",
+      "recentConsumption": "Recent Consumption",
+      "recentBillDetails": "Recent 30 Minutes Consumption Details",
+      "back": "Back"
     },
     "uploadInfo": {
       "nickname": "Nickname",

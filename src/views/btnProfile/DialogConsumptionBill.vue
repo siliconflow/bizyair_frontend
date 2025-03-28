@@ -28,14 +28,14 @@
         :class="{ active: activeTab === 'yearly' }"
         @click="activeTab = 'yearly'"
       >
-        年度账单
+        {{ $t('btnProfile.consumptionBill.yearlyBill') }}
       </div>
       <div
         class="tab-item"
         :class="{ active: activeTab === 'recent' }"
         @click="activeTab = 'recent'"
       >
-        最近消费
+        {{ $t('btnProfile.consumptionBill.recentConsumption') }}
       </div>
     </div>
 
@@ -43,19 +43,19 @@
       <div class="tab-header">
         <div class="tab-title-wrapper">
           <template v-if="currentBillLevel === 'yearly'">
-            <span class="tab-title">年度账单</span>
+            <span class="tab-title">{{ $t('btnProfile.consumptionBill.yearlyBill') }}</span>
           </template>
           <template v-else-if="currentBillLevel === 'monthly'">
             <span class="back-link" @click="backToYearly">
-              <span class="back-text">返回</span>
+              <span class="back-text">{{ $t('btnProfile.consumptionBill.back') }}</span>
             </span>
-            <span class="tab-title">{{ selectedYear }} 月度账单</span>
+            <span class="tab-title">{{ selectedYear }} {{ $t('btnProfile.consumptionBill.monthlyBill') }}</span>
           </template>
           <template v-else-if="currentBillLevel === 'daily'">
             <span class="back-link" @click="backToMonthly">
-              <span class="back-text">返回</span>
+              <span class="back-text">{{ $t('btnProfile.consumptionBill.back') }}</span>
             </span>
-            <span class="tab-title">{{ selectedMonth }} 日度账单</span>
+            <span class="tab-title">{{ selectedMonth }} {{ $t('btnProfile.consumptionBill.dailyBill') }}</span>
           </template>
         </div>
         <n-select
@@ -79,7 +79,7 @@
     <template v-else-if="activeTab === 'recent'">
       <div class="tab-header">
         <div class="tab-title-wrapper">
-          <span class="tab-title">最近30分钟的费用明细</span>
+          <span class="tab-title">{{ $t('btnProfile.consumptionBill.recentBillDetails') }}</span>
         </div>
       </div>
       <n-data-table
@@ -113,27 +113,12 @@ import { get_year_cost, get_month_cost, get_day_cost, get_recent_consumption } f
 const { t } = useI18n()
 const statusStore = useStatusStore()
 
-
-// 声明window.$message类型，解决TypeScript错误
-declare global {
-  interface Window {
-    $message: {
-      error: (content: string) => void
-      success: (content: string) => void
-      warning: (content: string) => void
-      info: (content: string) => void
-    }
-  }
-}
-
-// 当前激活的 tab
 const activeTab = ref('yearly')
 
-// 账单层级：年度、月度、日度
+// 账单层级
 const currentBillLevel = ref('yearly')
 const selectedMonth = ref('')
 const selectedDay = ref('')
-
 // 年份选择
 const currentYear = new Date().getFullYear()
 const selectedYear = ref(currentYear)
@@ -141,7 +126,6 @@ const yearOptions = Array.from({ length: 5 }, (_, i) => ({
   label: `${currentYear - i}年`,
   value: currentYear - i
 }))
-
 // 查询参数
 const queryParams = ref({
   apiKey: '',
@@ -149,16 +133,13 @@ const queryParams = ref({
   pageSize: 10,
   year: selectedYear.value
 })
-
-// 账单列表数据
 const yearlyBillList = ref<any[]>([])
 const monthlyBillList = ref<any[]>([])
 const dailyBillList = ref<any[]>([])
 const recentBillList = ref<any[]>([])
 const totalCount = ref(0)
 const loading = ref(false)
-
-// 根据当前层级选择不同的数据
+// 选择不同的数据
 const currentBillList = computed(() => {
   switch (currentBillLevel.value) {
     case 'yearly':
@@ -171,27 +152,23 @@ const currentBillList = computed(() => {
       return []
   }
 })
-
-// 计算总页数
 const pageCount = computed(() => {
   return Math.ceil(totalCount.value / queryParams.value.pageSize)
 })
-
-// 显示分页控件的条件
 const showPagination = computed(() => {
   return activeTab.value === 'recent' && pageCount.value > 1
 })
-
-// 年度账单表格列定义
+// 年度账单
 const yearlyColumns = [
   {
     title: t('btnProfile.consumptionBill.billingPeriod'),
-    key: 'billingPeriod'
+    key: 'time'
   },
   {
     title: t('btnProfile.consumptionBill.totalAmount'),
     key: 'totalAmount',
     render(row: any) {
+      const total = (row.charge_amount || 0) + (row.gift_amount || 0);
       return h(
         'span',
         {
@@ -210,31 +187,32 @@ const yearlyColumns = [
             },
             src: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp'
           }),
-          row.totalAmount
+          total
         ]
       )
     }
   },
   {
     title: t('btnProfile.consumptionBill.goldCoinDeduction'),
-    key: 'goldCoinDeduction'
+    key: 'charge_amount'
   },
   {
     title: t('btnProfile.consumptionBill.silverCoinDeduction'),
-    key: 'silverCoinDeduction'
+    key: 'gift_amount'
   }
 ]
 
-// 月度账单表格列定义
+// 月度账单
 const monthlyColumns = [
   {
     title: t('btnProfile.consumptionBill.billingPeriod'),
-    key: 'billingPeriod'
-  },
+    key: 'time'
+  },    
   {
     title: t('btnProfile.consumptionBill.totalAmount'),
     key: 'totalAmount',
     render(row: any) {
+      const total = (row.charge_amount || 0) + (row.gift_amount || 0);
       return h(
         'span',
         {
@@ -253,31 +231,32 @@ const monthlyColumns = [
             },
             src: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp'
           }),
-          row.totalAmount
+          total
         ]
       )
     }
   },
   {
     title: t('btnProfile.consumptionBill.goldCoinDeduction'),
-    key: 'goldCoinDeduction'
+    key: 'charge_amount'
   },
   {
     title: t('btnProfile.consumptionBill.silverCoinDeduction'),
-    key: 'silverCoinDeduction'
+    key: 'gift_amount'
   }
 ]
 
-// 日度账单表格列定义
+// 日度账单
 const dailyColumns = [
   {
     title: t('btnProfile.consumptionBill.billingPeriod'),
-    key: 'date'
+    key: 'time'
   },
   {
     title: t('btnProfile.consumptionBill.totalAmount'),
     key: 'totalAmount',
     render(row: any) {
+      const total = (row.charge_amount || 0) + (row.gift_amount || 0);
       return h(
         'span',
         {
@@ -296,31 +275,31 @@ const dailyColumns = [
             },
             src: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp'
           }),
-          row.totalAmount
+          total
         ]
       )
     }
   },
   {
     title: t('btnProfile.consumptionBill.goldCoinDeduction'),
-    key: 'goldCoinDeduction'
+    key: 'charge_amount'
   },
   {
     title: t('btnProfile.consumptionBill.silverCoinDeduction'),
-    key: 'silverCoinDeduction'
+    key: 'gift_amount'
   }
 ]
-
-// 最近消费表格列定义
+// 最近消费
 const recentColumns = [
   {
     title: 'Prompt ID',
-    key: 'promptId'
+    key: 'prompt_id'
   },
   {
     title: t('btnProfile.consumptionBill.totalAmount'),
     key: 'totalAmount',
     render(row: any) {
+      const total = (row.charge_amount || 0) + (row.gift_amount || 0);
       return h(
         'span',
         {
@@ -339,21 +318,20 @@ const recentColumns = [
             },
             src: 'https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/p3tqfe1o62WUCbFjcOWUk9n2dlCXyCB6.webp'
           }),
-          row.totalAmount
+          total
         ]
       )
     }
   },
   {
     title: t('btnProfile.consumptionBill.goldCoinDeduction'),
-    key: 'goldCoinDeduction'
+    key: 'charge_amount'
   },
   {
     title: t('btnProfile.consumptionBill.silverCoinDeduction'),
-    key: 'silverCoinDeduction'
+    key: 'gift_amount'
   }
 ]
-
 // 根据当前层级选择不同的列定义
 const currentColumns = computed(() => {
   switch (currentBillLevel.value) {
@@ -367,8 +345,6 @@ const currentColumns = computed(() => {
       return []
   }
 })
-
-// 行属性 - 添加点击事件
 const getRowProps = (row: any) => {
   if (currentBillLevel.value === 'yearly') {
     return {
@@ -385,45 +361,105 @@ const getRowProps = (row: any) => {
   return {}
 }
 
-// 下钻到月度账单
+const fetchData = async () => {
+  loading.value = true
+  
+  if (activeTab.value === 'yearly') {
+    await fetchBillByLevel(currentBillLevel.value)
+  } else {
+    await fetchRecentBillList()
+  }
+  
+  loading.value = false
+}
+
+// 根据层级获取账单数据
+const fetchBillByLevel = async (level: string, timeParam?: string) => {
+  const params: any = {}
+
+  if (queryParams.value.apiKey) {
+    params.api_key = queryParams.value.apiKey
+  }
+  
+  let data: any
+  
+  switch (level) {
+    case 'yearly':
+      params.year = `${selectedYear.value}`
+      data = await get_year_cost(params)
+      
+      if (data && data.data) {
+        yearlyBillList.value = formatBillData(data.data.by_time_results)
+      } else {
+        yearlyBillList.value = []
+      }
+      break
+      
+    case 'monthly':
+      params.month = timeParam || selectedMonth.value
+      data = await get_month_cost(params)
+      
+      if (data && data.data) {
+        monthlyBillList.value = formatBillData(data.data.by_time_results, 'day')
+      } else {
+        monthlyBillList.value = []
+      }
+      break
+      
+    case 'daily':
+      params.day = timeParam || selectedDay.value
+      data = await get_day_cost(params)
+      
+      if (data && data.data) {
+        dailyBillList.value = formatBillData(data.data.by_time_results, 'hour')
+      } else {
+        dailyBillList.value = []
+      }
+      break
+  }
+}
+
+const formatBillData = (data: any[], timeField?: string) => {
+  return data.map((item: any) => ({
+    time: item.time || (timeField && item[timeField]) || '',
+    charge_amount: item.charge_amount || 0,
+    gift_amount: item.gift_amount || 0,
+    prompt_id: item.prompt_id || ''
+  }))
+}
+
 const drillDownToMonthly = (row: any) => {
-  selectedMonth.value = row.billingPeriod
+  selectedMonth.value = row.time
   currentBillLevel.value = 'monthly'
-  fetchMonthlyBillList(row.billingPeriod)
+  fetchBillByLevel('monthly', row.time)
 }
 
-// 下钻到日度账单
 const drillDownToDaily = (row: any) => {
-  selectedDay.value = row.billingPeriod
+  selectedDay.value = row.time
   currentBillLevel.value = 'daily'
-  fetchDailyBillList(row.billingPeriod)
+  fetchBillByLevel('daily', row.time)
 }
 
-// 返回年度账单
 const backToYearly = () => {
   currentBillLevel.value = 'yearly'
-  fetchYearlyBillList()
+  fetchBillByLevel('yearly')
 }
 
-// 返回月度账单
 const backToMonthly = () => {
   currentBillLevel.value = 'monthly'
-  fetchMonthlyBillList(selectedMonth.value)
+  fetchBillByLevel('monthly')
 }
 
-// 搜索函数
 const handleSearch = () => {
   queryParams.value.current = 1
   fetchData()
 }
 
-// 页码变化处理
 const handlePageChange = (page: number) => {
   queryParams.value.current = page
   fetchData()
 }
 
-// 监听 tab 变化
 watch(activeTab, () => {
   queryParams.value.current = 1
   if (activeTab.value === 'yearly') {
@@ -432,197 +468,53 @@ watch(activeTab, () => {
   fetchData()
 })
 
-// 监听年份变化
 watch(selectedYear, (newYear) => {
   queryParams.value.year = newYear
   if (activeTab.value === 'yearly' && currentBillLevel.value === 'yearly') {
-    fetchYearlyBillList()
+    fetchBillByLevel('yearly')
   }
 })
 
-// 监听模态框显示状态变化
 watch(() => statusStore.showConsumptionBillDialog, (newVal) => {
   if (newVal) {
-    // 重置账单层级为年度
     currentBillLevel.value = 'yearly'
     activeTab.value = 'yearly'
     // 重置已选择的月份和日期
     selectedMonth.value = ''
     selectedDay.value = ''
-    // 获取数据
     fetchData()
   }
 })
 
-// 获取数据
-const fetchData = async () => {
-  loading.value = true
-  try {
-    if (activeTab.value === 'yearly') {
-      if (currentBillLevel.value === 'yearly') {
-        await fetchYearlyBillList()
-      } else if (currentBillLevel.value === 'monthly') {
-        await fetchMonthlyBillList(selectedMonth.value)
-      } else if (currentBillLevel.value === 'daily') {
-        await fetchDailyBillList(selectedDay.value)
-      }
-    } else {
-      await fetchRecentBillList()
-    }
-  } catch (error) {
-    console.error('获取账单数据失败', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-// 获取年度账单列表数据
-const fetchYearlyBillList = async () => {
-  loading.value = true
-  try {
-    const params: any = {}
-    
-    if (queryParams.value.apiKey) {
-      params.api_key = queryParams.value.apiKey
-    }
-    params.year = `${selectedYear.value}`
-    
-    const data = await get_year_cost(params)
-    
-    // 处理返回的数据
-    if (data && data.data) {
-      yearlyBillList.value = data.data.map((item: any) => ({
-        billingPeriod: item.month, // 显示月份
-        totalAmount: item.total_amount || 0,
-        goldCoinDeduction: item.gold_coin || 0,
-        silverCoinDeduction: item.silver_coin || 0
-      }))
-    } else {
-      yearlyBillList.value = []
-    }
-  } catch (error) {
-    console.error('获取年度账单列表失败', error)
-    if (window.$message) {
-      window.$message.error('获取年度账单失败，请稍后重试')
-    }
-  } finally {
-    loading.value = false
-  }
-}
-
-// 获取月度账单列表数据
-const fetchMonthlyBillList = async (month: string) => {
-  loading.value = true
-  try {
-    const params: any = {}
-    
-    if (queryParams.value.apiKey) {
-      params.api_key = queryParams.value.apiKey
-    }
-    params.month = month
-    
-    const data = await get_month_cost(params)
-    
-    // 处理月度数据
-    if (data && data.data) {
-      monthlyBillList.value = data.data.map((item: any) => ({
-        billingPeriod: item.day, // 显示日期
-        totalAmount: item.total_amount || 0,
-        goldCoinDeduction: item.gold_coin || 0,
-        silverCoinDeduction: item.silver_coin || 0
-      }))
-    } else {
-      monthlyBillList.value = []
-    }
-  } catch (error) {
-    console.error('获取月度账单列表失败', error)
-    if (window.$message) {
-      window.$message.error('获取月度账单失败，请稍后重试')
-    }
-  } finally {
-    loading.value = false
-  }
-}
-
-// 获取日度账单列表数据
-const fetchDailyBillList = async (day: string) => {
-  loading.value = true
-  try {
-    const params: any = {}
-    
-    if (queryParams.value.apiKey) {
-      params.api_key = queryParams.value.apiKey
-    }
-    params.day = day
-    
-    const data = await get_day_cost(params)
-    
-    // 处理日度数据
-    if (data && data.data) {
-      dailyBillList.value = data.data.map((item: any) => ({
-        date: item.hour || item.time || '', // 显示小时或时间
-        totalAmount: item.total_amount || 0,
-        goldCoinDeduction: item.gold_coin || 0,
-        silverCoinDeduction: item.silver_coin || 0
-      }))
-    } else {
-      dailyBillList.value = []
-    }
-  } catch (error) {
-    console.error('获取日度账单列表失败', error)
-    if (window.$message) {
-      window.$message.error('获取日度账单失败，请稍后重试')
-    }
-  } finally {
-    loading.value = false
-  }
-}
-
 // 获取最近消费列表数据
 const fetchRecentBillList = async () => {
   loading.value = true
-  try {
-    const params: any = {
-      page: queryParams.value.current,
-      page_size: queryParams.value.pageSize
-    }
-    
-    if (queryParams.value.apiKey) {
-      params.api_key = queryParams.value.apiKey
-    }
-    
-    // 使用专门的最近消费接口
-    const data = await get_recent_consumption(params)
-    
-    // 处理最近消费数据
-    if (data && data.data) {
-      // 假设数据结构包含 list 和 total
-      const list = data.data.list || data.data
-      
-      recentBillList.value = Array.isArray(list) ? list.map((item: any) => ({
-        promptId: item.prompt_id || '',
-        totalAmount: item.total_amount || 0,
-        goldCoinDeduction: item.gold_coin || 0,
-        silverCoinDeduction: item.silver_coin || 0
-      })) : []
-      
-      // 设置总数
-      totalCount.value = data.data.total || data.total || recentBillList.value.length
-    } else {
-      recentBillList.value = []
-      totalCount.value = 0
-    }
-  } catch (error) {
-    console.error('获取最近消费列表失败', error)
-    if (window.$message) {
-      window.$message.error('获取最近消费列表失败，请稍后重试')
-    }
-  } finally {
-    loading.value = false
+  
+  const params: any = {}
+  if (queryParams.value.apiKey) {
+    params.api_key = queryParams.value.apiKey
   }
+  const data = await get_recent_consumption(params)
+  if (data && data.data && data.data.prompt_results) {
+    const promptResults = data.data.prompt_results || []
+    const allRecords = promptResults.map((item: any) => ({
+      prompt_id: item.prompt_id || '',
+      charge_amount: item.charge_amount || 0,
+      gift_amount: item.gift_amount || 0
+    }))
+    //最多显示100条
+    totalCount.value = allRecords.length > 100 ? 100 : allRecords.length
+    // 前端分页
+    const startIndex = (queryParams.value.current - 1) * queryParams.value.pageSize
+    const endIndex = Math.min(startIndex + queryParams.value.pageSize, totalCount.value)
+    recentBillList.value = allRecords.slice(startIndex, endIndex)
+  } else {
+    recentBillList.value = []
+    totalCount.value = 0
+  }
+  
+  loading.value = false
 }
-
-// 组件挂载时获取数据
 onMounted(() => {
   fetchData()
 })

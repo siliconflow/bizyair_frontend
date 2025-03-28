@@ -436,7 +436,13 @@
       "silverCoinDeduction": "银币抵扣",
       "success": "成功",
       "failed": "失败",
-      "pending": "处理中"
+      "pending": "处理中",
+      "yearlyBill": "年度账单",
+      "monthlyBill": "月度账单",
+      "dailyBill": "日度账单",
+      "recentConsumption": "最近消费",
+      "recentBillDetails": "最近30分钟的费用明细",
+      "back": "返回"
     }
   },
   "purchaseDoc": {
@@ -444,7 +450,7 @@
     "service": {
       "title": "一、服务定义",
       "platform": "BizyAir平台（以下简称“平台”）通过向用户提供“BZ币”虚拟产品，授权用户使用包括但不限于BizyAir节点服务、任务执行等平台功能。",
-      "types": "BZ币分为两类：",
+      "types": "BZ币分为两类：", 
       "gold": "金币：用户通过充值直接购买的BZ币，具有有效期及有限退款权益；",
       "silver": "银币：平台通过活动、会员权益等途径赠予的BZ币，具有有效期且不可退款或提现。"
     },
