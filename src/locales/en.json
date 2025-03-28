@@ -335,17 +335,17 @@
     "userInfo": {
       "lazyText": "This person is lazy and left nothing behind",
       "balance": "Balance",
-      "coin": "Coins",
+      "coin": " Coins",
       "recharge": "Purchase",
       "giftSilverCoin": "Silver",
       "rechargeCoin": "Gold",
       "switchApiKey": "Set API Key",
       "myWallet": "My Wallet",
-      "rechargeRecord": "Purchase",
-      "consumptionBill": "Consumption Bill"
+      "rechargeRecord": "Payment Order",
+      "consumptionBill": "Invoice"
     },
     "consumptionBill": {
-      "title": "Consumption Bill",
+      "title": "Invoice",
       "enterApiKey": "Please enter API Key",
       "search": "Search",
       "billingPeriod": "Billing Period",
@@ -388,7 +388,7 @@
       "myBZCoins": "My BZ Coins"
     },
     "record": {
-      "rechargeRecord": "Purchase",
+      "rechargeRecord": "Payment Order",
       "bzCoinRecharge": "Purchase BZ Coin",
       "orderStatus": "Order Status",
       "selectOrder": "Select Order",
