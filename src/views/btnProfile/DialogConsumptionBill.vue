@@ -10,13 +10,13 @@
     <template #header>{{ $t('btnProfile.consumptionBill.title') }}</template>
 
     <n-tabs
-      class="filter-tab"
+      :class="['filter-tab', {'filter-tab-en' : locale == 'en'}]"
       type="segment"
       animated
       v-model:value="activeTab"
     >
-      <n-tab name="yearly">{{ $t('btnProfile.consumptionBill.yearlyBill') }}</n-tab>
-      <n-tab name="recent">{{ $t('btnProfile.consumptionBill.recentConsumption') }}</n-tab>
+      <n-tab name="yearly"><span class="n-tab-item-name">{{ $t('btnProfile.consumptionBill.yearlyBill') }}</span></n-tab>
+      <n-tab name="recent"><span class="n-tab-item-name">{{ $t('btnProfile.consumptionBill.recentConsumption') }}</span></n-tab>
     </n-tabs>
 
     <template v-if="activeTab === 'yearly'">
@@ -44,8 +44,11 @@
           />
           <n-popover trigger="click" placement="bottom-end">
             <template #trigger>
-              <n-button size="small" type="primary" ghost>
-                选择API Key
+              <n-button size="small" type="primary" color="#000">
+                <template #icon>
+                  <svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.6666 1H1.33325L6.66658 7.30667V11.6667L9.33325 13V7.30667L14.6666 1Z" stroke="#F9FAFB" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </template>
+                {{ $t('btnProfile.consumptionBill.selectAPIKey') }}
               </n-button>
             </template>
             <div class="api-key-popover">
@@ -106,7 +109,7 @@ import { useStatusStore } from '@/stores/userStatus'
 import { get_year_cost, get_month_cost, get_day_cost, get_recent_consumption } from '@/api/consumptionBill'
 import { formatCoinAmount } from '@/utils/tool'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const statusStore = useStatusStore()
 
 const activeTab = ref('yearly')
@@ -656,12 +659,15 @@ onMounted(() => {
     margin-left: 4px;
   }
 }
-
+.filter-tab-en{
+  width: 340px;
+}
 .tab-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  height: 30px;
   
   .tab-title-wrapper {
     display: flex;
@@ -700,6 +706,7 @@ onMounted(() => {
 
 .info-container {
   margin-bottom: 16px;
+  min-height: 240px;
 }
 
 .pagination-container {

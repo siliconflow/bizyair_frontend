@@ -360,7 +360,8 @@
       "dailyBill": "Daily Bill",
       "recentConsumption": "Recent Consumption",
       "recentBillDetails": "Recent 30 Minutes Consumption Details",
-      "back": "Back"
+      "back": "Back",
+      "selectAPIKey": "Select API Key"
     },
     "uploadInfo": {
       "nickname": "Nickname",
