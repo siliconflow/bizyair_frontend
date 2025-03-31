@@ -572,7 +572,7 @@
           break
       }
     } catch (error) {
-      throw error 
+      throw error
     }
   }
 
@@ -596,10 +596,9 @@
     }
 
     loading.value = true
-    fetchBillByLevel(level, timeParam)
-      .finally(() => {
-        loading.value = false
-      })
+    fetchBillByLevel(level, timeParam).finally(() => {
+      loading.value = false
+    })
   }
 
   const drillDownToLevel = (row: any, targetLevel: string) => {
@@ -652,10 +651,9 @@
     queryParams.value.year = year
     if (activeTab.value === 'yearly' && currentBillLevel.value === 'yearly') {
       loading.value = true
-      fetchBillByLevel('yearly')
-        .finally(() => {
-          loading.value = false
-        })
+      fetchBillByLevel('yearly').finally(() => {
+        loading.value = false
+      })
     }
   }
 
