@@ -116,25 +116,6 @@
       </div>
     </div>
     <div class="handles">
-      <div class="handles-item" @click="statusStore.showApiKeyDialog = true">
-        <span class="icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-            <g
-              fill="none"
-              stroke="#CBD5E1"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-            >
-              <path
-                d="m15.5 7.5l2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4m2-2l-9.6 9.6"
-              />
-              <circle cx="7.5" cy="15.5" r="5.5" />
-            </g>
-          </svg>
-        </span>
-        <span class="word">{{ $t('btnProfile.userInfo.switchApiKey') }}</span>
-      </div>
       <div class="handles-item" @click="toAllCoinList('all')">
         <span class="icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
@@ -166,6 +147,42 @@
           </svg>
         </span>
         <span class="word">{{ $t('btnProfile.userInfo.rechargeRecord') }}</span>
+      </div>
+      <div class="handles-item" @click="statusStore.showConsumptionBillDialog = true">
+        <span class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+            <g
+              fill="none"
+              stroke="#CBD5E1"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+            >
+              <path d="M3 3h18v18H3z" />
+              <path d="M7 7h10M7 11h10M7 15h10" />
+            </g>
+          </svg>
+        </span>
+        <span class="word">{{ $t('btnProfile.userInfo.consumptionBill') }}</span>
+      </div>
+      <div class="handles-item" @click="statusStore.showApiKeyDialog = true">
+        <span class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+            <g
+              fill="none"
+              stroke="#CBD5E1"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+            >
+              <path
+                d="m15.5 7.5l2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4m2-2l-9.6 9.6"
+              />
+              <circle cx="7.5" cy="15.5" r="5.5" />
+            </g>
+          </svg>
+        </span>
+        <span class="word">{{ $t('btnProfile.userInfo.switchApiKey') }}</span>
       </div>
     </div>
   </n-modal>
@@ -388,8 +405,12 @@
   .handles {
     display: flex;
     padding-top: 24px;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
     .handles-item {
+      width: 50%;
+      box-sizing: border-box;
       padding: 6px;
       cursor: pointer;
       transition: all 0.3s;
@@ -407,6 +428,8 @@
       display: block;
       width: 100%;
       text-align: center;
+      font-size: 12px;
+      // margin-top: 4px;
     }
   }
 </style>

@@ -62,6 +62,7 @@
     >
       <DialogProduct />
     </n-modal>
+    <DialogConsumptionBill />
   </div>
 </template>
 <script setup lang="ts">
@@ -73,6 +74,7 @@
   import DialogCoinsLis from './DialogCoinsLis.vue'
   import DialogRecord from './DialogRecord.vue'
   import DialogProduct from './DialogProduct.vue'
+  import DialogConsumptionBill from './DialogConsumptionBill.vue'
   import { useStatusStore } from '@/stores/userStatus'
   import { NModal } from 'naive-ui'
   import { useOrderStore } from '@/stores/orderStore'

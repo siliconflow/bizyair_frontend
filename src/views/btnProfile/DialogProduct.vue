@@ -29,7 +29,9 @@
       <n-checkbox v-model:checked="checked">{{
         $t('btnProfile.product.confirmAgreement')
       }}</n-checkbox>
-      <span class="protocol">{{ $t('btnProfile.product.rechargeAgreement') }}</span>
+      <span class="protocol" @click="orderStore.showPurchaseDoc = true">{{
+        $t('btnProfile.product.rechargeAgreement')
+      }}</span>
     </div>
     <span class="note">{{ $t('btnProfile.product.coinValidityNote') }}</span>
   </div>
@@ -75,6 +77,16 @@
   <n-modal v-model:show="orderStore.showPayResult">
     <n-result status="success" :description="$t('btnProfile.product.paySuccess')" />
   </n-modal>
+  <n-modal
+    v-model:show="orderStore.showPurchaseDoc"
+    preset="card"
+    :auto-focus="false"
+    :title="$t('btnProfile.product.rechargeAgreement')"
+    style="width: 988px"
+    :bordered="false"
+  >
+    <purchaseDoc />
+  </n-modal>
 </template>
 <script setup lang="ts">
   import { NCheckbox, NButton, NModal, NResult } from 'naive-ui'
@@ -83,6 +95,7 @@
   import { onMounted, onUnmounted, ref } from 'vue'
   import { payProduct } from '@/api/order'
   import wechat from './wechat.vue'
+  import purchaseDoc from './DialogPurchaseDoc.vue'
   import { useToaster } from '@/components/modules/toats/index'
   import { useI18n } from 'vue-i18n'
 
@@ -231,6 +244,7 @@
 
       .protocol {
         color: #94a3b8;
+        cursor: pointer;
       }
     }
 
