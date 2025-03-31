@@ -572,7 +572,7 @@
           break
       }
     } catch (error) {
-      console.error(`获取${level}账单数据失败:`, error)
+      throw error 
     }
   }
 
@@ -595,7 +595,11 @@
       selectedDay.value = timeParam
     }
 
+    loading.value = true
     fetchBillByLevel(level, timeParam)
+      .finally(() => {
+        loading.value = false
+      })
   }
 
   const drillDownToLevel = (row: any, targetLevel: string) => {
@@ -647,7 +651,11 @@
   const handleYearChange = (year: number) => {
     queryParams.value.year = year
     if (activeTab.value === 'yearly' && currentBillLevel.value === 'yearly') {
+      loading.value = true
       fetchBillByLevel('yearly')
+        .finally(() => {
+          loading.value = false
+        })
     }
   }
 
