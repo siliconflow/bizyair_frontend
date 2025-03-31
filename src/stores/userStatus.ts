@@ -149,12 +149,12 @@ export const useStatusStore = defineStore('userStatus', {
       }
     },
     async get_metadata() {
-      let res = await get_metadata()
+      const res = await get_metadata()
       this.usersMetadata = res.data
       return res.data
     },
     async get_wallet() {
-      let res = await get_wallet()
+      const res = await get_wallet()
       this.userWallte = res.data
       return res.data
     },

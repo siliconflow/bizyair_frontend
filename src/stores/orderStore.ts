@@ -64,7 +64,7 @@ export const useOrderStore = defineStore('userOrder', {
         }
       }
     },
-    intervalTimer(fn: Function) {
+    intervalTimer(fn: () => void) {
       this.iTimer = setInterval(() => {
         this.countExpire(localStorage.getItem('expire_at') as string)
       }, 1000)
@@ -75,7 +75,7 @@ export const useOrderStore = defineStore('userOrder', {
           }
           return
         }
-        let res = await getOrdersStatus(localStorage.getItem('order_no') as string)
+        const res = await getOrdersStatus(localStorage.getItem('order_no') as string)
         if (res.data.status != 'not_pay') {
           if (this.timerStatus !== null) {
             clearInterval(this.timerStatus)
