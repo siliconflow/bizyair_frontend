@@ -301,7 +301,7 @@
   .bizyair-menu-box {
     border-radius: 12px;
     transition: all 0.3s cubic-bezier(0, 0, 0.1, 1.8);
-    width: 480px;
+    width: 484px;
 
     .bizyair-bar {
       background-color: #7c3aed;
