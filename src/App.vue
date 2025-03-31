@@ -132,6 +132,7 @@
               <btnCommunity />
               <btnPublish />
               <btnTrain />
+              <btnDocs />
               <!-- <btnNews /> -->
               <apiKeyDialog />
             </div>
@@ -148,6 +149,7 @@
   import btnCommunity from '@/views/btnCommunity/index.vue'
   import btnPublish from '@/views/btnPublish/index.vue'
   import btnTrain from '@/views/btnTrain/index.vue'
+  import btnDocs from '@/views/btnDocs/index.vue'
   // import btnNews from '@/views/btnNews/index.vue'
   import btnMessage from '@/views/btnMessage/index.vue'
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
@@ -299,7 +301,7 @@
   .bizyair-menu-box {
     border-radius: 12px;
     transition: all 0.3s cubic-bezier(0, 0, 0.1, 1.8);
-    width: 410px;
+    width: 480px;
 
     .bizyair-bar {
       background-color: #7c3aed;

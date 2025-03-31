@@ -23,7 +23,8 @@
     "examples": "示例",
     "publishModel": "发布模型",
     "model": "模型",
-    "workflow": "工作流"
+    "workflow": "工作流",
+    "docs": "文档"
   },
   "common": {
     "language": "语言",
@@ -573,5 +574,9 @@
         "content": "银币有效期到期后，未使用的银币将自动清零且不可恢复。"
       }
     }
+  },
+  "btnDocs": {
+    "price": "定价策略",
+    "doc": "使用文档"
   }
 }

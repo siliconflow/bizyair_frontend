@@ -23,7 +23,8 @@
     "examples": "Examples",
     "publishModel": "PublishModel",
     "model": "Model",
-    "workflow": "Workflow"
+    "workflow": "Workflow",
+    "docs": "Docs"
   },
   "common": {
     "language": "Language",
@@ -573,5 +574,9 @@
         "content": "Unused silver coins will automatically expire and cannot be recovered after the validity period."
       }
     }
+  },
+  "btnDocs": {
+    "price": "Pricing strategy",
+    "doc": "Manual"
   }
 }
