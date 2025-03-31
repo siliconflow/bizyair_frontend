@@ -1,6 +1,5 @@
 import { customFetch } from '@/utils/customFetch'
 
-
 //查询年度消费账单
 export function get_year_cost(params: any) {
   return customFetch(`/bizyair/invoices/year_cost?${new URLSearchParams(params).toString()}`, {
