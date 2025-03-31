@@ -341,11 +341,11 @@
       "rechargeCoin": "Gold",
       "switchApiKey": "Set API Key",
       "myWallet": "My Wallet",
-      "rechargeRecord": "Payment Order",
-      "consumptionBill": "Invoice"
+      "rechargeRecord": "Payment",
+      "consumptionBill": "Bill"
     },
     "consumptionBill": {
-      "title": "Invoice",
+      "title": "Bill",
       "enterApiKey": "Please enter API Key",
       "search": "Search",
       "billingPeriod": "Billing Period",
@@ -395,7 +395,7 @@
       "myBZCoins": "My BZ Coins"
     },
     "record": {
-      "rechargeRecord": "Payment Order",
+      "rechargeRecord": "Payment",
       "bzCoinRecharge": "Purchase BZ Coin",
       "orderStatus": "Order Status",
       "selectOrder": "Select Order",
