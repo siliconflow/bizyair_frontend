@@ -45,20 +45,20 @@ export const formatCoinAmount = (amount: number): string => {
   if (amount === 0) {
     return '0'
   }
-  
+
   // 处理万级别
   if (amount >= 10000) {
     const w = amount / 10000.0
     // 使用 Math.floor 来处理小数位，避免四舍五入
     const intPart = parseInt(w.toString())
     const decimalPart = parseInt((w - intPart).toString())
-    
+
     if (decimalPart === 0) {
       return `${intPart}w`
     }
     return `${(intPart + decimalPart).toFixed(1)}w`
   }
-  
+
   // 小于10000直接返回数字
   return `${amount}`
 }

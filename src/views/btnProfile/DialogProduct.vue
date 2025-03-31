@@ -29,7 +29,9 @@
       <n-checkbox v-model:checked="checked">{{
         $t('btnProfile.product.confirmAgreement')
       }}</n-checkbox>
-      <span class="protocol" @click="orderStore.showPurchaseDoc = true">{{ $t('btnProfile.product.rechargeAgreement') }}</span>
+      <span class="protocol" @click="orderStore.showPurchaseDoc = true">{{
+        $t('btnProfile.product.rechargeAgreement')
+      }}</span>
     </div>
     <span class="note">{{ $t('btnProfile.product.coinValidityNote') }}</span>
   </div>
