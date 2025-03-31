@@ -23,7 +23,8 @@
     "examples": "示例",
     "publishModel": "发布模型",
     "model": "模型",
-    "workflow": "工作流"
+    "workflow": "工作流",
+    "docs": "文档"
   },
   "common": {
     "language": "语言",
@@ -335,13 +336,14 @@
     "userInfo": {
       "lazyText": "这家伙很懒，什么也没留下",
       "balance": "余额",
-      "coin": "币",
+      "coin": " 币",
       "recharge": "充值",
       "giftSilverCoin": "赠送银币",
       "rechargeCoin": "充值金币",
       "switchApiKey": "切换 API 密钥",
       "myWallet": "我的钱包",
-      "rechargeRecord": "充值记录"
+      "rechargeRecord": "充值记录",
+      "consumptionBill": "消费账单"
     },
     "uploadInfo": {
       "nickname": "昵称",
@@ -424,6 +426,157 @@
     },
     "index": {
       "profile": "个人资料"
+    },
+    "consumptionBill": {
+      "title": "消费账单",
+      "enterApiKey": "请输入API Key",
+      "search": "搜索",
+      "billingPeriod": "账期",
+      "totalAmount": "消费总额",
+      "goldCoinDeduction": "金币抵扣",
+      "silverCoinDeduction": "银币抵扣",
+      "success": "成功",
+      "failed": "失败",
+      "pending": "处理中",
+      "yearlyBill": "年度账单",
+      "monthlyBill": "月度账单",
+      "dailyBill": "日度账单",
+      "recentConsumption": "最近消费",
+      "recentBillDetails": "最近30分钟的费用明细",
+      "back": "返回",
+      "selectAPIKey": "选择API Key"
     }
+  },
+  "purchaseDoc": {
+    "title": "BizyAir 充值服务协议",
+    "service": {
+      "title": "一、服务定义",
+      "platform": "BizyAir平台（以下简称“平台”）通过向用户提供“BZ币”虚拟产品，授权用户使用包括但不限于BizyAir节点服务、任务执行等平台功能。",
+      "types": "BZ币分为两类：",
+      "gold": "金币：用户通过充值直接购买的BZ币，具有有效期及有限退款权益；",
+      "silver": "银币：平台通过活动、会员权益等途径赠予的BZ币，具有有效期且不可退款或提现。"
+    },
+    "rules": {
+      "title": "二、BZ币规则",
+      "acquisition": {
+        "title": "1. 获取与使用",
+        "methods": "用户可通过充值购买金币，或参与平台活动、开通会员等方式获取银币。",
+        "usage": "BZ币仅可用于平台指定服务（如节点资源消耗、任务执行等），不可转让、买卖或兑换现金。"
+      },
+      "validity": {
+        "title": "2. 有效期与退款",
+        "table": {
+          "type": "类型",
+          "validPeriod": "有效期",
+          "refundRule": "退款规则",
+          "gold": {
+            "period": "1年（自充值日起）",
+            "rule": "充值后180天内可申请按剩余比例退款（需扣除手续费）"
+          },
+          "silver": {
+            "period": "以活动规则为准",
+            "rule": "不可退款、不可提现"
+          }
+        }
+      },
+      "billing": {
+        "title": "3. 扣费规则",
+        "nodeTypes": {
+          "title": "3.1 节点分类计费",
+          "desc": "平台各节点实行差异化计费策略，具体分为两类：",
+          "goldOnly": "金币专用节点：仅接受金币支付（节点详情页将明确标注“仅限金币使用”）；",
+          "mixed": "混合支付节点：支持金币与银币混合支付（默认按“银币优先”原则扣费）。"
+        },
+        "execution": {
+          "title": "3.2 扣费执行规则",
+          "rule1": "在混合支付节点使用时，系统优先扣除银币，银币余额不足时自动扣除金币；",
+          "rule2": "在金币专用节点使用时，仅扣除金币余额；",
+          "rule3": "若对应币种余额不足，系统将实时暂停该节点服务并推送余额预警通知。"
+        },
+        "special": {
+          "title": "3.3 特殊说明",
+          "desc": "节点类型及计费方式可能因运营调整而变化，实际扣费规则以用户使用服务时节点详情页公示为准。"
+        }
+      }
+    },
+    "userRights": {
+      "title": "三、用户权利与义务",
+      "recharge": {
+        "title": "充值确认",
+        "content": "充值成功后，用户可在账户内查询BZ币余额及有效期。"
+      },
+      "refund": {
+        "title": "退款申请",
+        "content": "金币退款需通过平台客服提交申请，退款金额按剩余有效期比例计算（手续费详见平台公示）。"
+      },
+      "restriction": {
+        "title": "使用限制",
+        "content": "禁止通过非官方渠道获取BZ币或利用系统漏洞牟利，违者平台有权冻结账户并追责。"
+      }
+    },
+    "platformRights": {
+      "title": "四、平台权利与义务",
+      "service": {
+        "title": "服务调整",
+        "content": "平台有权因运营、政策等原因调整BZ币规则、定价或服务内容，并通过公告/站内信通知用户。"
+      },
+      "abnormal": {
+        "title": "异常处理",
+        "content": "如发现账户异常（如恶意刷币），平台可暂停服务并追溯违规所得。"
+      },
+      "disclaimer": {
+        "title": "免责声明",
+        "content": "因不可抗力或用户违规导致的损失，平台不承担责任。"
+      }
+    },
+    "userBehavior": {
+      "title": "五、用户行为规范与违约责任",
+      "prohibited": {
+        "title": "1. 禁止行为条款",
+        "desc": "用户在使用BizyAir平台服务时，需严格遵守以下行为准则：",
+        "item1": "严禁通过任何技术手段擅自修改平台服务内容、服务期限、交易金额或消费记录等数据信息。",
+        "item2": "禁止以任何非平台认可的方式（包括但不限于转借、出租、售卖、共享等）将账户或服务权限提供给第三方使用。",
+        "item3": "严格禁止对平台的安全防护系统进行破解、篡改、反向工程或其他破坏性操作。",
+        "item4": "未经平台书面授权，不得在任何公开场合（线上或线下）展示、传播服务内容（符合合理使用的情形除外）。",
+        "item5": "不得实施任何违反法律法规、本协议约定或侵犯平台及第三方合法权益的行为。"
+      },
+      "breach": {
+        "title": "2. 违约处理措施",
+        "desc": "如用户存在违反本协议或相关法律法规的行为，BizyAir平台有权根据情节严重程度采取以下处理措施：",
+        "item1": "依据本协议相关条款的特别约定进行处理。",
+        "item2": "采取必要的技术手段制止违规行为，包括但不限于删除违规内容、限制账户功能或暂停服务访问权限等。",
+        "item3": "单方面终止部分或全部服务，且已支付费用不予退还，用户亦无权要求任何形式的补偿。"
+      }
+    },
+    "other": {
+      "title": "六、其他条款",
+      "agreement": {
+        "title": "协议变更",
+        "content": "本协议修订后，继续使用服务视为接受新条款。"
+      },
+      "dispute": {
+        "title": "争议解决",
+        "content": "争议应协商解决，协商不成提交平台所在地法院诉讼。"
+      }
+    },
+    "keyPoints": {
+      "title": "附：重点条款说明",
+      "refund": {
+        "title": "退款示例",
+        "content": "用户充值100金币，使用30%后申请退款，如果在订单生效的180天内，可获得剩余70金币对应款项（扣除手续费）；如果在订单生效180天外，则不可退款。"
+      },
+      "goldExpire": {
+        "title": "金币清零",
+        "content": "金币有效期届满后，未使用的金币将自动清零且不可恢复。"
+      },
+      "silverExpire": {
+        "title": "银币清零",
+        "content": "银币有效期到期后，未使用的银币将自动清零且不可恢复。"
+      }
+    }
+  },
+  "btnDocs": {
+    "price": "定价策略",
+    "doc": "使用文档"
   }
 }
