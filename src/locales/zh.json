@@ -444,7 +444,8 @@
       "recentConsumption": "最近消费",
       "recentBillDetails": "最近30分钟的费用明细",
       "back": "返回",
-      "selectAPIKey": "选择API Key"
+      "selectAPIKey": "选择API Key",
+      "dailyBill2": "每日账单"
     }
   },
   "purchaseDoc": {

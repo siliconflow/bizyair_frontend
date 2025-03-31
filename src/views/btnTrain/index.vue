@@ -16,13 +16,13 @@
       />
     </svg>
   </btnMenu>
-  <dialogList />
-  <dialogUpload />
+  <!-- <dialogList />
+  <dialogUpload /> -->
 </template>
 <script setup lang="ts">
   import btnMenu from '@/components/modules/btnMenu.vue'
-  import dialogList from './dataset/dialogList.vue'
-  import dialogUpload from './dataset/dialogUpload.vue'
+  // import dialogList from './dataset/dialogList.vue'
+  // import dialogUpload from './dataset/dialogUpload.vue'
   import { onMounted, ref, watch } from 'vue'
   import { useI18n } from 'vue-i18n'
   // import { useDatasetStore } from '@/stores/datasetStore'
