@@ -72,7 +72,7 @@ export function useUpload(modelType: Ref<string | undefined>, emitFn: Function) 
   
   
   const doUpload = async (data: UploadData) => {
-    const { file, objectKey, retryLimit = 3, checkpoint, uploadedParts, autoRetry = false } = data
+    const { file, objectKey, retryLimit = 3, checkpoint, autoRetry = false } = data
     let lastUploadedSize = 0
     let lastTime = performance.now()
     
