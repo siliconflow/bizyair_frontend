@@ -330,7 +330,17 @@
     "uploadButton": "上传",
     "cancelButton": "取消",
     "uploadImage": "上传封面",
-    "loading": "加载中"
+    "loading": "加载中",
+    "foundUnfinishedUpload": "发现未完成的上传任务，将从断点处继续",
+    "noResumeData": "无法找到断点续传数据",
+    "resumeFailed": "断点续传失败，请重新上传",
+    "tokenExpired": "上传令牌已过期，请重新上传",
+    "maxRetriesReached": "已达到最大重试次数，请检查网络后手动重试",
+    "retryFailed": "多次重试上传失败，请检查网络连接后重新上传",
+    "willRetryInSeconds": "网络连接中断，将在 {seconds} 秒后自动重试",
+    "retrying": "正在等待第 {count} 次重试，剩余 {seconds} 秒",
+    "retryingUpload": "网络已恢复，正在继续上传",
+    "uploadComplete": "上传完成"
   },
   "btnProfile": {
     "userInfo": {
@@ -452,7 +462,7 @@
     "title": "BizyAir 充值服务协议",
     "service": {
       "title": "一、服务定义",
-      "platform": "BizyAir平台（以下简称“平台”）通过向用户提供“BZ币”虚拟产品，授权用户使用包括但不限于BizyAir节点服务、任务执行等平台功能。",
+      "platform": "BizyAir平台（以下简称“平台”）通过向用户提供”BZ币“虚拟产品，授权用户使用包括但不限于BizyAir节点服务、任务执行等平台功能。",
       "types": "BZ币分为两类：",
       "gold": "金币：用户通过充值直接购买的BZ币，具有有效期及有限退款权益；",
       "silver": "银币：平台通过活动、会员权益等途径赠予的BZ币，具有有效期且不可退款或提现。"
@@ -579,5 +589,22 @@
   "btnDocs": {
     "price": "定价策略",
     "doc": "使用文档"
+  },
+  "resumableUpload": {
+    "title": "断点续传",
+    "uploadStatus": "上传状态",
+    "uploadProgress": "上传进度",
+    "pauseUpload": "暂停上传",
+    "resumeUpload": "继续上传",
+    "uploadFailed": "上传失败",
+    "uploadSuccessful": "上传成功",
+    "uploadPaused": "上传已暂停",
+    "remainingTime": "剩余时间",
+    "uploadSpeed": "上传速度",
+    "prepareUpload": "准备上传中...",
+    "processingFile": "处理文件中...",
+    "largeFileWarning": "文件较大，上传可能需要较长时间",
+    "unstableNetworkWarning": "网络不稳定，上传速度可能受影响",
+    "uploadTimedOut": "上传超时，请检查网络连接"
   }
 }
