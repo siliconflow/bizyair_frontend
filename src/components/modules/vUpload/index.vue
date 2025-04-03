@@ -49,63 +49,60 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { NButton } from 'naive-ui'
-import { DEFAULT_ALLOWED_EXTENSIONS } from './constants'
-import { UploadProps } from './types'
-import { preventDefaults } from './utils'
-import { useUpload } from './useUpload'
+  import { ref, computed } from 'vue'
+  import { NButton } from 'naive-ui'
+  import { DEFAULT_ALLOWED_EXTENSIONS } from './constants'
+  import { UploadProps } from './types'
+  import { preventDefaults } from './utils'
+  import { useUpload } from './useUpload'
 
-const props = defineProps<UploadProps>()
-const fileInput = ref<HTMLInputElement | null>(null)
-const isHighlighted = ref(false)
-const emit = defineEmits(['progress', 'path', 'start', 'uploadInfo', 'success', 'error'])
-const allowedExtensions = computed(() => props.accept || DEFAULT_ALLOWED_EXTENSIONS)
-const {
-  disableUpload,
-  uploadSuccessful,
-  uploadFile,
-  interrupt,
-  cancel
-} = useUpload(computed(() => props.modelType), emit)
+  const props = defineProps<UploadProps>()
+  const fileInput = ref<HTMLInputElement | null>(null)
+  const isHighlighted = ref(false)
+  const emit = defineEmits(['progress', 'path', 'start', 'uploadInfo', 'success', 'error'])
+  const allowedExtensions = computed(() => props.accept || DEFAULT_ALLOWED_EXTENSIONS)
+  const { disableUpload, uploadSuccessful, uploadFile, interrupt, cancel } = useUpload(
+    computed(() => props.modelType),
+    emit
+  )
 
-function highlight(e: DragEvent) {
-  preventDefaults(e)
-  isHighlighted.value = true
-}
-
-function unhighlight(e: DragEvent) {
-  preventDefaults(e)
-  isHighlighted.value = false
-}
-
-function handleDrop(e: DragEvent) {
-  preventDefaults(e)
-  unhighlight(e)
-  const files = e.dataTransfer?.files
-  if (files && files.length > 0) {
-    uploadFile(files[0])
+  function highlight(e: DragEvent) {
+    preventDefaults(e)
+    isHighlighted.value = true
   }
-}
 
-function handleFileChange(e: Event) {
-  const target = e.target as HTMLInputElement
-  const files = target.files
-  if (files && files.length > 0) {
-    uploadFile(files[0])
-    if (!disableUpload.value) {
-      target.value = ''
+  function unhighlight(e: DragEvent) {
+    preventDefaults(e)
+    isHighlighted.value = false
+  }
+
+  function handleDrop(e: DragEvent) {
+    preventDefaults(e)
+    unhighlight(e)
+    const files = e.dataTransfer?.files
+    if (files && files.length > 0) {
+      uploadFile(files[0])
     }
   }
-}
+
+  function handleFileChange(e: Event) {
+    const target = e.target as HTMLInputElement
+    const files = target.files
+    if (files && files.length > 0) {
+      uploadFile(files[0])
+      if (!disableUpload.value) {
+        target.value = ''
+      }
+    }
+  }
 </script>
 
 <style scoped>
-.file-box:hover p {
-  color: hsl(var(--primary));
-}
+  .file-box:hover p {
+    color: hsl(var(--primary));
+  }
 
-.file-box:hover svg path {
-  stroke: hsl(var(--primary));
-}
+  .file-box:hover svg path {
+    stroke: hsl(var(--primary));
+  }
 </style>
