@@ -29,6 +29,15 @@ export async function creatClient(file: File | Blob, type: string) {
     }),
     objectKey: data.file.object_key,
     md5Hash,
-    sha256sum
+    sha256sum,
+    fileId: data.file.id,
+    credentials: {
+      accessKeyId,
+      accessKeySecret,
+      stsToken,
+      region,
+      bucket,
+      expiration: data.file.expiration
+    }
   }
 }
