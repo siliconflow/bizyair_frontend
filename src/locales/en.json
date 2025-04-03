@@ -330,7 +330,16 @@
     "uploadButton": "Upload",
     "cancelButton": "Cancel",
     "uploadImage": "Upload Image",
-    "loading": "Loading"
+    "loading": "Loading",
+    "foundUnfinishedUpload": "Found unfinished upload, resuming...",
+    "noResumeData": "No resumable upload data found",
+    "resumeFailed": "Failed to resume upload",
+    "tokenExpired": "Upload token expired, please upload again",
+    "retryFailed": "Multiple retry attempts failed, please check your network connection and upload again",
+    "willRetryInSeconds": "Network connection lost, will automatically retry in {seconds} seconds",
+    "retrying": "Waiting for retry attempt {count}, {seconds} seconds remaining",
+    "retryingUpload": "Network restored, continuing upload",
+    "uploadComplete": "Upload complete"
   },
   "btnProfile": {
     "userInfo": {

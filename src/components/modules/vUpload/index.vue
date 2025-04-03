@@ -32,7 +32,7 @@
         {{ $t('vUpload.clickOrDrag') }}
       </p>
       <input
-        :accept="ALLOW_UPLOADABLE_EXT_NAMES"
+        :accept="allowedExtensions"
         class="cursor-pointer opacity-0 w-full h-full absolute left-0 top-0"
         type="file"
         ref="fileInput"
@@ -49,39 +49,22 @@
 </template>
 
 <script setup lang="ts">
-  import { useToaster } from '@/components/modules/toats/index'
-  import { onMounted, ref } from 'vue'
-  import { useShadet } from '@/components/modules/vShadet/index'
-  // import { Button } from '@/components/ui/button'
-  import { commit_file } from '@/api/model'
-  import { creatClient } from './ossClient'
-  import { useI18n } from 'vue-i18n'
-
+  import { ref, computed } from 'vue'
   import { NButton } from 'naive-ui'
+  import { DEFAULT_ALLOWED_EXTENSIONS } from './constants'
+  import { UploadProps } from './types'
+  import { preventDefaults } from './utils'
+  import { useUpload } from './useUpload'
 
-  const { t } = useI18n()
-
-  const props = defineProps({
-    modelType: String,
-    fileName: String,
-    accept: {
-      type: String,
-      default: '.safetensors, .pth, .bin, .pt, .ckpt, .gguf, .sft'
-    }
-  })
-
-  let calculatingDialog: any
-  // const uploadText = ref('Click or drag file to this area to upload')
-  const disableUpload = ref(!!props.fileName)
-  const ALLOW_UPLOADABLE_EXT_NAMES = ref('.safetensors, .pth, .bin, .pt, .ckpt, .gguf, .sft')
+  const props = defineProps<UploadProps>()
   const fileInput = ref<HTMLInputElement | null>(null)
   const isHighlighted = ref(false)
-  const uploadSuccessful = ref(!!props.fileName)
-
-  function preventDefaults(e: Event) {
-    e.preventDefault()
-    e.stopPropagation()
-  }
+  const emit = defineEmits(['progress', 'path', 'start', 'uploadInfo', 'success', 'error'])
+  const allowedExtensions = computed(() => props.accept || DEFAULT_ALLOWED_EXTENSIONS)
+  const { disableUpload, uploadSuccessful, uploadFile, interrupt, cancel } = useUpload(
+    computed(() => props.modelType),
+    emit
+  )
 
   function highlight(e: DragEvent) {
     preventDefaults(e)
@@ -97,7 +80,7 @@
     preventDefaults(e)
     unhighlight(e)
     const files = e.dataTransfer?.files
-    if (files) {
+    if (files && files.length > 0) {
       uploadFile(files[0])
     }
   }
@@ -105,161 +88,13 @@
   function handleFileChange(e: Event) {
     const target = e.target as HTMLInputElement
     const files = target.files
-    if (files) {
+    if (files && files.length > 0) {
       uploadFile(files[0])
-    }
-  }
-  const emit = defineEmits(['progress', 'path', 'start', 'uploadInfo', 'success', 'error'])
-  const progress = ref(0)
-  const onProgress = (p: number) => {
-    progress.value = p || 0.0001
-    emit('progress', Number((progress.value * 100).toFixed(2)))
-  }
-  interface doUploadData {
-    client: any
-    file: File
-    objectKey: any
-    retryLimit?: number
-    md5Hash?: string
-    sha256sum?: string
-  }
-  async function doUpload(data: doUploadData) {
-    const { client, file, objectKey, retryLimit = 3 } = data
-    let lastUploadedSize = 0
-    let lastTime = performance.now()
-    try {
-      const completeResult = await client.multipartUpload(objectKey, file, {
-        progress: (p: any) => {
-          onProgress(p)
-          let speed: string = ''
-          const now = performance.now()
-          const uploadedSize = file.size * p
-          const deltaSize = uploadedSize - lastUploadedSize
-          const deltaTime = (now - lastTime) / 1000
-          if (deltaTime > 0) {
-            const speedInBytes = deltaSize / deltaTime
-            if (speedInBytes >= 1024 * 1024) {
-              speed = `${(speedInBytes / (1024 * 1024)).toFixed(2)} MB/s`
-            } else {
-              speed = `${(speedInBytes / 1024).toFixed(2)} KB/s`
-            }
-          }
-          lastUploadedSize = uploadedSize
-          lastTime = now
-          emit('uploadInfo', {
-            speed,
-            fileName: file.name
-          })
-        },
-        parallel: 2,
-        partSize: 5 * 1024 * 1024
-      })
-      return completeResult
-    } catch (e: any) {
-      console.error(e)
-      if (e.name === 'cancel') {
-        return e
-      }
-      if (retryLimit <= 0) {
-        throw e
-      } else {
-        return await doUpload({
-          client,
-          file,
-          objectKey,
-          retryLimit: retryLimit - 1
-        })
+      if (!disableUpload.value) {
+        target.value = ''
       }
     }
   }
-  let client: any = null
-
-  const interrupt = async () => {
-    await client?.cancel()
-    disableUpload.value = false
-    uploadSuccessful.value = false
-    fileInput.value?.value && (fileInput.value.value = '')
-    emit('progress', 0)
-  }
-  const cancel = () => {
-    disableUpload.value = false
-    uploadSuccessful.value = false
-    fileInput.value?.value && (fileInput.value.value = '')
-    emit('progress', 0)
-  }
-
-  async function uploadFile(file: File) {
-    // uploadText.value = file.name
-    const fileExtension = file.name.split('.').pop()
-    if (fileExtension && ALLOW_UPLOADABLE_EXT_NAMES.value.search(fileExtension) === -1) {
-      useToaster.error(t('vUpload.invalidFileFormat'))
-      return
-    }
-    emit('path', file.name)
-    disableUpload.value = true
-    calculatingDialog = useShadet({
-      content: t('vUpload.inHashCalculation'),
-      z: 'z-12000'
-    })
-    const { oss, objectKey, md5Hash, sha256sum, fileId } = await creatClient(
-      file,
-      props.modelType as string
-    )
-    calculatingDialog.close()
-    if (fileId) {
-      emit('success', { sha256sum, path: file.name })
-      emit('uploadInfo', {
-        fileName: file.name
-      })
-      emit('progress', 100)
-      uploadSuccessful.value = true
-      // disableUpload.value = false
-      return
-    }
-
-    client = oss
-    emit('start')
-    const result = await doUpload({
-      client,
-      file,
-      objectKey,
-      md5Hash,
-      sha256sum
-    })
-    if (result.status === 0) {
-      return Promise.reject('')
-    } else if (result.res.status === 200) {
-      await commit_file({
-        md5_hash: md5Hash,
-        md5Hash,
-        sha256sum,
-        object_key: objectKey,
-        type: props.modelType
-      })
-      // disableUpload.value = false
-      emit('success', { sha256sum, object_key: objectKey })
-      uploadSuccessful.value = true
-      emit('uploadInfo', {
-        fileName: file.name,
-        speed: ''
-      })
-      return result.res
-    } else {
-      emit('error')
-      disableUpload.value = false
-      uploadSuccessful.value = true
-      emit('progress', '')
-      throw new Error(`${t('vUpload.uploadFailed')}${result.res.statusText}`)
-    }
-  }
-  onMounted(() => {
-    if (props.accept) {
-      ALLOW_UPLOADABLE_EXT_NAMES.value = props.accept
-    }
-    if (props.fileName) {
-      emit('progress', 100)
-    }
-  })
 </script>
 
 <style scoped>
