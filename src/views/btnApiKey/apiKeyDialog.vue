@@ -92,7 +92,7 @@
   }
 
   const openOAuthPopup = async (setKey: (key: string) => void) => {
-    const clientId = 'SF3fHmXCIpJTMeXja72onq'
+    const clientId = 'SFIW4myD4HvRT9u9HF12hk'
     const ACCOUNT_ENDPOINT = 'https://account.siliconflow.cn'
     const authUrl = `${ACCOUNT_ENDPOINT}/oauth?client_id=${clientId}`
     const popup = window.open(authUrl, 'oauthPopup', 'width=600,height=600')
