@@ -28,15 +28,24 @@
 
   const handleAddNode = async (model: Model) => {
     try {
-      let nodeID = model.type === 'LoRA' ? 'BizyAir_LoraLoader' : 'BizyAir_ControlNetLoader'
+      const nodeTypes: Record<string, string> = {
+        LoRA: "BizyAir_LoraLoader",
+        Controlnet: "BizyAir_ControlNetLoader",
+        Checkpoint: "BizyAir_CheckpointLoaderSimple",
+        Clip: "BizyAir_CLIPVisionLoader",
+        Ipadapter: "BizyAir_IPAdapterModelLoade",
+        Unet: "BizyAir_MZ_KolorsUNETLoaderV2",
+        Vae: "BizyAir_VAELoader",
+        Upscale_models: "BizyAir_UpscaleModelLoader",
+        Instantid: "BizyAir_InstantIDModelLoader",
+        Pulid: "BizyAir_PulidFluxModelLoader"
+      }
+      let nodeID = nodeTypes[model.type] || 'BizyAir_ControlNetLoader'
       let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
       const canvas = window.LGraphCanvas?.active_canvas
 
       if (loraLoaderNode && canvas) {
-        loraLoaderNode.title =
-          model.type === 'LoRA'
-            ? t('community.models.nodeTitle.lora')
-            : t('community.models.nodeTitle.controlnet')
+        loraLoaderNode.title = `☁️BizyAir Load ${model.type}`
         loraLoaderNode.color = '#7C3AED'
 
         const widgetValues =

@@ -39,6 +39,7 @@
   watch(
     () => props.modelType,
     newModelType => {
+      console.log('modelType changed----->', newModelType)
       modelSelectStore.filterDataLoaded = false
       modelSelectStore.loadFilterData(newModelType, props.selectedBaseModels)
     },
