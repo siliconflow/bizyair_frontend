@@ -20,7 +20,7 @@ interface typeUsersMetadata {
   status: 'normal' | 'disable'
   last_share_id_update_at?: string
   avatar?: string
-  level?:number
+  level?: number
   Introducation: string
   auth: 0 | 1 | 2
   auth_type: 0 | 1
