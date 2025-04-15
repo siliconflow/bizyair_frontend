@@ -8,10 +8,40 @@
     content-style="padding: 0 32px 24px 32px;"
     :bordered="false"
   >
-    <div class="info-container">
-      <img class="avatar" :src="statusStore.usersMetadata.avatar || statusStore.userAvatar" />
+    <div class="info-container" :class="{ 'vip-container': statusStore.usersMetadata.level === 2 }">
+      <div
+        class="avatar-wrapper"
+        :class="{ 'vip-avatar-wrapper': statusStore.usersMetadata.level === 2 }"
+      >
+        <img class="avatar" :src="statusStore.usersMetadata.avatar || statusStore.userAvatar" />
+        <div v-if="statusStore.usersMetadata.level === 2" class="vip-crown">
+          <svg
+            class="crown-icon"
+            viewBox="0 0 1024 1024"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            p-id="4359"
+            width="24"
+            height="24"
+          >
+            <path
+              d="M510.955102 831.738776c-23.510204 0-45.453061-9.926531-61.64898-27.167347L138.971429 468.114286c-28.734694-31.346939-29.779592-79.412245-1.567347-111.804082l117.55102-135.314286c15.673469-18.285714 38.661224-28.734694 63.216327-28.734694H705.306122c24.032653 0 47.020408 10.44898 62.693878 28.734694l118.073469 135.314286c28.212245 32.391837 27.689796 80.457143-1.567347 111.804082L572.081633 804.571429c-15.673469 17.240816-38.138776 27.167347-61.126531 27.167347z"
+              fill="#F2CB51"
+              p-id="4360"
+            ></path>
+            <path
+              d="M506.77551 642.612245c-5.22449 0-10.971429-2.089796-15.15102-6.269388l-203.755102-208.979592c-7.836735-8.359184-7.836735-21.420408 0.522449-29.779592 8.359184-7.836735 21.420408-7.836735 29.779592 0.522449l189.12653 193.828572 199.053061-194.351021c8.359184-7.836735 21.420408-7.836735 29.779592 0.522449 7.836735 8.359184 7.836735 21.420408-0.522449 29.779592l-214.204081 208.979592c-4.179592 3.657143-9.404082 5.746939-14.628572 5.746939z"
+              fill="#FFF7E1"
+              p-id="4361"
+            ></path>
+          </svg>
+        </div>
+      </div>
       <div class="info" @click="toUploadInfo">
-        <p class="user-name">{{ statusStore.usersMetadata.name }}</p>
+        <p class="user-name">
+          {{ statusStore.usersMetadata.name }}
+          <span v-if="statusStore.usersMetadata.level === 2" class="vip-tag">VIP2</span>
+        </p>
         <p class="user-title">
           {{ statusStore.usersMetadata.introduction || $t('btnProfile.userInfo.lazyText') }}
         </p>
@@ -200,6 +230,7 @@
     statusStore.showInfoDialog = false
     statusStore.showUploadInfoDialog = true
   }
+  console.log(statusStore.usersMetadata.level, 'store')
 
   const copyID = () => {
     statusStore.copyText(`${statusStore.usersMetadata.id}`)
@@ -237,10 +268,39 @@
     box-sizing: border-box;
     position: relative;
 
+    &.vip-container {
+      border-radius: 12px;
+      padding: 32px 16px 0 16px;
+    }
+    .avatar-wrapper {
+      position: relative;
+    }
+    .vip-crown {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      top: auto;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .crown-icon {
+      width: 100%;
+      height: 100%;
+    }
+
     .avatar {
       width: 56px;
       height: 56px;
       border-radius: 28px;
+      position: relative;
+      // top:px;
+      z-index: 1;
     }
 
     .info {
@@ -257,6 +317,18 @@
         font-size: 18px;
         font-weight: 600;
         line-height: 24px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .vip-tag {
+          font-size: 12px;
+          padding: 0px 7px;
+          border-radius: 7px;
+          background: linear-gradient(90deg, #ffd700, #ffb700);
+          color: #7a4f01;
+          font-weight: bold;
+        }
       }
 
       .user-title {
