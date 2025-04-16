@@ -10,7 +10,8 @@
         "length": "The length of the clipboard content is incorrect.",
         "shareCodeLength": "The length of the share code is incorrect."
       }
-    }
+    },
+    "assistant": "Assistant"
   },
   "buttons": {
     "profile": "Profile",
@@ -371,7 +372,8 @@
       "recentConsumption": "Recent Consumption",
       "recentBillDetails": "Recent 30 Minutes Consumption Details",
       "back": "Back",
-      "selectAPIKey": "Select API Key"
+      "selectAPIKey": "Select API Key",
+      "time": "Time"
     },
     "uploadInfo": {
       "nickname": "Nickname",
