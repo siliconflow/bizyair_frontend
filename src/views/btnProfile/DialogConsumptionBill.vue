@@ -477,6 +477,10 @@
   // 最近消费
   const recentColumns = [
     {
+      title: t('btnProfile.consumptionBill.time'),
+      key: 'time'
+    },
+    {
       title: 'Prompt ID',
       key: 'prompt_id'
     },
@@ -739,6 +743,7 @@
       if (data && data.data && data.data.prompt_results) {
         const promptResults = data.data.prompt_results || []
         const allRecords = promptResults.map((item: any) => ({
+          time: item.time || '',
           prompt_id: item.prompt_id || '',
           charge_amount: item.charge_amount || 0,
           gift_amount: item.gift_amount || 0

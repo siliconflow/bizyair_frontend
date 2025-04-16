@@ -371,7 +371,8 @@
       "recentConsumption": "Recent Consumption",
       "recentBillDetails": "Recent 30 Minutes Consumption Details",
       "back": "Back",
-      "selectAPIKey": "Select API Key"
+      "selectAPIKey": "Select API Key",
+      "time": "Time"
     },
     "uploadInfo": {
       "nickname": "Nickname",
