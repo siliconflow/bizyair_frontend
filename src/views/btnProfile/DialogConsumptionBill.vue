@@ -477,8 +477,8 @@
   // 最近消费
   const recentColumns = [
     {
-      title: 'Prompt ID',
-      key: 'prompt_id'
+      title: t('btnProfile.consumptionBill.time'),
+      key: 'time'
     },
     {
       title: t('btnProfile.consumptionBill.totalAmount'),
@@ -741,7 +741,8 @@
         const allRecords = promptResults.map((item: any) => ({
           prompt_id: item.prompt_id || '',
           charge_amount: item.charge_amount || 0,
-          gift_amount: item.gift_amount || 0
+          gift_amount: item.gift_amount || 0,
+          time: item.time || ''
         }))
         //最多显示100条
         totalCount.value = allRecords.length > 100 ? 100 : allRecords.length

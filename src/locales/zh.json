@@ -10,7 +10,8 @@
         "length": "剪贴板内容长度不正确。",
         "shareCodeLength": "分享码长度不正确。"
       }
-    }
+    },
+    "assistant": "助手"
   },
   "buttons": {
     "profile": "个人资料",
@@ -344,12 +345,12 @@
   },
   "btnProfile": {
     "userInfo": {
-      "lazyText": "这家伙很懒，什么也没留下",
+      "lazyText": "这家伙很懒，什么也没留下2222111111",
       "balance": "余额",
       "coin": " 币",
       "recharge": "充值",
       "giftSilverCoin": "赠送银币",
-      "rechargeCoin": "充值金币",
+      "rechargeCoin": "充值金币", 
       "switchApiKey": "切换 API 密钥",
       "myWallet": "我的钱包",
       "rechargeRecord": "充值记录",
@@ -371,7 +372,7 @@
       "confirm": "确认"
     },
     "coinsList": {
-      "viewExpiring": "查看您即将过期的BZ币列表，并进行筛选查看。",
+      "viewExpiring": "查看您即将过期的BZ币列表，并进行筛选查看11111。",
       "expiringGoldTotal": "即将过期的金币总额",
       "expiringSilverTotal": "即将过期的银币总额",
       "all": "全部",
@@ -455,7 +456,8 @@
       "recentBillDetails": "最近30分钟的费用明细",
       "back": "返回",
       "selectAPIKey": "选择API Key",
-      "dailyBill2": "每日账单"
+      "dailyBill2": "每日账单",
+      "time": "时间"
     }
   },
   "purchaseDoc": {
