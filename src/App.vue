@@ -24,12 +24,15 @@
               <span>{{ $t('app.title') }}</span>
             </h1>
             <div class="handle">
-              <div :class="['share-input-box', { 'share-input-box-has-val': shareCode }]">
+              <div 
+                :class="['share-input-box', { 'share-input-box-has-val': shareCode }]"
+                @mouseover="() => (shareInput as any).focus()">
                 <strong class="share-input">
                   <n-input
                     size="tiny"
                     v-model:value="shareCode"
                     class="input"
+                    ref="shareInput"
                     :placeholder="$t('app.shareCode.placeholder')"
                   >
                     <template #suffix>
@@ -169,6 +172,8 @@
 
   const { t, locale } = useI18n()
   const languageStore = useLanguageStore()
+
+  const shareInput = ref(null)
 
   const getUserLanguageProfile = async () => {
     try {
