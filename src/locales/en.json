@@ -1,14 +1,14 @@
 {
   "app": {
     "title": "BizyAir",
-    "restore": "restore",
-    "minimize": "minimize",
+    "restore": "Restore",
+    "minimize": "Minimize",
     "shareCode": {
       "placeholder": "Paste share code",
       "error": {
         "empty": "Clipboard content is empty or not a string.",
-        "length": "The length of the clipboard content is incorrect.",
-        "shareCodeLength": "The length of the share code is incorrect."
+        "length": "Clipboard content length is incorrect.",
+        "shareCodeLength": "Share code length is incorrect."
       }
     },
     "assistant": "Assistant"
@@ -22,7 +22,7 @@
     "message": "Message",
     "news": "News",
     "examples": "Examples",
-    "publishModel": "PublishModel",
+    "publishModel": "Publish Model",
     "model": "Model",
     "workflow": "Workflow",
     "docs": "Docs"
@@ -32,21 +32,38 @@
     "english": "English",
     "chinese": "中文"
   },
+  "sidebar": {
+    "assistant": {
+      "title": "BizyAir Assistant",
+      "clearHistory": "Clear Chat History",
+      "close": "Close",
+      "nodeName": "Node Name",
+      "nodeType": "Node Type",
+      "inputPlaceholder": "Enter your question...",
+      "uploadImage": "Upload Image",
+      "removeImage": "Remove Image",
+      "sendMessage": "Send Message",
+      "abortGeneration": "Abort Generation",
+      "welcomeMessage": "Hello! I'm BizyAir Assistant. Click on images in nodes to upload them directly.",
+      "errorMessage": "Sorry, an error occurred. Please try again later.",
+      "imageUploadError": "Please upload an image file"
+    }
+  },
   "apiKeyDialog": {
     "title": "Set API Key",
     "placeholder": "API Key",
-    "login": "Please click to login and autofill the key,",
-    "clickToLogin": "click to login",
+    "login": "Please click login to auto-fill the key, ",
+    "clickToLogin": "Click to login",
     "visitTo": "or visit",
-    "getKey": "to get your key and input manually.",
-    "agreement": "Setting the API Key signifies agreement to the",
+    "getKey": "to get your key and enter it manually.",
+    "agreement": "Setting an API key means you agree to the",
     "userAgreement": "User Agreement",
     "and": "and",
     "privacyPolicy": "Privacy Policy.",
     "submit": "Submit",
     "close": "Close",
-    "success": "API Key set successfully!",
-    "failed": "Failed to set API Key:"
+    "success": "API key set successfully!",
+    "failed": "Failed to set API key:"
   },
   "profile": {
     "apiKey": "API Key:",
@@ -59,16 +76,16 @@
       "copy": "Copy",
       "confirmModify": {
         "title": "Are you sure you want to modify it?",
-        "desc": "If you make this change, it will render any models you have previously shared unavailable, and you are only allowed to make this modification once per year.",
-        "cancel": "No, Keep It",
-        "continue": "Yes, Delete It"
+        "desc": "If you make this change, it will cause any previously shared models to be unavailable, and you can only make this modification once a year.",
+        "cancel": "No, keep it",
+        "continue": "Yes, delete it"
       },
-      "waitMessage": "You can only change your share ID once a year. You need to wait until {date} to make the modification."
+      "waitMessage": "You can only change your Share ID once a year. You'll need to wait until {date} to make changes."
     }
   },
   "messageBox": {
     "title": "Message Box",
-    "markAllAsRead": "Mark All as Read",
+    "markAllAsRead": "Mark all as read",
     "officialNotices": "Official Notices",
     "userForks": "User Forks",
     "receivedLikes": "Received Likes",
@@ -91,10 +108,10 @@
     "remove": "Remove",
     "firstPublished": "First Published:",
     "lastUpdated": "Last Updated:",
-    "noIntroduction": "No introduction yet",
+    "noIntroduction": "No introduction",
     "type": "Type",
     "baseModel": "Base Model",
-    "published": "Published",
+    "published": "Published Time",
     "explore": "Explore",
     "quickStart": {
       "title": "Quick Start",
@@ -106,7 +123,7 @@
       "loadWorkflow": {
         "success": "Workflow loaded successfully",
         "error": "Failed to load workflow: {error}",
-        "notFound": "No workflow found"
+        "notFound": "Workflow not found"
       }
     },
     "models": {
@@ -124,8 +141,8 @@
     "mine": {
       "title": "Mine",
       "contents": {
-        "title": "Contents",
-        "subtitle": "View your contents"
+        "title": "Mine",
+        "subtitle": "View my content"
       },
       "tabs": {
         "posts": "Posts",
@@ -142,14 +159,14 @@
         "options": {
           "recently": "Recently",
           "popular": "Popular",
-          "downloads": "Downloads",
+          "downloads": "Most Downloaded",
           "most-used": "Most Used",
           "most-liked": "Most Liked",
           "most-forked": "Most Forked"
         }
       },
       "type": {
-        "title": "Filter by name",
+        "title": "Please enter keywords",
         "all": "All",
         "lora": "LoRA",
         "controlnet": "ControlNet",
@@ -158,17 +175,17 @@
       }
     },
     "emptyState": {
-      "title": "No Data Available",
-      "subtitle": "Try another Base Model or adjust your filters"
+      "title": "No Data",
+      "subtitle": "Please try selecting another base model or adjusting your filter criteria"
     },
     "modelCard": {
       "tooltips": {
         "loadWorkflow": "Load Workflow",
         "addNode": "Add Node",
-        "downloaded": "Downloaded",
-        "used": "Used",
-        "forked": "Forked",
-        "liked": "Liked"
+        "downloaded": "Downloads",
+        "used": "Usage Count",
+        "forked": "Forks",
+        "liked": "Likes"
       },
       "tags": {
         "new": "New"
@@ -177,7 +194,7 @@
     "detail": {
       "type": "Type",
       "baseModel": "Base Model",
-      "unFork": "UnFork",
+      "unFork": "Unfork",
       "fork": "Fork",
       "addNode": "Add Node",
       "load": "Load",
@@ -185,65 +202,65 @@
       "share": "Share",
       "copy": "Copy",
       "download": "Download",
-      "stats": "Stats",
+      "stats": "Statistics",
       "hash": "Hash",
       "file": "File",
-      "reviews": "Reviews",
-      "positive": "Positive",
-      "negative": "Negative",
+      "reviews": "Review Results",
+      "positive": "Verified",
+      "negative": "Unverified",
       "firstPublished": "First Published:",
       "lastUpdated": "Last Updated:",
-      "workflow": "workflow",
-      "model": "model",
+      "workflow": "Workflow",
+      "model": "Model",
       "confirmUnfork": "Are you sure you want to unfork this {0}?",
-      "unforkWarning": "The original model may no longer be public.",
-      "confirmUnforkBtn": "Yes, UnFork It",
+      "unforkWarning": "The original model may no longer be publicly available",
+      "confirmUnforkBtn": "Yes, unfork",
       "confirmDelete": "Are you sure you want to delete this {0}?",
-      "deleteWarning": "This action cannot be undone.",
-      "confirmDeleteBtn": "Yes, Delete It",
+      "deleteWarning": "This action cannot be undone",
+      "confirmDeleteBtn": "Yes, delete it",
       "tooltips": {
         "like": "Like",
         "liked": "Liked",
-        "modelType": "The type of model file may be {0}",
+        "modelType": "The model file type might be {0}",
         "unknownModelType": "Unknown base model type"
       },
       "edit": "Edit",
       "remove": "Remove",
-      "modelNotFound": "Model not found.",
+      "modelNotFound": "Model not found",
       "failedFetchModelDetails": "Failed to fetch model details",
-      "shareCodeCopied": "The share code has been copied!",
-      "copyFailed": "Copy failed.",
-      "publicVersionWarning": "Model has public version, cannot remove.",
-      "modelRemovedSuccessfully": "Model removed successfully.",
-      "failedRemoveModel": "Failed to remove model.",
+      "shareCodeCopied": "Share code copied",
+      "copyFailed": "Copy failed",
+      "publicVersionWarning": "Model has public versions, cannot delete",
+      "modelRemovedSuccessfully": "Model removed successfully",
+      "failedRemoveModel": "Failed to remove model",
       "noModelVersionsFound": "No model versions found",
-      "copiedSuccessfully": "Copied successfully.",
-      "failedLoadWorkflow": "Failed to load workflow.",
-      "nodeAddedSuccessfully": "Node added successfully.",
-      "failedDownloadWorkflow": "Failed to download workflow.",
-      "failedAddNode": "Failed to add node."
+      "copiedSuccessfully": "Copied successfully",
+      "failedLoadWorkflow": "Failed to load workflow",
+      "nodeAddedSuccessfully": "Node added successfully",
+      "failedDownloadWorkflow": "Failed to download workflow",
+      "failedAddNode": "Failed to add node"
     }
   },
   "publish": {
     "model": {
-      "title": "Publish a Model",
+      "title": "Publish Model",
       "name": {
         "label": "Model Name",
-        "placeholder": "Enter Model Name"
+        "placeholder": "Enter model name"
       },
       "type": {
         "label": "Model Type",
-        "placeholder": "Select Model Type"
+        "placeholder": "Select model type"
       },
       "nextStep": "Next Step",
       "addVersion": "Add Version",
       "version": {
         "name": "Version Name",
-        "placeholder": "Version Name"
+        "placeholder": "Enter version name"
       },
       "baseModel": "Base Model",
-      "baseModelPlaceholder": "Select Base Model",
-      "uploadImage": "Upload Image",
+      "baseModelPlaceholder": "Select base model",
+      "uploadImage": "Upload Cover",
       "introduction": "Introduction",
       "publicVisible": "Publicly Visible",
       "file": "File",
@@ -253,33 +270,33 @@
       "confirmDelete": {
         "title": "Are you sure you want to delete this version?",
         "desc": "This action cannot be undone.",
-        "cancel": "No, Keep It",
-        "continue": "Yes, Delete It"
+        "cancel": "No, keep it",
+        "continue": "Yes, delete it"
       },
       "errors": {
-        "enterName": "Please enter the model name",
-        "selectType": "Please select the model type",
-        "enterVersion": "Please enter the version name for version {index}",
-        "selectBaseModel": "Please select the base model for version {index}",
-        "enterFilePath": "Please enter the file path for version {index}"
+        "enterName": "Please enter model name",
+        "selectType": "Please select model type",
+        "enterVersion": "Please enter version name for version {index}",
+        "selectBaseModel": "Please select base model for version {index}",
+        "enterFilePath": "Please enter file path for version {index}"
       },
       "success": "Model published successfully"
     },
     "workflow": {
-      "title": "Publish a Workflow",
+      "title": "Publish Workflow",
       "name": {
         "label": "Workflow Name",
-        "placeholder": "Enter Workflow Name"
+        "placeholder": "Enter workflow name"
       },
       "nextStep": "Next Step",
       "addVersion": "Add Version",
       "version": {
         "name": "Version Name",
-        "placeholder": "Version Name"
+        "placeholder": "Enter version name"
       },
       "baseModel": "Base Model",
-      "baseModelPlaceholder": "Select Base Model",
-      "uploadImage": "Upload Image",
+      "baseModelPlaceholder": "Select base model",
+      "uploadImage": "Upload Cover",
       "introduction": "Introduction",
       "publicVisible": "Publicly Visible",
       "file": "File",
@@ -291,14 +308,14 @@
       "confirmDelete": {
         "title": "Are you sure you want to delete this version?",
         "desc": "This action cannot be undone.",
-        "cancel": "No, Keep It",
-        "continue": "Yes, Delete It"
+        "cancel": "No, keep it",
+        "continue": "Yes, delete it"
       },
       "errors": {
-        "enterName": "Please enter the workflow name",
-        "enterVersion": "Please enter the version name for version {index}",
-        "selectBaseModel": "Please select the base model for version {index}",
-        "enterFilePath": "Please enter the file path for version {index}"
+        "enterName": "Please enter workflow name",
+        "enterVersion": "Please enter version name for version {index}",
+        "selectBaseModel": "Please select base model for version {index}",
+        "enterFilePath": "Please enter file path for version {index}"
       },
       "success": "Workflow published successfully"
     }
@@ -313,67 +330,48 @@
   "confirm": {
     "cancel": "Cancel",
     "continue": "Continue",
-    "title": "Are you absolutely sure?"
+    "title": "Are you sure?"
   },
   "vUpload": {
-    "clickOrDrag": "Click or drag file to this area to upload",
+    "clickOrDrag": "Click or drag files to this area to upload",
     "interrupt": "Interrupt",
     "cancel": "Cancel",
     "invalidFileFormat": "Invalid file format.",
-    "inHashCalculation": "In hash calculation",
+    "inHashCalculation": "Calculating hash value",
     "uploadFailed": "Upload to OSS failed:",
     "clickToUpload": "Click to upload, please select a folder.",
-    "supportFormats": "You can add up to 600 images, with support for PNG, JPG, and JPEG formats.",
-    "fileNumber": "File Number",
-    "uploadConfirm": "You are about to upload {0} images and {1} texts.",
-    "missingCaptions": "Some of your images are missing captions. Please provide the caption files.",
-    "modalTitle": "Tips",
+    "supportFormats": "You can add up to 600 images, supporting PNG, JPG, and JPEG formats.",
+    "fileNumber": "File Count",
+    "uploadConfirm": "You are about to upload {0} images and {1} text files.",
+    "missingCaptions": "Some images are missing caption files. Please provide caption files.",
+    "modalTitle": "Prompt",
     "uploadButton": "Upload",
     "cancelButton": "Cancel",
-    "uploadImage": "Upload Image",
+    "uploadImage": "Upload Cover",
     "loading": "Loading",
-    "foundUnfinishedUpload": "Found unfinished upload, resuming...",
-    "noResumeData": "No resumable upload data found",
-    "resumeFailed": "Failed to resume upload",
+    "foundUnfinishedUpload": "Found an unfinished upload task, will continue from breakpoint",
+    "noResumeData": "Cannot find resume data",
+    "resumeFailed": "Resume upload failed, please upload again",
     "tokenExpired": "Upload token expired, please upload again",
-    "retryFailed": "Multiple retry attempts failed, please check your network connection and upload again",
-    "willRetryInSeconds": "Network connection lost, will automatically retry in {seconds} seconds",
+    "maxRetriesReached": "Maximum retries reached, please check network and retry manually",
+    "retryFailed": "Multiple upload retries failed, please check network connection and upload again",
+    "willRetryInSeconds": "Network connection interrupted, will automatically retry in {seconds} seconds",
     "retrying": "Waiting for retry attempt {count}, {seconds} seconds remaining",
     "retryingUpload": "Network restored, continuing upload",
     "uploadComplete": "Upload complete"
   },
   "btnProfile": {
     "userInfo": {
-      "lazyText": "This person is lazy and left nothing behind",
+      "lazyText": "This user is lazy and left nothing behind",
       "balance": "Balance",
       "coin": " Coins",
-      "recharge": "Purchase",
-      "giftSilverCoin": "Silver",
-      "rechargeCoin": "Gold",
-      "switchApiKey": "Set API Key",
+      "recharge": "Recharge",
+      "giftSilverCoin": "Gift Silver Coins",
+      "rechargeCoin": "Recharge Gold Coins",
+      "switchApiKey": "Switch API Key",
       "myWallet": "My Wallet",
-      "rechargeRecord": "Payment",
-      "consumptionBill": "Bill"
-    },
-    "consumptionBill": {
-      "title": "Bill",
-      "enterApiKey": "Please enter API Key",
-      "search": "Search",
-      "billingPeriod": "Billing Period",
-      "totalAmount": "Total Amount",
-      "goldCoinDeduction": "Gold Coin Deduction",
-      "silverCoinDeduction": "Silver Coin Deduction",
-      "success": "Success",
-      "failed": "Failed",
-      "pending": "Pending",
-      "yearlyBill": "Yearly Bill",
-      "monthlyBill": "Monthly Bill",
-      "dailyBill": "Daily Bill",
-      "recentConsumption": "Recent Consumption",
-      "recentBillDetails": "Recent 30 Minutes Consumption Details",
-      "back": "Back",
-      "selectAPIKey": "Select API Key",
-      "time": "Time"
+      "rechargeRecord": "Recharge Record",
+      "consumptionBill": "Consumption Bill"
     },
     "uploadInfo": {
       "nickname": "Nickname",
@@ -391,48 +389,48 @@
       "confirm": "Confirm"
     },
     "coinsList": {
-      "viewExpiring": "View your expiring BZ coins list and filter the view.",
+      "viewExpiring": "View your expiring BZ coins list and filter them.",
       "expiringGoldTotal": "Expiring Gold Coins Total",
       "expiringSilverTotal": "Expiring Silver Coins Total",
       "all": "All",
-      "silverCoin": "Silver",
-      "goldCoin": "Gold",
+      "silverCoin": "Silver Coins",
+      "goldCoin": "Gold Coins",
       "amount": "Amount",
       "expiryTime": "Expiry Time",
-      "inOneDay": "In 1 Day",
-      "inSevenDays": "In 7 Days",
-      "inFifteenDays": "In 15 Days",
-      "inThirtyDays": "In 30 Days",
-      "inOneYear": "In 1 Year",
+      "inOneDay": "Within 1 day",
+      "inSevenDays": "Within 7 days",
+      "inFifteenDays": "Within 15 days",
+      "inThirtyDays": "Within 30 days",
+      "inOneYear": "Within 1 year",
       "myBZCoins": "My BZ Coins"
     },
     "record": {
-      "rechargeRecord": "Payment",
-      "bzCoinRecharge": "Purchase BZ Coin",
+      "rechargeRecord": "Recharge Record",
+      "bzCoinRecharge": "BZ Coin Recharge",
       "orderStatus": "Order Status",
       "selectOrder": "Select Order",
       "orderNumber": "Order Number",
       "productName": "Product Name",
       "transactionTime": "Transaction Time",
       "transactionAmount": "Transaction Amount",
-      "status": "Status",
+      "status": "Order Status",
       "operations": "Operations",
       "pay": "Pay",
       "unknown": "Unknown",
       "wechatPay": "WeChat Pay",
-      "expireQrCode": "QR code will expire after {0}",
-      "qrCodeExpired": "QR code has expired, please click to refresh",
+      "expireQrCode": "QR code will expire in {0}",
+      "qrCodeExpired": "QR code expired, please click to refresh",
       "all": "All",
-      "paySuccess": "Payment Success",
+      "paySuccess": "Payment Successful",
       "notPaid": "Not Paid",
       "refund": "Refund",
       "refundProcessing": "Refund Processing",
-      "refundSuccess": "Refund Success",
+      "refundSuccess": "Refund Successful",
       "refundClosed": "Refund Closed",
       "refundAbnormal": "Refund Abnormal",
-      "refundOrder": "Cancel",
-      "minute": "Minutes",
-      "second": "Seconds",
+      "refundOrder": "Refund Order",
+      "minute": "min",
+      "second": "sec",
       "orderCreationFailed": "Order creation failed",
       "confirmCancel": "Are you sure you want to cancel this order?",
       "proceed": "Proceed",
@@ -440,39 +438,60 @@
     },
     "product": {
       "coin": "Coins",
-      "confirmAgreement": "By confirming payment, you agree to the platform's",
-      "rechargeAgreement": "「Recharge Agreement」",
+      "confirmAgreement": "Confirming payment means you agree to the platform's",
+      "rechargeAgreement": "\"Recharge Agreement\"",
       "coinValidityNote": "Note: Gold coins are valid for 1 year",
       "actualPayment": "Actual Payment",
       "pay": "Pay",
       "agreementWarning": "Please agree to the recharge agreement first",
       "wechatPay": "WeChat Pay",
-      "expireQrCode": "QR code will expire after {0}",
-      "qrCodeExpired": "QR code has expired, please click to refresh",
-      "paySuccess": "Payment Success"
+      "expireQrCode": "QR code will expire in {0}",
+      "qrCodeExpired": "QR code expired, please click to refresh",
+      "paySuccess": "Payment Successful"
     },
     "avatar": {
       "avatar": "Avatar"
     },
     "index": {
       "profile": "Profile"
+    },
+    "consumptionBill": {
+      "title": "Consumption Bill",
+      "enterApiKey": "Please enter API Key",
+      "search": "Search",
+      "billingPeriod": "Billing Period",
+      "totalAmount": "Total Amount",
+      "goldCoinDeduction": "Gold Coin Deduction",
+      "silverCoinDeduction": "Silver Coin Deduction",
+      "success": "Success",
+      "failed": "Failed",
+      "pending": "Pending",
+      "yearlyBill": "Yearly Bill",
+      "monthlyBill": "Monthly Bill",
+      "dailyBill": "Daily Bill",
+      "recentConsumption": "Recent Consumption",
+      "recentBillDetails": "Expense details for the last 30 minutes",
+      "back": "Back",
+      "selectAPIKey": "Select API Key",
+      "dailyBill2": "Daily Bill",
+      "time": "Time"
     }
   },
   "purchaseDoc": {
     "title": "BizyAir Recharge Service Agreement",
     "service": {
       "title": "I. Service Definition",
-      "platform": "BizyAir platform (hereinafter referred to as 'platform') authorizes users to use platform functions including but not limited to BizyAir node services and task execution by providing 'BZ Coins' virtual products.",
+      "platform": "BizyAir platform (hereinafter referred to as \"the Platform\") authorizes users to use platform features including but not limited to BizyAir node services and task execution by providing virtual \"BZ Coins\" products.",
       "types": "BZ Coins are divided into two categories:",
-      "gold": "Gold Coins: BZ coins directly purchased by users through recharge, with validity period and limited refund rights;",
-      "silver": "Silver Coins: BZ coins given by the platform through activities, membership benefits, etc., with validity period and non-refundable or withdrawable."
+      "gold": "Gold Coins: BZ Coins directly purchased by users through recharge, with validity period and limited refund rights;",
+      "silver": "Silver Coins: BZ Coins gifted through activities, membership benefits, etc., with validity period and not refundable or cashable."
     },
     "rules": {
       "title": "II. BZ Coin Rules",
       "acquisition": {
         "title": "1. Acquisition and Usage",
-        "methods": "Users can purchase gold coins through recharge, or obtain silver coins through platform activities, membership, etc.",
-        "usage": "BZ coins can only be used for designated platform services (such as node resource consumption, task execution, etc.), and cannot be transferred, traded or exchanged for cash."
+        "methods": "Users can purchase Gold Coins through recharge, or obtain Silver Coins through platform activities, membership subscription, etc.",
+        "usage": "BZ Coins can only be used for designated platform services (such as node resource consumption, task execution, etc.), and cannot be transferred, bought, sold, or exchanged for cash."
       },
       "validity": {
         "title": "2. Validity Period and Refund",
@@ -482,11 +501,11 @@
           "refundRule": "Refund Rule",
           "gold": {
             "period": "1 year (from recharge date)",
-            "rule": "Can apply for refund based on remaining ratio within 180 days after recharge (handling fee required)"
+            "rule": "Can apply for refund proportionally to remaining amount within 180 days of recharge (subject to service fee)"
           },
           "silver": {
             "period": "According to activity rules",
-            "rule": "Non-refundable, non-withdrawable"
+            "rule": "Non-refundable, non-cashable"
           }
         }
       },
@@ -495,14 +514,14 @@
         "nodeTypes": {
           "title": "3.1 Node Classification Billing",
           "desc": "The platform implements differentiated billing strategies for various nodes, specifically divided into two categories:",
-          "goldOnly": "Gold Coin Only Nodes: Only accept gold coin payments (node details page will clearly state 'Gold Coins Only');",
-          "mixed": "Mixed Payment Nodes: Support both gold and silver coin payments (default deduction follows the 'Silver Coins First' principle)."
+          "goldOnly": "Gold Coin Only Nodes: Accept only Gold Coin payment (node details page will clearly mark \"Gold Coins Only\");",
+          "mixed": "Mixed Payment Nodes: Support both Gold and Silver Coin payments (defaulting to \"Silver Coins First\" deduction principle)."
         },
         "execution": {
           "title": "3.2 Billing Execution Rules",
-          "rule1": "For mixed payment nodes, the system prioritizes deducting silver coins, automatically deducting gold coins when silver coin balance is insufficient;",
-          "rule2": "For gold coin only nodes, only gold coin balance is deducted;",
-          "rule3": "If the corresponding coin balance is insufficient, the system will immediately suspend the node service and push a balance warning notification."
+          "rule1": "When using mixed payment nodes, the system prioritizes deducting Silver Coins, automatically deducting Gold Coins when Silver Coin balance is insufficient;",
+          "rule2": "When using Gold Coin only nodes, only Gold Coin balance is deducted;",
+          "rule3": "If the corresponding coin balance is insufficient, the system will immediately pause the node service and send a balance alert notification."
         },
         "special": {
           "title": "3.3 Special Notes",
@@ -514,26 +533,26 @@
       "title": "III. User Rights and Obligations",
       "recharge": {
         "title": "Recharge Confirmation",
-        "content": "After successful recharge, users can check BZ coin balance and validity period in their account."
+        "content": "After successful recharge, users can check BZ Coin balance and validity period in their account."
       },
       "refund": {
         "title": "Refund Application",
-        "content": "Gold coin refunds must be applied through platform customer service, refund amount calculated based on remaining validity period ratio (handling fee details as announced on platform)."
+        "content": "Gold Coin refunds must be submitted through platform customer service. Refund amount is calculated based on remaining validity period proportion (service fee details are published on the platform)."
       },
       "restriction": {
         "title": "Usage Restrictions",
-        "content": "Obtaining BZ coins through unofficial channels or exploiting system vulnerabilities for profit is prohibited. Violators' accounts may be frozen and held accountable."
+        "content": "It is prohibited to obtain BZ Coins through unofficial channels or exploit system vulnerabilities for profit. Violators may have their accounts frozen and be held accountable."
       }
     },
     "platformRights": {
       "title": "IV. Platform Rights and Obligations",
       "service": {
-        "title": "Service Adjustments",
-        "content": "The platform reserves the right to adjust BZ coin rules, pricing, or service content due to operational or policy reasons, with notification via announcements/in-site messages."
+        "title": "Service Adjustment",
+        "content": "The platform has the right to adjust BZ Coin rules, pricing, or service content due to operational, policy, or other reasons, and will notify users through announcements/in-site messages."
       },
       "abnormal": {
         "title": "Abnormal Handling",
-        "content": "If account abnormalities are detected (such as malicious coin farming), the platform may suspend services and recover illegal gains."
+        "content": "If account abnormalities are detected (such as malicious coin accumulation), the platform may suspend service and recover illegally obtained benefits."
       },
       "disclaimer": {
         "title": "Disclaimer",
@@ -543,51 +562,68 @@
     "userBehavior": {
       "title": "V. User Behavior Standards and Breach Liability",
       "prohibited": {
-        "title": "1. Prohibited Conduct",
-        "desc": "Users must strictly comply with the following conduct guidelines when using BizyAir platform services:",
-        "item1": "Strictly prohibited to modify platform service content, service period, transaction amount, or consumption records through any technical means.",
-        "item2": "Prohibited to provide account or service privileges to third parties through any platform-unauthorized means (including but not limited to lending, renting, selling, sharing, etc.).",
-        "item3": "Strictly prohibited to crack, tamper with, reverse engineer, or perform other destructive operations on the platform's security protection system.",
-        "item4": "Without platform written authorization, service content may not be displayed or distributed in any public venue (online or offline) (except for fair use cases).",
-        "item5": "Must not engage in any behavior that violates laws, regulations, this agreement, or infringes upon the legitimate rights of the platform and third parties."
+        "title": "1. Prohibited Behavior Clauses",
+        "desc": "When using BizyAir platform services, users must strictly adhere to the following behavior guidelines:",
+        "item1": "Strictly prohibited from using any technical means to modify platform service content, service period, transaction amount, or consumption records without authorization.",
+        "item2": "Prohibited from providing account or service privileges to third parties in any way not approved by the platform (including but not limited to lending, renting, selling, sharing, etc.).",
+        "item3": "Strictly prohibited from cracking, tampering with, reverse engineering, or performing other destructive operations on the platform's security protection system.",
+        "item4": "Without written authorization from the platform, service content may not be displayed or disseminated in any public venue (online or offline) (except for fair use cases).",
+        "item5": "Must not engage in any behavior that violates laws, regulations, this agreement, or infringes on the legitimate rights and interests of the platform and third parties."
       },
       "breach": {
         "title": "2. Breach Handling Measures",
-        "desc": "If users violate this agreement or relevant laws and regulations, BizyAir platform has the right to take the following measures based on severity:",
-        "item1": "Handle according to special provisions in this agreement.",
-        "item2": "Take necessary technical measures to stop violations, including but not limited to deleting violating content, restricting account functions, or suspending service access.",
-        "item3": "Unilaterally terminate part or all services, with paid fees non-refundable and users having no right to claim any form of compensation."
+        "desc": "If users violate this agreement or relevant laws and regulations, the BizyAir platform has the right to take the following measures based on the severity of the situation:",
+        "item1": "Handle according to special provisions in relevant clauses of this agreement.",
+        "item2": "Take necessary technical measures to stop violations, including but not limited to deleting violating content, restricting account functions, or suspending service access privileges.",
+        "item3": "Unilaterally terminate part or all services, with no refund of fees already paid, and users have no right to request any form of compensation."
       }
     },
     "other": {
-      "title": "VI. Other Terms",
+      "title": "VI. Other Clauses",
       "agreement": {
         "title": "Agreement Changes",
-        "content": "Continued use of services after agreement revision is deemed acceptance of new terms."
+        "content": "Continued use of services after this agreement is revised is considered acceptance of the new terms."
       },
       "dispute": {
         "title": "Dispute Resolution",
-        "content": "Disputes should be resolved through negotiation; if unsuccessful, submit to the court where the platform is located."
+        "content": "Disputes should be resolved through negotiation; if negotiation fails, the case may be submitted to the court in the platform's location."
       }
     },
     "keyPoints": {
-      "title": "Appendix: Key Terms Explanation",
+      "title": "Appendix: Key Clause Explanations",
       "refund": {
         "title": "Refund Example",
-        "content": "If a user recharges 100 gold coins and uses 30% before requesting a refund, within 180 days of order effectiveness, they can receive the amount corresponding to the remaining 70 gold coins (minus handling fee); beyond 180 days, no refund is available."
+        "content": "If a user recharges 100 Gold Coins, uses 30%, and applies for a refund, they can receive the corresponding payment for the remaining 70 Gold Coins (minus service fee) if within 180 days of the order's effect; if beyond 180 days of the order's effect, no refund is possible."
       },
       "goldExpire": {
         "title": "Gold Coin Expiration",
-        "content": "Unused gold coins will automatically expire and cannot be recovered after the validity period."
+        "content": "Upon expiration of the validity period, unused Gold Coins will automatically be cleared and cannot be recovered."
       },
       "silverExpire": {
         "title": "Silver Coin Expiration",
-        "content": "Unused silver coins will automatically expire and cannot be recovered after the validity period."
+        "content": "Upon expiration of the validity period, unused Silver Coins will automatically be cleared and cannot be recovered."
       }
     }
   },
   "btnDocs": {
-    "price": "Pricing strategy",
-    "doc": "Manual"
+    "price": "Pricing Strategy",
+    "doc": "Documentation"
+  },
+  "resumableUpload": {
+    "title": "Resumable Upload",
+    "uploadStatus": "Upload Status",
+    "uploadProgress": "Upload Progress",
+    "pauseUpload": "Pause Upload",
+    "resumeUpload": "Resume Upload",
+    "uploadFailed": "Upload Failed",
+    "uploadSuccessful": "Upload Successful",
+    "uploadPaused": "Upload Paused",
+    "remainingTime": "Remaining Time",
+    "uploadSpeed": "Upload Speed",
+    "prepareUpload": "Preparing upload...",
+    "processingFile": "Processing file...",
+    "largeFileWarning": "File is large, upload may take longer",
+    "unstableNetworkWarning": "Network is unstable, upload speed may be affected",
+    "uploadTimedOut": "Upload timed out, please check your network connection"
   }
 }

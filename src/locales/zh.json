@@ -32,6 +32,23 @@
     "english": "English",
     "chinese": "中文"
   },
+  "sidebar": {
+    "assistant": {
+      "title": "BizyAir 助手",
+      "clearHistory": "清空对话历史",
+      "close": "关闭",
+      "nodeName": "节点名称",
+      "nodeType": "节点类型",
+      "inputPlaceholder": "输入问题...",
+      "uploadImage": "上传图片",
+      "removeImage": "移除图片",
+      "sendMessage": "发送消息",
+      "abortGeneration": "中止生成",
+      "welcomeMessage": "你好！我是BizyAir助手，点击节点中的图片可以直接上传",
+      "errorMessage": "抱歉，发生了错误。请稍后再试。",
+      "imageUploadError": "请上传图片文件"
+    }
+  },
   "apiKeyDialog": {
     "title": "设置API密钥",
     "placeholder": "API密钥",
@@ -345,12 +362,12 @@
   },
   "btnProfile": {
     "userInfo": {
-      "lazyText": "这家伙很懒，什么也没留下2222111111",
+      "lazyText": "这家伙很懒，什么也没留下",
       "balance": "余额",
       "coin": " 币",
       "recharge": "充值",
       "giftSilverCoin": "赠送银币",
-      "rechargeCoin": "充值金币", 
+      "rechargeCoin": "充值金币",
       "switchApiKey": "切换 API 密钥",
       "myWallet": "我的钱包",
       "rechargeRecord": "充值记录",
@@ -372,7 +389,7 @@
       "confirm": "确认"
     },
     "coinsList": {
-      "viewExpiring": "查看您即将过期的BZ币列表，并进行筛选查看11111。",
+      "viewExpiring": "查看您即将过期的BZ币列表，并进行筛选查看。",
       "expiringGoldTotal": "即将过期的金币总额",
       "expiringSilverTotal": "即将过期的银币总额",
       "all": "全部",
@@ -464,7 +481,7 @@
     "title": "BizyAir 充值服务协议",
     "service": {
       "title": "一、服务定义",
-      "platform": "BizyAir平台（以下简称“平台”）通过向用户提供”BZ币“虚拟产品，授权用户使用包括但不限于BizyAir节点服务、任务执行等平台功能。",
+      "platform": "BizyAir平台（以下简称\"平台\"）通过向用户提供\"BZ币\"虚拟产品，授权用户使用包括但不限于BizyAir节点服务、任务执行等平台功能。",
       "types": "BZ币分为两类：",
       "gold": "金币：用户通过充值直接购买的BZ币，具有有效期及有限退款权益；",
       "silver": "银币：平台通过活动、会员权益等途径赠予的BZ币，具有有效期且不可退款或提现。"

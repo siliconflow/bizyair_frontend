@@ -133,6 +133,7 @@
               <btnPublish />
               <btnTrain />
               <btnDocs />
+              <btnAssistant />
               <!-- <btnNews /> -->
               <apiKeyDialog />
             </div>
@@ -141,6 +142,8 @@
         <ModelDetail v-if="communityStore.showCommunityDetail" />
       </n-notification-provider>
     </n-message-provider>
+    <!-- 添加助手侧边栏 -->
+    <Sidebar />
   </vTheme>
 </template>
 <script setup lang="ts">
@@ -150,6 +153,7 @@
   import btnPublish from '@/views/btnPublish/index.vue'
   import btnTrain from '@/views/btnTrain/index.vue'
   import btnDocs from '@/views/btnDocs/index.vue'
+  import btnAssistant from '@/views/btnAssistant/index.vue'
   // import btnNews from '@/views/btnNews/index.vue'
   import btnMessage from '@/views/btnMessage/index.vue'
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
@@ -166,6 +170,7 @@
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { useToaster } from '@/components/modules/toats/index'
   import vTheme from './components/modules/vTheme.vue'
+  import Sidebar from '@/components/assistant/Sidebar.vue'
 
   const { t, locale } = useI18n()
   const languageStore = useLanguageStore()
@@ -301,7 +306,7 @@
   .bizyair-menu-box {
     border-radius: 12px;
     transition: all 0.3s cubic-bezier(0, 0, 0.1, 1.8);
-    width: 484px;
+    width: 554px;
 
     .bizyair-bar {
       background-color: #7c3aed;
@@ -375,6 +380,8 @@
         padding: 4px 12px;
         background-color: rgb(72, 72, 78);
         border-radius: 0 0 12px 12px;
+        min-width: 460px;
+        white-space: nowrap;
       }
     }
 
