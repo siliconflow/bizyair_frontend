@@ -1,14 +1,14 @@
 {
   "app": {
     "title": "BizyAir",
-    "restore": "restore",
-    "minimize": "minimize",
+    "restore": "Restore",
+    "minimize": "Minimize",
     "shareCode": {
       "placeholder": "Paste share code",
       "error": {
         "empty": "Clipboard content is empty or not a string.",
-        "length": "The length of the clipboard content is incorrect.",
-        "shareCodeLength": "The length of the share code is incorrect."
+        "length": "Clipboard content length is incorrect.",
+        "shareCodeLength": "Share code length is incorrect."
       }
     }
   },
@@ -343,16 +343,17 @@
   },
   "btnProfile": {
     "userInfo": {
-      "lazyText": "This person is lazy and left nothing behind",
+      "lazyText": "This person is lazy and left nothing",
       "balance": "Balance",
-      "coin": " Coins",
-      "recharge": "Purchase",
-      "giftSilverCoin": "Silver",
-      "rechargeCoin": "Gold",
-      "switchApiKey": "Set API Key",
+      "coin": " Coin",
+      "recharge": "Recharge",
+      "giftSilverCoin": "Gift Silver Coin",
+      "rechargeCoin": "Recharge Gold Coin",
+      "switchApiKey": "Switch API Key",
       "myWallet": "My Wallet",
-      "rechargeRecord": "Payment",
-      "consumptionBill": "Bill"
+      "rechargeRecord": "Recharge Record",
+      "consumptionBill": "Consumption Bill",
+      "vipRemaining": "Monthly card remaining {days} days"
     },
     "consumptionBill": {
       "title": "Bill",
@@ -439,6 +440,8 @@
     },
     "product": {
       "coin": "Coins",
+      "coinRecharge": "Gold Coins",
+      "memberRecharge": "Membership",
       "confirmAgreement": "By confirming payment, you agree to the platform's",
       "rechargeAgreement": "「Recharge Agreement」",
       "coinValidityNote": "Note: Gold coins are valid for 1 year",

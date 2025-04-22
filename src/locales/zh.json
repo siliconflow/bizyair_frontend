@@ -353,7 +353,8 @@
       "switchApiKey": "切换 API 密钥",
       "myWallet": "我的钱包",
       "rechargeRecord": "充值记录",
-      "consumptionBill": "消费账单"
+      "consumptionBill": "消费账单",
+      "vipRemaining": "月卡剩余 {days} 天"
     },
     "uploadInfo": {
       "nickname": "昵称",
@@ -420,6 +421,8 @@
     },
     "product": {
       "coin": "币",
+      "coinRecharge": "金币充值",
+      "memberRecharge": "月卡充值",
       "confirmAgreement": "确认支付即代表同意本平台",
       "rechargeAgreement": "「充值协议」",
       "coinValidityNote": "注：金币有效期为 1 年",

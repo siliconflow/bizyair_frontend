@@ -1,46 +1,40 @@
 <template>
-  <!-- <p class="title">Bz币充值</p> -->
-  <ul class="list">
+  <!-- Tab选项卡 -->
+  <div class="tabs">
+    <div 
+      class="tab-item" 
+      :class="{ active: activeTab === 'member' }" 
+      @click="switchTab('member')"
+    >
+      {{ $t('btnProfile.product.memberRecharge') }}
+    </div>
+    <div 
+      class="tab-item" 
+      :class="{ active: activeTab === 'coin' }" 
+      @click="switchTab('coin')"
+    >
+      {{ $t('btnProfile.product.coinRecharge') }}
+    </div>
+  </div>
+
+  <!-- 金币充值商品列表 -->
+  <ul class="list" v-if="activeTab === 'coin'">
     <li
-      v-for="(item, index) in orderStore.products"
+      v-for="(item, index) in coinProducts"
       :key="index"
       class="item"
-      @click="handleAmount(index)"
+      @click="handleAmount(index, 'coin')"
     >
-      <div :class="['item-content', { active: activeIndex === index }]">
+      <div :class="['item-content', { active: activeIndex === index && activeTab === 'coin' }]">
         <p class="coin">
           <img
-            v-if="item.type !== 'user_level_2'"
             src="https://bizyair-prod.oss-cn-shanghai.aliyuncs.com/web/BRVnojLT9cfbb3p0zdxKJkBVdB7amSPB.webp"
             alt="coin"
             class="coin-icon"
           />
-          <svg
-            v-if="item.type === 'user_level_2'"
-            class="crown-icon"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-          >
-            <path
-              d="M510.955102 831.738776c-23.510204 0-45.453061-9.926531-61.64898-27.167347L138.971429 468.114286c-28.734694-31.346939-29.779592-79.412245-1.567347-111.804082l117.55102-135.314286c15.673469-18.285714 38.661224-28.734694 63.216327-28.734694H705.306122c24.032653 0 47.020408 10.44898 62.693878 28.734694l118.073469 135.314286c28.212245 32.391837 27.689796 80.457143-1.567347 111.804082L572.081633 804.571429c-15.673469 17.240816-38.138776 27.167347-61.126531 27.167347z"
-              fill="#F2CB51"
-            ></path>
-            <path
-              d="M506.77551 642.612245c-5.22449 0-10.971429-2.089796-15.15102-6.269388l-203.755102-208.979592c-7.836735-8.359184-7.836735-21.420408 0.522449-29.779592 8.359184-7.836735 21.420408-7.836735 29.779592 0.522449l189.12653 193.828572 199.053061-194.351021c8.359184-7.836735 21.420408-7.836735 29.779592 0.522449 7.836735 8.359184 7.836735 21.420408-0.522449 29.779592l-214.204081 208.979592c-4.179592 3.657143-9.404082 5.746939-14.628572 5.746939z"
-              fill="#FFF7E1"
-            ></path>
-          </svg>
           <span>
-            <template v-if="item.type !== 'user_level_2'">
-              {{ item.benefits[0].amount }}
-              <span class="coin-unit">{{ $t('btnProfile.product.coin') }}</span>
-            </template>
-            <template v-else>
-              <span class="vip-text">月度会员</span>
-            </template>
+            {{ item.benefits[0].amount }}
+            <span class="coin-unit">{{ $t('btnProfile.product.coin') }}</span>
           </span>
         </p>
         <div class="divider"></div>
@@ -48,7 +42,134 @@
       </div>
     </li>
   </ul>
-  <div class="footer">
+
+  <!-- 会员充值商品列表 -->
+  <ul class="list member-list" v-if="activeTab === 'member'">
+    <n-spin :show="loading" description="加载中...">
+      <div class="member-cards-wrapper">
+        <div class="member-cards-container">
+          <!-- 普通用户卡片(不可点击) -->
+          <li class="member-card">
+            <div class="member-card-content disabled-card">
+              <!-- 普通用户标题区域 -->
+              <div class="member-header">
+                <div class="member-title">
+                  <svg
+                    class="user-icon"
+                    viewBox="0 0 1024 1024"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="28"
+                    height="28"
+                  >
+                    <path
+                      d="M512 512c123.776 0 224-100.224 224-224S635.776 64 512 64 288 164.224 288 288s100.224 224 224 224z m0-384c88.224 0 160 71.776 160 160s-71.776 160-160 160-160-71.776-160-160 71.776-160 160-160z"
+                      fill="#94a3b8"
+                    ></path>
+                    <path
+                      d="M512 544c-211.744 0-384 172.256-384 384 0 17.664 14.336 32 32 32s32-14.336 32-32c0-176.448 143.552-320 320-320s320 143.552 320 320c0 17.664 14.336 32 32 32s32-14.336 32-32c0-211.744-172.256-384-384-384z"
+                      fill="#94a3b8"
+                    ></path>
+                  </svg>
+                  <span class="normal-text">普通用户</span>
+                </div>
+                <div class="current-tag">免费</div>
+              </div>
+              
+              <!-- 价格区域 -->
+              <div class="price-section">
+                <div class="price-container">
+                  <span class="currency">￥</span>
+                  <span class="price">0</span>
+                  <span class="free-text">免费</span>
+                </div>
+              </div>
+              
+              <!-- 普通用户特权列表 -->
+              <div class="member-benefits-list">
+                <div class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span class="benefit-text">基础功能访问</span>
+                </div>
+                <div class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span class="benefit-text">标准资源限制</span>
+                </div>
+                <div class="benefit-item disabled-benefit">
+                  <span class="x-icon">✗</span>
+                  <span class="benefit-text">无高级模型访问权限</span>
+                </div>
+                <div class="benefit-item disabled-benefit">
+                  <span class="x-icon">✗</span>
+                  <span class="benefit-text">无参数限制解除</span>
+                </div>
+              </div>
+            </div>
+          </li>
+          
+          <!-- 会员卡 -->
+          <li
+            v-if="memberProducts.length > 0 && !loading"
+            class="member-card"
+            @click="handleAmount(0, 'member')"
+          >
+            <div :class="['member-card-content', { active: activeIndex === 0 && activeTab === 'member' }]">
+              <!-- 会员标题区域 -->
+              <div class="member-header">
+                <div class="member-title">
+                  <svg
+                    class="crown-icon"
+                    viewBox="0 0 1024 1024"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="28"
+                    height="28"
+                  >
+                    <path
+                      d="M510.955102 831.738776c-23.510204 0-45.453061-9.926531-61.64898-27.167347L138.971429 468.114286c-28.734694-31.346939-29.779592-79.412245-1.567347-111.804082l117.55102-135.314286c15.673469-18.285714 38.661224-28.734694 63.216327-28.734694H705.306122c24.032653 0 47.020408 10.44898 62.693878 28.734694l118.073469 135.314286c28.212245 32.391837 27.689796 80.457143-1.567347 111.804082L572.081633 804.571429c-15.673469 17.240816-38.138776 27.167347-61.126531 27.167347z"
+                      fill="#F2CB51"
+                    ></path>
+                    <path
+                      d="M506.77551 642.612245c-5.22449 0-10.971429-2.089796-15.15102-6.269388l-203.755102-208.979592c-7.836735-8.359184-7.836735-21.420408 0.522449-29.779592 8.359184-7.836735 21.420408-7.836735 29.779592 0.522449l189.12653 193.828572 199.053061-194.351021c8.359184-7.836735 21.420408-7.836735 29.779592 0.522449 7.836735 8.359184 7.836735 21.420408-0.522449 29.779592l-214.204081 208.979592c-4.179592 3.657143-9.404082 5.746939-14.628572 5.746939z"
+                      fill="#FFF7E1"
+                    ></path>
+                  </svg>
+                  <span class="vip-text">包月会员</span>
+                </div>
+                <div class="limited-tag">限时优惠</div>
+              </div>
+              
+              <!-- 价格区域 -->
+              <div class="price-section">
+                <div class="price-container">
+                  <span class="currency">￥</span>
+                  <span class="price">{{ memberProducts[0].price / 100 }}</span>
+                  <span class="original-price">原价{{memberProducts[0].original_price / 100}}</span>
+                </div>
+              </div>
+              
+              <!-- 购买按钮 -->
+              <div class="buy-button-container">
+                <n-button class="buy-button" type="warning" @click.stop="handlePay">
+                  立即购买
+                </n-button>
+              </div>
+              
+              <!-- 会员特权列表 -->
+              <div class="member-benefits-list">
+                <div v-for="(benefit, bIndex) in memberProducts[0].benefits" :key="bIndex" class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span class="benefit-text">{{ getBenefitName(benefit) }}{{ benefit.amount ? ' - ' + benefit.amount + (benefit.resource_type === 'charge_coin' ? '币' : '') : '' }}</span>
+                </div>
+              </div>
+            </div>
+          </li>
+        </div>
+      </div>
+    </n-spin>
+  </ul>
+
+  <div class="footer" v-if="activeTab === 'coin'">
     <div class="agreement">
       <n-checkbox v-model:checked="checked">{{
         $t('btnProfile.product.confirmAgreement')
@@ -59,7 +180,8 @@
     </div>
     <span class="note">{{ $t('btnProfile.product.coinValidityNote') }}</span>
   </div>
-  <div class="payment">
+  
+  <div class="payment" v-if="activeTab === 'coin'">
     <div class="payment-content">
       <span class="label">{{ $t('btnProfile.product.actualPayment') }}</span>
       <span class="amount">¥ {{ amount }}</span>
@@ -68,6 +190,7 @@
       }}</n-button>
     </div>
   </div>
+  
   <n-modal
     v-model:show="orderStore.showWechat"
     preset="card"
@@ -113,7 +236,7 @@
   </n-modal>
 </template>
 <script setup lang="ts">
-  import { NCheckbox, NButton, NModal, NResult } from 'naive-ui'
+  import { NCheckbox, NButton, NModal, NResult, NSpin } from 'naive-ui'
   import { useOrderStore } from '@/stores/orderStore'
   import { useStatusStore } from '@/stores/userStatus'
   import { onMounted, onUnmounted, ref } from 'vue'
@@ -127,24 +250,56 @@
   const orderStore = useOrderStore()
   const statusStore = useStatusStore()
 
+  const activeTab = ref('member')
   const activeIndex = ref(0)
   const checked = ref(false)
   const amount = ref(0)
   const wechatText = ref('')
+  const loading = ref(true)
+  
+  // 将商品分为金币和会员两类
+  const coinProducts = ref<any[]>([])
+  const memberProducts = ref<any[]>([])
 
-  const handleAmount = (index: number) => {
+  // 切换Tab
+  const switchTab = (tab: string) => {
+    activeTab.value = tab
+    activeIndex.value = 0
+    if (tab === 'coin' && coinProducts.value.length > 0) {
+      amount.value = coinProducts.value[0].price / 100
+    } else if (tab === 'member' && memberProducts.value.length > 0) {
+      amount.value = memberProducts.value[0].price / 100
+    }
+  }
+
+  const handleAmount = (index: number, type: string) => {
     activeIndex.value = index
-    amount.value = orderStore.products[index] && orderStore.products[index].price / 100
+    if (type === 'coin') {
+      amount.value = coinProducts.value[index] && coinProducts.value[index].price / 100
+    } else {
+      amount.value = memberProducts.value[index] && memberProducts.value[index].price / 100
+    }
+  }
+
+  // 获取权益名称
+  const getBenefitName = (benefit: any) => {
+    return benefit.name
   }
 
   const handlePay = async () => {
-    if (!checked.value) {
+    if (activeTab.value === 'coin' && !checked.value) {
       useToaster.error(t('btnProfile.product.agreementWarning'))
       return
     }
     localStorage.removeItem('expire_at')
     localStorage.removeItem('code_url')
-    const res = await payProduct(orderStore.products[activeIndex.value].id, 'wechat')
+    
+    // 根据当前选中的Tab和索引获取商品ID
+    const selectedProduct = activeTab.value === 'coin' 
+      ? coinProducts.value[activeIndex.value] 
+      : memberProducts.value[activeIndex.value]
+    
+    const res = await payProduct(selectedProduct.id, 'wechat')
     orderStore.showWechat = true
     wechatText.value = res.data.code_url
     localStorage.setItem('expire_at', res.data.expire_at)
@@ -155,17 +310,17 @@
   }
 
   onMounted(async () => {
+    loading.value = true
     await orderStore.getProducts()
-    handleAmount(0)
-    // const expireAt = localStorage.getItem('expire_at');
-    // if (expireAt && new Date(expireAt).getTime() > new Date().getTime() && localStorage.getItem('code_url')) {
-    //   orderStore.showWechat = true;
-    //   wechatText.value = localStorage.getItem('code_url') || '';
-
-    //   orderStore.countExpire(expireAt);
-    //   orderStore.intervalTimer(statusStore.loginRefresh);
-    // }
+    // 分类商品
+    coinProducts.value = orderStore.products.filter((item: any) => item.type === 'coin')
+    memberProducts.value = orderStore.subProducts || []
+    loading.value = false
+    
+    // 初始选择第一个月卡充值项目
+    switchTab('member')
   })
+
   onUnmounted(() => {
     if (orderStore.iTimer) {
       clearInterval(orderStore.iTimer)
@@ -183,6 +338,39 @@
     padding: 0;
     list-style: none;
   }
+
+  .tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(109, 40, 217, 0.3);
+    
+    .tab-item {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      
+      &.active {
+        color: #7c3aed;
+        
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background-color: #7c3aed;
+        }
+      }
+      
+      &:hover {
+        color: #7c3aed;
+      }
+    }
+  }
+
   .title {
     margin-top: 28px;
     text-align: center;
@@ -252,6 +440,203 @@
       text-align: center;
       padding-bottom: 4px;
     }
+  }
+
+  .member-list {
+    display: block;
+    width: 100%;
+  }
+  
+  .member-cards-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .member-cards-container {
+    display: flex;
+    flex-direction: row;
+    // justify-content: space-between;
+    justify-content: center;
+    gap: 70px;
+    width: 90%;
+    max-width: 800px;
+  }
+  
+  .member-card {
+    flex: 1;
+    max-width: 360px;
+    margin-bottom: 20px;
+    
+    .member-card-content {
+      width: 80%;
+      height: 380px;
+      background-color: rgba(32, 36, 45, 0.9);
+      border: 2px solid rgba(109, 40, 217, 0.5);
+      border-radius: 12px;
+      padding: 30px 20px;
+      padding-bottom: 60px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      
+      &:hover {
+        border: 2px solid #7c3aed;
+        box-shadow: 0 0 20px 0 #7c3aed;
+      }
+      
+      &.active {
+        border-color: #7c3aed;
+        box-shadow: 0 0 20px 0 #7c3aed;
+      }
+      
+      &.disabled-card {
+        cursor: default;
+        background-color: rgba(32, 36, 45, 0.4);
+        border: 2px solid rgba(109, 40, 217, 0.2);
+        
+        &:hover {
+          border: 2px solid rgba(109, 40, 217, 0.2);
+          box-shadow: none;
+        }
+      }
+    }
+    
+    .member-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      
+      .member-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        .vip-text {
+          font-size: 24px;
+          color: #F2CB51;
+          font-weight: bold;
+        }
+        
+        .normal-text {
+          font-size: 24px;
+          color: #94a3b8;
+          font-weight: bold;
+        }
+      }
+      
+      .limited-tag {
+        background-color: #FF6B35;
+        color: white;
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+      
+      .current-tag {
+        background-color: #64748B;
+        color: white;
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+    }
+    
+    .price-section {
+      margin-bottom: 24px;
+      
+      .price-container {
+        display: flex;
+        align-items: baseline;
+        margin-bottom: 8px;
+        
+        .currency {
+          font-size: 20px;
+          color: #F2CB51;
+        }
+        
+        .price {
+          font-size: 36px;
+          font-weight: bold;
+          color: #F2CB51;
+        }
+        
+        .original-price {
+          margin-left: 8px;
+          color: #94a3b8;
+          text-decoration: line-through;
+          font-size: 14px;
+        }
+      }
+      
+      .user-target {
+        font-size: 14px;
+        color: #94a3b8;
+      }
+    }
+    
+    .buy-button-container {
+      margin-bottom: 24px;
+      .buy-button {
+        width: 100%;
+        height: 48px;
+        border-radius: 27px;
+        font-size: 16px;
+        background-color: #F2CB51;
+        color: #333;
+        border: none;
+        margin: 0 auto;
+        display: block;
+        
+        &:hover {
+          background-color: #e9bd3a;
+        }
+      }
+    }
+    
+    .member-benefits-list {
+      margin-top: 10px;
+      flex: 1;
+      
+      .benefit-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+        
+        .check-icon {
+          color: #10b981;
+          margin-right: 8px;
+          font-weight: bold;
+        }
+        
+        .x-icon {
+          color: #94a3b8;
+          margin-right: 8px;
+          font-weight: bold;
+        }
+        
+        .benefit-text {
+          color: #e4e4e7;
+        }
+        
+        &.disabled-benefit .benefit-text {
+          color: #64748B;
+          text-decoration: line-through;
+        }
+        
+        &:last-child {
+          margin-bottom: 30px;
+        }
+      }
+    }
+  }
+  
+  .free-text {
+    margin-left: 8px;
+    color: #94a3b8;
+    font-size: 14px;
   }
 
   .footer {
