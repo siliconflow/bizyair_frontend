@@ -215,11 +215,10 @@
     statusStore.showUploadInfoDialog = true
   }
 
-
   const remainingDays = computed(() => {
     const subExpireAt = (statusStore.usersMetadata as any).sub_expire_at
     if (!subExpireAt?.[2]) return 0
-    
+
     const expireDate = new Date(subExpireAt[2])
     const today = new Date()
     // 计算两个日期之间的差值（毫秒）

@@ -30,7 +30,7 @@ export const useOrderStore = defineStore('userOrder', {
   actions: {
     async getProducts() {
       const res = await getProducts()
-      console.log(res.data);
+      console.log(res.data)
       this.products = res.data.products || []
       this.subProducts = res.data.sub_products || []
     },
