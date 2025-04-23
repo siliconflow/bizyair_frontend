@@ -278,9 +278,9 @@
 
     .vip-frame {
       position: absolute;
-      width: 68px;
-      height: 68px;
-      top: -10px;
+      width: 67px;
+      height: 71px;
+      top: -12px;
       left: -4px;
       z-index: 2;
     }
