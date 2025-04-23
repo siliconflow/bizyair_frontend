@@ -1,18 +1,10 @@
 <template>
   <!-- Tab选项卡 -->
   <div class="tabs">
-    <div 
-      class="tab-item" 
-      :class="{ active: activeTab === 'member' }" 
-      @click="switchTab('member')"
-    >
+    <div class="tab-item" :class="{ active: activeTab === 'member' }" @click="switchTab('member')">
       {{ $t('btnProfile.product.memberRecharge') }}
     </div>
-    <div 
-      class="tab-item" 
-      :class="{ active: activeTab === 'coin' }" 
-      @click="switchTab('coin')"
-    >
+    <div class="tab-item" :class="{ active: activeTab === 'coin' }" @click="switchTab('coin')">
       {{ $t('btnProfile.product.coinRecharge') }}
     </div>
   </div>
@@ -75,7 +67,7 @@
                 </div>
                 <div class="current-tag">{{ $t('btnProfile.product.freeTag') }}</div>
               </div>
-              
+
               <!-- 价格区域 -->
               <div class="price-section">
                 <div class="price-container">
@@ -84,16 +76,16 @@
                 </div>
                 <div class="description">{{ $t('btnProfile.product.freeDescription') }}</div>
               </div>
-              
+
               <!-- 按钮区域 -->
               <div class="buy-button-container">
-                <n-button class="using-button" disabled> 
-                  <div style="margin: auto;">
+                <n-button class="using-button" disabled>
+                  <div style="margin: auto">
                     {{ $t('btnProfile.product.usingNow') }}
                   </div>
                 </n-button>
               </div>
-              
+
               <!-- 普通用户特权列表 -->
               <div class="member-benefits-list">
                 <!-- <div class="benefit-item">
@@ -110,19 +102,26 @@
                 </div>
                 <div class="benefit-item">
                   <span class="check-icon">✓</span>
-                  <span class="benefit-text">{{ $t('btnProfile.product.regularImageSizeLimit') }}</span>
+                  <span class="benefit-text">{{
+                    $t('btnProfile.product.regularImageSizeLimit')
+                  }}</span>
                 </div>
               </div>
             </div>
           </li>
-          
+
           <!-- 会员卡 -->
           <li
             v-if="memberProducts.length > 0 && !loading"
             class="member-card"
             @click="handleAmount(0, 'member')"
           >
-            <div :class="['member-card-content', { active: activeIndex === 0 && activeTab === 'member' }]">
+            <div
+              :class="[
+                'member-card-content',
+                { active: activeIndex === 0 && activeTab === 'member' }
+              ]"
+            >
               <!-- 会员标题区域 -->
               <div class="member-header">
                 <div class="member-title">
@@ -147,26 +146,29 @@
                 </div>
                 <div class="limited-tag">{{ $t('btnProfile.product.limitedTimeTag') }}</div>
               </div>
-              
+
               <!-- 价格区域 -->
               <div class="price-section">
                 <div class="price-container">
                   <span class="currency">￥</span>
                   <span class="price">{{ memberProducts[0].price / 100 }}</span>
-                  <span class="original-price">{{ $t('btnProfile.product.originalPrice') }}{{memberProducts[0].original_price / 100}}</span>
+                  <span class="original-price"
+                    >{{ $t('btnProfile.product.originalPrice')
+                    }}{{ memberProducts[0].original_price / 100 }}</span
+                  >
                 </div>
                 <div class="description">{{ $t('btnProfile.product.proDescription') }}</div>
               </div>
-              
+
               <!-- 购买按钮 -->
               <div class="buy-button-container">
                 <n-button class="buy-button" type="warning" @click.stop="handlePay">
-                 <div style="margin: auto;">
-                  {{ $t('btnProfile.product.specialSubscribe') }}
-                 </div>
+                  <div style="margin: auto">
+                    {{ $t('btnProfile.product.specialSubscribe') }}
+                  </div>
                 </n-button>
               </div>
-              
+
               <!-- 会员特权列表 -->
               <div class="member-benefits-list">
                 <div class="benefit-item">
@@ -204,7 +206,7 @@
     </div>
     <span class="note">{{ $t('btnProfile.product.coinValidityNote') }}</span>
   </div>
-  
+
   <div class="payment" v-if="activeTab === 'coin'">
     <div class="payment-content">
       <span class="label">{{ $t('btnProfile.product.actualPayment') }}</span>
@@ -214,7 +216,7 @@
       }}</n-button>
     </div>
   </div>
-  
+
   <n-modal
     v-model:show="orderStore.showWechat"
     preset="card"
@@ -280,7 +282,7 @@
   const amount = ref(0)
   const wechatText = ref('')
   const loading = ref(true)
-  
+
   // 将商品分为金币和会员两类
   const coinProducts = ref<any[]>([])
   const memberProducts = ref<any[]>([])
@@ -317,12 +319,13 @@
     }
     localStorage.removeItem('expire_at')
     localStorage.removeItem('code_url')
-    
+
     // 根据当前选中的Tab和索引获取商品ID
-    const selectedProduct = activeTab.value === 'coin' 
-      ? coinProducts.value[activeIndex.value] 
-      : memberProducts.value[activeIndex.value]
-    
+    const selectedProduct =
+      activeTab.value === 'coin'
+        ? coinProducts.value[activeIndex.value]
+        : memberProducts.value[activeIndex.value]
+
     const res = await payProduct(selectedProduct.id, 'wechat')
     orderStore.showWechat = true
     wechatText.value = res.data.code_url
@@ -340,7 +343,7 @@
     coinProducts.value = orderStore.products.filter((item: any) => item.type === 'coin')
     memberProducts.value = orderStore.subProducts || []
     loading.value = false
-    
+
     // 初始选择第一个月卡充值项目
     switchTab('member')
   })
@@ -367,17 +370,17 @@
     display: flex;
     margin-bottom: 20px;
     border-bottom: 1px solid rgba(109, 40, 217, 0.3);
-    
+
     .tab-item {
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
       transition: all 0.3s;
       position: relative;
-      
+
       &.active {
         color: #7c3aed;
-        
+
         &:after {
           content: '';
           position: absolute;
@@ -388,7 +391,7 @@
           background-color: #7c3aed;
         }
       }
-      
+
       &:hover {
         color: #7c3aed;
       }
@@ -470,13 +473,13 @@
     display: block;
     width: 100%;
   }
-  
+
   .member-cards-wrapper {
     width: 100%;
     display: flex;
     justify-content: center;
   }
-  
+
   .member-cards-container {
     display: flex;
     flex-direction: row;
@@ -486,12 +489,12 @@
     width: 90%;
     max-width: 800px;
   }
-  
+
   .member-card {
     flex: 1;
     max-width: 460px;
     margin-bottom: 20px;
-    
+
     .member-card-content {
       width: 88%;
       height: 530px;
@@ -504,89 +507,89 @@
       transition: all 0.3s;
       display: flex;
       flex-direction: column;
-      
+
       &:hover {
         border: 2px solid #7c3aed;
         box-shadow: 0 0 20px 0 #7c3aed;
       }
-      
+
       &.active {
         border-color: #7c3aed;
         box-shadow: 0 0 20px 0 #7c3aed;
       }
-      
+
       &.disabled-card {
         cursor: default;
         background-color: rgba(32, 36, 45, 0.4);
         border: 2px solid rgba(109, 40, 217, 0.2);
-        
+
         &:hover {
           border: 2px solid rgba(109, 40, 217, 0.2);
           box-shadow: none;
         }
       }
     }
-    
+
     .member-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-      
+
       .member-title {
         display: flex;
         align-items: center;
         gap: 8px;
-        
+
         .vip-text {
           font-size: 24px;
-          color: #F2CB51;
+          color: #f2cb51;
           font-weight: bold;
         }
-        
+
         .normal-text {
           font-size: 24px;
           color: #94a3b8;
           font-weight: bold;
         }
       }
-      
+
       .limited-tag {
-        background-color: #FF6B35;
+        background-color: #ff6b35;
         color: white;
         font-size: 12px;
         padding: 4px 8px;
         border-radius: 4px;
       }
-      
+
       .current-tag {
-        background-color: #64748B;
+        background-color: #64748b;
         color: white;
         font-size: 12px;
         padding: 4px 8px;
         border-radius: 4px;
       }
     }
-    
+
     .price-section {
       margin-bottom: 24px;
-      
+
       .price-container {
         display: flex;
         align-items: baseline;
         margin-bottom: 8px;
-        
+
         .currency {
           font-size: 20px;
-          color: #F2CB51;
+          color: #f2cb51;
         }
-        
+
         .price {
           font-size: 36px;
           font-weight: bold;
-          color: #F2CB51;
+          color: #f2cb51;
         }
-        
+
         .original-price {
           margin-left: 8px;
           color: #94a3b8;
@@ -594,23 +597,23 @@
           font-size: 14px;
         }
       }
-      
+
       .description {
         font-size: 14px;
         color: #e4e4e7;
         margin-top: 10px;
       }
     }
-    
+
     .buy-button-container {
       margin-bottom: 24px;
-      
+
       .buy-button {
         width: 100%;
         height: 48px;
         border-radius: 27px;
         font-size: 16px;
-        background-color: #F2CB51;
+        background-color: #f2cb51;
         color: #333;
         border: none;
         margin: 0 auto;
@@ -619,18 +622,18 @@
         line-height: 48px;
         margin: auto;
         padding: 0;
-        
+
         &:hover {
           background-color: #e9bd3a;
         }
       }
-      
+
       .using-button {
         width: 100%;
         height: 48px;
         border-radius: 27px;
         font-size: 16px;
-        background-color: #6240C4;
+        background-color: #6240c4;
         color: #ffffff;
         border: none;
         margin: 0 auto;
@@ -641,17 +644,17 @@
         padding: 0;
       }
     }
-    
+
     .member-benefits-list {
       margin-top: 10px;
       flex: 1;
-      
+
       .benefit-item {
         display: flex;
         align-items: flex-start;
         margin-bottom: 16px;
         line-height: 1.4;
-        
+
         .check-icon {
           color: #10b981;
           margin-right: 8px;
@@ -659,32 +662,32 @@
           flex-shrink: 0;
           margin-top: 2px;
         }
-        
+
         .x-icon {
           color: #94a3b8;
           margin-right: 8px;
           font-weight: bold;
           flex-shrink: 0;
         }
-        
+
         .benefit-text {
           color: #e4e4e7;
           flex: 1;
           word-break: break-word;
         }
-        
+
         &.disabled-benefit .benefit-text {
-          color: #64748B;
+          color: #64748b;
           text-decoration: line-through;
         }
-        
+
         &:last-child {
           margin-bottom: 30px;
         }
       }
     }
   }
-  
+
   .free-text {
     margin-left: 8px;
     color: #94a3b8;
