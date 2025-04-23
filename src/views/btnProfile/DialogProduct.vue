@@ -45,7 +45,7 @@
 
   <!-- 会员充值商品列表 -->
   <ul class="list member-list" v-if="activeTab === 'member'">
-    <n-spin :show="loading" description="加载中...">
+    <n-spin :show="loading" :description="$t('vUpload.loading')">
       <div class="member-cards-wrapper">
         <div class="member-cards-container">
           <!-- 普通用户卡片(不可点击) -->
@@ -71,9 +71,9 @@
                       fill="#94a3b8"
                     ></path>
                   </svg>
-                  <span class="normal-text">普通用户</span>
+                  <span class="normal-text">{{ $t('btnProfile.product.regularMember') }}</span>
                 </div>
-                <div class="current-tag">免费</div>
+                <div class="current-tag">{{ $t('btnProfile.product.freeTag') }}</div>
               </div>
               
               <!-- 价格区域 -->
@@ -81,27 +81,36 @@
                 <div class="price-container">
                   <span class="currency">￥</span>
                   <span class="price">0</span>
-                  <span class="free-text">免费</span>
                 </div>
+                <div class="description">{{ $t('btnProfile.product.freeDescription') }}</div>
+              </div>
+              
+              <!-- 按钮区域 -->
+              <div class="buy-button-container">
+                <n-button class="using-button" disabled> 
+                  <div style="margin: auto;">
+                    {{ $t('btnProfile.product.usingNow') }}
+                  </div>
+                </n-button>
               </div>
               
               <!-- 普通用户特权列表 -->
               <div class="member-benefits-list">
+                <!-- <div class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span class="benefit-text">{{ $t('btnProfile.product.dailyLoginReward') }}</span>
+                </div> -->
                 <div class="benefit-item">
                   <span class="check-icon">✓</span>
-                  <span class="benefit-text">基础功能访问</span>
+                  <span class="benefit-text">{{ $t('btnProfile.product.regularImageLimit') }}</span>
                 </div>
                 <div class="benefit-item">
                   <span class="check-icon">✓</span>
-                  <span class="benefit-text">标准资源限制</span>
+                  <span class="benefit-text">{{ $t('btnProfile.product.regularRpdLimit') }}</span>
                 </div>
-                <div class="benefit-item disabled-benefit">
-                  <span class="x-icon">✗</span>
-                  <span class="benefit-text">无高级模型访问权限</span>
-                </div>
-                <div class="benefit-item disabled-benefit">
-                  <span class="x-icon">✗</span>
-                  <span class="benefit-text">无参数限制解除</span>
+                <div class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span class="benefit-text">{{ $t('btnProfile.product.regularImageSizeLimit') }}</span>
                 </div>
               </div>
             </div>
@@ -134,9 +143,9 @@
                       fill="#FFF7E1"
                     ></path>
                   </svg>
-                  <span class="vip-text">包月会员</span>
+                  <span class="vip-text">{{ $t('btnProfile.product.monthlyMember') }}</span>
                 </div>
-                <div class="limited-tag">限时优惠</div>
+                <div class="limited-tag">{{ $t('btnProfile.product.limitedTimeTag') }}</div>
               </div>
               
               <!-- 价格区域 -->
@@ -144,22 +153,37 @@
                 <div class="price-container">
                   <span class="currency">￥</span>
                   <span class="price">{{ memberProducts[0].price / 100 }}</span>
-                  <span class="original-price">原价{{memberProducts[0].original_price / 100}}</span>
+                  <span class="original-price">{{ $t('btnProfile.product.originalPrice') }}{{memberProducts[0].original_price / 100}}</span>
                 </div>
+                <div class="description">{{ $t('btnProfile.product.proDescription') }}</div>
               </div>
               
               <!-- 购买按钮 -->
               <div class="buy-button-container">
                 <n-button class="buy-button" type="warning" @click.stop="handlePay">
-                  立即购买
+                 <div style="margin: auto;">
+                  {{ $t('btnProfile.product.specialSubscribe') }}
+                 </div>
                 </n-button>
               </div>
               
               <!-- 会员特权列表 -->
               <div class="member-benefits-list">
-                <div v-for="(benefit, bIndex) in memberProducts[0].benefits" :key="bIndex" class="benefit-item">
+                <div class="benefit-item">
                   <span class="check-icon">✓</span>
-                  <span class="benefit-text">{{ getBenefitName(benefit) }}{{ benefit.amount ? ' - ' + benefit.amount + (benefit.resource_type === 'charge_coin' ? '币' : '') : '' }}</span>
+                  <span class="benefit-text">{{ $t('btnProfile.product.dailyLoginReward') }}</span>
+                </div>
+                <div class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span class="benefit-text">{{ $t('btnProfile.product.vipImageLimit') }}</span>
+                </div>
+                <div class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span class="benefit-text">{{ $t('btnProfile.product.vipRpdLimit') }}</span>
+                </div>
+                <div class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span class="benefit-text">{{ $t('btnProfile.product.vipImageSizeLimit') }}</span>
                 </div>
               </div>
             </div>
@@ -465,16 +489,16 @@
   
   .member-card {
     flex: 1;
-    max-width: 360px;
+    max-width: 460px;
     margin-bottom: 20px;
     
     .member-card-content {
-      width: 80%;
-      height: 380px;
+      width: 88%;
+      height: 530px;
       background-color: rgba(32, 36, 45, 0.9);
       border: 2px solid rgba(109, 40, 217, 0.5);
       border-radius: 12px;
-      padding: 30px 20px;
+      padding: 25px 20px;
       padding-bottom: 60px;
       cursor: pointer;
       transition: all 0.3s;
@@ -507,7 +531,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       
       .member-title {
         display: flex;
@@ -571,14 +595,16 @@
         }
       }
       
-      .user-target {
+      .description {
         font-size: 14px;
-        color: #94a3b8;
+        color: #e4e4e7;
+        margin-top: 10px;
       }
     }
     
     .buy-button-container {
       margin-bottom: 24px;
+      
       .buy-button {
         width: 100%;
         height: 48px;
@@ -589,10 +615,30 @@
         border: none;
         margin: 0 auto;
         display: block;
+        text-align: center;
+        line-height: 48px;
+        margin: auto;
+        padding: 0;
         
         &:hover {
           background-color: #e9bd3a;
         }
+      }
+      
+      .using-button {
+        width: 100%;
+        height: 48px;
+        border-radius: 27px;
+        font-size: 16px;
+        background-color: #6240C4;
+        color: #ffffff;
+        border: none;
+        margin: 0 auto;
+        display: block;
+        cursor: not-allowed;
+        text-align: center;
+        line-height: 48px;
+        padding: 0;
       }
     }
     
@@ -602,23 +648,29 @@
       
       .benefit-item {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         margin-bottom: 16px;
+        line-height: 1.4;
         
         .check-icon {
           color: #10b981;
           margin-right: 8px;
           font-weight: bold;
+          flex-shrink: 0;
+          margin-top: 2px;
         }
         
         .x-icon {
           color: #94a3b8;
           margin-right: 8px;
           font-weight: bold;
+          flex-shrink: 0;
         }
         
         .benefit-text {
           color: #e4e4e7;
+          flex: 1;
+          word-break: break-word;
         }
         
         &.disabled-benefit .benefit-text {
