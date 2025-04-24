@@ -307,10 +307,10 @@
     }
   }
 
-  // 获取权益名称
-  const getBenefitName = (benefit: any) => {
-    return benefit.name
-  }
+  // // 获取权益名称
+  // const getBenefitName = (benefit: any) => {
+  //   return benefit.name
+  // }
 
   const handlePay = async () => {
     if (activeTab.value === 'coin' && !checked.value) {
