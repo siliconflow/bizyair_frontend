@@ -5,7 +5,7 @@
       <div class="sidebar-header">
         <h2>{{ $t('sidebar.assistant.title') }}</h2>
         <div class="header-actions">
-          <button class="action-btn" @click="clearHistory" :title="$t('sidebar.assistant.clearHistory')">
+          <button class="action-btn" @click="clearHistory" title="清空对话历史">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
               <path fill="currentColor"
                 d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
@@ -87,9 +87,15 @@
               </div>
 
               <!-- 发送/中止按钮 -->
-              <button 
+              <!-- <button 
                 :class="['message-btn', isLoading ? 'abort-message-btn' : 'send-message-btn']" 
                 @click="isLoading ? abortGeneration() : sendMessage()" 
+                :disabled="!isLoading && !canSendMessage"
+                :title="isLoading ? $t('sidebar.assistant.abortGeneration') : $t('sidebar.assistant.sendMessage')"
+              > -->
+              <button 
+                :class="['message-btn', isLoading ? 'abort-message-btn' : 'send-message-btn']" 
+                @click="isLoading ? abortGeneration() : sendMessage2()" 
                 :disabled="!isLoading && !canSendMessage"
                 :title="isLoading ? $t('sidebar.assistant.abortGeneration') : $t('sidebar.assistant.sendMessage')"
               >
@@ -122,14 +128,12 @@ import {
   ChatMessage,
   formatOutputText
 } from './util';
-/*
 import {
   saveMessage,
   clearAllMessages,
   getRecentMessages,
   convertToStoredMessage
 } from './database';
-*/
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -252,7 +256,7 @@ const removeImage = () => {
 const clearHistory = async () => {
   try {
     // 清空数据库中的历史记录
-    /* await clearAllMessages(); */
+    await clearAllMessages();
     
     // 创建一个新的欢迎消息
     const welcomeMessage = {
@@ -265,10 +269,8 @@ const clearHistory = async () => {
     chatMessages.value = [welcomeMessage];
     
     // 将欢迎消息保存到数据库中，这样可以避免第一条消息重复发送
-    /* 
     const storedWelcomeMessage = convertToStoredMessage(welcomeMessage);
     await saveMessage(storedWelcomeMessage);
-    */
     
     console.log('历史记录已清空，并添加了欢迎消息');
   } catch (error) {
@@ -286,6 +288,28 @@ const abortGeneration = () => {
   }
 };
 
+
+const sendMessage2=async function unsafeGenerateImage(prompt: any) {
+  const apiKey = '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'; // 此处会暴露密钥！
+  const response = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: "gpt-image-1",
+      prompt:'一个蓝色的天空，有一群大雁在飞',
+      size: "1024x1024",
+      n: 1
+    })
+  });
+
+  const data = await response.json();
+  console.log(data,'data______________');
+  
+  console.log(data.data[0].url); // 图片URL
+}
 // 修改发送消息函数
 const sendMessage = async () => {
   if (!canSendMessage.value || isLoading.value) return;
@@ -335,7 +359,7 @@ const sendMessage = async () => {
     // 保存已收到的完整文本
     let receivedText = '';
     let hasReceivedFirstToken = false;
-    // let userMessageSaved = false; // 标记用户消息是否已保存
+    let userMessageSaved = false; // 标记用户消息是否已保存
     
     // 发送流式请求并保存中止控制器
     abortController.value = await sendStreamChatRequest(
@@ -358,7 +382,6 @@ const sendMessage = async () => {
             });
             
             // 在收到第一个token后再保存用户消息到数据库
-            /* 
             if (!userMessageSaved) {
               userMessageSaved = true;
               const storedUserMessage = convertToStoredMessage(userMessage);
@@ -369,7 +392,6 @@ const sendMessage = async () => {
                 console.error('保存用户消息失败:', error);
               }
             }
-            */
           }
           
           // 累积收到的文本
@@ -392,7 +414,6 @@ const sendMessage = async () => {
           // 如果从未收到任何token，但是有完整响应，显示一个消息
           if (!hasReceivedFirstToken && fullText) {
             // 在这种情况下也需要保存用户消息
-            /* 
             if (!userMessageSaved) {
               userMessageSaved = true;
               const storedUserMessage = convertToStoredMessage(userMessage);
@@ -403,7 +424,6 @@ const sendMessage = async () => {
                 console.error('保存用户消息失败:', error);
               }
             }
-            */
             
             aiMessageIndex = chatMessages.value.length;
             const formattedText = formatOutputText(fullText);
@@ -415,13 +435,11 @@ const sendMessage = async () => {
           }
           
           // 保存AI响应到数据库
-          /* 
           if (aiMessageIndex >= 0 && aiMessageIndex < chatMessages.value.length) {
             const assistantMessage = chatMessages.value[aiMessageIndex];
             const storedAssistantMessage = convertToStoredMessage(assistantMessage);
             await saveMessage(storedAssistantMessage);
           }
-          */
         },
         onError: async (error) => {
           console.error('流式响应错误:', error);
@@ -429,7 +447,6 @@ const sendMessage = async () => {
           abortController.value = null;
           
           // 即使出错也要保存用户消息，确保对话连贯性
-          /* 
           if (!userMessageSaved) {
             userMessageSaved = true;
             const storedUserMessage = convertToStoredMessage(userMessage);
@@ -440,7 +457,6 @@ const sendMessage = async () => {
               console.error('保存用户消息失败:', error);
             }
           }
-          */
           
           // 添加错误消息
           chatMessages.value.push({
@@ -457,7 +473,6 @@ const sendMessage = async () => {
     abortController.value = null;
     
     // 即使API请求出错也保存用户消息
-    /* 
     const storedUserMessage = convertToStoredMessage(userMessage);
     try {
       await saveMessage(storedUserMessage);
@@ -465,7 +480,6 @@ const sendMessage = async () => {
     } catch (saveError) {
       console.error('保存用户消息失败:', saveError);
     }
-    */
     
     // 添加错误消息
     chatMessages.value.push({
@@ -497,8 +511,19 @@ watch(() => sidebarStore.nodeInfo, (newValue) => {
     
     // 设置上传的图片以便用户可以输入文本后发送
     previewImage.value = imageUrl;
+    
+    // 处理base64数据
     if (newValue.imageInfo.base64) {
-      uploadedImageBase64.value = newValue.imageInfo.base64;
+      // 检查是否已包含data:前缀
+      if (typeof newValue.imageInfo.base64 === 'string') {
+        if (newValue.imageInfo.base64.startsWith('data:')) {
+          // 如果包含前缀，则提取纯base64部分
+          uploadedImageBase64.value = newValue.imageInfo.base64.split(',')[1];
+        } else {
+          // 已经是纯base64，直接使用
+          uploadedImageBase64.value = newValue.imageInfo.base64;
+        }
+      }
     } else if (newValue.imageInfo.url) {
       // 如果没有base64，则尝试从URL加载并转换
       fetch(newValue.imageInfo.url)
@@ -537,7 +562,6 @@ onMounted(async () => {
   
   try {
     // 尝试从IndexedDB加载历史消息
-    /* 
     const recentMessages = await getRecentMessages(10); // 最多显示10条历史消息
     
     if (recentMessages && recentMessages.length > 0) {
@@ -581,7 +605,6 @@ onMounted(async () => {
       console.log('从数据库加载了', uiMessages.length, '条历史消息');
       return;
     }
-    */
   } catch (error) {
     console.error('加载历史消息失败:', error);
   }
@@ -596,7 +619,6 @@ onMounted(async () => {
   chatMessages.value.push(welcomeMessage);
   
   // 将欢迎消息保存到数据库
-  /* 
   try {
     const storedWelcomeMessage = convertToStoredMessage(welcomeMessage);
     await saveMessage(storedWelcomeMessage);
@@ -604,7 +626,6 @@ onMounted(async () => {
   } catch (error) {
     console.error('保存欢迎消息失败:', error);
   }
-  */
 });
 </script>
 

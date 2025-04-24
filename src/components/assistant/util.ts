@@ -1,9 +1,7 @@
 // API请求相关接口和工具函数
-/*
 import {
   getRecentMessages,
 } from './database';
-*/
 
 // API请求选项接口
 export interface ChatApiOptions {
@@ -120,23 +118,28 @@ export function createTextUserMessage(text: string): ChatMessage {
  * 准备包含历史记录的消息数组用于API请求
  * @param currentMessage 当前消息
  * @param historyCount 历史消息数量
+ * @param maxLength 最大消息长度限制，默认值为20
  * @returns Promise<ChatMessage[]>
  */
 export async function prepareMessagesWithHistory(
   currentMessage: ChatMessage,
-  // historyCount: number = 6
+  historyCount: number = 6,
+  maxLength: number = 20
 ): Promise<ChatMessage[]> {
   // 获取历史消息（不包括当前正在发送的消息）
-  /* 
   const recentMessages = await getRecentMessages(historyCount);
   
   // 创建消息数组：历史消息 + 当前消息
   const messages = [...recentMessages] as ChatMessage[];
-  messages.push(currentMessage);
-  */
   
-  // 不使用数据库，只返回当前消息
-  const messages = [currentMessage];
+  // 确保消息总数不超过maxLength
+  if (messages.length > maxLength - 1) {
+    // 保留最近的消息，删除旧消息
+    messages.splice(0, messages.length - (maxLength - 1));
+  }
+  
+  // 添加当前消息
+  messages.push(currentMessage);
   
   console.log('准备发送的消息数组:', messages);
   return messages;
@@ -147,19 +150,21 @@ export async function prepareMessagesWithHistory(
  * @param messages 消息数组或单条消息
  * @param callbacks 流式回调
  * @param options API选项
+ * @param historyCount 历史消息数量，默认为6
  * @returns 用于中止请求的AbortController
  */
 export async function sendStreamChatRequest(
   messages: ChatMessage[] | ChatMessage,
   callbacks: StreamCallbacks,
-  options: Partial<ChatApiOptions> = {}
+  options: Partial<ChatApiOptions> = {},
+  historyCount: number = 6
 ): Promise<AbortController> {
   const mergedOptions = { ...defaultApiOptions, ...options };
   
   // 如果传入的是单条消息，则添加历史记录
   let messagesArray: ChatMessage[];
   if (!Array.isArray(messages)) {
-    messagesArray = await prepareMessagesWithHistory(messages);
+    messagesArray = await prepareMessagesWithHistory(messages, historyCount);
   } else {
     messagesArray = messages;
   }
