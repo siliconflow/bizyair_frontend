@@ -353,7 +353,8 @@
       "switchApiKey": "切换 API 密钥",
       "myWallet": "我的钱包",
       "rechargeRecord": "充值记录",
-      "consumptionBill": "消费账单"
+      "consumptionBill": "消费账单",
+      "vipRemaining": "月卡剩余 {days} 天"
     },
     "uploadInfo": {
       "nickname": "昵称",
@@ -388,7 +389,7 @@
     },
     "record": {
       "rechargeRecord": "充值记录",
-      "bzCoinRecharge": "BZ币充值",
+      "bzCoinRecharge": "充值",
       "orderStatus": "订单状态",
       "selectOrder": "选择订单",
       "orderNumber": "订单编号",
@@ -420,16 +421,34 @@
     },
     "product": {
       "coin": "币",
-      "confirmAgreement": "确认支付即代表同意本平台",
+      "coinRecharge": "金币充值",
+      "memberRecharge": "月卡充值",
+      "confirmAgreement": "确认支付即代表同意平台",
       "rechargeAgreement": "「充值协议」",
-      "coinValidityNote": "注：金币有效期为 1 年",
-      "actualPayment": "实付款",
+      "coinValidityNote": "温馨提示：金币有效期1年",
+      "actualPayment": "实际支付",
       "pay": "支付",
       "agreementWarning": "请先同意充值协议",
       "wechatPay": "微信支付",
-      "expireQrCode": "二维码将于{0}后过期",
-      "qrCodeExpired": "二维码已过期，请点击刷新",
-      "paySuccess": "支付成功"
+      "expireQrCode": "二维码{0}后失效",
+      "qrCodeExpired": "二维码已失效，点击刷新",
+      "paySuccess": "支付成功",
+      "regularMember": "普通会员",
+      "freeTag": "免费",
+      "freeDescription": "免费使用，高质量的设计体验",
+      "usingNow": "正在体验中",
+      "dailyLoginReward": "每日登陆可获取 1000 币",
+      "regularImageLimit": "约生产 30 张图片或 1 个视频",
+      "regularRpdLimit": "每日调用次数限制 (RPD) 为 1000 次/日",
+      "regularImageSizeLimit": "生成图片的尺寸限制，默认为 1×1280×1280",
+      "monthlyMember": "包月会员",
+      "limitedTimeTag": "限时优惠",
+      "proDescription": "适合专业的ComfyUI和AI应用创作者",
+      "specialSubscribe": "特惠订阅",
+      "vipImageLimit": "月生产 2000 张图片或 200 个视频",
+      "vipRpdLimit": "每日调用次数限制 (RPD) 为 20000 次/日",
+      "vipImageSizeLimit": "生成图片的尺寸限制，默认为 2×1536×1536",
+      "originalPrice": "原价"
     },
     "avatar": {
       "avatar": "头像"
