@@ -7,7 +7,7 @@
     "dev:vite": "vite --host ",
     "dev": "vue-tsc -b && vite build --watch",
     "build": "vue-tsc -b && vite build",
-    "build:py": "npm run build && sh scripts/build_python_package.sh",
+    "build:py": "rm -rf dist && npm run build && sh scripts/build_python_package.sh",
     "preview": "vite preview",
     "format": "prettier --write \"{src,browser_tests}/**/*.{vue,ts,tsx,js,jsx,css,less,scss,json,md}\""
   },
