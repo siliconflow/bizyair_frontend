@@ -13,9 +13,9 @@ npm run format
 npx eslint src
 # release frontend 
 npm run dev
-#打包前端得到.whl包
+#重新打包前端得到.whl包
 npm run build:py
-#不打包前端直接重新构建
+#不重新生成forntend_bizyair.js只重新打包bizyui目录得到.whl包
 npm run build:bizyui
 ```
 
