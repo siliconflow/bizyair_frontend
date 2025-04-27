@@ -17,7 +17,7 @@ import {
 } from './utils'
 import { useRetry } from './useRetry'
 
-export function useUpload(modelType: Ref<string | undefined>, emitFn: Function) {
+export function useUpload(modelType: Ref<string | undefined>, emitFn: (event: string, payload?: any) => void) {
   const { t } = useI18n()
 
   const uploadState = ref<UploadState>({})
