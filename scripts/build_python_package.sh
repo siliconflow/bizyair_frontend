@@ -29,6 +29,14 @@ fi
 
 # 构建Python包
 echo "Building Python package..."
-sh scripts/build_bizyui.sh
+
+# 清理旧的构建文件
+rm -rf build bizyui.egg-info
+
+# 构建Python包
+python -m build
+
+echo "BizyUI package built successfully!"
+echo "Wheel package is available in the dist/ directory"
 
 echo "=== BizyAir frontend integration build completed! ===" 
