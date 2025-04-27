@@ -13,6 +13,11 @@ npm run format
 npx eslint src
 # release frontend 
 npm run dev
+#打包前端得到.whl包
+npm run build:py
+#不打包前端直接重新构建
+npm run build:bizyui
 ```
+
 
 ### Installation and Setup
