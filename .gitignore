@@ -99,3 +99,5 @@ browser_tests/blob-report/
 bizyui.egg-info/
 bizyui/js/bizyair_frontend.js
 dist/
+
+*.tsbuildinfo
