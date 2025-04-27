@@ -21,27 +21,6 @@ else
 fi
 echo "Frontend files copied successfully!"
 
-# 复制其他必要的js文件到bizyui/js目录
-echo "Copying additional JS files..."
-if [ -d "src/js" ]; then
-  cp -r src/js/* bizyui/js/ 2>/dev/null || :
-  echo "Additional JS files copied!"
-else
-  echo "No src/js directory found, skipping additional files"
-fi
-
-# 确保版本文件存在
-echo "Checking version file..."
-if [ ! -f bizyui/version.txt ]; then
-  if [ -f version.txt ]; then
-    cp version.txt bizyui/
-    echo "Version file copied!"
-  else
-    echo "1.2.3" > bizyui/version.txt
-    echo "Version file created with default version!"
-  fi
-fi
-
 # 确保__init__.py文件存在
 if [ ! -f bizyui/__init__.py ]; then
   touch bizyui/__init__.py
