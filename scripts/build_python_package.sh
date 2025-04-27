@@ -39,4 +39,4 @@ python -m build
 echo "BizyUI package built successfully!"
 echo "Wheel package is available in the dist/ directory"
 
-echo "=== BizyAir frontend integration build completed! ===" 
+echo "=== BizyAir frontend integration build completed! ==="
