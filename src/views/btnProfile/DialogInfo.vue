@@ -277,10 +277,10 @@
 
     .vip-frame {
       position: absolute;
-      width: 67px;
+      width: 65px;
       height: 71px;
       top: -12px;
-      left: -4px;
+      left: -3px;
       z-index: 2;
     }
 
