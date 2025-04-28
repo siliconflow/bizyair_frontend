@@ -133,7 +133,7 @@
 
 <script setup lang="ts">
 import { useSidebarStore } from '../../stores/sidebarStore'
-import { onMounted, watch, ref, computed, onBeforeUnmount } from 'vue';
+import { onMounted, watch, ref, computed, onBeforeUnmount, nextTick } from 'vue';
 import { sendStreamChatRequest, createImageUserMessage, formatOutputTextLight } from './util';
 import { useI18n } from 'vue-i18n';
 import { useToaster } from '@/components/modules/toats/index'
@@ -287,6 +287,10 @@ const sendMessage = async () => {
   const messageText = userInput.value || '请描述一下这张图片';
   const currentTime = getCurrentTime();
   const hasImage = !!previewImage.value;
+
+  nextTick(()=>{
+    isLoading.value = true;
+  })
   
   // 创建用户消息并添加到聊天记录
   const userMessage = {
@@ -307,8 +311,7 @@ const sendMessage = async () => {
   }, 0);
   
   // 显示加载状态
-  isLoading.value = true;
-  processingStatus.value = '思考中...';
+
   
   try {
     // 创建AbortController用于中止请求
@@ -339,6 +342,8 @@ const sendMessage = async () => {
       {
         onStart: () => {
           console.log('开始请求多模态模型...');
+            isLoading.value = true;
+  // processingStatus.value = '思考中...';
           // 立即滚动到底部
           setTimeout(() => {
             scrollToBottom();
@@ -353,6 +358,7 @@ const sendMessage = async () => {
               time: currentMsgTime
             });
             isFirstToken = false;
+            isLoading.value = false;
           } else {
             // 找到刚创建的消息并更新
             const currentAssistantMsg = chatMessages.value
@@ -395,7 +401,7 @@ const sendMessage = async () => {
           }, 0);
           
           // 清除上传的图片
-          removeImage();
+          // removeImage();
         },
         onError: (error) => {
           console.error('多模态请求失败:', error);
@@ -410,9 +416,9 @@ const sendMessage = async () => {
           });
           
           // 更新状态
-          isLoading.value = false;
+          // isLoading.value = false;
           processingStatus.value = '';
-          removeImage();
+      
         }
       },
       {
@@ -432,11 +438,10 @@ const sendMessage = async () => {
     });
     
     // 更新状态
-    isLoading.value = false;
+    // isLoading.value = false;
     processingStatus.value = '';
   } finally {
     console.log('请求处理完成，重置状态');
-    isLoading.value = false;
     processingStatus.value = '';
     if (!abortController.value) {
       abortController.value = null;
@@ -604,6 +609,8 @@ const applyImageToNode = async (imageUrl: string | undefined) => {
     })
   }
 };
+
+// const isLoadingComputed = computed(() => isLoading.value);
 
 onMounted(() => {
   // 从本地存储加载宽度设置
