@@ -6,7 +6,7 @@ import { UploadData, RetryTimeout } from './types'
 import { isNetworkError } from './utils'
 
 export function useRetry(
-  emitFn: Function,
+  emitFn: (event: string, payload?: any) => void,
   doUploadFn: (data: UploadData) => Promise<any>,
   handleSuccessFn: (data: UploadData) => Promise<void>,
   disableUploadRef: Ref<boolean>

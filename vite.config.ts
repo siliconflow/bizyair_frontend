@@ -29,8 +29,7 @@ export default defineConfig({
     }
   },
   build: {
-    // outDir: '../frontend/js',
-    outDir: '../js',
+    outDir: 'dist',
     cssCodeSplit: false,
     lib: {
       entry: 'src/main.ts',

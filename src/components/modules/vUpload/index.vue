@@ -63,7 +63,9 @@
   const allowedExtensions = computed(() => props.accept || DEFAULT_ALLOWED_EXTENSIONS)
   const { disableUpload, uploadSuccessful, uploadFile, interrupt, cancel } = useUpload(
     computed(() => props.modelType),
-    emit
+    (event: string, payload?: any) => {
+      emit(event as 'error' | 'progress' | 'uploadInfo' | 'success' | 'path' | 'start', payload)
+    }
   )
 
   function highlight(e: DragEvent) {

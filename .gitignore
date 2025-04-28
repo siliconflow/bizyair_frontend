@@ -94,3 +94,10 @@ Thumbs.db
 browser_tests/test-results/
 browser_tests/playwright-report/
 browser_tests/blob-report/
+
+#packaged product
+bizyui.egg-info/
+bizyui/js/bizyair_frontend.js
+dist/
+
+*.tsbuildinfo
