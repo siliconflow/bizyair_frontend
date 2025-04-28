@@ -72,7 +72,7 @@ export const defaultApiOptions: ChatApiOptions = {
   top_k: 50,
   frequency_penalty: 0,
   max_tokens: 4096,
-  apiKey: "sk-pvdAuzkzM9UrS8LBE7D4E973E3F44536842b4d69Db387994" // 请注意：实际项目中应通过环境变量或安全的方式管理API密钥
+  apiKey: "" // 请注意：实际项目中应通过环境变量或安全的方式管理API密钥
 };
 
 // 默认图像生成选项
@@ -82,7 +82,7 @@ export const defaultImageGenOptions: ImageGenOptions = {
   size: "1024x1024",
   quality: "medium",
   n: 1,
-  apiKey: "sk-pvdAuzkzM9UrS8LBE7D4E973E3F44536842b4d69Db387994"
+  apiKey: ""
 };
 
 // 默认图像编辑选项
@@ -91,7 +91,7 @@ export const defaultImageEditOptions: ImageEditOptions = {
   prompt: "",
   size: "1024x1024",
   n: 1,
-  apiKey: "sk-pvdAuzkzM9UrS8LBE7D4E973E3F44536842b4d69Db387994"
+  apiKey: ""
 };
 
 /**
