@@ -14,6 +14,7 @@ export const useOrderStore = defineStore('userOrder', {
     showProduct: false,
     showPayResult: false,
     products: [] as any[],
+    subProducts: [] as any[],
     payList: {} as any,
     payListParms: {
       current: 1,
@@ -29,10 +30,9 @@ export const useOrderStore = defineStore('userOrder', {
   actions: {
     async getProducts() {
       const res = await getProducts()
-      this.products = res.data.products.sort(
-        (a: { sort: number }, b: { sort: number }) => a.sort - b.sort
-      )
-      return res.data
+      console.log(res.data)
+      this.products = res.data.products || []
+      this.subProducts = res.data.sub_products || []
     },
     async getPayPage() {
       const temp = { ...this.payListParms }
