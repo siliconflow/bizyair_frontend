@@ -34,7 +34,7 @@
   },
   "sidebar": {
     "assistant": {
-      "title": "BizyAir 助手",
+      "title": "BizyAir Agent",
       "clearHistory": "清空对话历史",
       "close": "关闭",
       "nodeName": "节点名称",
