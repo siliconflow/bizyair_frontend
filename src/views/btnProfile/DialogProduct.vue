@@ -81,7 +81,11 @@
               <div class="buy-button-container">
                 <n-button class="using-button" disabled>
                   <div style="margin: auto">
-                    {{ statusStore.usersMetadata.level === 2 ? $t('btnProfile.product.activate') : $t('btnProfile.product.usingNow') }}
+                    {{
+                      statusStore.usersMetadata.level === 2
+                        ? $t('btnProfile.product.activate')
+                        : $t('btnProfile.product.usingNow')
+                    }}
                   </div>
                 </n-button>
               </div>
@@ -165,9 +169,14 @@
                 <template v-if="statusStore.usersMetadata.level === 2">
                   <div class="progress-bar-container">
                     <div class="progress-bar">
-                      <div class="progress" :style="{ width: `${(remainingDays / 30) * 100}%` }"></div>
+                      <div
+                        class="progress"
+                        :style="{ width: `${(remainingDays / 30) * 100}%` }"
+                      ></div>
                     </div>
-                    <div class="days-remaining">{{ $t('btnProfile.userInfo.vipRemaining', { days: remainingDays }) }}</div>
+                    <div class="days-remaining">
+                      {{ $t('btnProfile.userInfo.vipRemaining', { days: remainingDays }) }}
+                    </div>
                   </div>
                   <n-button class="renew-button" type="warning" @click.stop="handlePay">
                     <div style="margin: auto">
