@@ -1,6 +1,7 @@
 import { app } from "../../scripts/app.js";
 
 import './bizyair_frontend.js'
+import './apply_image_to_node.js'
 import { hideWidget } from './subassembly/tools.js'
 
 const possibleWidgetNames=[
@@ -18,6 +19,180 @@ const possibleWidgetNames=[
     "pulid_file",
     "style_model_name",
 ]
+// 节点点击信息记录器 - 新添加的功能
+const NodeInfoLogger = (function() {
+    // 节点类型与图片类型的映射
+    const NODE_TYPE_MAPPING = {
+        'PreviewImage': { type: 'temp', path: 'temp' },
+        'SaveImage': { type: 'output', path: 'output' },
+        'LoadImage': { type: 'input', path: 'input' }
+    };
+
+    // 构建图片URL
+    const buildImageUrl = (filename, type) => {
+        const baseUrl = window.location.protocol + '//' + window.location.host + "/api/view";
+        return `${baseUrl}?filename=${filename}&subfolder=&type=${type}&rand=${Math.random()}`;
+    };
+
+    // 获取图片并转换为base64
+    const getImageAsBase64 = async (filename, type) => {
+        try {
+            const imageUrl = buildImageUrl(filename, type);
+            const response = await fetch(imageUrl);
+            if (!response.ok) {
+                throw new Error(`获取图片失败: ${response.status} ${response.statusText}`);
+            }
+            const blob = await response.blob();
+
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64Data = reader.result;
+                    resolve(base64Data);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        } catch (error) {
+            console.error('获取图片并转换为base64失败:', error);
+            return null;
+        }
+    };
+
+    // 构建图片信息对象
+    const buildImageInfo = (imageData) => {
+        if (!imageData?.filename) return null;
+
+        // 根据节点类型确定图片类型
+        const type = imageData.type || 'temp'; // 默认为temp类型
+        const path = `/${type}/${imageData.filename}`;
+
+        return {
+            filename: imageData.filename,
+            url: buildImageUrl(imageData.filename, type),
+            path: path,
+            type: type
+        };
+    };
+
+    // 注册应用扩展
+    app.registerExtension({
+        name: "bizyair.node.info.logger",
+        async nodeCreated(node) {
+            // 保存原始的onMouseDown方法
+            if (!node._originalOnMouseDown) {
+                node._originalOnMouseDown = node.onMouseDown;
+            }
+
+            // 重写onMouseDown方法
+            node.onMouseDown = async function(e, pos, canvas) {
+                // 如果不是右键点击，则记录节点信息
+                if (e.button === 0) { // 左键点击
+                    console.log("节点信息:", {
+                        id: this.id,
+                        type: this.type,
+                        comfyClass: this.comfyClass,
+                        title: this.title,
+                        inputs: this.inputs,
+                        outputs: this.outputs,
+                        properties: this.properties,
+                        widgets: this.widgets?.map(w => ({
+                            name: w.name,
+                            value: w.value,
+                            type: w.type
+                        }))
+                    });
+
+                    console.log(this.images, 'this');
+                    console.log("节点title:", this.title);
+                    console.log("节点type:", this.type);
+                    console.log('id', this.id);
+
+                    // 创建基本节点信息对象
+                    const nodeInfo = {
+                        title: this.title,
+                        type: this.type,
+                        id: this.id,
+                        imageInfo: null
+                    };
+
+                    // 处理图片信息并传递给logNodeInfo
+                    if (this.images && this.images.length > 0) {
+                        const imageInfo = buildImageInfo(this.images[0]);
+
+                        // 检查是否存在全局bizyAirLib对象及logNodeInfo函数
+                        if (typeof bizyAirLib !== 'undefined' && typeof bizyAirLib.logNodeInfo === 'function') {
+                            try {
+                                // 获取图片的base64数据
+                                const base64Data = await getImageAsBase64(this.images[0].filename, imageInfo.type);
+
+                                // 添加base64数据到图片信息对象
+                                if (base64Data) {
+                                    imageInfo.base64 = base64Data;
+                                }
+
+                                // 添加图片信息到节点信息对象
+                                nodeInfo.imageInfo = imageInfo;
+
+                                console.log("已将节点和图片信息传递到logNodeInfo (包含base64数据):", {
+                                    title: this.title,
+                                    type: this.type,
+                                    id: this.id,
+                                    imageInfo: {
+                                        ...imageInfo,
+                                        base64: base64Data ? '已包含base64数据' : null
+                                    }
+                                });
+                            } catch (error) {
+                                console.error("获取图片base64数据失败:", error);
+                                // 即使获取base64失败，也添加基本图片信息
+                                nodeInfo.imageInfo = imageInfo;
+                            }
+                        } else {
+                            console.error("bizyAirLib.logNodeInfo未定义，无法传递节点信息");
+                        }
+                    }
+                    
+                    // 对所有节点都传递信息到前端
+                    if (typeof bizyAirLib !== 'undefined' && typeof bizyAirLib.logNodeInfo === 'function') {
+                        bizyAirLib.logNodeInfo(nodeInfo);
+                    }
+                }
+
+                // 调用原始方法，保持原有功能
+                return this._originalOnMouseDown?.apply(this, arguments);
+            };
+        }
+    });
+
+    return {
+        // 提供一个全局函数，可以在控制台手动调用获取选中节点的信息
+        logSelectedNodes: function() {
+            const selectedNodes = app.canvas.selected_nodes || [];
+            if (selectedNodes.length === 0) {
+                console.log("没有选中任何节点");
+                return;
+            }
+
+            selectedNodes.forEach((node, index) => {
+                console.log(`选中节点 ${index + 1}:`, {
+                    id: node.id,
+                    type: node.type,
+                    comfyClass: node.comfyClass,
+                    title: node.title,
+                    widgets: node.widgets?.map(w => ({
+                        name: w.name,
+                        value: w.value
+                    }))
+                });
+            });
+        }
+    };
+})();
+
+// 将节点记录器暴露到全局，方便在控制台使用
+window.NodeInfoLogger = NodeInfoLogger;
+
 function createSetWidgetCallback(modelType, selectedBaseModels = []) {
     return function setWidgetCallback() {
         const targetWidget = this.widgets.find(widget => possibleWidgetNames.includes(widget.name));
@@ -89,8 +264,6 @@ function setupNodeMouseBehavior(node, modelType) {
         if (e.widgetClick) {
             return this._bizyairState.original_onMouseDown?.apply(this, arguments);
         }
-
-
 
         const targetWidget = this.widgets.find(widget => possibleWidgetNames.includes(widget.name));
         if (targetWidget && pos[1] - targetWidget.last_y > 0 && pos[1] - targetWidget.last_y < 20) {
