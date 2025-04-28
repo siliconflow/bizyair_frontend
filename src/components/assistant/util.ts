@@ -1,7 +1,4 @@
 // API请求相关接口和工具函数
-import {
-  getRecentMessages,
-} from './database';
 
 // API请求选项接口
 export interface ChatApiOptions {
@@ -11,27 +8,6 @@ export interface ChatApiOptions {
   top_k: number;
   frequency_penalty: number;
   max_tokens: number;
-  apiKey: string;
-}
-
-// 图像生成选项接口
-export interface ImageGenOptions {
-  model: string;
-  prompt: string;
-  size: string;
-  quality: string;
-  n: number;
-  apiKey: string;
-  messages?: any[]; // 添加messages参数
-}
-
-// 图像编辑选项接口
-export interface ImageEditOptions {
-  model: string;
-  prompt: string;
-  size: string;
-  n: number;
-  apiKey: string;
 }
 
 // 消息接口
@@ -57,42 +33,18 @@ export interface StreamCallbacks {
   onError?: (error: any) => void;
 }
 
-// 图像生成回调接口
-export interface ImageCallbacks {
-  onStart?: () => void;
-  onComplete?: (imageBase64: string) => void;
-  onError?: (error: any) => void;
-}
-
 // 默认API选项
 export const defaultApiOptions: ChatApiOptions = {
-  model: "Qwen/Qwen2.5-VL-32B-Instruct",
+  model: "Qwen/Qwen2.5-VL-72B-Instruct",
   temperature: 0.7,
   top_p: 0.7,
   top_k: 50,
-  frequency_penalty: 0,
-  max_tokens: 4096,
-  apiKey: "" // 请注意：实际项目中应通过环境变量或安全的方式管理API密钥
+  frequency_penalty: 0.5,
+  max_tokens: 512
 };
 
-// 默认图像生成选项
-export const defaultImageGenOptions: ImageGenOptions = {
-  model: "gpt-image-1",
-  prompt: "",
-  size: "1024x1024",
-  quality: "medium",
-  n: 1,
-  apiKey: ""
-};
-
-// 默认图像编辑选项
-export const defaultImageEditOptions: ImageEditOptions = {
-  model: "gpt-image-1",
-  prompt: "",
-  size: "1024x1024",
-  n: 1,
-  apiKey: ""
-};
+// 服务器API路径
+const SERVER_MODEL_API_URL = "/bizyair/model/chat";
 
 /**
  * 构建聊天请求体
@@ -163,99 +115,13 @@ export function createTextUserMessage(text: string): ChatMessage {
 /**
  * 准备包含历史记录的消息数组用于API请求
  * @param currentMessage 当前消息
- * @param historyCount 历史消息数量
- * @param maxLength 最大消息长度限制，默认值为20
  * @returns Promise<ChatMessage[]>
  */
 export async function prepareMessagesWithHistory(
-  currentMessage: ChatMessage,
-  historyCount: number = 6,
-  maxLength: number = 20
+  currentMessage: ChatMessage
 ): Promise<ChatMessage[]> {
-  // 获取历史消息（不包括当前正在发送的消息）
-  const recentMessages = await getRecentMessages(historyCount);
-  
-  // 创建消息数组：历史消息 + 当前消息
-  const messages = [...recentMessages] as ChatMessage[];
-  
-  // 确保消息总数不超过maxLength
-  if (messages.length > maxLength - 1) {
-    // 保留最近的消息，删除旧消息
-    messages.splice(0, messages.length - (maxLength - 1));
-  }
-  
-  // 添加当前消息
-  messages.push(currentMessage);
-  
-  console.log('准备发送的消息数组:', messages);
-  return messages;
-}
-
-/**
- * 发送流式聊天请求
- * @param messages 消息数组或单条消息
- * @param callbacks 流式回调
- * @param options API选项
- * @param historyCount 历史消息数量，默认为6
- * @returns 用于中止请求的AbortController
- */
-export async function sendStreamChatRequest(
-  messages: ChatMessage[] | ChatMessage,
-  callbacks: StreamCallbacks,
-  options: Partial<ChatApiOptions> = {},
-  historyCount: number = 6
-): Promise<AbortController> {
-  const mergedOptions = { ...defaultApiOptions, ...options };
-  
-  // 如果传入的是单条消息，则添加历史记录
-  let messagesArray: ChatMessage[];
-  if (!Array.isArray(messages)) {
-    messagesArray = await prepareMessagesWithHistory(messages, historyCount);
-  } else {
-    messagesArray = messages;
-  }
-  
-  const requestBody = buildChatRequestBody(messagesArray, mergedOptions);
-  
-  // 创建AbortController用于中止请求
-  const abortController = new AbortController();
-
-  try {
-    // 通知开始
-    callbacks.onStart?.();
-    
-    const response = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${mergedOptions.apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody),
-      signal: abortController.signal // 添加中止信号
-    });
-
-    if (!response.ok) {
-      throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
-    }
-
-    if (!response.body) {
-      throw new Error('响应体为空');
-    }
-
-    // 处理流式响应
-    processStreamResponse(response.body, callbacks, abortController.signal);
-  } catch (error: any) {
-    // 检查是否是由于中止导致的错误
-    if (error.name === 'AbortError') {
-      console.log('请求已中止');
-      callbacks.onComplete?.(''); // 中止时清空并完成
-    } else {
-      console.error('API请求错误:', error);
-      callbacks.onError?.(error);
-    }
-  }
-  
-  return abortController; // 返回控制器供外部使用
+  // 由于不再使用数据库，直接返回包含当前消息的数组
+  return [currentMessage];
 }
 
 /**
@@ -282,6 +148,8 @@ async function processStreamResponse(
   }
 
   try {
+    callbacks.onStart?.();
+    
     while (true) {
       // 检查是否已中止
       if (signal?.aborted) {
@@ -313,12 +181,13 @@ async function processStreamResponse(
           
           try {
             const parsed = JSON.parse(data);
-            if (parsed.choices && parsed.choices[0]?.delta?.content) {
+            if (parsed.choices && parsed.choices[0]?.delta?.content !== undefined) {
               const content = parsed.choices[0].delta.content;
-              fullText += content;
-              
-              // 向UI回调发送当前token
-              callbacks.onToken?.(content);
+              if (content) {
+                fullText += content;
+                // 向UI回调发送当前token
+                callbacks.onToken?.(content);
+              }
             }
           } catch (e) {
             console.error('解析响应数据出错:', e, data);
@@ -332,27 +201,32 @@ async function processStreamResponse(
     const formattedText = formatOutputText(fullText);
     callbacks.onComplete?.(formattedText);
   } catch (error: any) {
-    // 处理中止错误
-      console.error('处理流式响应时出错:', error);
-   
+    console.error('处理流式响应时出错:', error);
+    callbacks.onError?.(error);
   }
 }
 
 /**
- * 生成图像API
- * @param prompt 提示词
- * @param callbacks 回调函数
- * @param options 图像生成选项
- * @param messages 历史消息 (可选)
+ * 发送流式聊天请求
+ * @param messages 消息数组或单条消息
+ * @param callbacks 流式回调
+ * @param options API选项
  * @returns 用于中止请求的AbortController
  */
-export async function generateImage(
-  prompt: string,
-  callbacks: ImageCallbacks,
-  options: Partial<ImageGenOptions> = {},
-  messages?: any[]
+export async function sendStreamChatRequest(
+  messages: ChatMessage[] | ChatMessage,
+  callbacks: StreamCallbacks,
+  options: Partial<ChatApiOptions> = {}
 ): Promise<AbortController> {
-  const mergedOptions = { ...defaultImageGenOptions, ...options, prompt };
+  // 如果传入的是单条消息，则添加历史记录
+  let messagesArray: ChatMessage[];
+  if (!Array.isArray(messages)) {
+    messagesArray = await prepareMessagesWithHistory(messages);
+  } else {
+    messagesArray = messages;
+  }
+  
+  const requestBody = buildChatRequestBody(messagesArray, options);
   
   // 创建AbortController用于中止请求
   const abortController = new AbortController();
@@ -361,124 +235,37 @@ export async function generateImage(
     // 通知开始
     callbacks.onStart?.();
     
-    const response = await fetch('https://api.gpt.ge/v1/images/generations', {
+    const response = await fetch(SERVER_MODEL_API_URL, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${mergedOptions.apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        model: mergedOptions.model,
-        prompt: mergedOptions.prompt,
-        messages: messages || [], // 传递历史消息
-        size: mergedOptions.size,
-        // quality: mergedOptions.quality,
-        n: mergedOptions.n
-      }),
-      signal: abortController.signal
+      body: JSON.stringify(requestBody),
+      signal: abortController.signal // 添加中止信号
     });
 
     if (!response.ok) {
-      throw new Error(`图像生成请求失败: ${response.status} ${response.statusText}`);
+      throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    
-    if (data.data && data.data[0] && data.data[0].b64_json) {
-      const imageBase64 = `data:image/png;base64,${data.data[0].b64_json}`;
-      callbacks.onComplete?.(imageBase64);
-    } else if (data.data && data.data[0] && data.data[0].url) {
-      // 如果返回URL而不是base64，则使用URL
-      callbacks.onComplete?.(data.data[0].url);
-    } else {
-      throw new Error('图像生成响应格式错误');
+    if (!response.body) {
+      throw new Error('响应体为空');
     }
+
+    // 处理流式响应
+    processStreamResponse(response.body, callbacks, abortController.signal);
   } catch (error: any) {
     // 检查是否是由于中止导致的错误
     if (error.name === 'AbortError') {
-      console.log('图像生成请求已中止');
+      console.log('请求已中止');
+      callbacks.onComplete?.(''); // 中止时清空并完成
     } else {
-      console.error('图像生成请求错误:', error);
+      console.error('API请求错误:', error);
       callbacks.onError?.(error);
     }
   }
   
-  return abortController;
-}
-
-/**
- * 编辑图像API
- * @param imageFile 源图像文件
- * @param prompt 提示词
- * @param maskFile 遮罩图像文件（可选）
- * @param callbacks 回调函数
- * @param options 图像编辑选项
- * @returns 用于中止请求的AbortController
- */
-export async function editImage(
-  imageFile: File,
-  prompt: string,
-  maskFile: File | null,
-  callbacks: ImageCallbacks,
-  options: Partial<ImageEditOptions> = {}
-): Promise<AbortController> {
-  const mergedOptions = { ...defaultImageEditOptions, ...options, prompt };
-  
-  // 创建AbortController用于中止请求
-  const abortController = new AbortController();
-
-  try {
-    // 通知开始
-    callbacks.onStart?.();
-    
-    // 创建FormData
-    const formData = new FormData();
-    formData.append('image', imageFile);
-    formData.append('prompt', mergedOptions.prompt);
-    formData.append('model', mergedOptions.model);
-    formData.append('size', mergedOptions.size);
-    formData.append('n', mergedOptions.n.toString());
-    
-    // 如果有遮罩图像则添加
-    if (maskFile) {
-      formData.append('mask', maskFile);
-    }
-    
-    const response = await fetch('https://api.gpt.ge/v1/images/edits', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${mergedOptions.apiKey}`
-      },
-      body: formData,
-      signal: abortController.signal
-    });
-
-    if (!response.ok) {
-      throw new Error(`图像编辑请求失败: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    
-    if (data.data && data.data[0] && data.data[0].b64_json) {
-      const imageBase64 = `data:image/png;base64,${data.data[0].b64_json}`;
-      callbacks.onComplete?.(imageBase64);
-    } else if (data.data && data.data[0] && data.data[0].url) {
-      // 如果返回URL而不是base64，则使用URL
-      callbacks.onComplete?.(data.data[0].url);
-    } else {
-      throw new Error('图像编辑响应格式错误');
-    }
-  } catch (error: any) {
-    // 检查是否是由于中止导致的错误
-    if (error.name === 'AbortError') {
-      console.log('图像编辑请求已中止');
-    } else {
-      console.error('图像编辑请求错误:', error);
-      callbacks.onError?.(error);
-    }
-  }
-  
-  return abortController;
+  return abortController; // 返回控制器供外部使用
 }
 
 /**
@@ -546,4 +333,24 @@ export function formatOutputText(text: string): string {
   console.log('格式化后的HTML文本:', text);
   
   return text;
+}
+
+/**
+ * 轻量级实时格式化文本函数，用于流式输出时的格式化
+ * @param text 原始模型输出文本
+ * @returns 格式化后的HTML文本
+ */
+export function formatOutputTextLight(text: string): string {
+  if (!text) return '';
+  
+  // 基本的Markdown格式转换
+  let formatted = text;
+  
+  // 替换加粗文本
+  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  
+  // 替换换行符为HTML换行标签
+  formatted = formatted.replace(/\n/g, '<br>');
+  
+  return formatted;
 } 

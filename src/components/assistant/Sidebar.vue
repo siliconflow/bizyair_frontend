@@ -93,30 +93,32 @@
                 </svg>
               </button>
 
-              <div class="image-actions" v-if="previewImage">
-                <button class="action-btn image-edit-btn" @click="showImageEditPrompt" :disabled="isLoading" title="编辑图片">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                  </svg>
-                </button>
-              </div>
-
               <div class="textarea-container">
                 <textarea v-model="userInput" :placeholder="$t('sidebar.assistant.inputPlaceholder')" @keydown.enter.prevent="sendMessage"
                   ref="textareaRef" :disabled="isLoading"></textarea>
               </div>
 
+              <!-- 发送按钮 - 在加载时禁用但保持显示 -->
               <button 
-                :class="['message-btn', isLoading ? 'abort-message-btn' : 'send-message-btn']" 
-                @click="isLoading ? abortGeneration() : sendMessage()" 
-                :disabled="!isLoading && !canSendMessage"
-                :title="isLoading ? $t('sidebar.assistant.abortGeneration') : $t('sidebar.assistant.sendMessage')"
+                class="send-message-btn" 
+                @click="sendMessage()" 
+                :disabled="!canSendMessage || isLoading"
+                :title="$t('sidebar.assistant.sendMessage')"
               >
-                <svg v-if="!isLoading" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2l.01 7z" />
                 </svg>
-                <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M6 6h12v12H6z" />
+              </button>
+              
+              <!-- 取消按钮 - 仅在加载时显示 -->
+              <button 
+                v-if="isLoading"
+                class="control-btn stop-btn" 
+                @click="abortGeneration" 
+                title="取消生成"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M6 6h12v12H6z"/>
                 </svg>
               </button>
             </div>
@@ -132,7 +134,7 @@
 <script setup lang="ts">
 import { useSidebarStore } from '../../stores/sidebarStore'
 import { onMounted, watch, ref, computed, onBeforeUnmount } from 'vue';
-import { editImage, base64ToFile, generateImage } from './util';
+import { sendStreamChatRequest, createImageUserMessage, formatOutputTextLight } from './util';
 import { useI18n } from 'vue-i18n';
 import { useToaster } from '@/components/modules/toats/index'
 
@@ -204,7 +206,9 @@ const imageInputRef = ref<HTMLInputElement | null>(null);
 const abortController = ref<AbortController | null>(null);
 
 // 计算属性：是否可以发送消息
-const canSendMessage = computed(() => userInput.value.trim() !== '' || previewImage.value !== '');
+const canSendMessage = computed(() => 
+  (userInput.value.trim() !== '' || previewImage.value !== '')
+);
 
 // 获取当前时间格式化字符串
 const getCurrentTime = () => {
@@ -276,38 +280,20 @@ const abortGeneration = () => {
   }
 };
 
-// 修改 showImageEditPrompt 函数
-const showImageEditPrompt = () => {
-  if (!previewImage.value) {
-    useToaster({
-      type: 'error',
-      // message: t('sidebar.assistant.imageUploadError')
-      message: '请先上传或选择一张图片'
-    })
-    return;
-  }
-  
-  // 设置用户输入为编辑提示前缀
-  userInput.value = "编辑这张图片：";
-  // 聚焦输入框
-  setTimeout(() => {
-    textareaRef.value?.focus();
-  }, 100);
-};
-
 // 修改 sendMessage 函数
 const sendMessage = async () => {
   if (!canSendMessage.value || isLoading.value) return;
   
-  const messageText = userInput.value || '生成一张图片';
+  const messageText = userInput.value || '请描述一下这张图片';
   const currentTime = getCurrentTime();
+  const hasImage = !!previewImage.value;
   
   // 创建用户消息并添加到聊天记录
   const userMessage = {
     role: 'user' as const,
     content: messageText,
     time: currentTime,
-    hasImage: !!previewImage.value,
+    hasImage: hasImage,
     image: previewImage.value
   };
   
@@ -315,7 +301,6 @@ const sendMessage = async () => {
   
   // 清空输入并滚动到底部
   userInput.value = '';
-  removeImage(); // 无论是否有图片，都清除上传的图片
   
   setTimeout(() => {
     scrollToBottom();
@@ -323,131 +308,132 @@ const sendMessage = async () => {
   
   // 显示加载状态
   isLoading.value = true;
+  processingStatus.value = '思考中...';
   
   try {
     // 创建AbortController用于中止请求
     abortController.value = new AbortController();
     
-    // 检查是否有图片，如果有则使用图片编辑接口，否则使用图片生成接口
-    if (userMessage.hasImage && userMessage.image) {
-      // 设置处理状态提示
-      processingStatus.value = '正在处理图像中...';
-      
-      // 将Base64图片转换为File对象
-      const imageFile = base64ToFile(userMessage.image, 'image-to-edit.png');
-      
-      // 调用图片编辑API
-      await editImage(
-        imageFile,
-        messageText,
-        null, // 不使用遮罩
-        {
-          onStart: () => {
-            console.log('开始编辑图片...');
-          },
-          onComplete: (editedImageUrl) => {
-            console.log('图片编辑完成');
-            
-            // 将编辑后的图片显示在聊天中
-            chatMessages.value.push({
-              role: 'assistant',
-              content: `已编辑图片（提示词：${messageText}）`,
-              time: getCurrentTime(),
-              hasImage: true,
-              image: editedImageUrl
-            });
-            
-            // 更新状态
-            isLoading.value = false;
-            processingStatus.value = '';
-            
-            // 滚动到底部
-            setTimeout(() => {
-              scrollToBottom();
-            }, 0);
-          },
-          onError: (error) => {
-            console.error('图片编辑失败:', error);
-            
-            // 添加错误消息
-            chatMessages.value.push({
-              role: 'assistant',
-              content: t('sidebar.assistant.errorMessage'),
-              time: getCurrentTime()
-            });
-            
-            // 更新状态
-            isLoading.value = false;
-            processingStatus.value = '';
-          }
-        },
-        {
-          model: "image-gpt-1", 
-          size: "1024x1024"
+    // 准备历史对话数据
+    const historyMessages = chatMessages.value
+      .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+      .map(msg => {
+        // 处理带图片的消息
+        if (msg.hasImage && msg.image && msg.role === 'user') {
+          return createImageUserMessage(msg.content, msg.image);
+        } else {
+          return {
+            role: msg.role,
+            content: msg.content
+          };
         }
-      );
-    } else {
-      // 设置生成状态提示
-      processingStatus.value = '正在生成图像中...';
-      
-      // 使用util.ts中的generateImage函数生成新图片
-      abortController.value = await generateImage(
-        messageText,
-        {
-          onStart: () => {
-            console.log('开始生成图片...');
-          },
-          onComplete: (imageUrl) => {
-            console.log('图片生成完成');
-            
-            // 将生成的图片显示在聊天中
+      });
+    
+    // 记录当前消息时间，用于标识当前回答
+    const currentMsgTime = getCurrentTime();
+    let isFirstToken = true;
+    
+    // 使用流式聊天请求
+    abortController.value = await sendStreamChatRequest(
+      historyMessages,
+      {
+        onStart: () => {
+          console.log('开始请求多模态模型...');
+          // 立即滚动到底部
+          setTimeout(() => {
+            scrollToBottom();
+          }, 0);
+        },
+        onToken: (token: string) => {
+          // 首次接收到token时创建新的助手消息
+          if (isFirstToken) {
             chatMessages.value.push({
               role: 'assistant',
-              content: `已生成图片（点击节点可以应用或保存）`,
-              time: getCurrentTime(),
-              hasImage: true,
-              image: imageUrl
+              content: token,
+              time: currentMsgTime
             });
+            isFirstToken = false;
+          } else {
+            // 找到刚创建的消息并更新
+            const currentAssistantMsg = chatMessages.value
+              .filter(msg => msg.role === 'assistant' && msg.time === currentMsgTime)
+              .pop();
             
-            // 更新状态
-            isLoading.value = false;
-            processingStatus.value = '';
-            
-            // 滚动到底部
-            setTimeout(() => {
-              scrollToBottom();
-            }, 0);
-          },
-          onError: (error) => {
-            console.error('图片生成失败:', error);
-            
-            // 添加错误消息
-            chatMessages.value.push({
-              role: 'assistant',
-              content: t('sidebar.assistant.errorMessage'),
-              time: getCurrentTime()
-            });
-            
-            // 更新状态
-            isLoading.value = false;
-            processingStatus.value = '';
+            if (currentAssistantMsg) {
+              currentAssistantMsg.content += token;
+              
+              // 实时应用格式化
+              const formattedText = formatOutputTextLight(currentAssistantMsg.content);
+              currentAssistantMsg.content = formattedText;
+            }
           }
+          
+          // 滚动到底部
+          setTimeout(() => {
+            scrollToBottom();
+          }, 0);
         },
-        {
-          model: "dall-e-3",
-          size: "1024x1024"
+        onComplete: (fullText: string) => {
+          console.log('多模态模型响应完成');
+          
+          // 更新状态
+          isLoading.value = false;
+          processingStatus.value = '';
+          
+          // 确保UI显示完整的回复
+          const currentAssistantMsg = chatMessages.value
+            .filter(msg => msg.role === 'assistant' && msg.time === currentMsgTime)
+            .pop();
+          
+          if (currentAssistantMsg) {
+            currentAssistantMsg.content = fullText;
+          }
+          
+          // 滚动到底部
+          setTimeout(() => {
+            scrollToBottom();
+          }, 0);
+          
+          // 清除上传的图片
+          removeImage();
         },
-        chatMessages.value // 传入历史消息
-      );
-    }
+        onError: (error) => {
+          console.error('多模态请求失败:', error);
+          
+          const errorMsgTime = getCurrentTime();
+          
+          // 添加错误消息
+          chatMessages.value.push({
+            role: 'assistant',
+            content: t('sidebar.assistant.errorMessage'),
+            time: errorMsgTime
+          });
+          
+          // 更新状态
+          isLoading.value = false;
+          processingStatus.value = '';
+          removeImage();
+        }
+      },
+      {
+        model: "Qwen/Qwen2.5-VL-72B-Instruct"
+      }
+    );
   } catch (error) {
-    console.error('图像处理过程出错:', error);
+    console.error('请求过程出错:', error);
+    
+    const errorMsgTime = getCurrentTime();
+    
     // 添加错误消息
     chatMessages.value.push({
       role: 'assistant',
       content: t('sidebar.assistant.errorMessage'),
-      time: getCurrentTime()
+      time: errorMsgTime
     });
+    
+    // 更新状态
+    isLoading.value = false;
+    processingStatus.value = '';
   } finally {
     console.log('请求处理完成，重置状态');
     isLoading.value = false;
@@ -673,7 +659,7 @@ onMounted(() => {
     time: getCurrentTime()
   };
   
-  chatMessages.value.push(welcomeMessage);
+  chatMessages.value = [welcomeMessage];
 });
 </script>
 
@@ -957,11 +943,7 @@ body.resizing {
   border-color: #7c3aed;
 }
 
-.upload-image-btn,
-.send-message-btn,
-.message-btn,
-.image-gen-btn,
-.image-edit-btn {
+.upload-image-btn {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -975,35 +957,35 @@ body.resizing {
   transition: background-color 0.2s;
 }
 
-.upload-image-btn:hover,
-.send-message-btn:hover,
-.message-btn:hover,
-.image-gen-btn:hover,
-.image-edit-btn:hover {
+.upload-image-btn:hover {
   background-color: #555;
 }
 
+.upload-image-btn:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .send-message-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
   background-color: #7c3aed;
+  border: none;
+  color: white;
+  transition: background-color 0.2s; 
 }
 
 .send-message-btn:hover {
   background-color: #6429d9;
 }
 
-.abort-message-btn {
-  background-color: #e53e3e;
-}
-
-.abort-message-btn:hover {
-  background-color: #c53030;
-}
-
-.send-message-btn:disabled,
-.message-btn:disabled,
-.upload-image-btn:disabled,
-.image-gen-btn:disabled,
-.image-edit-btn:disabled {
+.send-message-btn:disabled {
   background-color: #555;
   cursor: not-allowed;
   opacity: 0.6;
@@ -1028,22 +1010,6 @@ body.resizing {
 
 .apply-to-node-btn:hover {
   background-color: #3e8e41;
-}
-
-.image-gen-btn {
-  background-color: #2a9d8f;
-}
-
-.image-gen-btn:hover {
-  background-color: #238c7e;
-}
-
-.image-edit-btn {
-  background-color: #f4a261;
-}
-
-.image-edit-btn:hover {
-  background-color: #e08c48;
 }
 
 .image-preview-area {
@@ -1130,5 +1096,27 @@ body.resizing {
     transform: scale(1);
     opacity: 1;
   }
+}
+
+.control-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background-color: #e53e3e;
+  border: none;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.control-btn:hover {
+  background-color: #c53030;
+}
+
+.stop-btn {
+  color: white;
 }
 </style> 
