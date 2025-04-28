@@ -81,7 +81,7 @@
               <div class="buy-button-container">
                 <n-button class="using-button" disabled>
                   <div style="margin: auto">
-                    {{ $t('btnProfile.product.usingNow') }}
+                    {{ statusStore.usersMetadata.level === 2 ? $t('btnProfile.product.activate') : $t('btnProfile.product.usingNow') }}
                   </div>
                 </n-button>
               </div>
@@ -153,8 +153,8 @@
                   <span class="currency">￥</span>
                   <span class="price">{{ memberProducts[0].price / 100 }}</span>
                   <span class="original-price"
-                    >{{ $t('btnProfile.product.originalPrice')
-                    }}{{ memberProducts[0].original_price / 100 }}</span
+                    >{{ $t('btnProfile.product.originalPrice') }}¥
+                    {{ memberProducts[0].original_price / 100 }}</span
                   >
                 </div>
                 <div class="description">{{ $t('btnProfile.product.proDescription') }}</div>
@@ -162,7 +162,20 @@
 
               <!-- 购买按钮 -->
               <div class="buy-button-container">
-                <n-button class="buy-button" type="warning" @click.stop="handlePay">
+                <template v-if="statusStore.usersMetadata.level === 2">
+                  <div class="progress-bar-container">
+                    <div class="progress-bar">
+                      <div class="progress" :style="{ width: `${(remainingDays / 30) * 100}%` }"></div>
+                    </div>
+                    <div class="days-remaining">{{ $t('btnProfile.userInfo.vipRemaining', { days: remainingDays }) }}</div>
+                  </div>
+                  <n-button class="renew-button" type="warning" @click.stop="handlePay">
+                    <div style="margin: auto">
+                      {{ $t('btnProfile.product.renewNow') }}
+                    </div>
+                  </n-button>
+                </template>
+                <n-button v-else class="buy-button" type="warning" @click.stop="handlePay">
                   <div style="margin: auto">
                     {{ $t('btnProfile.product.specialSubscribe') }}
                   </div>
@@ -265,7 +278,7 @@
   import { NCheckbox, NButton, NModal, NResult, NSpin } from 'naive-ui'
   import { useOrderStore } from '@/stores/orderStore'
   import { useStatusStore } from '@/stores/userStatus'
-  import { onMounted, onUnmounted, ref } from 'vue'
+  import { onMounted, onUnmounted, ref, computed } from 'vue'
   import { payProduct } from '@/api/order'
   import wechat from './wechat.vue'
   import purchaseDoc from './DialogPurchaseDoc.vue'
@@ -282,6 +295,19 @@
   const amount = ref(0)
   const wechatText = ref('')
   const loading = ref(true)
+
+  // 计算剩余天数
+  const remainingDays = computed(() => {
+    const subExpireAt = (statusStore.usersMetadata as any).sub_expire_at
+    if (!subExpireAt?.[2]) return 0
+
+    const expireDate = new Date(subExpireAt[2])
+    const today = new Date()
+    // 计算两个日期之间的差值（毫秒）
+    const diffTime = expireDate.getTime() - today.getTime()
+    // 转换为天数并向上取整
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  })
 
   // 将商品分为金币和会员两类
   const coinProducts = ref<any[]>([])
@@ -771,5 +797,40 @@
   .vip-text {
     font-size: 24px;
     color: #f2cb51;
+  }
+
+  .progress-bar-container {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(109, 40, 217, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress {
+    height: 100%;
+    background-color: #f2cb51;
+    border-radius: 4px;
+  }
+
+  .days-remaining {
+    font-size: 12px;
+    text-align: center;
+    margin: 5px 0;
+    color: #ffdb07;
+  }
+
+  .renew-button {
+    background-color: #f2cb51;
+    border-radius: 8px;
+    width: 100%;
+    height: 36px;
+    color: #fff;
+    font-weight: 600;
   }
 </style>
