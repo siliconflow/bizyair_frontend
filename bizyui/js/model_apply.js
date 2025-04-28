@@ -83,83 +83,162 @@ const NodeInfoLogger = (function() {
             if (!node._originalOnMouseDown) {
                 node._originalOnMouseDown = node.onMouseDown;
             }
-
-            // 重写onMouseDown方法
-            node.onMouseDown = async function(e, pos, canvas) {
-                // 如果不是右键点击，则记录节点信息
-                if (e.button === 0) { // 左键点击
-                    console.log("节点信息:", {
-                        id: this.id,
-                        type: this.type,
-                        comfyClass: this.comfyClass,
-                        title: this.title,
-                        inputs: this.inputs,
-                        outputs: this.outputs,
-                        properties: this.properties,
-                        widgets: this.widgets?.map(w => ({
-                            name: w.name,
-                            value: w.value,
-                            type: w.type
-                        }))
-                    });
-
-                    console.log(this.images, 'this');
-                    console.log("节点title:", this.title);
-                    console.log("节点type:", this.type);
-                    console.log('id', this.id);
-
-                    // 创建基本节点信息对象
-                    const nodeInfo = {
-                        title: this.title,
-                        type: this.type,
-                        id: this.id,
-                        imageInfo: null
-                    };
-
-                    // 处理图片信息并传递给logNodeInfo
-                    if (this.images && this.images.length > 0) {
-                        const imageInfo = buildImageInfo(this.images[0]);
-
-                        // 检查是否存在全局bizyAirLib对象及logNodeInfo函数
-                        if (typeof bizyAirLib !== 'undefined' && typeof bizyAirLib.logNodeInfo === 'function') {
-                            try {
-                                // 获取图片的base64数据
-                                const base64Data = await getImageAsBase64(this.images[0].filename, imageInfo.type);
-
-                                // 添加base64数据到图片信息对象
-                                if (base64Data) {
-                                    imageInfo.base64 = base64Data;
-                                }
-
-                                // 添加图片信息到节点信息对象
-                                nodeInfo.imageInfo = imageInfo;
-
-                                console.log("已将节点和图片信息传递到logNodeInfo (包含base64数据):", {
-                                    title: this.title,
-                                    type: this.type,
-                                    id: this.id,
-                                    imageInfo: {
-                                        ...imageInfo,
-                                        base64: base64Data ? '已包含base64数据' : null
-                                    }
-                                });
-                            } catch (error) {
-                                console.error("获取图片base64数据失败:", error);
-                                // 即使获取base64失败，也添加基本图片信息
-                                nodeInfo.imageInfo = imageInfo;
-                            }
-                        } else {
-                            console.error("bizyAirLib.logNodeInfo未定义，无法传递节点信息");
-                        }
+            
+            // 使用装饰器模式扩展节点的onMouseDown方法
+            node.onMouseDown = function(e, pos, canvas) {
+                // 对于小部件点击或右键点击，直接使用原始方法处理
+                if (e.widgetClick || e.button !== 0) {
+                    return this._originalOnMouseDown?.apply(this, arguments);
+                }
+                
+                // 第一步：处理LORA小部件特殊区域点击
+                const targetWidget = this.widgets && this.widgets.find(widget => 
+                    possibleWidgetNames.includes(widget.name));
+                    
+                if (targetWidget && pos[1] - targetWidget.last_y > 0 && pos[1] - targetWidget.last_y < 20) {
+                    const litecontextmenu = document.querySelector('.litegraph.litecontextmenu');
+                    if (litecontextmenu) {
+                        litecontextmenu.style.display = 'none';
+                    }
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    
+                    // 防抖处理
+                    if (!this._bizyairState) {
+                        this._bizyairState = {
+                            lastClickTime: 0,
+                            DEBOUNCE_DELAY: 300
+                        };
                     }
                     
-                    // 对所有节点都传递信息到前端
-                    if (typeof bizyAirLib !== 'undefined' && typeof bizyAirLib.logNodeInfo === 'function') {
-                        bizyAirLib.logNodeInfo(nodeInfo);
+                    const currentTime = new Date().getTime();
+                    if (currentTime - this._bizyairState.lastClickTime < this._bizyairState.DEBOUNCE_DELAY) {
+                        return false;
                     }
+                    this._bizyairState.lastClickTime = currentTime;
+                    
+                    // 处理模型选择
+                    for (const key in nodeDataNames) {
+                        const names = nodeDataNames[key];
+                        const isMatch = names ?
+                            (Array.isArray(names) ? names.includes(this.comfyClass) : this.comfyClass === names)
+                            : false;
+                        
+                        if (isMatch) {
+                            const currentNode = this;
+                            bizyAirLib.showModelSelect({
+                                modelType: [key],
+                                selectedBaseModels: [],
+                                onApply: (version, model) => {
+                                    if (!currentNode || !currentNode.widgets) return;
+                                    
+                                    const currentLora = currentNode.widgets.find(widget => 
+                                        possibleWidgetNames.includes(widget.name));
+                                    const currentModel = currentNode.widgets.find(w => 
+                                        w.name === "model_version_id");
+                                    
+                                    if (model && currentModel && version) {
+                                        currentLora.value = model;
+                                        currentModel.value = version.id;
+                                        currentNode.setDirtyCanvas(true);
+                                    }
+                                }
+                            });
+                            break;
+                        }
+                    }
+                    return false;
                 }
-
-                // 调用原始方法，保持原有功能
+                
+                // 第二步：记录节点信息，但不阻止后续操作
+                // 使用微任务队列或setTimeout将日志和信息收集与事件处理分离
+                // 这样不会阻塞拖动等操作的开始
+                queueMicrotask(() => {
+                    // 只有当不处于拖动状态时才记录信息
+                    if (!canvas.is_dragging) {
+                        // 收集节点信息
+                        console.log("节点信息:", {
+                            id: this.id,
+                            type: this.type,
+                            comfyClass: this.comfyClass,
+                            title: this.title,
+                            inputs: this.inputs,
+                            outputs: this.outputs,
+                            properties: this.properties,
+                            widgets: this.widgets?.map(w => ({
+                                name: w.name,
+                                value: w.value,
+                                type: w.type
+                            }))
+                        });
+                        
+                        console.log(this.images, 'this');
+                        console.log("节点title:", this.title);
+                        console.log("节点type:", this.type);
+                        console.log('id', this.id);
+                        
+                        // 创建基本节点信息对象
+                        const nodeInfo = {
+                            title: this.title,
+                            type: this.type,
+                            id: this.id,
+                            imageInfo: null
+                        };
+                        
+                        // 处理图片信息并传递给logNodeInfo
+                        if (this.images && this.images.length > 0) {
+                            // 使用异步IIFE处理图片，不阻塞主流程
+                            (async () => {
+                                try {
+                                    const imageInfo = buildImageInfo(this.images[0]);
+                                    
+                                    // 检查是否存在全局bizyAirLib对象及logNodeInfo函数
+                                    if (typeof bizyAirLib !== 'undefined' && typeof bizyAirLib.logNodeInfo === 'function') {
+                                        // 获取图片的base64数据
+                                        const base64Data = await getImageAsBase64(this.images[0].filename, imageInfo.type);
+                                        
+                                        // 添加base64数据到图片信息对象
+                                        if (base64Data) {
+                                            imageInfo.base64 = base64Data;
+                                        }
+                                        
+                                        // 添加图片信息到节点信息对象
+                                        nodeInfo.imageInfo = imageInfo;
+                                        
+                                        console.log("已将节点和图片信息传递到logNodeInfo (包含base64数据):", {
+                                            title: this.title,
+                                            type: this.type,
+                                            id: this.id,
+                                            imageInfo: {
+                                                ...imageInfo,
+                                                base64: base64Data ? '已包含base64数据' : null
+                                            }
+                                        });
+                                        
+                                        // 发送完整节点信息
+                                        bizyAirLib.logNodeInfo(nodeInfo);
+                                    } else {
+                                        console.error("bizyAirLib.logNodeInfo未定义，无法传递节点信息");
+                                    }
+                                } catch (error) {
+                                    console.error("获取图片base64数据失败:", error);
+                                    
+                                    // 即使获取base64失败，也尝试发送基本节点信息
+                                    if (typeof bizyAirLib !== 'undefined' && typeof bizyAirLib.logNodeInfo === 'function') {
+                                        bizyAirLib.logNodeInfo(nodeInfo);
+                                    }
+                                }
+                            })();
+                        } else {
+                            // 对不包含图片的节点，直接传递信息到前端
+                            if (typeof bizyAirLib !== 'undefined' && typeof bizyAirLib.logNodeInfo === 'function') {
+                                bizyAirLib.logNodeInfo(nodeInfo);
+                            }
+                        }
+                    }
+                });
+                
+                // 调用原始方法处理拖动等操作
                 return this._originalOnMouseDown?.apply(this, arguments);
             };
         }
@@ -251,59 +330,14 @@ function createSetWidgetCallback(modelType, selectedBaseModels = []) {
 
 function setupNodeMouseBehavior(node, modelType) {
     hideWidget(node, "model_version_id");
-
+    
+    // 只设置必要的状态信息，不修改onMouseDown（已在上面的扩展中处理）
     if (!node._bizyairState) {
         node._bizyairState = {
             lastClickTime: 0,
             DEBOUNCE_DELAY: 300,
-            original_onMouseDown: node.onMouseDown
+            modelType: modelType
         };
-    }
-
-    node.onMouseDown = function(e, pos, canvas) {
-        if (e.widgetClick) {
-            return this._bizyairState.original_onMouseDown?.apply(this, arguments);
-        }
-
-        const targetWidget = this.widgets.find(widget => possibleWidgetNames.includes(widget.name));
-        if (targetWidget && pos[1] - targetWidget.last_y > 0 && pos[1] - targetWidget.last_y < 20) {
-            const litecontextmenu = document.querySelector('.litegraph.litecontextmenu')
-            if (litecontextmenu) {
-                litecontextmenu.style.display = 'none'
-            }
-            e.stopImmediatePropagation();
-            e.preventDefault();
-            if (e.button !== 0) {
-                return false;
-            }
-
-            const currentTime = new Date().getTime();
-            if (currentTime - this._bizyairState.lastClickTime < this._bizyairState.DEBOUNCE_DELAY) {
-                return false;
-            }
-            this._bizyairState.lastClickTime = currentTime;
-
-            const currentNode = this;
-            bizyAirLib.showModelSelect({
-                modelType: [modelType],
-                selectedBaseModels: [],
-                onApply: (version, model) => {
-                    if (!currentNode || !currentNode.widgets) return;
-
-                    const currentLora = currentNode.widgets.find(widget => possibleWidgetNames.includes(widget.name));
-                    const currentModel = currentNode.widgets.find(w => w.name === "model_version_id");
-
-                    if (model && currentModel && version) {
-                        currentLora.value = model;
-                        currentModel.value = version.id;
-                        currentNode.setDirtyCanvas(true);
-                    }
-                }
-            });
-            return false;
-        } else {
-            return this._bizyairState.original_onMouseDown?.apply(this, arguments);
-        }
     }
 }
 
