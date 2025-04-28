@@ -14,6 +14,26 @@ export interface ChatApiOptions {
   apiKey: string;
 }
 
+// 图像生成选项接口
+export interface ImageGenOptions {
+  model: string;
+  prompt: string;
+  size: string;
+  quality: string;
+  n: number;
+  apiKey: string;
+  messages?: any[]; // 添加messages参数
+}
+
+// 图像编辑选项接口
+export interface ImageEditOptions {
+  model: string;
+  prompt: string;
+  size: string;
+  n: number;
+  apiKey: string;
+}
+
 // 消息接口
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -37,6 +57,13 @@ export interface StreamCallbacks {
   onError?: (error: any) => void;
 }
 
+// 图像生成回调接口
+export interface ImageCallbacks {
+  onStart?: () => void;
+  onComplete?: (imageBase64: string) => void;
+  onError?: (error: any) => void;
+}
+
 // 默认API选项
 export const defaultApiOptions: ChatApiOptions = {
   model: "Qwen/Qwen2.5-VL-32B-Instruct",
@@ -45,7 +72,26 @@ export const defaultApiOptions: ChatApiOptions = {
   top_k: 50,
   frequency_penalty: 0,
   max_tokens: 4096,
-  apiKey: "sk-gwmhsgcqweejdkyadfdyzvpctstutxqdzxlxnabubatcwjfe" // 请注意：实际项目中应通过环境变量或安全的方式管理API密钥
+  apiKey: "sk-pvdAuzkzM9UrS8LBE7D4E973E3F44536842b4d69Db387994" // 请注意：实际项目中应通过环境变量或安全的方式管理API密钥
+};
+
+// 默认图像生成选项
+export const defaultImageGenOptions: ImageGenOptions = {
+  model: "gpt-image-1",
+  prompt: "",
+  size: "1024x1024",
+  quality: "medium",
+  n: 1,
+  apiKey: "sk-pvdAuzkzM9UrS8LBE7D4E973E3F44536842b4d69Db387994"
+};
+
+// 默认图像编辑选项
+export const defaultImageEditOptions: ImageEditOptions = {
+  model: "gpt-image-1",
+  prompt: "",
+  size: "1024x1024",
+  n: 1,
+  apiKey: "sk-pvdAuzkzM9UrS8LBE7D4E973E3F44536842b4d69Db387994"
 };
 
 /**
@@ -290,6 +336,182 @@ async function processStreamResponse(
       console.error('处理流式响应时出错:', error);
    
   }
+}
+
+/**
+ * 生成图像API
+ * @param prompt 提示词
+ * @param callbacks 回调函数
+ * @param options 图像生成选项
+ * @param messages 历史消息 (可选)
+ * @returns 用于中止请求的AbortController
+ */
+export async function generateImage(
+  prompt: string,
+  callbacks: ImageCallbacks,
+  options: Partial<ImageGenOptions> = {},
+  messages?: any[]
+): Promise<AbortController> {
+  const mergedOptions = { ...defaultImageGenOptions, ...options, prompt };
+  
+  // 创建AbortController用于中止请求
+  const abortController = new AbortController();
+
+  try {
+    // 通知开始
+    callbacks.onStart?.();
+    
+    const response = await fetch('https://api.gpt.ge/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${mergedOptions.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: mergedOptions.model,
+        prompt: mergedOptions.prompt,
+        messages: messages || [], // 传递历史消息
+        size: mergedOptions.size,
+        // quality: mergedOptions.quality,
+        n: mergedOptions.n
+      }),
+      signal: abortController.signal
+    });
+
+    if (!response.ok) {
+      throw new Error(`图像生成请求失败: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.data && data.data[0] && data.data[0].b64_json) {
+      const imageBase64 = `data:image/png;base64,${data.data[0].b64_json}`;
+      callbacks.onComplete?.(imageBase64);
+    } else if (data.data && data.data[0] && data.data[0].url) {
+      // 如果返回URL而不是base64，则使用URL
+      callbacks.onComplete?.(data.data[0].url);
+    } else {
+      throw new Error('图像生成响应格式错误');
+    }
+  } catch (error: any) {
+    // 检查是否是由于中止导致的错误
+    if (error.name === 'AbortError') {
+      console.log('图像生成请求已中止');
+    } else {
+      console.error('图像生成请求错误:', error);
+      callbacks.onError?.(error);
+    }
+  }
+  
+  return abortController;
+}
+
+/**
+ * 编辑图像API
+ * @param imageFile 源图像文件
+ * @param prompt 提示词
+ * @param maskFile 遮罩图像文件（可选）
+ * @param callbacks 回调函数
+ * @param options 图像编辑选项
+ * @returns 用于中止请求的AbortController
+ */
+export async function editImage(
+  imageFile: File,
+  prompt: string,
+  maskFile: File | null,
+  callbacks: ImageCallbacks,
+  options: Partial<ImageEditOptions> = {}
+): Promise<AbortController> {
+  const mergedOptions = { ...defaultImageEditOptions, ...options, prompt };
+  
+  // 创建AbortController用于中止请求
+  const abortController = new AbortController();
+
+  try {
+    // 通知开始
+    callbacks.onStart?.();
+    
+    // 创建FormData
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    formData.append('prompt', mergedOptions.prompt);
+    formData.append('model', mergedOptions.model);
+    formData.append('size', mergedOptions.size);
+    formData.append('n', mergedOptions.n.toString());
+    
+    // 如果有遮罩图像则添加
+    if (maskFile) {
+      formData.append('mask', maskFile);
+    }
+    
+    const response = await fetch('https://api.gpt.ge/v1/images/edits', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${mergedOptions.apiKey}`
+      },
+      body: formData,
+      signal: abortController.signal
+    });
+
+    if (!response.ok) {
+      throw new Error(`图像编辑请求失败: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.data && data.data[0] && data.data[0].b64_json) {
+      const imageBase64 = `data:image/png;base64,${data.data[0].b64_json}`;
+      callbacks.onComplete?.(imageBase64);
+    } else if (data.data && data.data[0] && data.data[0].url) {
+      // 如果返回URL而不是base64，则使用URL
+      callbacks.onComplete?.(data.data[0].url);
+    } else {
+      throw new Error('图像编辑响应格式错误');
+    }
+  } catch (error: any) {
+    // 检查是否是由于中止导致的错误
+    if (error.name === 'AbortError') {
+      console.log('图像编辑请求已中止');
+    } else {
+      console.error('图像编辑请求错误:', error);
+      callbacks.onError?.(error);
+    }
+  }
+  
+  return abortController;
+}
+
+/**
+ * 将base64数据转换为File对象
+ * @param base64Data base64数据（可以包含前缀）
+ * @param fileName 文件名
+ * @param mimeType MIME类型
+ * @returns File对象
+ */
+export function base64ToFile(base64Data: string, fileName: string, mimeType: string = 'image/png'): File {
+  // 如果包含前缀，则去除前缀
+  const base64Content = base64Data.includes('base64,') 
+    ? base64Data.split('base64,')[1] 
+    : base64Data;
+  
+  // 将base64解码为二进制数据
+  const byteCharacters = atob(base64Content);
+  const byteArrays: Uint8Array[] = [];
+  
+  for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+    const slice = byteCharacters.slice(offset, offset + 1024);
+    
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+  
+  const blob = new Blob(byteArrays, { type: mimeType });
+  return new File([blob], fileName, { type: mimeType });
 }
 
 /**
