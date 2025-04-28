@@ -7,12 +7,18 @@ const DB_NAME = 'bizyair_assistant';
 const DB_VERSION = 1;
 const CHAT_STORE_NAME = 'chat_history';
 
+// 消息类型
+export type MessageType = 'text' | 'image' | 'image_edit';
+
 // 存储的消息类型
 export interface StoredChatMessage {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string | ChatContent[];
   timestamp: number;
+  messageType?: MessageType; // 消息类型，用于区分普通消息、生成图像和编辑图像
+  originalImage?: string; // 编辑图像时的原始图像
+  prompt?: string; // 图像生成或编辑的提示词
 }
 
 /**
@@ -40,6 +46,7 @@ export function initDatabase(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains(CHAT_STORE_NAME)) {
         const store = db.createObjectStore(CHAT_STORE_NAME, { keyPath: 'id' });
         store.createIndex('timestamp', 'timestamp', { unique: false });
+        store.createIndex('messageType', 'messageType', { unique: false });
         console.log('创建聊天历史存储成功');
       }
     };
@@ -132,6 +139,50 @@ export async function getRecentMessages(count: number = 10): Promise<StoredChatM
 }
 
 /**
+ * 根据消息类型从数据库获取消息
+ * @param messageType 消息类型
+ * @param count 获取的消息数量
+ * @returns Promise<StoredChatMessage[]>
+ */
+export async function getMessagesByType(messageType: MessageType, count: number = 10): Promise<StoredChatMessage[]> {
+  try {
+    const db = await initDatabase();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([CHAT_STORE_NAME], 'readonly');
+      const store = transaction.objectStore(CHAT_STORE_NAME);
+      const index = store.index('messageType');
+      
+      // 使用倒序游标获取最新的指定类型的记录
+      const request = index.openCursor(IDBKeyRange.only(messageType), 'prev');
+      const messages: StoredChatMessage[] = [];
+      
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result;
+        if (cursor && messages.length < count) {
+          messages.push(cursor.value);
+          cursor.continue();
+        } else {
+          // 返回正确的时间顺序
+          resolve(messages.reverse());
+        }
+      };
+      
+      request.onerror = (event) => {
+        console.error('获取消息失败:', event);
+        reject('获取消息失败');
+      };
+      
+      transaction.oncomplete = () => {
+        db.close();
+      };
+    });
+  } catch (error) {
+    console.error('根据类型获取消息时出错:', error);
+    return [];
+  }
+}
+
+/**
  * 清空数据库中的所有消息
  * @returns Promise<boolean>
  */
@@ -173,7 +224,10 @@ export function convertToStoredMessage(message: {
   role: 'user' | 'assistant', 
   content: string, 
   hasImage?: boolean, 
-  image?: string 
+  image?: string,
+  messageType?: MessageType,
+  originalImage?: string,
+  prompt?: string
 }): StoredChatMessage {
   let storedContent: string | ChatContent[];
   
@@ -200,6 +254,9 @@ export function convertToStoredMessage(message: {
     id: generateId(),
     role: message.role,
     content: storedContent,
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    messageType: message.messageType || 'text',
+    originalImage: message.originalImage,
+    prompt: message.prompt
   };
 } 

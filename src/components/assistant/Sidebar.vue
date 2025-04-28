@@ -32,13 +32,22 @@
               </div>
               <div class="message-content">
                 <div class="message-header">
-                  <span class="message-sender">{{ message.role === 'user' ? '' : $t('sidebar.assistant.title') }}</span>
+                  <span class="message-sender">{{ message.role === 'user' ? 'You' : $t('sidebar.assistant.title') }}</span>
                   <span class="message-time">{{ message.time }}</span>
                 </div>
 
                 <!-- 图片消息 -->
                 <div v-if="message.hasImage" class="message-image">
                   <img :src="message.image" alt="用户上传图片" />
+                  <!-- 对于AI生成的图片消息，显示应用到节点按钮 -->
+                  <div v-if="message.role === 'assistant' && sidebarStore.nodeInfo && canApplyToNode(sidebarStore.nodeInfo)" class="image-actions">
+                    <button 
+                      class="apply-to-node-btn" 
+                      @click="applyImageToNode(message.image)"
+                      :title="getNodeActionTitle(sidebarStore.nodeInfo)">
+                      {{ getNodeActionText(sidebarStore.nodeInfo) }}
+                    </button>
+                  </div>
                 </div>
 
                 <!-- 文本消息 -->
@@ -48,9 +57,12 @@
 
             <!-- 加载指示器 -->
             <div v-if="isLoading" class="loading-indicator">
-              <div class="dot"></div>
-              <div class="dot"></div>
-              <div class="dot"></div>
+              <div class="loading-text">{{ processingStatus }}</div>
+              <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+              </div>
             </div>
           </div>
 
@@ -81,29 +93,28 @@
                 </svg>
               </button>
 
+              <div class="image-actions" v-if="previewImage">
+                <button class="action-btn image-edit-btn" @click="showImageEditPrompt" :disabled="isLoading" title="编辑图片">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                  </svg>
+                </button>
+              </div>
+
               <div class="textarea-container">
                 <textarea v-model="userInput" :placeholder="$t('sidebar.assistant.inputPlaceholder')" @keydown.enter.prevent="sendMessage"
                   ref="textareaRef" :disabled="isLoading"></textarea>
               </div>
 
-              <!-- 发送/中止按钮 -->
-              <!-- <button 
+              <button 
                 :class="['message-btn', isLoading ? 'abort-message-btn' : 'send-message-btn']" 
                 @click="isLoading ? abortGeneration() : sendMessage()" 
                 :disabled="!isLoading && !canSendMessage"
                 :title="isLoading ? $t('sidebar.assistant.abortGeneration') : $t('sidebar.assistant.sendMessage')"
-              > -->
-              <button 
-                :class="['message-btn', isLoading ? 'abort-message-btn' : 'send-message-btn']" 
-                @click="isLoading ? abortGeneration() : sendMessage2()" 
-                :disabled="!isLoading && !canSendMessage"
-                :title="isLoading ? $t('sidebar.assistant.abortGeneration') : $t('sidebar.assistant.sendMessage')"
               >
-                <!-- 发送图标 -->
                 <svg v-if="!isLoading" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2l.01 7z" />
                 </svg>
-                <!-- 停止图标 -->
                 <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M6 6h12v12H6z" />
                 </svg>
@@ -119,22 +130,11 @@
 </template>
 
 <script setup lang="ts">
-import { useSidebarStore } from '@/stores/sidebarStore'
+import { useSidebarStore } from '../../stores/sidebarStore'
 import { onMounted, watch, ref, computed, onBeforeUnmount } from 'vue';
-import { 
-  sendStreamChatRequest, 
-  createTextUserMessage, 
-  createImageUserMessage,
-  ChatMessage,
-  formatOutputText
-} from './util';
-import {
-  saveMessage,
-  clearAllMessages,
-  getRecentMessages,
-  convertToStoredMessage
-} from './database';
+import { editImage, base64ToFile, generateImage } from './util';
 import { useI18n } from 'vue-i18n';
+import { useToaster } from '@/components/modules/toats/index'
 
 const { t } = useI18n();
 const sidebarStore = useSidebarStore()
@@ -189,10 +189,12 @@ const chatMessages = ref<Array<{
   content: string,
   time: string,
   hasImage?: boolean,
-  image?: string
+  image?: string,
+  id?: string,
 }>>([]);
 const userInput = ref('');
 const isLoading = ref(false);
+const processingStatus = ref('');
 const previewImage = ref('');
 const uploadedImageBase64 = ref('');
 const chatMessagesRef = ref<HTMLElement | null>(null);
@@ -202,9 +204,7 @@ const imageInputRef = ref<HTMLInputElement | null>(null);
 const abortController = ref<AbortController | null>(null);
 
 // 计算属性：是否可以发送消息
-const canSendMessage = computed(() => {
-  return userInput.value.trim() !== '' || previewImage.value !== '';
-});
+const canSendMessage = computed(() => userInput.value.trim() !== '' || previewImage.value !== '');
 
 // 获取当前时间格式化字符串
 const getCurrentTime = () => {
@@ -215,32 +215,32 @@ const getCurrentTime = () => {
 };
 
 // 触发图片上传
-const triggerImageUpload = () => {
-  if (imageInputRef.value) {
-    imageInputRef.value.click();
-  }
-};
+const triggerImageUpload = () => imageInputRef.value?.click();
 
 // 处理图片上传
 const handleImageUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
-  if (target.files && target.files.length > 0) {
-    const file = target.files[0];
-    
-    // 验证文件类型
-    if (!file.type.startsWith('image/')) {
-      alert(t('sidebar.assistant.imageUploadError'));
-      return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      previewImage.value = result;
-      uploadedImageBase64.value = result.split(',')[1]; // 去掉 data:image/png;base64, 前缀
-    };
-    reader.readAsDataURL(file);
+  if (!target.files?.length) return;
+  
+  const file = target.files[0];
+  
+  // 验证文件类型
+  if (!file.type.startsWith('image/')) {
+
+    useToaster({
+      type: 'error',
+      message: t('sidebar.assistant.imageUploadError')
+    })
+    return;
   }
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const result = e.target?.result as string;
+    previewImage.value = result;
+    uploadedImageBase64.value = result.split(',')[1]; // 去掉 data:image/png;base64, 前缀
+  };
+  reader.readAsDataURL(file);
 };
 
 // 移除已选图片
@@ -252,30 +252,18 @@ const removeImage = () => {
   }
 };
 
-// 添加对话历史相关功能按钮
-const clearHistory = async () => {
-  try {
-    // 清空数据库中的历史记录
-    await clearAllMessages();
-    
-    // 创建一个新的欢迎消息
-    const welcomeMessage = {
-      role: 'assistant' as const,
-      content: t('sidebar.assistant.welcomeMessage'),
-      time: getCurrentTime()
-    };
-    
-    // 更新UI显示
-    chatMessages.value = [welcomeMessage];
-    
-    // 将欢迎消息保存到数据库中，这样可以避免第一条消息重复发送
-    const storedWelcomeMessage = convertToStoredMessage(welcomeMessage);
-    await saveMessage(storedWelcomeMessage);
-    
-    console.log('历史记录已清空，并添加了欢迎消息');
-  } catch (error) {
-    console.error('清空历史失败:', error);
-  }
+// 清空对话历史
+const clearHistory = () => {
+  // 创建一个新的欢迎消息
+  const welcomeMessage = {
+    role: 'assistant' as const,
+    content: t('sidebar.assistant.welcomeMessage'),
+    time: getCurrentTime()
+  };
+  
+  // 更新UI显示
+  chatMessages.value = [welcomeMessage];
+  console.log('历史记录已清空，并添加了欢迎消息');
 };
 
 // 中止生成
@@ -288,199 +276,172 @@ const abortGeneration = () => {
   }
 };
 
-
-const sendMessage2=async function unsafeGenerateImage(prompt: any) {
-  const apiKey = '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'; // 此处会暴露密钥！
-  const response = await fetch('https://api.openai.com/v1/images/generations', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: "gpt-image-1",
-      prompt:'一个蓝色的天空，有一群大雁在飞',
-      size: "1024x1024",
-      n: 1
+// 修改 showImageEditPrompt 函数
+const showImageEditPrompt = () => {
+  if (!previewImage.value) {
+    useToaster({
+      type: 'error',
+      // message: t('sidebar.assistant.imageUploadError')
+      message: '请先上传或选择一张图片'
     })
-  });
-
-  const data = await response.json();
-  console.log(data,'data______________');
+    return;
+  }
   
-  console.log(data.data[0].url); // 图片URL
-}
-// 修改发送消息函数
+  // 设置用户输入为编辑提示前缀
+  userInput.value = "编辑这张图片：";
+  // 聚焦输入框
+  setTimeout(() => {
+    textareaRef.value?.focus();
+  }, 100);
+};
+
+// 修改 sendMessage 函数
 const sendMessage = async () => {
   if (!canSendMessage.value || isLoading.value) return;
   
+  const messageText = userInput.value || '生成一张图片';
   const currentTime = getCurrentTime();
-  // 创建用户消息
+  
+  // 创建用户消息并添加到聊天记录
   const userMessage = {
     role: 'user' as const,
-    content: userInput.value,
+    content: messageText,
     time: currentTime,
     hasImage: !!previewImage.value,
     image: previewImage.value
   };
   
-  // 添加用户消息到UI聊天记录
   chatMessages.value.push(userMessage);
   
-  // 滚动到底部
+  // 清空输入并滚动到底部
+  userInput.value = '';
+  removeImage(); // 无论是否有图片，都清除上传的图片
+  
   setTimeout(() => {
     scrollToBottom();
   }, 0);
   
-  // 准备API请求
-  const messageText = userInput.value;
-  const hasImage = !!uploadedImageBase64.value;
-  
-  // 清空输入
-  userInput.value = '';
-  const imageBase64 = uploadedImageBase64.value;
-  removeImage();
-  
   // 显示加载状态
   isLoading.value = true;
   
-  // 稍后将用于存储AI回复消息的索引
-  let aiMessageIndex = -1;
-  
   try {
-    // 创建消息对象供API使用
-    let message: ChatMessage;
-    if (hasImage) {
-      message = createImageUserMessage(messageText, imageBase64);
-    } else {
-      message = createTextUserMessage(messageText);
-    }
+    // 创建AbortController用于中止请求
+    abortController.value = new AbortController();
     
-    // 保存已收到的完整文本
-    let receivedText = '';
-    let hasReceivedFirstToken = false;
-    let userMessageSaved = false; // 标记用户消息是否已保存
-    
-    // 发送流式请求并保存中止控制器
-    abortController.value = await sendStreamChatRequest(
-      message,
-      {
-        onStart: () => {
-          console.log('开始接收流式响应');
-        },
-        onToken: async (token) => {
-          // 第一次收到token时，先保存用户消息到数据库
-          if (!hasReceivedFirstToken) {
-            hasReceivedFirstToken = true;
+    // 检查是否有图片，如果有则使用图片编辑接口，否则使用图片生成接口
+    if (userMessage.hasImage && userMessage.image) {
+      // 设置处理状态提示
+      processingStatus.value = '正在处理图像中...';
+      
+      // 将Base64图片转换为File对象
+      const imageFile = base64ToFile(userMessage.image, 'image-to-edit.png');
+      
+      // 调用图片编辑API
+      await editImage(
+        imageFile,
+        messageText,
+        null, // 不使用遮罩
+        {
+          onStart: () => {
+            console.log('开始编辑图片...');
+          },
+          onComplete: (editedImageUrl) => {
+            console.log('图片编辑完成');
             
-            // 创建AI消息框
-            aiMessageIndex = chatMessages.value.length;
+            // 将编辑后的图片显示在聊天中
             chatMessages.value.push({
               role: 'assistant',
-              content: '',
+              content: `已编辑图片（提示词：${messageText}）`,
+              time: getCurrentTime(),
+              hasImage: true,
+              image: editedImageUrl
+            });
+            
+            // 更新状态
+            isLoading.value = false;
+            processingStatus.value = '';
+            
+            // 滚动到底部
+            setTimeout(() => {
+              scrollToBottom();
+            }, 0);
+          },
+          onError: (error) => {
+            console.error('图片编辑失败:', error);
+            
+            // 添加错误消息
+            chatMessages.value.push({
+              role: 'assistant',
+              content: t('sidebar.assistant.errorMessage'),
               time: getCurrentTime()
             });
             
-            // 在收到第一个token后再保存用户消息到数据库
-            if (!userMessageSaved) {
-              userMessageSaved = true;
-              const storedUserMessage = convertToStoredMessage(userMessage);
-              try {
-                await saveMessage(storedUserMessage);
-                console.log('用户消息保存成功');
-              } catch (error) {
-                console.error('保存用户消息失败:', error);
-              }
-            }
-          }
-          
-          // 累积收到的文本
-          receivedText += token;
-          
-          // 更新聊天消息内容，应用格式化
-          if (aiMessageIndex >= 0 && aiMessageIndex < chatMessages.value.length) {
-            const formattedText = formatOutputText(receivedText);
-            chatMessages.value[aiMessageIndex].content = formattedText;
-          }
-          
-          // 滚动到底部
-          scrollToBottom();
-        },
-        onComplete: async (fullText) => {
-          console.log('流式响应完成:', fullText);
-          isLoading.value = false;
-          abortController.value = null;
-          
-          // 如果从未收到任何token，但是有完整响应，显示一个消息
-          if (!hasReceivedFirstToken && fullText) {
-            // 在这种情况下也需要保存用户消息
-            if (!userMessageSaved) {
-              userMessageSaved = true;
-              const storedUserMessage = convertToStoredMessage(userMessage);
-              try {
-                await saveMessage(storedUserMessage);
-                console.log('用户消息保存成功');
-              } catch (error) {
-                console.error('保存用户消息失败:', error);
-              }
-            }
-            
-            aiMessageIndex = chatMessages.value.length;
-            const formattedText = formatOutputText(fullText);
-            chatMessages.value.push({
-              role: 'assistant',
-              content: formattedText,
-              time: getCurrentTime()
-            });
-          }
-          
-          // 保存AI响应到数据库
-          if (aiMessageIndex >= 0 && aiMessageIndex < chatMessages.value.length) {
-            const assistantMessage = chatMessages.value[aiMessageIndex];
-            const storedAssistantMessage = convertToStoredMessage(assistantMessage);
-            await saveMessage(storedAssistantMessage);
+            // 更新状态
+            isLoading.value = false;
+            processingStatus.value = '';
           }
         },
-        onError: async (error) => {
-          console.error('流式响应错误:', error);
-          isLoading.value = false;
-          abortController.value = null;
-          
-          // 即使出错也要保存用户消息，确保对话连贯性
-          if (!userMessageSaved) {
-            userMessageSaved = true;
-            const storedUserMessage = convertToStoredMessage(userMessage);
-            try {
-              await saveMessage(storedUserMessage);
-              console.log('用户消息保存成功');
-            } catch (error) {
-              console.error('保存用户消息失败:', error);
-            }
-          }
-          
-          // 添加错误消息
-          chatMessages.value.push({
-            role: 'assistant',
-            content: t('sidebar.assistant.errorMessage'),
-            time: getCurrentTime()
-          });
+        {
+          model: "image-gpt-1", 
+          size: "1024x1024"
         }
-      }
-    );
-  } catch (error) {
-    console.error('API请求错误:', error);
-    isLoading.value = false;
-    abortController.value = null;
-    
-    // 即使API请求出错也保存用户消息
-    const storedUserMessage = convertToStoredMessage(userMessage);
-    try {
-      await saveMessage(storedUserMessage);
-      console.log('用户消息保存成功');
-    } catch (saveError) {
-      console.error('保存用户消息失败:', saveError);
+      );
+    } else {
+      // 设置生成状态提示
+      processingStatus.value = '正在生成图像中...';
+      
+      // 使用util.ts中的generateImage函数生成新图片
+      abortController.value = await generateImage(
+        messageText,
+        {
+          onStart: () => {
+            console.log('开始生成图片...');
+          },
+          onComplete: (imageUrl) => {
+            console.log('图片生成完成');
+            
+            // 将生成的图片显示在聊天中
+            chatMessages.value.push({
+              role: 'assistant',
+              content: `已生成图片（点击节点可以应用或保存）`,
+              time: getCurrentTime(),
+              hasImage: true,
+              image: imageUrl
+            });
+            
+            // 更新状态
+            isLoading.value = false;
+            processingStatus.value = '';
+            
+            // 滚动到底部
+            setTimeout(() => {
+              scrollToBottom();
+            }, 0);
+          },
+          onError: (error) => {
+            console.error('图片生成失败:', error);
+            
+            // 添加错误消息
+            chatMessages.value.push({
+              role: 'assistant',
+              content: t('sidebar.assistant.errorMessage'),
+              time: getCurrentTime()
+            });
+            
+            // 更新状态
+            isLoading.value = false;
+            processingStatus.value = '';
+          }
+        },
+        {
+          model: "dall-e-3",
+          size: "1024x1024"
+        },
+        chatMessages.value // 传入历史消息
+      );
     }
-    
+  } catch (error) {
+    console.error('图像处理过程出错:', error);
     // 添加错误消息
     chatMessages.value.push({
       role: 'assistant',
@@ -488,6 +449,12 @@ const sendMessage = async () => {
       time: getCurrentTime()
     });
   } finally {
+    console.log('请求处理完成，重置状态');
+    isLoading.value = false;
+    processingStatus.value = '';
+    if (!abortController.value) {
+      abortController.value = null;
+    }
     // 滚动到底部
     setTimeout(() => {
       scrollToBottom();
@@ -502,12 +469,12 @@ const scrollToBottom = () => {
   }
 };
 
-// 修改watch函数，不再添加消息到聊天
+// 处理节点信息更新
 watch(() => sidebarStore.nodeInfo, (newValue) => {
   console.log('节点信息更新:', newValue);
-  if (newValue && newValue.imageInfo && (newValue.imageInfo.url || newValue.imageInfo.base64)) {
+  if (newValue?.imageInfo?.url || newValue?.imageInfo?.base64) {
     // 直接设置预览图片，就像用户上传了一样
-    const imageUrl = newValue.imageInfo.base64 || newValue.imageInfo.url;
+    const imageUrl = newValue.imageInfo.base64 || newValue.imageInfo.url || '';
     
     // 设置上传的图片以便用户可以输入文本后发送
     previewImage.value = imageUrl;
@@ -516,13 +483,8 @@ watch(() => sidebarStore.nodeInfo, (newValue) => {
     if (newValue.imageInfo.base64) {
       // 检查是否已包含data:前缀
       if (typeof newValue.imageInfo.base64 === 'string') {
-        if (newValue.imageInfo.base64.startsWith('data:')) {
-          // 如果包含前缀，则提取纯base64部分
-          uploadedImageBase64.value = newValue.imageInfo.base64.split(',')[1];
-        } else {
-          // 已经是纯base64，直接使用
-          uploadedImageBase64.value = newValue.imageInfo.base64;
-        }
+        uploadedImageBase64.value = newValue.imageInfo.base64.startsWith('data:') ? 
+          newValue.imageInfo.base64.split(',')[1] : newValue.imageInfo.base64;
       }
     } else if (newValue.imageInfo.url) {
       // 如果没有base64，则尝试从URL加载并转换
@@ -543,14 +505,121 @@ watch(() => sidebarStore.nodeInfo, (newValue) => {
     
     // 聚焦到输入框
     setTimeout(() => {
-      if (textareaRef.value) {
-        textareaRef.value.focus();
-      }
+      textareaRef.value?.focus();
     }, 0);
   }
 }, { deep: true });
 
-onMounted(async () => {
+// 修改canApplyToNode函数来返回更具体的操作类型
+const canApplyToNode = (nodeInfo: any) => {
+  // 根据节点类型返回不同的操作类型
+  if (!nodeInfo || !nodeInfo.type) return false;
+  
+  const nodeType = nodeInfo.type;
+  if (nodeType === 'LoadImage') {
+    return 'apply'; // 应用到节点
+  } else if (nodeType === 'SaveImage') {
+    return 'save-output'; // 保存到output目录
+  } else if (nodeType === 'PreviewImage') {
+    return 'save-temp'; // 保存到temp目录
+  }
+  return false; // 其他类型节点不支持操作
+};
+
+// 添加getNodeActionText函数，返回按钮文本
+const getNodeActionText = (nodeInfo: any) => {
+  const actionType = canApplyToNode(nodeInfo);
+  if (actionType === 'apply') {
+    return '应用到当前节点';
+  } else if (actionType === 'save-output') {
+    return '保存到output目录';
+  } else if (actionType === 'save-temp') {
+    return '保存到temp目录';
+  }
+  return '应用到节点';
+};
+
+// 添加getNodeActionTitle函数，返回提示文本
+const getNodeActionTitle = (nodeInfo: any) => {
+  const actionType = canApplyToNode(nodeInfo);
+  if (actionType === 'apply') {
+    return '将图片应用到LoadImage节点';
+  } else if (actionType === 'save-output') {
+    return '将图片保存到output目录';
+  } else if (actionType === 'save-temp') {
+    return '将图片保存到temp目录';
+  }
+  return '';
+};
+
+// 应用图片到当前节点
+const applyImageToNode = async (imageUrl: string | undefined) => {
+  if (!sidebarStore.nodeInfo) {
+    console.error('没有选中的节点信息');
+    return;
+  }
+  
+  if (!imageUrl) {
+    console.error('没有图片URL');
+    return;
+  }
+
+  try {
+    // 获取图片的base64数据
+    let base64Data = imageUrl;
+    
+    // 如果图片URL不是base64格式，需要获取并转换
+    if (!imageUrl.startsWith('data:')) {
+      try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        base64Data = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
+      } catch (error) {
+        console.error('获取图片数据失败:', error);
+        useToaster({
+          type: 'error',
+          message: '获取图片数据失败，无法应用到节点'
+        })
+        return;
+      }
+    }
+
+    // 创建要发送到节点的图片数据对象
+    const imageData = {
+      nodeId: sidebarStore.nodeInfo.id,
+      imageBase64: base64Data,
+      nodeType: sidebarStore.nodeInfo.type
+    };
+    console.log(window.bizyAirLib,'window.bizyAirLib-----');
+    
+    // 如果window.bizyAirLib存在并有updateNodeImage方法，调用它
+    if (typeof window.bizyAirLib !== 'undefined' && typeof window.bizyAirLib.updateNodeImage === 'function') {
+      window.bizyAirLib.updateNodeImage(imageData);
+      useToaster({
+        type: 'success',
+        message: '图片已应用到节点: ' + sidebarStore.nodeInfo.title
+      })
+    } else {
+      console.error('bizyAirLib.updateNodeImage未定义');
+      useToaster({
+        type: 'error',
+        message: '系统功能未就绪，无法应用图片到节点'
+      })
+    }
+  } catch (error) {
+    console.error('应用图片到节点失败:', error);
+    useToaster({
+      type: 'error',
+      message: '应用图片到节点失败'
+    })
+  }
+};
+
+onMounted(() => {
   // 从本地存储加载宽度设置
   const savedWidth = localStorage.getItem('bizyair-sidebar-width');
   if (savedWidth) {
@@ -560,56 +629,44 @@ onMounted(async () => {
     }
   }
   
-  try {
-    // 尝试从IndexedDB加载历史消息
-    const recentMessages = await getRecentMessages(10); // 最多显示10条历史消息
-    
-    if (recentMessages && recentMessages.length > 0) {
-      // 转换存储的消息为UI展示格式
-      const uiMessages = recentMessages.map(msg => {
-        let content = '';
-        let hasImage = false;
-        let image = '';
-        
-        // 处理不同格式的消息内容
-        if (typeof msg.content === 'string') {
-          content = msg.content;
-        } else if (Array.isArray(msg.content)) {
-          // 查找文本和图片内容
-          const textContent = msg.content.find(item => item.type === 'text');
-          const imageContent = msg.content.find(item => item.type === 'image_url');
-          
-          if (textContent && textContent.text) {
-            content = textContent.text;
-          }
-          
-          if (imageContent && imageContent.image_url && imageContent.image_url.url) {
-            hasImage = true;
-            image = imageContent.image_url.url;
-          }
-        }
-        
-        return {
-          role: msg.role as 'user' | 'assistant',
-          content: content,
-          time: new Date(msg.timestamp).toTimeString().slice(0, 5),
-          hasImage: hasImage,
-          image: image
-        };
-      });
-      
-      // 添加历史消息到聊天UI
-      chatMessages.value = uiMessages;
-      
-      // 如果有历史消息，则不显示欢迎消息
-      console.log('从数据库加载了', uiMessages.length, '条历史消息');
-      return;
-    }
-  } catch (error) {
-    console.error('加载历史消息失败:', error);
+  // 确保全局bizyAirLib对象存在
+  if (typeof window.bizyAirLib === 'undefined') {
+    // 使用any类型来避免TypeScript错误
+    (window as any).bizyAirLib = {};
   }
   
-  // 如果没有历史消息或加载失败，显示欢迎消息并保存到数据库
+  // 直接定义updateNodeImage方法
+  if (typeof (window as any).bizyAirLib.updateNodeImage !== 'function') {
+    (window as any).bizyAirLib.updateNodeImage = function(imageData: any) {
+      if (!imageData || !imageData.nodeId || !imageData.imageBase64) {
+        console.error('应用图片到节点失败: 缺少必要的参数');
+        return;
+      }
+
+      try {
+        console.log('正在尝试应用图片到节点...');
+        
+        // 直接使用传入的imageData.nodeId通过IFRAME找到节点
+        // bizyAirLib直接传递postMessage到父窗口
+        window.parent.postMessage({
+          type: 'APPLY_IMAGE_TO_NODE',
+          data: {
+            nodeId: imageData.nodeId,
+            base64Data: imageData.imageBase64,
+          }
+        }, '*');
+        
+        console.log('已发送图片应用消息到ComfyUI');
+  
+      } catch (error) {
+        console.error('应用图片到节点时发生异常:', error);
+       
+      }
+    };
+    console.log('已添加updateNodeImage方法到bizyAirLib对象');
+  }
+  
+  // 显示欢迎消息
   const welcomeMessage = {
     role: 'assistant' as const,
     content: t('sidebar.assistant.welcomeMessage'),
@@ -617,15 +674,6 @@ onMounted(async () => {
   };
   
   chatMessages.value.push(welcomeMessage);
-  
-  // 将欢迎消息保存到数据库
-  try {
-    const storedWelcomeMessage = convertToStoredMessage(welcomeMessage);
-    await saveMessage(storedWelcomeMessage);
-    console.log('初始欢迎消息已保存到数据库');
-  } catch (error) {
-    console.error('保存欢迎消息失败:', error);
-  }
 });
 </script>
 
@@ -811,7 +859,7 @@ body.resizing {
 }
 
 .message-content {
-  max-width: 70%;
+  max-width: 80%;
   background-color: #444;
   border-radius: 12px;
   padding: 12px;
@@ -911,7 +959,9 @@ body.resizing {
 
 .upload-image-btn,
 .send-message-btn,
-.message-btn {
+.message-btn,
+.image-gen-btn,
+.image-edit-btn {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -927,7 +977,9 @@ body.resizing {
 
 .upload-image-btn:hover,
 .send-message-btn:hover,
-.message-btn:hover {
+.message-btn:hover,
+.image-gen-btn:hover,
+.image-edit-btn:hover {
   background-color: #555;
 }
 
@@ -949,10 +1001,49 @@ body.resizing {
 
 .send-message-btn:disabled,
 .message-btn:disabled,
-.upload-image-btn:disabled {
+.upload-image-btn:disabled,
+.image-gen-btn:disabled,
+.image-edit-btn:disabled {
   background-color: #555;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.image-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.apply-to-node-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.apply-to-node-btn:hover {
+  background-color: #3e8e41;
+}
+
+.image-gen-btn {
+  background-color: #2a9d8f;
+}
+
+.image-gen-btn:hover {
+  background-color: #238c7e;
+}
+
+.image-edit-btn {
+  background-color: #f4a261;
+}
+
+.image-edit-btn:hover {
+  background-color: #e08c48;
 }
 
 .image-preview-area {
@@ -997,6 +1088,16 @@ body.resizing {
   justify-content: center;
   margin: 10px 0;
   height: 24px;
+}
+
+.loading-text {
+  margin-right: 8px;
+  color: #fff;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 4px;
 }
 
 .dot {
