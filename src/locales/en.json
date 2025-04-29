@@ -1,14 +1,14 @@
 {
   "app": {
     "title": "BizyAir",
-    "restore": "Restore",
-    "minimize": "Minimize",
+    "restore": "restore",
+    "minimize": "minimize",
     "shareCode": {
       "placeholder": "Paste share code",
       "error": {
         "empty": "Clipboard content is empty or not a string.",
-        "length": "Clipboard content length is incorrect.",
-        "shareCodeLength": "Share code length is incorrect."
+        "length": "The length of the clipboard content is incorrect.",
+        "shareCodeLength": "The length of the share code is incorrect."
       }
     },
     "assistant": "Assistant"
@@ -363,14 +363,41 @@
   },
   "btnProfile": {
     "userInfo": {
+      "lazyText": "This person is lazy and left nothing behind",
       "lazyText": "This user is lazy and left nothing behind",
       "balance": "Balance",
+      "coin": " Coins",
+      "recharge": "Purchase",
+      "giftSilverCoin": "Silver",
+      "rechargeCoin": "Gold",
+      "switchApiKey": "Set API Key",
       "coin": " Coins",
       "recharge": "Recharge",
       "giftSilverCoin": "Gift Silver Coins",
       "rechargeCoin": "Recharge Gold Coins",
       "switchApiKey": "Switch API Key",
       "myWallet": "My Wallet",
+      "rechargeRecord": "Payment",
+      "consumptionBill": "Bill"
+    },
+    "consumptionBill": {
+      "title": "Bill",
+      "enterApiKey": "Please enter API Key",
+      "search": "Search",
+      "billingPeriod": "Billing Period",
+      "totalAmount": "Total Amount",
+      "goldCoinDeduction": "Gold Coin Deduction",
+      "silverCoinDeduction": "Silver Coin Deduction",
+      "success": "Success",
+      "failed": "Failed",
+      "pending": "Pending",
+      "yearlyBill": "Yearly Bill",
+      "monthlyBill": "Monthly Bill",
+      "dailyBill": "Daily Bill",
+      "recentConsumption": "Recent Consumption",
+      "recentBillDetails": "Recent 30 Minutes Consumption Details",
+      "back": "Back",
+      "selectAPIKey": "Select API Key"
       "rechargeRecord": "Recharge Record",
       "consumptionBill": "Consumption Bill"
     },
@@ -439,6 +466,11 @@
     },
     "product": {
       "coin": "Coins",
+      "confirmAgreement": "By confirming payment, you agree to the platform's",
+      "rechargeAgreement": "「Recharge Agreement」",
+      "coinValidityNote": "Note: Gold coins are valid for 1 year",
+      "actualPayment": "Actual Payment",
+      "coin": "Coins",
       "confirmAgreement": "Confirming payment means you agree to the platform's",
       "rechargeAgreement": "\"Recharge Agreement\"",
       "coinValidityNote": "Note: Gold coins are valid for 1 year",
@@ -446,6 +478,9 @@
       "pay": "Pay",
       "agreementWarning": "Please agree to the recharge agreement first",
       "wechatPay": "WeChat Pay",
+      "expireQrCode": "QR code will expire after {0}",
+      "qrCodeExpired": "QR code has expired, please click to refresh",
+      "paySuccess": "Payment Success"
       "expireQrCode": "QR code will expire in {0}",
       "qrCodeExpired": "QR code expired, please click to refresh",
       "paySuccess": "Payment Successful"
