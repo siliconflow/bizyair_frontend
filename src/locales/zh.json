@@ -46,7 +46,7 @@
       "sendMessage": "发送消息",
       "abortGeneration": "中止生成",
       "welcomeMessage": "你好！我是BizyAir助手，点击节点中的图片可以直接上传",
-      "errorMessage": "抱歉，发生了错误，请不要连续上传超过2mb的图片。清除对话上下文后重试。",
+      "errorMessage": "抱歉，发生了错误。请刷新页面重试。",
       "imageUploadError": "请上传图片文件"
     }
   },

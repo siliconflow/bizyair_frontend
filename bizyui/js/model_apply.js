@@ -3,7 +3,6 @@ import { app } from "../../scripts/app.js";
 import './bizyair_frontend.js'
 import './apply_image_to_node.js'
 import { hideWidget } from './subassembly/tools.js'
-import { formatToWebp } from '../../../src/components/modules/vUpload/imageToOss';
 
 const possibleWidgetNames=[
     "clip_name",
@@ -50,6 +49,7 @@ const NodeInfoLogger = (function() {
             
             // 使用formatToWebp进行压缩
             const { base64: compressedBase64 } = await formatToWebp(file);
+            
             return compressedBase64;
             
      
@@ -58,7 +58,41 @@ const NodeInfoLogger = (function() {
             return null;
         }
     };
-
+     const formatToWebp = (file)=> {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = e => {
+            const img = new Image()
+            img.onload = () => {
+              const canvas = document.createElement('canvas')
+              const ctx = canvas.getContext('2d')
+              canvas.width = img.width
+              canvas.height = img.height
+              ctx?.drawImage(img, 0, 0)
+              const webpDataUrl = canvas.toDataURL('image/webp')
+              resolve({
+                file: base64ToFile(webpDataUrl, `${file.name}.webp`, 'image/webp'),
+                base64: webpDataUrl
+              })
+            }
+            img.src = e.target?.result 
+          }
+          reader.onerror = e => {
+            reject(e)
+          }
+          reader.readAsDataURL(file)
+        })
+      }
+       function base64ToFile(base64, filename, mimeType) {
+        const byteCharacters = atob(base64.split(',')[1])
+        const byteNumbers = new Array(byteCharacters.length)
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i)
+        }
+        const byteArray = new Uint8Array(byteNumbers)
+        const blob = new Blob([byteArray], { type: mimeType || base64.split(':')[1].split(';')[0] })
+        return new File([blob], filename, { type: blob.type })
+      }
     // 构建图片信息对象
     const buildImageInfo = (imageData) => {
         if (!imageData?.filename) return null;
