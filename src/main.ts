@@ -10,8 +10,6 @@ import enMessages from './locales/en.json'
 import zhMessages from './locales/zh.json'
 import { useSidebarStore } from '@/stores/sidebarStore'
 
-
-
 // 创建i18n实例
 const i18n = createI18n({
   legacy: false,
@@ -23,36 +21,36 @@ const i18n = createI18n({
   }
 })
 
-export const logNodeInfo = (nodeInfo: { 
-  title: string; 
-  type: string; 
-  id?: string;
+export const logNodeInfo = (nodeInfo: {
+  title: string
+  type: string
+  id?: string
   imageInfo?: {
-    filename: string;
-    url: string;
-    path: string;
-  } | null;
+    filename: string
+    url: string
+    path: string
+  } | null
 }) => {
-  console.log('节点信息已接收:', nodeInfo);
-  
+  console.log('节点信息已接收:', nodeInfo)
+
   try {
     // 使用app中已创建的pinia实例
-    const sidebarStore = useSidebarStore();
-    
+    const sidebarStore = useSidebarStore()
+
     // 使用store更新节点信息，但不打开侧边栏
     sidebarStore.setNodeInfo({
       title: nodeInfo.title,
       type: nodeInfo.type,
       id: nodeInfo.id || '',
       imageInfo: nodeInfo.imageInfo || null
-    });
-    
+    })
+
     // 打开侧边栏
     // sidebarStore.openSidebar();
-    
-    console.log('节点信息已同步到store:', nodeInfo, '侧边栏状态保持不变');
+
+    console.log('节点信息已同步到store:', nodeInfo, '侧边栏状态保持不变')
   } catch (error) {
-    console.error('同步节点信息到store时出错:', error);
+    console.error('同步节点信息到store时出错:', error)
   }
 }
 
@@ -257,19 +255,18 @@ if (import.meta.env.MODE !== 'production') {
 declare global {
   interface Window {
     bizyAirLib: {
-      showModelSelect: typeof showModelSelect;
-      showDatasetSelect: typeof showDatasetSelect;
-      logNodeInfo: typeof logNodeInfo;
-      [key: string]: any;
-    };
+      showModelSelect: typeof showModelSelect
+      showDatasetSelect: typeof showDatasetSelect
+      logNodeInfo: typeof logNodeInfo
+      [key: string]: any
+    }
   }
 }
 
 // 初始化全局bizyAirLib对象
 if (typeof window !== 'undefined') {
-  window.bizyAirLib = window.bizyAirLib || {};
-  window.bizyAirLib.showModelSelect = showModelSelect;
-  window.bizyAirLib.showDatasetSelect = showDatasetSelect;
-  window.bizyAirLib.logNodeInfo = logNodeInfo;
-  
+  window.bizyAirLib = window.bizyAirLib || {}
+  window.bizyAirLib.showModelSelect = showModelSelect
+  window.bizyAirLib.showDatasetSelect = showDatasetSelect
+  window.bizyAirLib.logNodeInfo = logNodeInfo
 }
