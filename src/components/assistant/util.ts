@@ -1,4 +1,3 @@
-
 // API请求选项接口
 export interface ChatApiOptions {
   model: string;
@@ -159,7 +158,8 @@ async function processStreamResponse(
   try {
     callbacks.onStart?.();
     
-    while (true) {
+    let isProcessing = true;
+    while (isProcessing) {
       // 检查是否已中止
       if (signal?.aborted) {
         reader.cancel().catch(err => console.error('取消读取流出错:', err));
@@ -167,7 +167,10 @@ async function processStreamResponse(
       }
       
       const { done, value } = await reader.read();
-      if (done) break;
+      if (done) {
+        isProcessing = false;
+        break;
+      }
       
       buffer += decoder.decode(value, { stream: true });
       
