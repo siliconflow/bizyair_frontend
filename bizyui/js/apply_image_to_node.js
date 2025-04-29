@@ -1,6 +1,6 @@
 import { app } from "../../scripts/app.js";
 
-// 调试代码
+
 function inspectNode(node) {
     console.log('节点信息:', {
         id: node.id,
@@ -19,7 +19,7 @@ const NODE_TYPE_MAPPING = {
 
 // 监听来自iframe的消息
 window.addEventListener('message', async function(event) {
-    // 确保消息来源安全
+
     if (event.data && event.data.type === 'APPLY_IMAGE_TO_NODE') {
         const { nodeId, base64Data } = event.data.data;
         
@@ -147,7 +147,7 @@ window.addEventListener('message', async function(event) {
                     targetNode.size = originalSize;
                 }
                 
-                // 通知画布重绘
+                // 通知重绘
                 app.canvas && app.canvas.draw(true, true);
                 
                 console.log(`图片已成功应用到LoadImage节点 ${targetNode.title} (ID: ${targetNode.id})`);
