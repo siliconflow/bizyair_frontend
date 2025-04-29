@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - dev_workflow
       - feat/agent
   workflow_dispatch:
 
