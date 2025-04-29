@@ -173,5 +173,4 @@ window.addEventListener('message', async function(event) {
 
 console.log('已设置消息监听器，可接收iframe发送的图片更新请求');
 
-// 导出供其他模块使用
 export { app }; 
