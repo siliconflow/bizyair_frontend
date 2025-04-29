@@ -439,7 +439,7 @@
       // 准备历史对话数据
       const historyMessages = chatMessages.value
         .filter(msg => msg.role === 'user' || msg.role === 'assistant')
-        .slice(-4) // 保留最近6条消息传入
+        .slice(-6) // 保留最近6条消息传入
         .map(msg => {
           // 处理带图片的消息
           if (msg.hasImage && msg.image && msg.role === 'user') {
