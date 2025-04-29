@@ -10,7 +10,8 @@
         "length": "Clipboard content length is incorrect.",
         "shareCodeLength": "Share code length is incorrect."
       }
-    }
+    },
+    "assistant": "Assistant"
   },
   "buttons": {
     "profile": "Profile",
@@ -21,7 +22,7 @@
     "message": "Message",
     "news": "News",
     "examples": "Examples",
-    "publishModel": "PublishModel",
+    "publishModel": "Publish Model",
     "model": "Model",
     "workflow": "Workflow",
     "docs": "Docs"
@@ -30,6 +31,24 @@
     "language": "Language",
     "english": "English",
     "chinese": "中文"
+  },
+  "sidebar": {
+    "assistant": {
+      "title": "BizyAir Assistant",
+      "clearHistory": "Clear Chat History",
+      "close": "Close",
+      "nodeName": "Node Name",
+      "nodeType": "Node Type",
+      "inputPlaceholder": "Type your message...",
+      "uploadImage": "Upload Image",
+      "generateImage": "Generate Image",
+      "removeImage": "Remove Image",
+      "sendMessage": "Send Message",
+      "abortGeneration": "Abort Generation",
+      "welcomeMessage": "Hello! I'm BizyAir Assistant. Click on images in nodes to upload them directly.",
+      "errorMessage": "Sorry, an error occurred. Please try again later.",
+      "imageUploadError": "Please upload an image file"
+    }
   },
   "apiKeyDialog": {
     "title": "Set API Key",
@@ -335,25 +354,31 @@
     "noResumeData": "No resumable upload data found",
     "resumeFailed": "Failed to resume upload",
     "tokenExpired": "Upload token expired, please upload again",
-    "retryFailed": "Multiple retry attempts failed, please check your network connection and upload again",
-    "willRetryInSeconds": "Network connection lost, will automatically retry in {seconds} seconds",
+    "maxRetriesReached": "Maximum retries reached, please check network and retry manually",
+    "retryFailed": "Multiple upload retries failed, please check network connection and upload again",
+    "willRetryInSeconds": "Network connection interrupted, will automatically retry in {seconds} seconds",
     "retrying": "Waiting for retry attempt {count}, {seconds} seconds remaining",
     "retryingUpload": "Network restored, continuing upload",
     "uploadComplete": "Upload complete"
   },
   "btnProfile": {
     "userInfo": {
-      "lazyText": "This person is lazy and left nothing",
+      "lazyText": "This person is lazy and left nothing behind",
+      "lazyText": "This user is lazy and left nothing behind",
       "balance": "Balance",
-      "coin": " Coin",
+      "coin": " Coins",
+      "recharge": "Purchase",
+      "giftSilverCoin": "Silver",
+      "rechargeCoin": "Gold",
+      "switchApiKey": "Set API Key",
+      "coin": " Coins",
       "recharge": "Recharge",
-      "giftSilverCoin": "Gift Silver Coin",
-      "rechargeCoin": "Recharge Gold Coin",
+      "giftSilverCoin": "Gift Silver Coins",
+      "rechargeCoin": "Recharge Gold Coins",
       "switchApiKey": "Switch API Key",
       "myWallet": "My Wallet",
-      "rechargeRecord": "Recharge Record",
-      "consumptionBill": "Consumption Bill",
-      "vipRemaining": "Monthly card remaining {days} days"
+      "rechargeRecord": "Payment",
+      "consumptionBill": "Bill"
     },
     "consumptionBill": {
       "title": "Bill",
@@ -373,7 +398,8 @@
       "recentBillDetails": "Recent 30 Minutes Consumption Details",
       "back": "Back",
       "selectAPIKey": "Select API Key",
-      "time": "Time"
+      "rechargeRecord": "Recharge Record",
+      "consumptionBill": "Consumption Bill"
     },
     "uploadInfo": {
       "nickname": "Nickname",
@@ -439,13 +465,16 @@
       "cancel": "Cancel"
     },
     "product": {
-      "coin": "Coin",
-      "coinRecharge": "Coin Recharge",
-      "memberRecharge": "Monthly Card Recharge",
-      "confirmAgreement": "Confirmation of payment represents agreement to the platform's",
+      "coin": "Coins",
+      "confirmAgreement": "By confirming payment, you agree to the platform's",
+      "rechargeAgreement": "「Recharge Agreement」",
+      "coinValidityNote": "Note: Gold coins are valid for 1 year",
+      "actualPayment": "Actual Payment",
+      "coin": "Coins",
+      "confirmAgreement": "Confirming payment means you agree to the platform's",
       "rechargeAgreement": "\"Recharge Agreement\"",
-      "coinValidityNote": "Note: Coins are valid for 1 year",
-      "actualPayment": "Actual payment",
+      "coinValidityNote": "Note: Gold coins are valid for 1 year",
+      "actualPayment": "Actual Payment",
       "pay": "Pay",
       "agreementWarning": "Please agree to the recharge agreement first",
       "wechatPay": "WeChat Pay",
@@ -607,7 +636,24 @@
     }
   },
   "btnDocs": {
-    "price": "Pricing strategy",
-    "doc": "Manual"
+    "price": "Pricing Strategy",
+    "doc": "Documentation"
+  },
+  "resumableUpload": {
+    "title": "Resumable Upload",
+    "uploadStatus": "Upload Status",
+    "uploadProgress": "Upload Progress",
+    "pauseUpload": "Pause Upload",
+    "resumeUpload": "Resume Upload",
+    "uploadFailed": "Upload Failed",
+    "uploadSuccessful": "Upload Successful",
+    "uploadPaused": "Upload Paused",
+    "remainingTime": "Remaining Time",
+    "uploadSpeed": "Upload Speed",
+    "prepareUpload": "Preparing upload...",
+    "processingFile": "Processing file...",
+    "largeFileWarning": "File is large, upload may take longer",
+    "unstableNetworkWarning": "Network is unstable, upload speed may be affected",
+    "uploadTimedOut": "Upload timed out, please check your network connection"
   }
 }
