@@ -11,7 +11,7 @@
         "shareCodeLength": "分享码长度不正确。"
       }
     },
-    "assistant": "助手"
+    "assistant": "Agent"
   },
   "buttons": {
     "profile": "个人资料",
@@ -34,13 +34,14 @@
   },
   "sidebar": {
     "assistant": {
-      "title": "BizyAir Agent",
+      "title": "BizyAir Agent111",
       "clearHistory": "清空对话历史",
       "close": "关闭",
       "nodeName": "节点名称",
       "nodeType": "节点类型",
       "inputPlaceholder": "输入问题...",
       "uploadImage": "上传图片",
+      "generateImage": "生成图片",
       "removeImage": "移除图片",
       "sendMessage": "发送消息",
       "abortGeneration": "中止生成",

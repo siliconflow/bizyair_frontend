@@ -1,4 +1,3 @@
-// API请求相关接口和工具函数
 
 // API请求选项接口
 export interface ChatApiOptions {
@@ -8,6 +7,16 @@ export interface ChatApiOptions {
   top_k: number;
   frequency_penalty: number;
   max_tokens: number;
+}
+
+// 图像生成选项接口
+export interface ImageGenerationOptions {
+  prompt: string;
+  n?: number;
+  model?: string;
+  size?: string;
+  loading_callback?: (loading: boolean) => void;
+  error_callback?: (error: any) => void;
 }
 
 // 消息接口
@@ -243,7 +252,7 @@ export async function sendStreamChatRequest(
       body: JSON.stringify(requestBody),
       signal: abortController.signal // 添加中止信号
     });
-
+ 
     if (!response.ok) {
       throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
     }
@@ -353,4 +362,57 @@ export function formatOutputTextLight(text: string): string {
   formatted = formatted.replace(/\n/g, '<br>');
   
   return formatted;
+}
+
+/**
+ * 生成图像
+ * @param options 图像生成选项
+ * @returns Promise<string> 返回生成的图像URL
+ */
+export async function generateImage(options: {
+  prompt: string;
+  n?: number;
+  size?: string;
+  model?: string;
+  loading_callback?: (loading: boolean) => void;
+  error_callback?: (error: any) => void;
+}): Promise<string> {
+  const { prompt, loading_callback, error_callback } = options;
+  
+  try {
+    loading_callback?.(true);
+    
+    const response = await fetch('/bizyair/model/images', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "prompt": prompt,
+        "n": options.n || 1,
+        "model": options.model || "Kwai-Kolors/Kolors",
+        "size": options.size || "1024x1024"
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`图像生成API请求失败: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log('图像生成成功:', data);
+    
+    // 返回生成的图像URL
+    if (data.data) {
+      return data.data.images[0].url;
+    } else {
+      throw new Error('API返回的数据中没有图像URL');
+    }
+  } catch (error) {
+    console.error('生成图像时出错:', error);
+    error_callback?.(error);
+    throw error;
+  } finally {
+    loading_callback?.(false);
+  }
 } 
