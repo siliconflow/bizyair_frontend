@@ -64,7 +64,7 @@ const NodeInfoLogger = (function() {
         if (!imageData?.filename) return null;
 
         // 根据节点类型确定图片类型
-        const type = imageData.type || 'temp'; // 默认为temp类型
+        const type = imageData.type || 'temp'; 
         const path = `/${type}/${imageData.filename}`;
 
         return {
