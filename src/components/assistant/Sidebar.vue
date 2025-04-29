@@ -39,7 +39,7 @@
                 <!-- 图片消息 -->
                 <div v-if="message.hasImage" class="message-image">
                   <img :src="message.image" alt="用户上传图片" />
-                  <!-- 对于AI生成的图片消息，显示应用到节点按钮 -->
+                  <!-- 生图消息，显示应用按钮 -->
                   <div v-if="message.role === 'assistant' && sidebarStore.nodeInfo && canApplyToNode(sidebarStore.nodeInfo)" class="image-actions">
                     <button 
                       class="apply-to-node-btn" 
@@ -92,7 +92,9 @@
                     d="M19 5v14H5V5h14zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14L6 17h12l-3.86-5.14z" />
                 </svg>
               </button>
-
+              <button class="upload-image-btn" @click="generateImageAction" :disabled="isLoading" :title="$t('sidebar.assistant.generateImage')">
+                生图
+              </button>
               <div class="textarea-container">
                 <textarea v-model="userInput" :placeholder="$t('sidebar.assistant.inputPlaceholder')" @keydown.enter.prevent="sendMessage"
                   ref="textareaRef" :disabled="isLoading"></textarea>
@@ -112,7 +114,7 @@
               
               <!-- 取消按钮 - 仅在加载时显示 -->
               <button 
-                v-if="isLoading"
+                v-if="isGenerating"
                 class="control-btn stop-btn" 
                 @click="abortGeneration" 
                 title="取消生成"
@@ -134,13 +136,13 @@
 <script setup lang="ts">
 import { useSidebarStore } from '../../stores/sidebarStore'
 import { onMounted, watch, ref, computed, onBeforeUnmount, nextTick } from 'vue';
-import { sendStreamChatRequest, createImageUserMessage, formatOutputTextLight } from './util';
+import { sendStreamChatRequest, createImageUserMessage, formatOutputTextLight, generateImage } from './util';
 import { useI18n } from 'vue-i18n';
 import { useToaster } from '@/components/modules/toats/index'
 
 const { t } = useI18n();
 const sidebarStore = useSidebarStore()
-//'// 拖拽调整大小---------------------------------------'
+// 拖拽调整大小---------------------------------------'
 // 侧边栏宽度相关变量
 const sidebarWidth = ref(550); // 默认宽度
 const minWidth = 50;  // 最小宽度
@@ -166,7 +168,7 @@ const handleResize = (e: MouseEvent) => {
   // 限制宽度范围
   if (newWidth >= minWidth && newWidth <= maxWidth) {
     sidebarWidth.value = newWidth;
-    // 可选：保存宽度到本地存储
+    // 保存宽度到本地存储
     localStorage.setItem('bizyair-sidebar-width', newWidth.toString());
   }
 };
@@ -196,6 +198,7 @@ const chatMessages = ref<Array<{
 }>>([]);
 const userInput = ref('');
 const isLoading = ref(false);
+const isGenerating = ref(false);
 const processingStatus = ref('');
 const previewImage = ref('');
 const uploadedImageBase64 = ref('');
@@ -276,20 +279,37 @@ const abortGeneration = () => {
     abortController.value.abort();
     abortController.value = null;
     isLoading.value = false;
+    isGenerating.value = false;
     console.log('已手动中止生成');
   }
 };
 
-// 修改 sendMessage 函数
+// 生图功能
+const isGeneratingImage = ref(false);
+
+const generateImageAction = () => {
+  if (isLoading.value) return;
+  
+  // 在输入框中添加生成图片前缀
+  userInput.value = `生成图片: ${userInput.value.trim()}`;
+  
+  // 聚焦到输入框
+  setTimeout(() => {
+    textareaRef.value?.focus();
+  }, 0);
+};
+
 const sendMessage = async () => {
   if (!canSendMessage.value || isLoading.value) return;
   
-  const messageText = userInput.value || '请描述一下这张图片';
+  const messageText = userInput.value;
   const currentTime = getCurrentTime();
   const hasImage = !!previewImage.value;
+  const isImageGeneration = messageText.trim().startsWith('生成图片:');
 
   nextTick(()=>{
     isLoading.value = true;
+    isGenerating.value = true;
   })
   
   // 创建用户消息并添加到聊天记录
@@ -310,16 +330,73 @@ const sendMessage = async () => {
     scrollToBottom();
   }, 0);
   
-  // 显示加载状态
-
-  
   try {
+    // 判断是否是图片生成请求
+    if (isImageGeneration) {
+      isGeneratingImage.value = true;
+      processingStatus.value = '正在生成图片...';
+      
+      // 提取提示词
+      const prompt = messageText.replace('生成图片:', '').trim() || "一张漂亮的图片";
+      
+      // 调用图像生成API
+      const imageUrl = await generateImage({
+        prompt,
+        model: "Kwai-Kolors/Kolors",
+        loading_callback: (loading) => {
+          // 加载状态更新
+          if (!loading) {
+            processingStatus.value = '';
+          } else {
+            processingStatus.value = '正在生成图片...';
+          }
+        },
+        error_callback: (error) => {
+          useToaster({
+            type: 'error',
+            message: '生成图片失败: ' + (error.message || '未知错误')
+          });
+        }
+      });
+      
+      // 生成成功后，添加带图片的助手消息
+      const assistantMessage = {
+        role: 'assistant' as const,
+        content: `已为您生成图片（点击节点可以应用）`,
+        time: getCurrentTime(),
+        hasImage: true,
+        image: imageUrl
+      };
+      
+      chatMessages.value.push(assistantMessage);
+      
+      // 成功提示
+      useToaster({
+        type: 'success',
+        message: '图片生成成功'
+      });
+      
+      // 更新状态
+      isGeneratingImage.value = false;
+      isLoading.value = false;
+      isGenerating.value = false;
+      processingStatus.value = '';
+      
+      // 滚动到底部
+      setTimeout(() => {
+        scrollToBottom();
+      }, 0);
+      
+      return;
+    }
+    
     // 创建AbortController用于中止请求
     abortController.value = new AbortController();
     
     // 准备历史对话数据
     const historyMessages = chatMessages.value
       .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+      .slice(-10) // 保留最近10条消息传入
       .map(msg => {
         // 处理带图片的消息
         if (msg.hasImage && msg.image && msg.role === 'user') {
@@ -343,7 +420,6 @@ const sendMessage = async () => {
         onStart: () => {
           console.log('开始请求多模态模型...');
             isLoading.value = true;
-  // processingStatus.value = '思考中...';
           // 立即滚动到底部
           setTimeout(() => {
             scrollToBottom();
@@ -384,6 +460,7 @@ const sendMessage = async () => {
           
           // 更新状态
           isLoading.value = false;
+          isGenerating.value = false;
           processingStatus.value = '';
           
           // 确保UI显示完整的回复
@@ -610,8 +687,6 @@ const applyImageToNode = async (imageUrl: string | undefined) => {
   }
 };
 
-// const isLoadingComputed = computed(() => isLoading.value);
-
 onMounted(() => {
   // 从本地存储加载宽度设置
   const savedWidth = localStorage.getItem('bizyair-sidebar-width');
@@ -624,7 +699,6 @@ onMounted(() => {
   
   // 确保全局bizyAirLib对象存在
   if (typeof window.bizyAirLib === 'undefined') {
-    // 使用any类型来避免TypeScript错误
     (window as any).bizyAirLib = {};
   }
   
