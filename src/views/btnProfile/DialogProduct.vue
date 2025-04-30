@@ -1,9 +1,12 @@
 <template>
   <!-- Tab选项卡 -->
   <div class="tabs">
+    <!-- 隐藏月卡 -->
+    <!--
     <div class="tab-item" :class="{ active: activeTab === 'member' }" @click="switchTab('member')">
       {{ $t('btnProfile.product.memberRecharge') }}
     </div>
+    -->
     <div class="tab-item" :class="{ active: activeTab === 'coin' }" @click="switchTab('coin')">
       {{ $t('btnProfile.product.coinRecharge') }}
     </div>
@@ -298,7 +301,7 @@
   const orderStore = useOrderStore()
   const statusStore = useStatusStore()
 
-  const activeTab = ref('member')
+  const activeTab = ref('coin')
   const activeIndex = ref(0)
   const checked = ref(false)
   const amount = ref(0)
@@ -380,7 +383,8 @@
     loading.value = false
 
     // 初始选择第一个月卡充值项目
-    switchTab('member')
+    // switchTab('member')
+    switchTab('coin')
   })
 
   onUnmounted(() => {
