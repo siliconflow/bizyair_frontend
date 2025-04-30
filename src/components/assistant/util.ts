@@ -48,7 +48,7 @@ export const defaultApiOptions: ChatApiOptions = {
   top_p: 0.7,
   top_k: 50,
   frequency_penalty: 0.5,
-  max_tokens: 512
+  max_tokens: 1024
 }
 
 // 服务器API路径

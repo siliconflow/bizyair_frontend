@@ -11,7 +11,7 @@
         "shareCodeLength": "Share code length is incorrect."
       }
     },
-    "assistant": "Assistant"
+    "assistant": "BizyBot"
   },
   "buttons": {
     "profile": "Profile",
@@ -34,7 +34,7 @@
   },
   "sidebar": {
     "assistant": {
-      "title": "BizyAir Assistant",
+      "title": "BizyBot",
       "clearHistory": "Clear Chat History",
       "close": "Close",
       "nodeName": "Node Name",
@@ -45,7 +45,7 @@
       "removeImage": "Remove Image",
       "sendMessage": "Send Message",
       "abortGeneration": "Abort Generation",
-      "welcomeMessage": "Hello! I'm BizyAir Assistant. Click on images in nodes to upload them directly.",
+      "welcomeMessage": "Hello! I'm BizyBot. Click on images in nodes to upload them directly.",
       "errorMessage": "Sorry, an error occurred. Please try again later.",
       "imageUploadError": "Please upload an image file"
     }
