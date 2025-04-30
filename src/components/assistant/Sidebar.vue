@@ -339,8 +339,8 @@
     setTimeout(() => {
       textareaRef.value?.focus()
       if (textareaRef.value) {
-        const position = "生成图片:".length + 1; 
-        textareaRef.value.setSelectionRange(position, position);
+        const position = '生成图片:'.length + 1
+        textareaRef.value.setSelectionRange(position, position)
       }
     }, 0)
   }
@@ -352,7 +352,7 @@
     const currentTime = getCurrentTime()
     const hasImage = !!previewImage.value
     const isImageGeneration = messageText.trim().startsWith('生成图片:')
-    
+
     nextTick(() => {
       isLoading.value = true
       isGenerating.value = true
@@ -469,7 +469,7 @@
             // 立即滚动到底部
             setTimeout(() => {
               scrollToBottom()
-              removeImage();
+              removeImage()
             }, 0)
           },
           onToken: (token: string) => {
