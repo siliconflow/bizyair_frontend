@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - dev_workflow
   workflow_dispatch:
 
 concurrency:
@@ -41,7 +40,7 @@ jobs:
       - name: Install Python build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build wheel
+          pip install build wheel twine
       
       - name: Build Python package
         run: npm run build:py
@@ -52,3 +51,10 @@ jobs:
           name: python-wheel
           path: dist/*.whl
           retention-days: 30 
+          
+      - name: Upload to PyPI
+        env:
+          TWINE_USERNAME: "__token__"
+          TWINE_PASSWORD: ${{ secrets.PYPI_KEY }}
+        run: |
+          python -m twine upload dist/*.whl 
