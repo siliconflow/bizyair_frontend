@@ -51,7 +51,7 @@ window.addEventListener('message', async function(event) {
             
             console.log(`节点类型: ${nodeType}, 使用图片类型: ${imageType}`);
             
-            // 提取base64数据（如果包含data:前缀，则去除）
+            // 提取base64
             const cleanBase64Data = base64Data.includes('base64,') 
                 ? base64Data.split('base64,')[1] 
                 : base64Data;
@@ -152,7 +152,7 @@ window.addEventListener('message', async function(event) {
                 
                 console.log(`图片已成功应用到LoadImage节点 ${targetNode.title} (ID: ${targetNode.id})`);
             } else {
-                // 对于其他类型节点，仅保存图片，不修改节点
+                // 对于其他类型节点，保存图片
                 if (nodeType === 'SaveImage') {
                     console.log(`图片已成功保存到output目录: ${serverFilename}`);
                     alert(`图片已保存到output目录: ${serverFilename}`);

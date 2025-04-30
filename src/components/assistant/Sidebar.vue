@@ -405,7 +405,7 @@
         // 生成成功后，添加带图片的助手消息
         const assistantMessage = {
           role: 'assistant' as const,
-          content: `已为您生成图片（点击节点可以应用）`,
+          content: `已为您生成图片（点击LoadImage节点可以应用）`,
           time: getCurrentTime(),
           hasImage: true,
           image: imageUrl
