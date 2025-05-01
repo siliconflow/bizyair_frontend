@@ -746,11 +746,11 @@
   // enter发送，shift+enter换行
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.shiftKey) {
-      return;
+      return
     }
     // enter键，发送消息
-    e.preventDefault();
-    sendMessage();
+    e.preventDefault()
+    sendMessage()
   }
 
   onMounted(() => {
