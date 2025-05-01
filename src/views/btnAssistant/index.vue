@@ -8,7 +8,6 @@
     </svg>
     <div class="text-box">
       <span class="text">{{ $t('app.assistant') }}</span>
-      
     </div>
   </div>
 </template>
