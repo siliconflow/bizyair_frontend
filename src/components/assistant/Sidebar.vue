@@ -5,7 +5,7 @@
       <div class="sidebar-header">
         <h2>{{ $t('sidebar.assistant.title') }}</h2>
         <div class="header-actions">
-          <button class="action-btn" @click="clearHistory" title="清空对话历史">
+          <button class="action-btn interactive-element" @click="clearHistory" title="清空对话历史">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -13,7 +13,7 @@
               />
             </svg>
           </button>
-          <button class="close-btn" @click="sidebarStore.closeSidebar">
+          <button class="close-btn interactive-element" @click="sidebarStore.closeSidebar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -104,7 +104,7 @@
 
             <div class="input-controls">
               <button
-                class="upload-image-btn"
+                class="upload-image-btn interactive-element"
                 @click="triggerImageUpload"
                 :disabled="isLoading"
                 :title="$t('sidebar.assistant.uploadImage')"
@@ -117,18 +117,19 @@
                 </svg>
               </button>
               <button
-                class="upload-image-btn"
+                class="upload-image-btn interactive-element"
                 @click="generateImageAction"
                 :disabled="isLoading"
                 :title="$t('sidebar.assistant.generateImage')"
               >
                 生图
               </button>
-              <div class="textarea-container">
+              <div class="textarea-container interactive-element">
                 <textarea
+                  class="interactive-element"
                   v-model="userInput"
                   :placeholder="$t('sidebar.assistant.inputPlaceholder')"
-                  @keydown.enter.prevent="sendMessage"
+                  @keydown.enter="handleKeyDown"
                   ref="textareaRef"
                   :disabled="isLoading"
                 ></textarea>
@@ -136,7 +137,7 @@
 
               <!-- 发送按钮 - 在加载时禁用但保持显示 -->
               <button
-                class="send-message-btn"
+                class="send-message-btn interactive-element"
                 @click="sendMessage()"
                 :disabled="isGenerating"
                 :title="$t('sidebar.assistant.sendMessage')"
@@ -149,7 +150,7 @@
               <!-- 取消按钮 - 仅在加载时显示 -->
               <button
                 v-if="isGenerating"
-                class="control-btn stop-btn"
+                class="control-btn stop-btn interactive-element"
                 @click="abortGeneration"
                 title="取消生成"
               >
@@ -742,6 +743,16 @@
     }
   }
 
+  // enter发送，shift+enter换行
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.shiftKey) {
+      return;
+    }
+    // enter键，发送消息
+    e.preventDefault();
+    sendMessage();
+  }
+
   onMounted(() => {
     // 从本地存储加载宽度设置
     const savedWidth = localStorage.getItem('bizyair-sidebar-width')
@@ -813,6 +824,7 @@
     overflow: hidden;
     z-index: 99999;
     transition: width 0.1s ease;
+    pointer-events: auto;
   }
 
   .resize-handle {
@@ -869,6 +881,18 @@
     align-items: center;
     justify-content: center;
     border-radius: 4px;
+  }
+
+  .action-btn {
+    pointer-events: auto;
+    position: relative;
+    z-index: 1000;
+  }
+
+  .close-btn {
+    pointer-events: auto;
+    position: relative;
+    z-index: 1000;
   }
 
   .action-btn:hover,
@@ -1049,6 +1073,9 @@
     border-top: 1px solid #444;
     padding: 16px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 10001 !important;
+    pointer-events: auto !important;
   }
 
   .input-controls {
@@ -1257,5 +1284,42 @@
 
   .stop-btn {
     color: white;
+  }
+
+  /* 处理需要交互的元素避免被modal挡住 */
+  .interactive-element {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 10000 !important;
+  }
+
+  .action-btn {
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+
+  .action-btn:hover,
+  .close-btn:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
   }
 </style>
