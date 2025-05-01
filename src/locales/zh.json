@@ -10,7 +10,8 @@
         "length": "剪贴板内容长度不正确。",
         "shareCodeLength": "分享码长度不正确。"
       }
-    }
+    },
+    "assistant": "BizyBot"
   },
   "buttons": {
     "profile": "个人资料",
@@ -30,6 +31,24 @@
     "language": "语言",
     "english": "English",
     "chinese": "中文"
+  },
+  "sidebar": {
+    "assistant": {
+      "title": "BizyBot",
+      "clearHistory": "清空对话历史",
+      "close": "关闭",
+      "nodeName": "节点名称",
+      "nodeType": "节点类型",
+      "inputPlaceholder": "输入问题...",
+      "uploadImage": "上传图片",
+      "generateImage": "生成图片",
+      "removeImage": "移除图片",
+      "sendMessage": "发送消息",
+      "abortGeneration": "中止生成",
+      "welcomeMessage": "你好！我是BizyBot，点击节点中的图片可以直接上传",
+      "errorMessage": "抱歉，发生了错误。请刷新页面重试。",
+      "imageUploadError": "请上传图片文件"
+    }
   },
   "apiKeyDialog": {
     "title": "设置API密钥",
@@ -484,7 +503,7 @@
     "title": "BizyAir 充值服务协议",
     "service": {
       "title": "一、服务定义",
-      "platform": "BizyAir平台（以下简称“平台”）通过向用户提供”BZ币“虚拟产品，授权用户使用包括但不限于BizyAir节点服务、任务执行等平台功能。",
+      "platform": "BizyAir平台（以下简称\"平台\"）通过向用户提供\"BZ币\"虚拟产品，授权用户使用包括但不限于BizyAir节点服务、任务执行等平台功能。",
       "types": "BZ币分为两类：",
       "gold": "金币：用户通过充值直接购买的BZ币，具有有效期及有限退款权益；",
       "silver": "银币：平台通过活动、会员权益等途径赠予的BZ币，具有有效期且不可退款或提现。"
