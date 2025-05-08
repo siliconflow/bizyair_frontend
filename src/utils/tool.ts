@@ -128,3 +128,31 @@ export const getDictData = <K extends keyof CommonDict>(
 export const setDictData = (key: string, data: CommonDict, expires?: number): void => {
   setLocalStorage<CommonDict>(key, data, expires)
 }
+
+/**
+ * 提取分享码的方法。
+ * 从文本中提取6-10位分享码，支持URL中code参数或路径，和直接输入的方式
+ * @param text 包含分享码的文本
+ * @returns 提取到的6-10位分享码或null
+ */
+export const extractShareCode = (text: string): string | null => {
+  const trimmedText = text.trim();
+  
+  // 检测是否为URL
+  if (trimmedText.startsWith('http://') || trimmedText.startsWith('https://')) {
+      const url = new URL(trimmedText);
+      // 从URL参数中提取code=xxxx
+      const codeParam = url.searchParams.get('code');
+      if (codeParam && codeParam.length >= 6 && codeParam.length <= 10 && /^[a-zA-Z0-9]{6,10}$/.test(codeParam)) return codeParam;
+      
+      // 从URL路径的最后一部分提取分享码
+      const pathParts = url.pathname.split('/').filter(part => part.length > 0);
+      const lastPart = pathParts[pathParts.length - 1];
+      
+      // 检查最后一部分是否是6-10位分享码
+      return lastPart && lastPart.length >= 6 && lastPart.length <= 10 && /^[a-zA-Z0-9]{6,10}$/.test(lastPart) ? lastPart : null;
+   
+  }
+  // 检查是否为直接的6-10位分享码
+  return trimmedText.length >= 6 && trimmedText.length <= 10 && /^[a-zA-Z0-9]{6,10}$/.test(trimmedText) ? trimmedText : null;
+};

@@ -174,6 +174,7 @@
   import { useToaster } from '@/components/modules/toats/index'
   import vTheme from './components/modules/vTheme.vue'
   import Sidebar from '@/components/assistant/Sidebar.vue'
+  import { extractShareCode } from '@/utils/tool'
 
   const { t, locale } = useI18n()
   const languageStore = useLanguageStore()
@@ -246,10 +247,19 @@
 
   const convert = async () => {
     const res = await get_share_code({ code: shareCode.value })
-    communityStore.setAndShowCommunityDetail(
-      Number(res.data.data.bizy_model_id),
-      Number(res.data.data.biz_id)
-    )
+    if (res?.data?.type === 'bizy_model_version') {
+      communityStore.setAndShowCommunityDetail(
+        Number(res.data.data.bizy_model_id),
+        Number(res.data.data.biz_id)
+      )
+    } else if (res?.data?.type === 'redeem_product') {
+      useToaster({
+        type: 'success',
+        message: t('app.shareCode.success.redeemProduct', {
+          product_name: res.data.data.product_name
+        })
+      })
+    }
     shareCode.value = ''
   }
   const toMini = () => {
@@ -267,41 +277,42 @@
   }
 
   const runShareCode = async () => {
+
     if (shareCode.value) {
-      shareCode.value = shareCode.value.trim()
-      if (shareCode.value.length != 8) {
+      // 从用户输入中提取分享码
+      const extractedCode = extractShareCode(shareCode.value)
+      console.log('extractedCode', extractedCode)
+
+      if (extractedCode) {
+        shareCode.value = extractedCode
+        convert()
+      } else {
         useToaster({
           type: 'error',
           message: t('app.shareCode.error.shareCodeLength')
         })
         shareCode.value = ''
-        return false
       }
-      convert()
     } else {
-      try {
-        const clipboardText = await navigator.clipboard.readText()
-        if (!clipboardText || typeof clipboardText !== 'string') {
-          useToaster({
-            type: 'error',
-            message: t('app.shareCode.error.empty')
-          })
-          return false
-        }
-        const trimmedClipboardText = clipboardText.trim()
-        if (trimmedClipboardText.length != 8) {
-          useToaster({
-            type: 'error',
-            message: t('app.shareCode.error.length')
-          })
-          return false
-        }
-        shareCode.value = trimmedClipboardText
-        convert()
-      } catch (error) {
+      // 尝试从剪贴板获取内容
+
+      const clipboardText = await navigator.clipboard.readText()
+      if (!clipboardText || typeof clipboardText !== 'string') {
         useToaster({
           type: 'error',
-          message: error
+          message: t('app.shareCode.error.empty')
+        })
+        return false
+      }
+      // 从剪贴板内容中提取分享码
+      const extractedCode = extractShareCode(clipboardText)
+      if (extractedCode) {
+        shareCode.value = extractedCode
+        convert()
+      } else {
+        useToaster({
+          type: 'error',
+          message: t('app.shareCode.error.length')
         })
       }
     }

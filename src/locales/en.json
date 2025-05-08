@@ -9,6 +9,9 @@
         "empty": "Clipboard content is empty or not a string.",
         "length": "Clipboard content length is incorrect.",
         "shareCodeLength": "Share code length is incorrect."
+      },
+      "success": {
+        "redeemProduct": "Successfully redeemed {product_name}"
       }
     },
     "assistant": "BizyBot"

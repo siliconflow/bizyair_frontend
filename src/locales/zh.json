@@ -9,6 +9,9 @@
         "empty": "剪贴板内容为空或不是字符串。",
         "length": "剪贴板内容长度不正确。",
         "shareCodeLength": "分享码长度不正确。"
+      },
+      "success": {
+        "redeemProduct": "成功兑换 {product_name}"
       }
     },
     "assistant": "BizyBot"
