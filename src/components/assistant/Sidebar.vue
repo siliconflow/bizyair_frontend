@@ -797,7 +797,7 @@
           console.error('应用图片到节点时发生异常:', error)
         }
       }
-      console.log('已添加updateNodeImage方法到bizyAirLib对象')
+     
     }
 
     // 显示欢迎消息
