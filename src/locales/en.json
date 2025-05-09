@@ -25,7 +25,8 @@
     "publishModel": "Publish Model",
     "model": "Model",
     "workflow": "Workflow",
-    "docs": "Docs"
+    "docs": "Docs",
+    "export": "Export"
   },
   "common": {
     "language": "Language",
@@ -655,5 +656,11 @@
     "largeFileWarning": "File is large, upload may take longer",
     "unstableNetworkWarning": "Network is unstable, upload speed may be affected",
     "uploadTimedOut": "Upload timed out, please check your network connection"
+  },
+  "export": {
+    "title": "Export",
+    "selectedNodes": "Selected Nodes",
+    "noNodesSelected": "Click on nodes to select content for export",
+    "selectionHint": "Tip: Only nodes with properties can be selected. Selected nodes are highlighted in orange."
   }
 }

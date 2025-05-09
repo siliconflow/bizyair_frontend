@@ -138,8 +138,10 @@
               <btnTrain />
               <btnDocs />
               <btnAssistant />
+              <btnExport />
               <!-- <btnNews /> -->
               <apiKeyDialog />
+              <ExportDialog />
             </div>
           </div>
         </div>
@@ -157,9 +159,11 @@
   import btnTrain from '@/views/btnTrain/index.vue'
   import btnDocs from '@/views/btnDocs/index.vue'
   import btnAssistant from '@/views/btnAssistant/index.vue'
+  import btnExport from '@/views/btnExport/index.vue'
   // import btnNews from '@/views/btnNews/index.vue'
   import btnMessage from '@/views/btnMessage/index.vue'
   import apiKeyDialog from '@/views/btnApiKey/apiKeyDialog.vue'
+  import ExportDialog from '@/components/export/ExportDialog.vue'
   import { useStatusStore } from '@/stores/userStatus'
   import { provide, ref, computed, onMounted } from 'vue'
   import { useI18n } from 'vue-i18n'

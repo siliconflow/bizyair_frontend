@@ -25,7 +25,8 @@
     "publishModel": "发布模型",
     "model": "模型",
     "workflow": "工作流",
-    "docs": "文档"
+    "docs": "文档",
+    "export": "导出"
   },
   "common": {
     "language": "语言",
@@ -647,5 +648,11 @@
     "largeFileWarning": "文件较大，上传可能需要较长时间",
     "unstableNetworkWarning": "网络不稳定，上传速度可能受影响",
     "uploadTimedOut": "上传超时，请检查网络连接"
+  },
+  "export": {
+    "title": "导出",
+    "selectedNodes": "选中节点",
+    "noNodesSelected": "请点击节点以选择要导出的内容",
+    "selectionHint": "提示：只有带有属性的节点可以被选择。选中的节点会显示橙色高亮。"
   }
 }
