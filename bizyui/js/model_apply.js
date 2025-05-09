@@ -184,9 +184,7 @@ const NodeInfoLogger = (function() {
                     return false;
                 }
                 
-                // 第二步：记录节点信息，但不阻止后续操作
-                // 使用微任务队列或setTimeout将日志和信息收集与事件处理分离
-                // 这样不会阻塞拖动等操作的开始
+                // 将日志和信息收集与事件处理分离,
                 queueMicrotask(() => {
                     // 只有当不处于拖动状态时才记录信息
                     if (!canvas.is_dragging) {
