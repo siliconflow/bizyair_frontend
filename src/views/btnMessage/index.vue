@@ -27,7 +27,8 @@
 <script setup lang="ts">
   import MessageBox from '@/components/message-box/Index.vue'
   import { useNotificationStore } from '@/stores/notificationStore'
-  import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+  import { useStatusStore } from '@/stores/userStatus'
+  import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue'
   import { NTooltip, NBadge } from 'naive-ui'
   import { useI18n } from 'vue-i18n'
 
@@ -38,6 +39,8 @@
   }
 
   const notificationStore = useNotificationStore()
+  const statusStore = useStatusStore()
+  const isUserLoggedIn = computed(() => statusStore.isLogin)
   const hasUnread = ref(notificationStore.totalUnreadCount > 0)
 
   watch(
@@ -61,6 +64,11 @@
   }
 
   const fetchUnreadCount = async () => {
+    if (!isUserLoggedIn.value) {
+      setupPolling()
+      return
+    }
+
     try {
       await notificationStore.loadUnreadCountWithError()
       currentInterval.value = INITIAL_INTERVAL
