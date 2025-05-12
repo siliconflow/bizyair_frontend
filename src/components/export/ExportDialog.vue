@@ -125,14 +125,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed, watch, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useExportStore } from '@/stores/exportStore.ts'
-import { useI18n } from 'vue-i18n'
-import { useSidebarStore } from '@/stores/sidebarStore'
 
-const { t } = useI18n()
+
 const exportStore = useExportStore()
-const sidebarStore = useSidebarStore()
 
 // 侧边栏宽度相关变量
 const sidebarWidth = ref(450) // 默认宽度
@@ -141,7 +138,7 @@ const maxWidth = 800 // 最大宽度
 const isResizing = ref(false)
 
 // 获取节点信息
-const nodeInfo = computed(() => sidebarStore.nodeInfo)
+// const nodeInfo = computed(() => sidebarStore.nodeInfo)
 
 // 存储选中节点信息的数组
 const selectedNodes = ref<any[]>([])
@@ -318,16 +315,16 @@ const setupMessageListener = () => {
 }
 
 // 在window.bizyAirLib对象中注册更新选中节点的方法
-declare global {
-  interface Window {
-    bizyAirLib: {
-      updateExportNodes: (nodes: any[]) => void;
-      enableExportNodeSelection?: () => void;
-      disableExportNodeSelection?: () => void;
-      [key: string]: any;
-    }
-  }
-}
+// declare global {
+//   interface Window {
+//     bizyAirLib: {
+//       updateExportNodes: (nodes: any[]) => void;
+//       enableExportNodeSelection?: () => void;
+//       disableExportNodeSelection?: () => void;
+//       [key: string]: any;
+//     }
+//   }
+// }
 
 if (typeof window.bizyAirLib === 'undefined') {
   window.bizyAirLib = {} as any;
