@@ -68,7 +68,7 @@
       setupPolling()
       return
     }
-    
+
     try {
       await notificationStore.loadUnreadCountWithError()
       currentInterval.value = INITIAL_INTERVAL
