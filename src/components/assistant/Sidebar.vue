@@ -185,6 +185,7 @@
   } from './util'
   import { useI18n } from 'vue-i18n'
   import { useToaster } from '@/components/modules/toats/index'
+  import { v4 as uuidv4 } from 'uuid'
 
   const { t } = useI18n()
   const sidebarStore = useSidebarStore()
@@ -303,6 +304,20 @@
     }
   }
 
+  const promptId = ref('')
+  const requestId = ref('')
+  
+  // 生成新的会话ID
+  const generateNewPromptId = () => {
+    promptId.value = uuidv4()
+    localStorage.setItem('bizyair-prompt-id', promptId.value)
+  }
+  
+  // 生成新的请求ID
+  const generateNewRequestId = () => {
+    requestId.value = uuidv4()
+  }
+
   // 清空对话历史
   const clearHistory = () => {
     // 创建一个新的欢迎消息
@@ -315,6 +330,7 @@
     // 更新UI显示
     chatMessages.value = [welcomeMessage]
     console.log('历史记录已清空，并添加了欢迎消息')
+    generateNewPromptId()
   }
 
   // 中止生成
@@ -348,7 +364,8 @@
 
   const sendMessage = async () => {
     if (!canSendMessage.value || isLoading.value) return
-
+    generateNewRequestId()
+    
     const messageText = userInput.value
     const currentTime = getCurrentTime()
     const hasImage = !!previewImage.value
@@ -547,7 +564,9 @@
           }
         },
         {
-          model: 'Qwen/Qwen2.5-VL-72B-Instruct'
+          model: 'Qwen/Qwen2.5-VL-72B-Instruct',
+          prompt_id: promptId.value,
+          request_id: requestId.value
         }
       )
     } catch (error) {
@@ -762,6 +781,14 @@
         sidebarWidth.value = width
       }
     }
+  
+    const savedPromptId = localStorage.getItem('bizyair-prompt-id')
+    if (savedPromptId) {
+      promptId.value = savedPromptId
+    } else {
+      generateNewPromptId()
+    }
+    generateNewRequestId()
 
     // 确保全局bizyAirLib对象存在
     if (typeof window.bizyAirLib === 'undefined') {

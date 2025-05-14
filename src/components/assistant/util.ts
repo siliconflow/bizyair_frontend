@@ -6,6 +6,8 @@ export interface ChatApiOptions {
   top_k: number
   frequency_penalty: number
   max_tokens: number
+  prompt_id?: string
+  request_id?: string
 }
 
 // 图像生成选项接口
@@ -75,7 +77,9 @@ export function buildChatRequestBody(
     frequency_penalty: mergedOptions.frequency_penalty,
     n: 1,
     stop: [],
-    messages: messages
+    messages: messages,
+    prompt_id: mergedOptions.prompt_id,
+    request_id: mergedOptions.request_id
   }
 }
 
