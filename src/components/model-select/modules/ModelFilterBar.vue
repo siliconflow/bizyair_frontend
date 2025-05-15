@@ -79,9 +79,14 @@
         sort: 'Recently'
       }
     }
-    
+
     // 确保所有BaseModel在初始化时都被选中
-    if (store.baseModelTypes && store.baseModelTypes.length > 0 && (!store[props.page].filterState.base_models || store[props.page].filterState.base_models.length === 0)) {
+    if (
+      store.baseModelTypes &&
+      store.baseModelTypes.length > 0 &&
+      (!store[props.page].filterState.base_models ||
+        store[props.page].filterState.base_models.length === 0)
+    ) {
       store[props.page].filterState.base_models = store.baseModelTypes.map(model => model.value)
     }
 

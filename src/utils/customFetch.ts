@@ -29,11 +29,10 @@ export function customFetch(url: string, options = {}, needDebounce = true, need
       const { code, message } = data
       if (code !== 20000) {
         if (needError) {
-
           if (fetchCache.has(message)) {
             const lastFetchTime = fetchCache.get(message)
             if (now - lastFetchTime < 2500) {
-              return 
+              return
             }
           }
           fetchCache.set(message, now)

@@ -29,7 +29,7 @@ export function useToaster(options: { [x: string]: unknown } | string) {
     containerBox.style.transform = 'translateX(-50%)'
   }
   document.body.appendChild(containerBox)
-  
+
   const container = document.createElement('div')
   container.style.transition = 'all 0.3s'
   containerBox.appendChild(container)

@@ -271,13 +271,13 @@
     if (str.length === 8) {
       return str
     }
-    
+
     const shareCodePattern = /share_code=([A-Za-z0-9]{8})/
     const match = str.match(shareCodePattern)
     if (match && match[1]) {
       return match[1]
     }
-    
+
     return ''
   }
 
@@ -313,7 +313,7 @@
           })
           return false
         }
-        
+
         const processedCode = handleShareCode(clipboardText)
         if (!processedCode) {
           useToaster({
@@ -322,7 +322,7 @@
           })
           return false
         }
-        
+
         shareCode.value = processedCode
         convert()
       } catch (error) {
