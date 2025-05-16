@@ -266,18 +266,43 @@
     }, 400)
   }
 
+  const handleShareCode = (str: string) => {
+    str = str.trim()
+    if (str.length === 8) {
+      return str
+    }
+
+    const shareCodePattern = /share_code=([A-Za-z0-9]{8})/
+    const match = str.match(shareCodePattern)
+    if (match && match[1]) {
+      return match[1]
+    }
+
+    return ''
+  }
+
   const runShareCode = async () => {
     if (shareCode.value) {
-      shareCode.value = shareCode.value.trim()
-      if (shareCode.value.length != 8) {
+      const processedCode = handleShareCode(shareCode.value)
+      if (processedCode) {
+        shareCode.value = processedCode
+        if (shareCode.value.length != 8) {
+          useToaster({
+            type: 'error',
+            message: t('app.shareCode.error.shareCodeLength')
+          })
+          shareCode.value = ''
+          return false
+        }
+        convert()
+      } else {
         useToaster({
           type: 'error',
-          message: t('app.shareCode.error.shareCodeLength')
+          message: t('app.shareCode.error.invalid')
         })
         shareCode.value = ''
         return false
       }
-      convert()
     } else {
       try {
         const clipboardText = await navigator.clipboard.readText()
@@ -288,15 +313,17 @@
           })
           return false
         }
-        const trimmedClipboardText = clipboardText.trim()
-        if (trimmedClipboardText.length != 8) {
+
+        const processedCode = handleShareCode(clipboardText)
+        if (!processedCode) {
           useToaster({
             type: 'error',
-            message: t('app.shareCode.error.length')
+            message: t('app.shareCode.error.invalid')
           })
           return false
         }
-        shareCode.value = trimmedClipboardText
+
+        shareCode.value = processedCode
         convert()
       } catch (error) {
         useToaster({

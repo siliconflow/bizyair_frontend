@@ -43,7 +43,7 @@
 </script>
 
 <template>
-  <div class="flex items-center justify-between">
+  <div class="flex items-center justify-between bizy-select-title-container">
     <div class="text-white text-base font-medium">{{ t('community.mine.tabs.posts') }}</div>
     <Popover class="bg-[#353535]" :open="downloadOpen" @update:open="handleDownload">
       <PopoverTrigger class="bg-transparent" :disabled="disabled">

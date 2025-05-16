@@ -45,7 +45,7 @@
     <Check class="w-6 h-6 mr-2" v-if="type === 'success'" />
     <CircleX class="w-6 h-6 mr-2" v-if="type === 'error'" />
     <TriangleAlert class="w-6 h-6 mr-2" v-if="type === 'warning'" />
-    <span class="flex-1">
+    <span class="flex-1 bizy-toast-message-text">
       {{ message }}
     </span>
     <X class="absolute right-2 top-2 cursor-pointer" @click="close" />

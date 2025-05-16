@@ -142,6 +142,11 @@
     }
   }, 300)
 
+  const openInWeb = () => {
+    const url = `https://bizyair.cn/community/models/${communityStore.TabSource}/${model.value?.id}?version=${currentVersion.value?.id}`
+    window.open(url, '_blank')
+  }
+
   const getShareCode = async () => {
     if (!currentVersion.value) return
     isLoading.value = true
@@ -369,6 +374,7 @@
 
   const handleAddNode = async () => {
     try {
+      isLoading.value = true
       const nodeTypes: Record<string, string> = {
         LoRA: 'BizyAir_LoraLoader',
         Controlnet: 'BizyAir_ControlNetLoader',
@@ -415,10 +421,13 @@
 
       canvas.graph.add(loraLoaderNode)
       communityStore.showDialog = false
+      communityStore.showCommunityDetail = false
       useToaster.success(t('community.detail.nodeAddedSuccessfully'))
     } catch (error) {
       console.error('Failed to add node:', error)
-      useToaster.error(t('community.detail.failedAddNode' + error))
+      useToaster.error(t('community.detail.failedAddNode') + error)
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -700,6 +709,30 @@
                 </svg>
               </div>
             </vTooltips>
+
+            <vTooltips :tips="t('community.detail.open')">
+              <div
+                @click="openInWeb"
+                class="w-[48px] h-[48px] bg-[#4e4e4e] hover:bg-[#4e4e4e]/60 rounded-lg flex items-center justify-center cursor-pointer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 512 512"
+                >
+                  <path
+                    fill="none"
+                    stroke="#FFF"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="32"
+                    d="M384 224v184a40 40 0 0 1-40 40H104a40 40 0 0 1-40-40V168a40 40 0 0 1 40-40h167.48M336 64h112v112M224 288L440 72"
+                  />
+                </svg>
+              </div>
+            </vTooltips>
+
             <Popover
               v-if="['my', 'my_fork'].includes(communityStore.TabSource)"
               class="bg-[#353535]"
@@ -872,6 +905,7 @@
               <Button
                 v-if="model?.type !== 'Workflow'"
                 class="flex w-[170px] px-8 py-2 justify-center items-center gap-2 bg-[#F43F5E] hover:bg-[#F43F5E]/90 rounded-[6px]"
+                :disabled="isLoading"
                 @click="handleAddNode"
               >
                 <svg
@@ -886,9 +920,10 @@
                     stroke="#F9FAFB"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                  /></svg
-                >{{ t('community.detail.addNode') }}</Button
-              >
+                  />
+                </svg>
+                {{ t('community.detail.addNode') }}
+              </Button>
 
               <Button
                 v-if="model?.type === 'Workflow'"
