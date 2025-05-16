@@ -37,7 +37,17 @@ export function customFetch(url: string, options = {}, needDebounce = true, need
           }
           fetchCache.set(message, now)
 
-          useToaster.error(message)
+          // 检查options中是否有shieldError字段，如果有，记录URL以确保同一URL的错误只提示一次
+          const hasShieldError = options && (options as any).shieldError
+          const errorCacheKey = `error_${url}`
+          if (hasShieldError) {
+            if (!fetchCache.has(errorCacheKey)) {
+              fetchCache.set(errorCacheKey, true)
+              useToaster.error(message)
+            }
+          } else {
+            useToaster.error(message)
+          }
 
           throw new Error(message)
         } else {

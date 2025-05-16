@@ -306,13 +306,13 @@
 
   const promptId = ref('')
   const requestId = ref('')
-  
+
   // 生成新的会话ID
   const generateNewPromptId = () => {
     promptId.value = uuidv4()
     localStorage.setItem('bizyair-prompt-id', promptId.value)
   }
-  
+
   // 生成新的请求ID
   const generateNewRequestId = () => {
     requestId.value = uuidv4()
@@ -365,7 +365,7 @@
   const sendMessage = async () => {
     if (!canSendMessage.value || isLoading.value) return
     generateNewRequestId()
-    
+
     const messageText = userInput.value
     const currentTime = getCurrentTime()
     const hasImage = !!previewImage.value
@@ -781,7 +781,7 @@
         sidebarWidth.value = width
       }
     }
-  
+
     const savedPromptId = localStorage.getItem('bizyair-prompt-id')
     if (savedPromptId) {
       promptId.value = savedPromptId
