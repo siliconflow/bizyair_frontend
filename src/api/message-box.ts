@@ -14,7 +14,7 @@ export const get_messages_list = (params: any) => {
     searchParams.append('types', params.types)
   }
   return customFetch(`/bizyair/community/notifications?${searchParams.toString()}`, {
-    method: 'GET',
+    method: 'GET'
   })
 }
 
