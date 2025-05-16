@@ -786,9 +786,10 @@
                     stroke="#F9FAFB"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                  /></svg
-                >{{ t('modelSelect.apply') }}</Button
-              >
+                  />
+                </svg>
+                {{ t('modelSelect.apply') }}
+              </Button>
             </div>
           </div>
           <div

@@ -8,7 +8,8 @@
       "error": {
         "empty": "Clipboard content is empty or not a string.",
         "length": "Clipboard content length is incorrect.",
-        "shareCodeLength": "Share code length is incorrect."
+        "shareCodeLength": "Share code length is incorrect.",
+        "invalid": "Share code format is incorrect."
       }
     },
     "assistant": "BizyBot"
@@ -201,6 +202,7 @@
       "load": "Load",
       "loading": "Loading...",
       "share": "Share",
+      "open": "Open on the website",
       "copy": "Copy",
       "download": "Download",
       "stats": "Stats",
