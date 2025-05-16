@@ -13,15 +13,15 @@ export const get_messages_list = (params: any) => {
   if (params.types && (typeof params.types === 'string' || typeof params.types === 'number')) {
     searchParams.append('types', params.types)
   }
-
   return customFetch(`/bizyair/community/notifications?${searchParams.toString()}`, {
-    method: 'GET'
+    method: 'GET',
   })
 }
 
 export const get_message_unread_count = () =>
   customFetch(`/bizyair/community/notifications/unread_count`, {
-    method: 'GET'
+    method: 'GET',
+    shieldError: true
   })
 
 export const read_message = (id: number) =>
