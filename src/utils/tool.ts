@@ -128,3 +128,66 @@ export const getDictData = <K extends keyof CommonDict>(
 export const setDictData = (key: string, data: CommonDict, expires?: number): void => {
   setLocalStorage<CommonDict>(key, data, expires)
 }
+
+/**
+ * 将导出数据转换为JSON Schema格式
+ * @param data 要转换的数据对象
+ * @returns JSON Schema格式的对象
+ */
+export const convertToJsonSchema = (data: Record<string, any>): Record<string, any> => {
+  const schema: Record<string, any> = {
+    $schema: "http://json-schema.org/draft-07/schema#",
+    type: "object",
+    properties: {},
+    required: []
+  };
+  
+  // 遍历所有节点
+  Object.keys(data).forEach(nodeId => {
+    const node = data[nodeId];
+    
+    // 为每个节点创建schema定义
+    schema.properties[nodeId] = {
+      type: "object",
+      properties: {
+        inputs: {
+          type: "object",
+          properties: {},
+          required: []
+        },
+        class_type: { type: "string" },
+        _meta: {
+          type: "object",
+          properties: {
+            title: { type: "string" }
+          },
+          required: ["title"]
+        }
+      },
+      required: ["inputs", "class_type", "_meta"]
+    };
+    
+    // 将节点ID添加到required数组
+    schema.required.push(nodeId);
+    
+    // 处理inputs中的属性
+    if (node.inputs) {
+      Object.keys(node.inputs).forEach(inputName => {
+        const inputValue = node.inputs[inputName];
+        const inputType = typeof inputValue;
+        
+        // 为每个input添加类型定义
+        schema.properties[nodeId].properties.inputs.properties[inputName] = {
+          type: inputType === 'number' ? 
+                (Number.isInteger(inputValue) ? "integer" : "number") : 
+                inputType
+        };
+        
+        // 将input名称添加到required数组
+        schema.properties[nodeId].properties.inputs.required.push(inputName);
+      });
+    }
+  });
+  
+  return schema;
+};

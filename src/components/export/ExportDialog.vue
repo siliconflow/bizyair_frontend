@@ -127,6 +127,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useExportStore } from '@/stores/exportStore.ts'
+import { convertToJsonSchema } from '@/utils/tool'
 
 
 const exportStore = useExportStore()
@@ -162,10 +163,11 @@ const handleExport = () => {
   // 格式化导出数据
   const exportData = formatExportData(selectedNodes.value);
   
-  // 打印导出数据
-  console.log('导出数据:', JSON.stringify(exportData, null, 2));
+  // 转换为JSON Schema格式
+  const jsonSchema = convertToJsonSchema(exportData);
   
-
+  // 打印导出数据
+  console.log('导出数据:', JSON.stringify(jsonSchema, null, 2));
 }
 
 // 格式化导出数据为指定格式
