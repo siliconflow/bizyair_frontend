@@ -96,7 +96,7 @@
     const authUrl = `${ACCOUNT_ENDPOINT}/oauth?client_id=${clientId}`
     const popup = window.open(authUrl, 'oauthPopup', 'width=600,height=600')
     window.addEventListener('message', event => {
-      if (event.data.length > 0 && event.data[1]['secretKey'] !== undefined) {
+      if (event.data.length > 0 && event.data[0]['secretKey'] !== undefined) {
         setKey(event.data[0]['secretKey'])
         if (popup) {
           popup.close()
