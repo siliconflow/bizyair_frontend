@@ -18,7 +18,7 @@ export function customFetch(url: string, options = {}, needDebounce = true, need
   // 添加自定义header
   const headers = {
     'Content-Type': 'application/json',
-    api_key: Cookies.get('bizy_token') || '',
+    'Authorization': Cookies.get('bizy_token') || '',
     ...(options as any)?.headers
   }
 
