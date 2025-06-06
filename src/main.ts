@@ -235,18 +235,18 @@ app.directive('debounce', {
   }
 })
 
-
 export function mount(container: string | Element, comfyUIApp?: any) {
   app.provide('comfyUIApp', comfyUIApp)
-  server_mode().then((res) => {
+  server_mode().then(res => {
     console.log('server_mode100', res)
     if (!res.data.server_mode) {
-
       app.use(i18n)
       app.mount(container)
     } else {
       const timer = setInterval(() => {
-        const authToken = document.cookie.split(';').find(cookie => cookie.trim().startsWith('bizy_token='))
+        const authToken = document.cookie
+          .split(';')
+          .find(cookie => cookie.trim().startsWith('bizy_token='))
         if (authToken) {
           clearInterval(timer)
           app.use(i18n)
