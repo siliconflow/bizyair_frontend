@@ -1,4 +1,5 @@
 import { useToaster } from '@/components/modules/toats/index'
+import Cookies from 'js-cookie'
 
 const fetchCache = new Map()
 
@@ -14,9 +15,21 @@ export function customFetch(url: string, options = {}, needDebounce = true, need
     fetchCache.set(url, now)
   }
 
+  // 添加自定义header
+  const headers = {
+    'Content-Type': 'application/json',
+    'api_key': Cookies.get('bizy_token') || '',
+    ...(options as any)?.headers
+  }
+  
+  const updatedOptions = {
+    ...options,
+    headers
+  }
+
   const host = `${window.location.origin}${window.location.pathname === '/' ? '' : window.location.pathname}`
   return window
-    .fetch(`${host}${url}`, options)
+    .fetch(`${host}${url}`, updatedOptions)
     .then(response => {
       if (response.status === 404) {
         useToaster.error(

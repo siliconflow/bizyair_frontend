@@ -43,3 +43,5 @@ export const get_coins = (param: any) =>
   customFetch(`/bizyair/user/coins?${new URLSearchParams(param).toString()}`, { method: 'GET' })
 
 export const logout = () => customFetch(`/bizyair/user/logout`, { method: 'POST' })
+
+export const server_mode = () => customFetch(`/bizyair/server_mode`, { method: 'GET' }, false, false)

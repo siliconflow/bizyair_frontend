@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { get_user_info, get_metadata, get_coins, get_wallet, logout } from '@/api/user'
+import { get_user_info, get_metadata, get_coins, get_wallet, logout, server_mode } from '@/api/user'
 // , put_smetadata, post_real_name, get_wallet, get_coins
 import { WebSocketClient } from '@/utils/socket.ts'
 // import useClipboard from 'vue-clipboard3'
@@ -88,7 +88,12 @@ export const useStatusStore = defineStore('userStatus', {
     coinsListTitle: ''
   }),
   actions: {
-    loginRefresh(isLoading?: string) {
+    async loginRefresh(isLoading?: string) {
+      const serverModeRes = await server_mode()
+      const isServerMode = serverModeRes?.data?.server_mode
+      if (isServerMode) {
+        return
+      }
       get_user_info()
         .then((info: { data: any }) => {
           if (info !== null) {
@@ -105,7 +110,12 @@ export const useStatusStore = defineStore('userStatus', {
         this.get_wallet()
       }
     },
-    sendSocket(fn: (res: any) => void) {
+    async sendSocket(fn: (res: any) => void) {
+      const serverModeRes = await server_mode()
+      const isServerMode = serverModeRes?.data?.server_mode
+      if (isServerMode) {
+        return
+      }
       const wsClient = new WebSocketClient(
         `/bizyair/ws?clientId=${sessionStorage.getItem('clientId')}`,
         []
