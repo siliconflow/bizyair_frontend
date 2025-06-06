@@ -168,7 +168,7 @@
 
   import { useCommunityStore } from '@/stores/communityStore'
   import { get_share_code } from '@/api/model'
-  import { get_user_language_profile, put_user_language_profile } from '@/api/user'
+  import { get_user_language_profile, put_user_language_profile, server_mode } from '@/api/user'
 
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { useToaster } from '@/components/modules/toats/index'
@@ -182,6 +182,11 @@
 
   const getUserLanguageProfile = async () => {
     try {
+      const serverModeRes = await server_mode()
+      const isServerMode = serverModeRes?.data?.server_mode
+      if (isServerMode) {
+        return
+      }
       const res = await get_user_language_profile()
       if (res.data?.global?.lang) {
         const userLang = res.data.global.lang

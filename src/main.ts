@@ -9,6 +9,7 @@ import { createI18n } from 'vue-i18n'
 import enMessages from './locales/en.json'
 import zhMessages from './locales/zh.json'
 import { useSidebarStore } from '@/stores/sidebarStore'
+import { server_mode } from '@/api/user'
 
 // 创建i18n实例
 const i18n = createI18n({
@@ -234,10 +235,26 @@ app.directive('debounce', {
   }
 })
 
+
 export function mount(container: string | Element, comfyUIApp?: any) {
   app.provide('comfyUIApp', comfyUIApp)
-  app.use(i18n)
-  app.mount(container)
+  server_mode().then((res) => {
+    console.log('server_mode100', res)
+    if (!res.data.server_mode) {
+
+      app.use(i18n)
+      app.mount(container)
+    } else {
+      const timer = setInterval(() => {
+        const authToken = document.cookie.split(';').find(cookie => cookie.trim().startsWith('bizy_token='))
+        if (authToken) {
+          clearInterval(timer)
+          app.use(i18n)
+          app.mount(container)
+        }
+      }, 300)
+    }
+  })
 }
 
 export function unmount() {
