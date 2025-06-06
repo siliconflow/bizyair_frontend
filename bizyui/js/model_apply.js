@@ -376,7 +376,7 @@ function setupNodeMouseBehavior(node, modelType) {
 }
 
 const nodeDataNames = {
-    LoRA: ["BizyAir_LoraLoader","BizyAir_NunchakuFluxLoraLoader"],
+    LoRA: ["BizyAir_LoraLoader","BizyAir_NunchakuFluxLoraLoader", "BizyAir_Wan_LoraLoader"],
     Controlnet: "BizyAir_ControlNetLoader",
     Checkpoint: "BizyAir_CheckpointLoaderSimple",
     // Clip: "BizyAir_CLIPVisionLoader",
