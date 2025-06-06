@@ -44,4 +44,5 @@ export const get_coins = (param: any) =>
 
 export const logout = () => customFetch(`/bizyair/user/logout`, { method: 'POST' })
 
-export const server_mode = () => customFetch(`/bizyair/server_mode`, { method: 'GET' }, false, false)
+export const server_mode = () =>
+  customFetch(`/bizyair/server_mode`, { method: 'GET' }, false, false)
