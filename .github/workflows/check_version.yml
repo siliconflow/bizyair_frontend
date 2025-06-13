@@ -29,7 +29,7 @@ jobs:
     - name: Diff version.txt
       run: |
         echo "Current directory: $(pwd)"
-        modified_files=$(git diff --name-only origin/${{ env.target_branch }}...HEAD | grep bizyengine/version.txt)
+        modified_files=$(git diff --name-only origin/${{ env.target_branch }}...HEAD | grep version.txt)
         echo "Modified files: $modified_files"
         if [[ ! -n $modified_files ]]; then
           echo "version.txt unchanged"
@@ -44,7 +44,7 @@ jobs:
       with:
         script: |
           const { pull_request } = context.payload;
-          const comment = "代码改动同时请更新版本文件bizyengine/version.txt";
+          const comment = "代码改动同时请更新版本文件 version.txt";
           await github.issues.createComment({
             issue_number: pull_request.number,
             owner: context.repo.owner,
