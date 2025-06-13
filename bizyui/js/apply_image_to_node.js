@@ -38,19 +38,26 @@ window.addEventListener('message', async function(event) {
                 return;
             }
             
-            // 等待token可用
-            const token = await new Promise((resolve) => {
-                const checkToken = () => {
-                    const token = getCookie("bizy_token");
-                    if (token) {
-                        clearInterval(timer);
-                        resolve(token);
-                    }
-                };
-                
-                const timer = setInterval(checkToken, 300);
-                checkToken(); // 立即执行一次检查
-            });
+            // 检查服务器模式
+            const serverModeResponse = await fetch("/bizyair/server_mode");
+            const serverModeData = await serverModeResponse.json();
+            
+            let token = null;
+            if (serverModeData.data.server_mode) {
+                // 服务器模式，需要token
+                token = await new Promise((resolve) => {
+                    const checkToken = () => {
+                        const token = getCookie("bizy_token");
+                        if (token) {
+                            clearInterval(timer);
+                            resolve(token);
+                        }
+                    };
+                    
+                    const timer = setInterval(checkToken, 300);
+                    checkToken(); // 立即执行一次检查
+                });
+            }
             
             // 保存原始节点大小
             const originalSize = targetNode.size ? [...targetNode.size] : null;
@@ -100,12 +107,15 @@ window.addEventListener('message', async function(event) {
             formData.append('filename', filename);
             
             // 发送请求
+            const headers = {};
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`;
+            }
+            
             const response = await fetch('/upload/image', {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
+                headers: headers
             });
             
             if (!response.ok) {
