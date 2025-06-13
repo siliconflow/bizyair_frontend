@@ -37,25 +37,35 @@ const NodeInfoLogger = (function() {
     // 获取图片并转换为base64
     const getImageAsBase64 = async (filename, type) => {
         try {
-            // 等待token可用
-            const token = await new Promise((resolve) => {
-                const checkToken = () => {
-                    const token = getCookie("bizy_token");
-                    if (token) {
-                        clearInterval(timer);
-                        resolve(token);
-                    }
-                };
-                
-                const timer = setInterval(checkToken, 300);
-                checkToken(); // 立即执行一次检查
-            });
+            // 检查服务器模式
+            const serverModeResponse = await fetch("/bizyair/server_mode");
+            const serverModeData = await serverModeResponse.json();
+            
+            let token = null;
+            if (serverModeData.data.server_mode) {
+                // 服务器模式，需要token
+                token = await new Promise((resolve) => {
+                    const checkToken = () => {
+                        const token = getCookie("bizy_token");
+                        if (token) {
+                            clearInterval(timer);
+                            resolve(token);
+                        }
+                    };
+                    
+                    const timer = setInterval(checkToken, 300);
+                    checkToken(); // 立即执行一次检查
+                });
+            }
 
             const imageUrl = buildImageUrl(filename, type);
+            const headers = {};
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`;
+            }
+            
             const response = await fetch(imageUrl, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
+                headers: headers
             });
             if (!response.ok) {
                 throw new Error(`获取图片失败: ${response.status} ${response.statusText}`);

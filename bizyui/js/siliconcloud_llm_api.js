@@ -16,18 +16,28 @@ const createModelFetchExtension = (nodeName, endpoint) => {
 
                     const fetchModels = async () => {
                         try {
-                            return new Promise((resolve) => {
-                                const checkToken = () => {
-                                    const token = getCookie("bizy_token");
-                                    if (token) {
-                                        clearInterval(timer);
-                                        fetchWithToken(token).then(resolve);
-                                    }
-                                };
-                                
-                                const timer = setInterval(checkToken, 300);
-                                checkToken(); // 立即执行一次检查
-                            });
+                            // 首先检查服务器模式
+                            const serverModeResponse = await fetch("/bizyair/server_mode");
+                            const serverModeData = await serverModeResponse.json();
+                            
+                            if (serverModeData.data.server_mode) {
+                                // 服务器模式，需要token
+                                return new Promise((resolve) => {
+                                    const checkToken = () => {
+                                        const token = getCookie("bizy_token");
+                                        if (token) {
+                                            clearInterval(timer);
+                                            fetchWithToken(token).then(resolve);
+                                        }
+                                    };
+                                    
+                                    const timer = setInterval(checkToken, 300);
+                                    checkToken(); // 立即执行一次检查
+                                });
+                            } else {
+                                // 非服务器模式，直接发送请求
+                                return fetchWithToken();
+                            }
                         } catch (error) {
                             console.error(`Error fetching ${nodeName} models`, error);
                             return [];
@@ -36,12 +46,18 @@ const createModelFetchExtension = (nodeName, endpoint) => {
 
                     const fetchWithToken = async (token) => {
                         try {
+                            const headers = {
+                                "Content-Type": "application/json"
+                            };
+                            
+                            // 只有在token存在时才添加Authorization头
+                            if (token) {
+                                headers["Authorization"] = `Bearer ${token}`;
+                            }
+
                             const response = await fetch(endpoint, {
                                 method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${token}`,
-                                },
+                                headers: headers,
                                 body: JSON.stringify({}),
                             });
 
