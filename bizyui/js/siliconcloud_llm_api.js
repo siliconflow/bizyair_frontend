@@ -1,4 +1,5 @@
 import { app } from "../../scripts/app.js";
+import { getCookie } from "./subassembly/tools.js";
 
 const createModelFetchExtension = (nodeName, endpoint) => {
     return {
@@ -15,10 +16,31 @@ const createModelFetchExtension = (nodeName, endpoint) => {
 
                     const fetchModels = async () => {
                         try {
+                            return new Promise((resolve) => {
+                                const checkToken = () => {
+                                    const token = getCookie("bizy_token");
+                                    if (token) {
+                                        clearInterval(timer);
+                                        fetchWithToken(token).then(resolve);
+                                    }
+                                };
+                                
+                                const timer = setInterval(checkToken, 300);
+                                checkToken(); // 立即执行一次检查
+                            });
+                        } catch (error) {
+                            console.error(`Error fetching ${nodeName} models`, error);
+                            return [];
+                        }
+                    };
+
+                    const fetchWithToken = async (token) => {
+                        try {
                             const response = await fetch(endpoint, {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${token}`,
                                 },
                                 body: JSON.stringify({}),
                             });
