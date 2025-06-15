@@ -238,7 +238,6 @@ app.directive('debounce', {
 export function mount(container: string | Element, comfyUIApp?: any) {
   app.provide('comfyUIApp', comfyUIApp)
   server_mode().then(res => {
-    console.log('server_mode100', res)
     if (!res.data.server_mode) {
       app.use(i18n)
       app.mount(container)

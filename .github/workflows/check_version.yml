@@ -1,0 +1,53 @@
+name: Check Version Updated
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  target_branch: ${{ github.base_ref || 'master' }}
+
+jobs:
+  check_version:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        ref: ${{ github.head_ref }}
+
+    - name: Fetch target branch
+      run: |
+        git fetch origin ${{ env.target_branch }}
+
+    - name: Diff version.txt
+      run: |
+        echo "Current directory: $(pwd)"
+        modified_files=$(git diff --name-only origin/${{ env.target_branch }}...HEAD | grep version.txt)
+        echo "Modified files: $modified_files"
+        if [[ ! -n $modified_files ]]; then
+          echo "version.txt unchanged"
+          exit 1
+        else
+          echo "version.txt changed"
+        fi
+
+    - name: Add PR review comment if version.txt is not updated
+      if: failure() && !cancelled()
+      uses: actions/github-script@v4
+      with:
+        script: |
+          const { pull_request } = context.payload;
+          const comment = "代码改动同时请更新版本文件 version.txt";
+          await github.issues.createComment({
+            issue_number: pull_request.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });

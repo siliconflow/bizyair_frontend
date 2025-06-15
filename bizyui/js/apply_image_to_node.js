@@ -1,5 +1,5 @@
 import { app } from "../../scripts/app.js";
-
+import { getCookie } from "./subassembly/tools.js";
 
 function inspectNode(node) {
     console.log('节点信息:', {
@@ -36,6 +36,27 @@ window.addEventListener('message', async function(event) {
             if (!targetNode) {
                 console.error('应用图片到节点失败: 找不到指定ID的节点', nodeId);
                 return;
+            }
+            
+            // 检查服务器模式
+            const serverModeResponse = await fetch("/bizyair/server_mode");
+            const serverModeData = await serverModeResponse.json();
+            
+            let token = null;
+            if (serverModeData.data.server_mode) {
+                // 服务器模式，需要token
+                token = await new Promise((resolve) => {
+                    const checkToken = () => {
+                        const token = getCookie("bizy_token");
+                        if (token) {
+                            clearInterval(timer);
+                            resolve(token);
+                        }
+                    };
+                    
+                    const timer = setInterval(checkToken, 300);
+                    checkToken(); // 立即执行一次检查
+                });
             }
             
             // 保存原始节点大小
@@ -86,9 +107,15 @@ window.addEventListener('message', async function(event) {
             formData.append('filename', filename);
             
             // 发送请求
+            const headers = {};
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`;
+            }
+            
             const response = await fetch('/upload/image', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: headers
             });
             
             if (!response.ok) {
