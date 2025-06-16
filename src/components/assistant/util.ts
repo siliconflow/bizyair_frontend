@@ -55,7 +55,8 @@ export const defaultApiOptions: ChatApiOptions = {
 
 // 服务器API路径
 const SERVER_MODEL_API_URL = '/bizyair/model/chat'
-
+// context_API_KEY
+export const API_KEY = 'sk-bZ9JbKE7NKFql9y2ZVI7tezgezJOY1eAx6q1k0fovPUlkawK'
 /**
  * 构建聊天请求体
  * @param messages 消息数组
@@ -424,4 +425,57 @@ export async function generateImage(options: {
   } finally {
     loading_callback?.(false)
   }
+}
+
+/**
+ * 处理带图片的消息，使用flux-kontext-pro模型编辑图片
+ * @param prompt 提示词
+ * @param imageBase64 图片base64数据
+ * @returns Promise<string> 返回生成的图片URL
+ */
+export async function handleImageWithKontextPro(prompt: string, imageBase64: string): Promise<string> {
+  const API_KEY = "sk-bZ9JbKE7NKFql9y2ZVI7tezgezJOY1eAx6q1k0fovPUlkawK";
+  const API_HOST = "www.dmxapi.cn";
+  const API_ENDPOINT = "/v1/images/edits";
+
+  // 创建FormData
+  const formData = new FormData();
+  formData.append('prompt', prompt);
+  formData.append('model', 'flux-kontext-pro');
+  formData.append('n', '1');
+  formData.append('size', '1024x1024');
+
+  // 从base64字符串中提取实际的图片数据
+  const base64Data = imageBase64.split(',')[1];
+  const binaryData = atob(base64Data);
+  const bytes = new Uint8Array(binaryData.length);
+  for (let i = 0; i < binaryData.length; i++) {
+    bytes[i] = binaryData.charCodeAt(i);
+  }
+  
+  // 创建File对象
+  const imageFile = new File([bytes], 'image.png', { type: 'image/png' });
+  formData.append('image', imageFile);
+
+  const response = await fetch(`https://${API_HOST}${API_ENDPOINT}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${API_KEY}`,
+      'User-Agent': 'DMXAPI/1.0.0 (https://www.dmxapi.cn)',
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error?.message || `API请求失败: ${response.status} ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  
+  if (!data.data?.[0]?.url) {
+    throw new Error('API返回数据格式错误');
+  }
+
+  return data.data[0].url;
 }
