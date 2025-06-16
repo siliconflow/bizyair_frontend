@@ -52,7 +52,7 @@ const createModelFetchExtension = (nodeName, endpoint) => {
                             
                             // 只有在token存在时才添加Authorization头
                             if (token) {
-                                headers["Authorization"] = `Bearer ${token}`;
+                                headers["Authorization"] = token;
                             }
 
                             const response = await fetch(endpoint, {
