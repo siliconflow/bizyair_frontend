@@ -109,7 +109,7 @@ window.addEventListener('message', async function(event) {
             // 发送请求
             const headers = {};
             if (token) {
-                headers["Authorization"] = `Bearer ${token}`;
+                headers["Authorization"] = token;
             }
             
             const response = await fetch('/upload/image', {

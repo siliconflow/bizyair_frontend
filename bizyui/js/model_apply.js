@@ -61,7 +61,7 @@ const NodeInfoLogger = (function() {
             const imageUrl = buildImageUrl(filename, type);
             const headers = {};
             if (token) {
-                headers["Authorization"] = `Bearer ${token}`;
+                headers["Authorization"] = token;
             }
             
             const response = await fetch(imageUrl, {
