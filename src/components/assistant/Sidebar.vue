@@ -23,9 +23,8 @@
           </button>
         </div>
       </div>
-
-      <div class="sidebar-content">
-        <div class="chat-container">
+        <!-- 聊天标签页内容 -->
+        <div class="chat-container" >
           <div class="chat-messages" ref="chatMessagesRef">
             <div
               v-for="(message, index) in chatMessages"
@@ -116,14 +115,14 @@
                   />
                 </svg>
               </button>
-              <button
+              <!-- <button
                 class="upload-image-btn interactive-element"
                 @click="generateImageAction"
                 :disabled="isLoading"
                 :title="$t('sidebar.assistant.generateImage')"
               >
                 生图
-              </button>
+              </button> -->
               <div class="textarea-container interactive-element">
                 <textarea
                   class="interactive-element"
@@ -169,7 +168,6 @@
             />
           </div>
         </div>
-      </div>
     </div>
   </Teleport>
 </template>
@@ -181,7 +179,8 @@
     sendStreamChatRequest,
     createImageUserMessage,
     formatOutputTextLight,
-    generateImage
+    generateImage,
+    handleImageWithKontextPro
   } from './util'
   import { useI18n } from 'vue-i18n'
   import { useToaster } from '@/components/modules/toats/index'
@@ -189,6 +188,7 @@
 
   const { t } = useI18n()
   const sidebarStore = useSidebarStore()
+
   // 拖拽调整大小---------------------------------------'
   // 侧边栏宽度相关变量
   const sidebarWidth = ref(550) // 默认宽度
@@ -347,20 +347,7 @@
   // 生图功能
   const isGeneratingImage = ref(false)
 
-  const generateImageAction = () => {
-    if (isLoading.value) return
 
-    // 在输入框中添加生成图片前缀
-    userInput.value = `生成图片: ${userInput.value.trim()}`
-    // 聚焦到输入框最后一个字
-    setTimeout(() => {
-      textareaRef.value?.focus()
-      if (textareaRef.value) {
-        const position = '生成图片:'.length + 1
-        textareaRef.value.setSelectionRange(position, position)
-      }
-    }, 0)
-  }
 
   const sendMessage = async () => {
     if (!canSendMessage.value || isLoading.value) return
@@ -395,6 +382,48 @@
     }, 0)
 
     try {
+      // 判断是否是图片编辑请求（带图片的普通消息）
+      if (hasImage && !isImageGeneration) {
+        processingStatus.value = '正在编辑图片...'
+        
+        try {
+          // 调用图片编辑API
+          const imageUrl = await handleImageWithKontextPro(messageText || '请编辑这张图片', previewImage.value)
+          
+          // 编辑成功后，添加带图片的助手消息
+          const assistantMessage = {
+            role: 'assistant' as const,
+            content: '已为您编辑图片，点击LoadImage节点可以直接应用。',
+            time: getCurrentTime(),
+            hasImage: true,
+            image: imageUrl
+          }
+          chatMessages.value.push(assistantMessage)
+          // 更新状态
+          isLoading.value = false
+          isGenerating.value = false
+          processingStatus.value = ''
+          removeImage() // 清除已处理的图片
+          // 滚动到底部
+          setTimeout(() => {
+            scrollToBottom()
+          }, 0)
+          
+          return
+        } catch (error: any) {
+          console.error('图片编辑失败:', error)
+          
+          useToaster({
+            type: 'error',
+            message: '图片编辑失败: ' + (error.message || '未知错误')
+          })
+          // 更新状态
+          isLoading.value = false
+          isGenerating.value = false
+          processingStatus.value = ''
+          return
+        }
+      }
       // 判断是否是图片生成请求
       if (isImageGeneration) {
         isGeneratingImage.value = true
@@ -1348,5 +1377,28 @@
   .close-btn:hover {
     color: #fff;
     background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* 添加标签页样式 */
+  .tab-navigation {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+  }
+  
+  .tab-btn {
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.2s;
+  }
+  
+  .flux-kontext-container {
+    height: calc(100% - 50px);
+    overflow-y: auto;
   }
 </style>
