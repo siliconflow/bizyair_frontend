@@ -434,48 +434,80 @@ export async function generateImage(options: {
  * @returns Promise<string> 返回生成的图片URL
  */
 export async function handleImageWithKontextPro(prompt: string, imageBase64: string): Promise<string> {
+  console.log('进入handleImageWithKontextPro函数');
   const API_KEY = "sk-bZ9JbKE7NKFql9y2ZVI7tezgezJOY1eAx6q1k0fovPUlkawK";
   const API_HOST = "www.dmxapi.cn";
   const API_ENDPOINT = "/v1/images/edits";
 
-  // 创建FormData
-  const formData = new FormData();
-  formData.append('prompt', prompt);
-  formData.append('model', 'flux-kontext-pro');
-  formData.append('n', '1');
-  formData.append('size', '1024x1024');
+  try {
+    // 验证imageBase64是否有效
+    if (!imageBase64 || typeof imageBase64 !== 'string') {
+      console.error('无效的图片数据');
+      throw new Error('图片数据无效');
+    }
+    
+    // 创建FormData
+    const formData = new FormData();
+    formData.append('prompt', prompt);
+    formData.append('model', 'flux-kontext-pro');
+    formData.append('n', '1');
+    formData.append('size', '1024x1024');
+    
+    let base64Data;
+    // 从base64字符串中提取实际的图片数据
+    if (imageBase64.includes('base64,')) {
+      base64Data = imageBase64.split('base64,')[1];
+    } else {
+      base64Data = imageBase64;
+      console.warn('图片数据不包含base64前缀');
+    }
+    
+    try {
+      const binaryData = atob(base64Data);
+      const bytes = new Uint8Array(binaryData.length);
+      for (let i = 0; i < binaryData.length; i++) {
+        bytes[i] = binaryData.charCodeAt(i);
+      }
+      
+      // 创建File对象
+      const imageFile = new File([bytes], 'image.png', { type: 'image/png' });
+      formData.append('image', imageFile);
+      
+      console.log('FormData已准备，开始发送请求');
 
-  // 从base64字符串中提取实际的图片数据
-  const base64Data = imageBase64.split(',')[1];
-  const binaryData = atob(base64Data);
-  const bytes = new Uint8Array(binaryData.length);
-  for (let i = 0; i < binaryData.length; i++) {
-    bytes[i] = binaryData.charCodeAt(i);
+      const response = await fetch(`https://${API_HOST}${API_ENDPOINT}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`,
+          'User-Agent': 'DMXAPI/1.0.0 (https://www.dmxapi.cn)',
+        },
+        body: formData
+      });
+
+      console.log('API响应状态:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API请求失败:', errorData);
+        throw new Error(errorData.error?.message || `API请求失败: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('API响应数据:', data);
+      
+      if (!data.data?.[0]?.url) {
+        console.error('API返回数据格式错误:', data);
+        throw new Error('API返回数据格式错误');
+      }
+
+      console.log('成功获取图片URL:', data.data[0].url);
+      return data.data[0].url;
+    } catch (error: any) {
+      console.error('处理图片数据失败:', error);
+      throw new Error('处理图片数据失败: ' + (error.message || '未知错误'));
+    }
+  } catch (error: any) {
+    console.error('图片编辑处理失败:', error);
+    throw error;
   }
-  
-  // 创建File对象
-  const imageFile = new File([bytes], 'image.png', { type: 'image/png' });
-  formData.append('image', imageFile);
-
-  const response = await fetch(`https://${API_HOST}${API_ENDPOINT}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${API_KEY}`,
-      'User-Agent': 'DMXAPI/1.0.0 (https://www.dmxapi.cn)',
-    },
-    body: formData
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error?.message || `API请求失败: ${response.status} ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  
-  if (!data.data?.[0]?.url) {
-    throw new Error('API返回数据格式错误');
-  }
-
-  return data.data[0].url;
 }
