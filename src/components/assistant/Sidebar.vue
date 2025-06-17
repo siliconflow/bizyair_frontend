@@ -46,7 +46,12 @@
 
                 <!-- 图片消息 -->
                 <div v-if="message.hasImage" class="message-image">
-                  <img :src="message.image" alt="用户上传图片" />
+                  <img 
+                    :src="message.image" 
+                    alt="用户上传图片" 
+                    @click="message.image && selectExistingImage(message.image)" 
+                    class="clickable-image" 
+                  />
                   <!-- 生图消息，显示应用按钮 -->
                   <div
                     v-if="
@@ -347,8 +352,6 @@
   // 生图功能
   const isGeneratingImage = ref(false)
 
-
-
   const sendMessage = async () => {
     if (!canSendMessage.value || isLoading.value) return
     generateNewRequestId()
@@ -366,7 +369,7 @@
     // 创建用户消息并添加到聊天记录
     const userMessage = {
       role: 'user' as const,
-      content: messageText,
+      content: messageText || '请编辑这张图片', // 如果没有输入文本，默认添加编辑图片的提示
       time: currentTime,
       hasImage: hasImage,
       image: previewImage.value
@@ -383,14 +386,25 @@
 
     try {
       // 判断是否是图片编辑请求（带图片的普通消息）
+      console.log('hasImage:', hasImage);
+      console.log('isImageGeneration:', isImageGeneration);
       if (hasImage && !isImageGeneration) {
         processingStatus.value = '正在编辑图片...'
+        console.log('调用到这边了');
         
         try {
           // 调用图片编辑API
           const imageUrl = await handleImageWithKontextPro(messageText || '请编辑这张图片', previewImage.value)
           
-          // 编辑成功后，添加带图片的助手消息
+          // Image对象预加载图片
+          const img = new Image();
+          // Promise等待图片加载完成
+          await new Promise((resolve, reject) => {
+            img.onload = () => resolve(true);
+            img.onerror = () => reject(new Error('图片加载失败'));
+            img.src = imageUrl;
+          });
+          // 图片加载成功后，添加带图片的消息
           const assistantMessage = {
             role: 'assistant' as const,
             content: '已为您编辑图片，点击LoadImage节点可以直接应用。',
@@ -411,13 +425,6 @@
           
           return
         } catch (error: any) {
-          console.error('图片编辑失败:', error)
-          
-          useToaster({
-            type: 'error',
-            message: '图片编辑失败: ' + (error.message || '未知错误')
-          })
-          // 更新状态
           isLoading.value = false
           isGenerating.value = false
           processingStatus.value = ''
@@ -451,6 +458,15 @@
             })
           }
         })
+
+        // 预加载生成的图片
+        const img = new Image();
+        // 使用Promise等待图片加载完成
+        await new Promise((resolve, reject) => {
+          img.onload = () => resolve(true);
+          img.onerror = () => reject(new Error('图片加载失败'));
+          img.src = imageUrl;
+        });
 
         // 生成成功后，添加带图片的助手消息
         const assistantMessage = {
@@ -599,14 +615,11 @@
         }
       )
     } catch (error) {
-      console.error('请求过程出错:', error)
-
-      const errorMsgTime = getCurrentTime()
-
+     const errorMsgTime = getCurrentTime()
       // 添加错误消息
       chatMessages.value.push({
         role: 'assistant',
-        content: t('sidebar.assistant.errorMessage'),
+        content: String(error),
         time: errorMsgTime
       })
 
@@ -732,8 +745,6 @@
       console.error('没有图片URL')
       return
     }
-
-    try {
       // 获取图片的base64数据
       let base64Data = imageUrl
 
@@ -782,13 +793,7 @@
           message: '系统功能未就绪，无法应用图片到节点'
         })
       }
-    } catch (error) {
-      console.error('应用图片到节点失败:', error)
-      useToaster({
-        type: 'error',
-        message: '应用图片到节点失败'
-      })
-    }
+
   }
 
   // enter发送，shift+enter换行
@@ -800,6 +805,57 @@
     e.preventDefault()
     sendMessage()
   }
+
+  // 选择现有图片
+  const selectExistingImage = (imageUrl: string) => {
+    if (!imageUrl) return;
+    previewImage.value = imageUrl;
+    // 如果图片URL以data:开头，则为base64格式
+    if (previewImage.value.includes('data:')) {
+      try {
+        // 提取base64部分
+        const base64Part = previewImage.value.split('base64,')[1];
+        if (base64Part) {
+          uploadedImageBase64.value = base64Part;
+          console.log('已设置base64数据，长度:', uploadedImageBase64.value.length);
+        } else {
+          console.error('无法从图片URL提取base64数据');
+        }
+      } catch (error) {
+        console.error('解析base64数据出错:', error);
+      }
+    } else if (imageUrl.startsWith('http')) {
+      // 否则尝试将图片转换为base64
+      console.log('正在获取远程图片:', imageUrl.substring(0, 50) + '...');
+      fetch(imageUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`无法获取图片: ${response.status} ${response.statusText}`);
+          }
+          return response.blob();
+        })
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+              previewImage.value = reader.result;
+              const base64data = reader.result.split('base64,')[1];
+              if (base64data) {
+                uploadedImageBase64.value = base64data;
+                console.log('已转换远程图片为base64，长度:', uploadedImageBase64.value.length);
+              }
+            }
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(error => console.error('获取图片出错:', error));
+    }
+    
+    // 聚焦到输入框
+    setTimeout(() => {
+      textareaRef.value?.focus();
+    }, 0);
+  };
 
   onMounted(() => {
     // 从本地存储加载宽度设置
@@ -1400,5 +1456,35 @@
   .flux-kontext-container {
     height: calc(100% - 50px);
     overflow-y: auto;
+  }
+
+  /* 可点击图片样式 */
+  .clickable-image {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .clickable-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .clickable-image::after {
+    content: '点击复用此图片';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .clickable-image:hover::after {
+    opacity: 1;
   }
 </style>
