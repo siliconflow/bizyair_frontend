@@ -55,6 +55,7 @@ export const defaultApiOptions: ChatApiOptions = {
 
 // 服务器API路径
 const SERVER_MODEL_API_URL = '/bizyair/model/chat'
+
 // context_API_KEY
 export const API_KEY = 'sk-bZ9JbKE7NKFql9y2ZVI7tezgezJOY1eAx6q1k0fovPUlkawK'
 /**
@@ -70,7 +71,7 @@ export function buildChatRequestBody(
   const mergedOptions = { ...defaultApiOptions, ...options }
   return {
     model: mergedOptions.model,
-    stream: true,
+    // 不默认设置stream，让调用者自己决定是否流式
     max_tokens: mergedOptions.max_tokens,
     temperature: mergedOptions.temperature,
     top_p: mergedOptions.top_p,
@@ -244,6 +245,9 @@ export async function sendStreamChatRequest(
   }
 
   const requestBody = buildChatRequestBody(messagesArray, options)
+  
+  // 确保总是设置stream=true，因为这个函数是专门用于流式请求的
+  requestBody.stream = true
 
   // 创建AbortController用于中止请求
   const abortController = new AbortController()
@@ -435,10 +439,7 @@ export async function generateImage(options: {
  */
 export async function handleImageWithKontextPro(prompt: string, imageBase64: string): Promise<string> {
   console.log('进入handleImageWithKontextPro函数');
-  const API_KEY = "sk-bZ9JbKE7NKFql9y2ZVI7tezgezJOY1eAx6q1k0fovPUlkawK";
-  const API_HOST = "www.dmxapi.cn";
-  const API_ENDPOINT = "/v1/images/edits";
-
+  
   try {
     // 验证imageBase64是否有效
     if (!imageBase64 || typeof imageBase64 !== 'string') {
@@ -446,65 +447,57 @@ export async function handleImageWithKontextPro(prompt: string, imageBase64: str
       throw new Error('图片数据无效');
     }
     
-    // 创建FormData
-    const formData = new FormData();
-    formData.append('prompt', prompt);
-    formData.append('model', 'flux-kontext-pro');
-    formData.append('n', '1');
-    formData.append('size', '1024x1024');
+    // 确保imageBase64有正确的前缀
+    const imageUrl = imageBase64.startsWith('data:')
+      ? imageBase64
+      : `data:image/png;base64,${imageBase64}`
     
-    let base64Data;
-    // 从base64字符串中提取实际的图片数据
-    if (imageBase64.includes('base64,')) {
-      base64Data = imageBase64.split('base64,')[1];
-    } else {
-      base64Data = imageBase64;
-      console.warn('图片数据不包含base64前缀');
+    // 只包含context模型必要的字段
+    const requestBody = {
+      model: 'flux-kontext-pro',
+      prompt: prompt || '请编辑这张图片',
+      image_url: imageUrl,
+      stream: false  // 显式设置为非流式请求
+    };
+    
+    console.log('发送图像编辑请求到内部API(使用统一接口，非流式请求)');
+    
+    const response = await fetch(SERVER_MODEL_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API请求失败:', response.status, errorText);
+      throw new Error(`图像编辑API请求失败: ${response.status} ${response.statusText}`);
     }
     
-    try {
-      const binaryData = atob(base64Data);
-      const bytes = new Uint8Array(binaryData.length);
-      for (let i = 0; i < binaryData.length; i++) {
-        bytes[i] = binaryData.charCodeAt(i);
-      }
+    const responseData = await response.json();
+    console.log('API响应数据:', responseData);
+    
+    // 处理包含在data字段中的实际响应
+    if (responseData.code === 20000 && responseData.data) {
+      const data = responseData.data;
+      console.log('从data中提取的数据:', data);
       
-      // 创建File对象
-      const imageFile = new File([bytes], 'image.png', { type: 'image/png' });
-      formData.append('image', imageFile);
-      
-      console.log('FormData已准备，开始发送请求');
-
-      const response = await fetch(`https://${API_HOST}${API_ENDPOINT}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'User-Agent': 'DMXAPI/1.0.0 (https://www.dmxapi.cn)',
-        },
-        body: formData
-      });
-
-      console.log('API响应状态:', response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('API请求失败:', errorData);
-        throw new Error(errorData.error?.message || `API请求失败: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      console.log('API响应数据:', data);
-      
-      if (!data.data?.[0]?.url) {
+      // 从响应中提取图片URL
+      if (data.data?.[0]?.url) {
+        console.log('成功获取图片URL:', data.data[0].url);
+        return data.data[0].url;
+      } else if (data.images?.[0]?.url) {
+        console.log('成功获取图片URL:', data.images[0].url);
+        return data.images[0].url;
+      } else {
         console.error('API返回数据格式错误:', data);
-        throw new Error('API返回数据格式错误');
+        throw new Error('API返回数据格式错误，未找到图片URL');
       }
-
-      console.log('成功获取图片URL:', data.data[0].url);
-      return data.data[0].url;
-    } catch (error: any) {
-      console.error('处理图片数据失败:', error);
-      throw new Error('处理图片数据失败: ' + (error.message || '未知错误'));
+    } else {
+      console.error('API响应格式不符合预期:', responseData);
+      throw new Error(`API响应错误: ${responseData.message || '未知错误'}`);
     }
   } catch (error: any) {
     console.error('图片编辑处理失败:', error);
