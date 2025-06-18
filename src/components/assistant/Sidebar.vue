@@ -325,6 +325,9 @@
 
   // 清空对话历史
   const clearHistory = () => {
+    if (isGenerating.value) {
+      abortGeneration()
+    }
     // 创建一个新的欢迎消息
     const welcomeMessage = {
       role: 'assistant' as const,
@@ -332,10 +335,12 @@
       time: getCurrentTime()
     }
 
-    // 更新UI显示
-    chatMessages.value = [welcomeMessage]
-    console.log('历史记录已清空，并添加了欢迎消息')
-    generateNewPromptId()
+    // 延迟更新UI显示，确保所有正在进行的操作已停止
+    setTimeout(() => {
+      chatMessages.value = [welcomeMessage]
+      console.log('历史记录已清空，并添加了欢迎消息')
+      generateNewPromptId()
+    }, 10)
   }
 
   // 中止生成
