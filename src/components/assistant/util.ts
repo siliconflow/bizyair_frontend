@@ -336,12 +336,22 @@ export function formatOutputText(text: string): string {
   console.log('格式化前的原始文本:', text)
 
   // 替换井号标记（如 "###"，"####"等）
-  text = text.replace(/^(#{1,6})\s*(.+)$/gm, (hashes, content) => {
+  text = text.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
     // 根据井号数量决定标题级别或者样式
     const level = Math.min(hashes.length, 6)
     // 对于标题内容，应用颜色样式而不是使用h标签
     return `<div class="markdown-heading level-${level}">${content}</div>`
   })
+
+  // 防止连续的#标签被错误解析（如#标签1#标签2），先将非标题格式的#标签替换为安全标记
+  text = text.replace(/#(\S+?)(?=#|\s|$)/g, (match, tagContent) => {
+    // 检查标签内容是否包含HTML标签起始符号但没有闭合符号
+    if (tagContent.includes('<') && !tagContent.includes('>')) {
+      // 遇到不完整的HTML标签，返回原始文本
+      return match;
+    }
+    return `<span class="tag">#${tagContent}</span>`;
+  });
 
   // 替换加粗文本
   text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -368,6 +378,23 @@ export function formatOutputTextLight(text: string): string {
 
   // 基本的Markdown格式转换
   let formatted = text
+
+  // 处理标题格式 (# 标题)
+  formatted = formatted.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
+    const level = Math.min(hashes.length, 6)
+    return `<div class="markdown-heading level-${level}">${content}</div>`
+  })
+
+  // 处理中文标签格式 (#标签)
+  // 在流式输出时使用更安全的方式处理标签，避免HTML标签未闭合问题
+  formatted = formatted.replace(/#(\S+?)(?=#|\s|$)/g, (match, tagContent) => {
+    // 检查标签内容是否包含HTML标签起始符号但没有闭合符号
+    if (tagContent.includes('<') && !tagContent.includes('>')) {
+      // 在流式输出中遇到不完整的HTML标签，返回原始文本，等待完整内容
+      return match;
+    }
+    return `<span class="tag">#${tagContent}</span>`;
+  });
 
   // 替换加粗文本
   formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
