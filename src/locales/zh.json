@@ -26,7 +26,7 @@
     "model": "模型",
     "workflow": "工作流",
     "docs": "文档",
-    "export": "导出"
+    "export": "AI应用"
   },
   "common": {
     "language": "语言",
@@ -650,7 +650,7 @@
     "uploadTimedOut": "上传超时，请检查网络连接"
   },
   "export": {
-    "title": "导出",
+    "title": "发布AI应用",
     "selectedNodes": "选中节点",
     "noNodesSelected": "请点击节点以选择要导出的内容",
     "selectionHint": "提示：只有带有属性的节点可以被选择。选中的节点会显示橙色高亮。"

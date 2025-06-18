@@ -3,7 +3,7 @@
     <div class="export-sidebar-wrapper" v-if="exportStore.showExportDialog" :style="{ width: `${sidebarWidth}px` }">
       <div class="resize-handle" @mousedown="startResize"></div>
       <div class="sidebar-header">
-        <h2>{{ $t('export.title') || '导出' }}</h2>
+        <h2>{{ $t('export.title') || '导出AI应用' }}</h2>
         <div class="header-actions">
           <button class="close-btn interactive-element" @click="closeExportDialog">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -65,7 +65,13 @@
                   class="widget-item"
                 >
                   <div class="widget-header">
-                    <span class="widget-name">{{ widget.name }}:</span>
+                    <span class="widget-name">
+                      <input 
+                        class="widget-name-input" 
+                        v-model="widget.name"
+                        @change="updateNodeWidget(node, widget)"
+                      >
+                    </span>
                     <button 
                       class="delete-widget-btn interactive-element" 
                       @click="removeWidget(node, widgetIndex)"
@@ -159,15 +165,17 @@ const hasOptionsValues = (widget: any): boolean => {
 // 导出
 const handleExport = () => {
   if (selectedNodes.value.length === 0) return;
+  console.log('selectedNodes.value', selectedNodes.value);
   
-  // 格式化导出数据
-  const exportData = formatExportData(selectedNodes.value);
+  // // 格式化导出数据
+  // const exportData = formatExportData(selectedNodes.value);
+  // console.log('exportData', exportData);
   
-  // 转换为JSON Schema格式
-  const jsonSchema = convertToJsonSchema(exportData);
+  // // 转换为JSON Schema格式
+  // const jsonSchema = convertToJsonSchema(exportData);
   
-  // 打印导出数据
-  console.log('导出数据:', JSON.stringify(jsonSchema, null, 2));
+  // // 打印导出数据
+  // console.log('导出数据:', JSON.stringify(jsonSchema, null, 2));
 }
 
 // 格式化导出数据为指定格式
@@ -635,6 +643,27 @@ const updateNodeWidget = (node: any, widget: any) => {
 .widget-name {
   font-weight: bold;
   color: #ccc;
+}
+
+.widget-name-input {
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: #ccc;
+  font-weight: bold;
+  padding: 2px 4px;
+  width: calc(100% - 20px);
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+.widget-name-input:hover {
+  border-color: #555;
+}
+
+.widget-name-input:focus {
+  outline: none;
+  background-color: #444;
+  border-color: #7C3AED;
 }
 
 .delete-widget-btn {
