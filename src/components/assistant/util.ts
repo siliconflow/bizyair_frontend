@@ -464,7 +464,7 @@ export async function generateImage(options: {
  * @param imageBase64 图片base64数据
  * @returns Promise<string> 返回生成的图片URL
  */
-export async function handleImageWithKontextPro(prompt: string, imageBase64: string): Promise<string> {
+export async function handleImageWithKontextPro(prompt: string, imageBase64: string) {
   console.log('进入handleImageWithKontextPro函数');
   
   try {
@@ -474,34 +474,37 @@ export async function handleImageWithKontextPro(prompt: string, imageBase64: str
       throw new Error('图片数据无效');
     }
     
-    // 确保imageBase64有正确的前缀
-    const imageUrl = imageBase64.startsWith('data:')
-      ? imageBase64
-      : `data:image/png;base64,${imageBase64}`
+    // 确保图片数据包含正确的前缀
+    let imageData = imageBase64;
+    if (!imageBase64.startsWith('data:')) {
+      // 如果没有前缀，添加webp前缀
+      imageData = `data:image/webp;base64,${imageBase64}`;
+    }
     
-    // 只包含context模型必要的字段
+    // 使用新的专用图像编辑API端点
     const requestBody = {
       model: 'flux-kontext-pro',
       prompt: prompt || '请编辑这张图片',
-      image_url: imageUrl,
-      stream: false  // 显式设置为非流式请求
+      image: imageData,
+      stream: false
     };
     
-    console.log('发送图像编辑请求到内部API(使用统一接口，非流式请求)');
+    console.log('发送图像编辑请求到新的图像编辑API端点');
     
-    const response = await fetch(SERVER_MODEL_API_URL, {
+    const response = await fetch('/bizyair/model/image-edit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(requestBody)
     });
+    console.log(response,'请求结果');
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API请求失败:', response.status, errorText);
-      throw new Error(`图像编辑API请求失败: ${response.status} ${response.statusText}`);
-    }
+    // if (!response.ok) {
+    //   const errorText = await response.text();
+    //   console.error('API请求失败:', response.status, errorText);
+    //   throw new Error(`图像编辑API请求失败: ${response.status} ${response.statusText}`);
+    // }
     
     const responseData = await response.json();
     console.log('API响应数据:', responseData);
@@ -511,17 +514,22 @@ export async function handleImageWithKontextPro(prompt: string, imageBase64: str
       const data = responseData.data;
       console.log('从data中提取的数据:', data);
       
-      // 从响应中提取图片URL
-      if (data.data?.[0]?.url) {
-        console.log('成功获取图片URL:', data.data[0].url);
-        return data.data[0].url;
-      } else if (data.images?.[0]?.url) {
-        console.log('成功获取图片URL:', data.images[0].url);
-        return data.images[0].url;
-      } else {
-        console.error('API返回数据格式错误:', data);
-        throw new Error('API返回数据格式错误，未找到图片URL');
+      // 处理result字段是字符串的情况
+      if (data.result && typeof data.result === 'string') {
+        try {
+          const resultJson = JSON.parse(data.result);
+          console.log('解析result字段:', resultJson);
+          
+          if (resultJson.data && resultJson.data.length > 0) {
+            const imageUrl = resultJson.data[0].url;
+            console.log('成功获取图片URL:', imageUrl);
+            return imageUrl;
+          }
+        } catch (error) {
+          console.error('解析result字段失败:', error);
+        }
       }
+ 
     } else {
       console.error('API响应格式不符合预期:', responseData);
       throw new Error(`API响应错误: ${responseData.message || '未知错误'}`);
