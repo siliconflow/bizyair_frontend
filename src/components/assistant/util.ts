@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie'
 // API请求选项接口
 export interface ChatApiOptions {
   model: string
@@ -254,7 +255,9 @@ export async function sendStreamChatRequest(
     const response = await fetch(SERVER_MODEL_API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('bizy_token') || '',
+        ...(options as any)?.headers
       },
       body: JSON.stringify(requestBody),
       signal: abortController.signal // 添加中止信号
