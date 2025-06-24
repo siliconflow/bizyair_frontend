@@ -397,7 +397,9 @@ export async function generateImage(options: {
     const response = await fetch('/bizyair/model/images', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('bizy_token') || '',
+        ...(options as any)?.headers
       },
       body: JSON.stringify({
         prompt: prompt,
