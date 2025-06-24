@@ -173,7 +173,7 @@
             class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a]"
             :class="{ 'opacity-0': props.imageLoaded }"
           ></div>
-          
+
           <!-- 视频显示（悬停时） -->
           <video
             v-if="isVideo && isHovering && currentMediaSrc"
@@ -190,13 +190,15 @@
             @loadeddata="handleImageLoad"
             @error="handleImageError"
           />
-          
+
           <img
             v-else-if="currentMediaSrc"
             :src="currentMediaSrc"
             :alt="model.versions?.[0]?.version || model.name"
             :crossorigin="
-              typeof currentMediaSrc === 'string' && currentMediaSrc.startsWith('blob:') ? 'anonymous' : undefined
+              typeof currentMediaSrc === 'string' && currentMediaSrc.startsWith('blob:')
+                ? 'anonymous'
+                : undefined
             "
             class="absolute inset-0 w-full h-full object-cover transition-all duration-300"
             :class="{
@@ -206,7 +208,7 @@
             @load="handleImageLoad"
             @error="handleImageError"
           />
-          
+
           <div v-if="!props.imageLoaded" class="absolute inset-0 flex items-center justify-center">
             <vDefaultPic />
           </div>

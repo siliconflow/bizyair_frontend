@@ -829,7 +829,10 @@
           class="flex flex-col gap-4 items-start justify-start relative min-w-[620px] w-[65%] overflow-hidden"
         >
           <div class="w-full">
-            <div v-if="currentVersion?.cover_urls && currentVersion?.cover_urls.length > 0" class="space-y-4">
+            <div
+              v-if="currentVersion?.cover_urls && currentVersion?.cover_urls.length > 0"
+              class="space-y-4"
+            >
               <div v-for="(cover, index) in currentVersion?.cover_urls" :key="index" class="w-full">
                 <!-- 视频显示 -->
                 <video

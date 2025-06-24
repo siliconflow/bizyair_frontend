@@ -46,20 +46,20 @@
     if (files) {
       const file = files[0]
       currentFile.value = file
-      
+
       // 创建预览URL
       mediaSrc.value = URL.createObjectURL(file)
       emit('update:modelValue', mediaSrc.value)
-      
+
       try {
         let processedFile = file
-        
+
         // 如果是图片且不是gif，才进行webp压缩
         if (file.type.startsWith('image/') && file.type !== 'image/gif') {
           const { file: webpFile } = await formatToWebp(file)
           processedFile = webpFile
         }
-        
+
         // 上传到OSS
         const { url } = await imageToOss(processedFile)
         mediaSrc.value = url
@@ -72,7 +72,7 @@
       }
     }
   }
-  
+
   const clearVal = () => {
     mediaSrc.value = ''
     currentFile.value = null
@@ -80,7 +80,7 @@
       fileInput.value.value = ''
     }
   }
-  
+
   onMounted(() => {
     let previewPrc = props.previewPrc as string
     if (previewPrc.includes('.mp4')) {
@@ -108,7 +108,7 @@
         @change="handleFileChange"
         accept="image/*,video/*"
       />
-      
+
       <!-- 视频预览 -->
       <video
         v-if="isVideo && mediaSrc"
@@ -117,14 +117,14 @@
         muted
         controls
       />
-      
+
       <!-- 图片预览 -->
       <vImage
         v-else-if="isImage && mediaSrc"
         :src="mediaSrc"
         class="block object-cover w-full h-full rounded-lg absolute left-0 top-0 z-10"
       />
-      
+
       <!-- 占位符 -->
       <div v-if="!mediaSrc">
         <div
@@ -134,7 +134,7 @@
           class="w-1 h-[64%] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-400 rounded-md"
         ></div>
       </div>
-      
+
       <Trash2
         class="absolute right-2 top-2 z-30 cursor-pointer text-white bg-black/50 rounded p-1"
         v-if="mediaSrc"
