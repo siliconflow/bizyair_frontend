@@ -46,6 +46,15 @@
   const isLoading = ref(false)
   const activeTab = ref<number>()
   const showAllTags = ref(false)
+  
+  // 添加视频检测函数
+  const isVideoUrl = (url: string) => {
+    if (!url) return false
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv']
+    const lowercaseUrl = url.toLowerCase()
+    return videoExtensions.some(ext => lowercaseUrl.includes(ext))
+  }
+
   const fetchModelDetail = async () => {
     try {
       const res = await model_detail({
@@ -688,15 +697,27 @@
           class="flex flex-col gap-4 items-start justify-start relative min-w-[620px] w-[65%] overflow-hidden"
         >
           <div class="w-full">
-            <NImageGroup v-if="currentVersion?.cover_urls && currentVersion?.cover_urls.length > 0">
-              <NImage
-                v-for="(cover, index) in currentVersion?.cover_urls"
-                :key="index"
-                :src="cover"
-                :preview-src="cover"
-                height="512px"
-              />
-            </NImageGroup>
+            <div v-if="currentVersion?.cover_urls && currentVersion?.cover_urls.length > 0" class="space-y-4">
+              <div v-for="(cover, index) in currentVersion?.cover_urls" :key="index" class="w-full">
+                <!-- 视频显示 -->
+                <video
+                  v-if="isVideoUrl(cover)"
+                  :src="cover"
+                  controls
+                  class="w-full h-auto max-h-[512px] object-contain rounded-lg"
+                  preload="metadata"
+                />
+                <!-- 图片显示 -->
+                <NImageGroup v-else>
+                  <NImage
+                    :src="cover"
+                    :preview-src="cover"
+                    height="512px"
+                    class="w-full object-contain"
+                  />
+                </NImageGroup>
+              </div>
+            </div>
             <MdPreview
               v-if="currentVersion?.intro"
               id="previewRef"
@@ -813,7 +834,7 @@
               >
                 {{ t('community.detail.baseModel') }}
               </div>
-              <div className="flex-1 p-4 border-b  border-[rgba(78,78,78,0.50)]">
+              <div className="flex-1 p-4 border-b  border-b-[rgba(78,78,78,0.50)]">
                 {{ currentVersion?.base_model }}
               </div>
             </div>

@@ -350,7 +350,7 @@
     "modalTitle": "Tips",
     "uploadButton": "Upload",
     "cancelButton": "Cancel",
-    "uploadImage": "Upload Image",
+    "uploadImage": "Upload Image or Video",
     "loading": "Loading",
     "foundUnfinishedUpload": "Found unfinished upload, resuming...",
     "noResumeData": "No resumable upload data found",

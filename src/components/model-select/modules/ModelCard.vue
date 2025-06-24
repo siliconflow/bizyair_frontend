@@ -6,7 +6,7 @@
 
   import { sliceString, formatNumber } from '@/utils/tool'
   import { useModelSelectStore } from '@/stores/modelSelectStore'
-  import { ref, watch, onMounted } from 'vue'
+  import { ref, watch, onMounted, computed } from 'vue'
   import { useDictStore } from '@/stores/dictStore'
 
   const { t } = useI18n()
@@ -18,13 +18,13 @@
   const modelSelectStore = useModelSelectStore()
   const imgSrc = ref('')
   const tagsStore = useDictStore()
+  const isHovering = ref(false)
 
   const props = defineProps({
     model: {
       type: Object as () => Model | null,
       default: null
     },
-
     loading: {
       type: Boolean,
       default: false
@@ -36,6 +36,48 @@
   })
 
   const emit = defineEmits(['action', 'image-load', 'image-error'])
+
+  // 添加计算属性判断是否为视频
+  const isVideo = computed(() => {
+    if (!imgSrc.value) return false
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv']
+    const url = imgSrc.value.toLowerCase()
+    return videoExtensions.some(ext => url.includes(ext))
+  })
+
+  // 生成视频缩略图URL
+  const getVideoThumbnail = (videoUrl: string) => {
+    // 如果URL已经包含OSS处理参数，直接返回
+    if (videoUrl.includes('x-oss-process=video/snapshot')) {
+      return videoUrl
+    }
+    // 添加OSS视频截图处理参数
+    const separator = videoUrl.includes('?') ? '&' : '?'
+    return `${videoUrl}${separator}x-oss-process=video/snapshot,t_000,f_jpg,w_300,h_600`
+  }
+
+  // 当前显示的媒体源
+  const currentMediaSrc = computed(() => {
+    if (!imgSrc.value) return ''
+    if (isVideo.value) {
+      // 如果是视频且鼠标悬停，返回视频URL，否则返回缩略图
+      return isHovering.value ? imgSrc.value : getVideoThumbnail(imgSrc.value)
+    }
+    return imgSrc.value
+  })
+
+  // 鼠标悬停处理
+  const handleMouseEnter = () => {
+    if (isVideo.value) {
+      isHovering.value = true
+    }
+  }
+
+  const handleMouseLeave = () => {
+    if (isVideo.value) {
+      isHovering.value = false
+    }
+  }
 
   const handleImageLoad = (e: Event) => {
     emit('image-load', e)
@@ -114,17 +156,38 @@
         <div
           class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
           @click.prevent="handleDetail(Number(model?.id), Number(model?.versions?.[0]?.id))"
+          @mouseenter="handleMouseEnter"
+          @mouseleave="handleMouseLeave"
         >
           <div
             class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a]"
             :class="{ 'opacity-0': props.imageLoaded }"
           ></div>
+          
+          <!-- 视频显示（悬停时） -->
+          <video
+            v-if="isVideo && isHovering && currentMediaSrc"
+            :src="currentMediaSrc"
+            class="absolute inset-0 w-full h-full object-cover transition-all duration-300"
+            :class="{
+              'opacity-0': !props.imageLoaded,
+              'opacity-100 group-hover:scale-105': props.imageLoaded
+            }"
+            muted
+            autoplay
+            loop
+            preload="metadata"
+            @loadeddata="handleImageLoad"
+            @error="handleImageError"
+          />
+          
+          <!-- 图片显示（包括视频缩略图） -->
           <img
-            v-if="imgSrc"
-            :src="imgSrc"
+            v-else-if="currentMediaSrc"
+            :src="currentMediaSrc"
             :alt="model.versions?.[0]?.version || model.name"
             :crossorigin="
-              typeof imgSrc === 'string' && imgSrc.startsWith('blob:') ? 'anonymous' : undefined
+              typeof currentMediaSrc === 'string' && currentMediaSrc.startsWith('blob:') ? 'anonymous' : undefined
             "
             class="absolute inset-0 w-full h-full object-cover transition-all duration-300"
             :class="{
@@ -134,6 +197,7 @@
             @load="handleImageLoad"
             @error="handleImageError"
           />
+          
           <div v-if="!props.imageLoaded" class="absolute inset-0 flex items-center justify-center">
             <vDefaultPic />
           </div>
