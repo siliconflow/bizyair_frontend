@@ -1,3 +1,5 @@
+import Cookies from 'js-cookie'
+
 // API请求选项接口
 export interface ChatApiOptions {
   model: string
@@ -259,7 +261,9 @@ export async function sendStreamChatRequest(
     const response = await fetch(SERVER_MODEL_API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('bizy_token') || '',
+        ...(options as any)?.headers
       },
       body: JSON.stringify(requestBody),
       signal: abortController.signal // 添加中止信号
@@ -336,7 +340,7 @@ export function formatOutputText(text: string): string {
   console.log('格式化前的原始文本:', text)
 
   // 替换井号标记（如 "###"，"####"等）
-  text = text.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
+  text = text.replace(/^(#{1,6})\s+(.+)$/gm, ( hashes, content) => {
     // 根据井号数量决定标题级别或者样式
     const level = Math.min(hashes.length, 6)
     // 对于标题内容，应用颜色样式而不是使用h标签
@@ -380,7 +384,7 @@ export function formatOutputTextLight(text: string): string {
   let formatted = text
 
   // 处理标题格式 (# 标题)
-  formatted = formatted.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
+  formatted = formatted.replace(/^(#{1,6})\s+(.+)$/gm, ( hashes, content) => {
     const level = Math.min(hashes.length, 6)
     return `<div class="markdown-heading level-${level}">${content}</div>`
   })
