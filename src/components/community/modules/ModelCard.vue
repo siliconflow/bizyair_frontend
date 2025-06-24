@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { Model } from '@/types/model'
+  // import { Model } from '@/types/model'
   import vDefaultPic from '@/components/modules/vDefaultPic.vue'
   import vTooltips from '@/components/modules/v-tooltip.vue'
   import { sliceString, formatNumber } from '@/utils/tool'
@@ -18,24 +18,16 @@
   const showDialog = ref(false)
   const imgSrc = ref('')
   const tagsStore = useDictStore()
-  const props = defineProps({
-    model: {
-      type: Object as () => Model | null,
-      default: null
-    },
-    loading: {
-      type: Boolean,
-      default: false
-    },
-    imageLoaded: {
-      type: Boolean,
-      default: false
-    }
-  })
+  const props = defineProps<{
+    model?: any
+    imageLoaded?: boolean
+    loading?: boolean
+  }>()
 
   const emit = defineEmits(['action', 'image-load', 'image-error'])
 
-  // 计算工作流或节点的提示文本
+  const isHovering = ref(false)
+
   const actionTooltipText = computed(() => {
     return props.model?.type === 'Workflow'
       ? t('community.modelCard.tooltips.loadWorkflow')
@@ -94,6 +86,41 @@
       imgSrc.value = url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`
     }
   })
+
+  const isVideo = computed(() => {
+    if (!imgSrc.value) return false
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv']
+    const url = imgSrc.value.toLowerCase()
+    return videoExtensions.some(ext => url.includes(ext))
+  })
+
+  const getVideoThumbnail = (videoUrl: string) => {
+    if (videoUrl.includes('x-oss-process=video/snapshot')) {
+      return videoUrl
+    }
+    const separator = videoUrl.includes('?') ? '&' : '?'
+    return `${videoUrl}${separator}x-oss-process=video/snapshot,t_0000,f_jpg,w_300,h_600`
+  }
+
+  const currentMediaSrc = computed(() => {
+    if (!imgSrc.value) return ''
+    if (isVideo.value) {
+      return isHovering.value ? imgSrc.value : getVideoThumbnail(imgSrc.value)
+    }
+    return imgSrc.value
+  })
+
+  const handleMouseEnter = () => {
+    if (isVideo.value) {
+      isHovering.value = true
+    }
+  }
+
+  const handleMouseLeave = () => {
+    if (isVideo.value) {
+      isHovering.value = false
+    }
+  }
 </script>
 
 <template>
@@ -139,17 +166,39 @@
         <div
           class="relative aspect-[2/3] md:aspect-[3/4] lg:aspect-[2/3] overflow-hidden"
           @click.prevent="handleDetail(Number(model?.id), Number(model?.versions?.[0]?.id))"
+          @mouseenter="handleMouseEnter"
+          @mouseleave="handleMouseLeave"
         >
           <div
             class="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a]"
             :class="{ 'opacity-0': props.imageLoaded }"
           ></div>
+
+          <!-- 视频显示（悬停时） -->
+          <video
+            v-if="isVideo && isHovering && currentMediaSrc"
+            :src="currentMediaSrc"
+            class="absolute inset-0 w-full h-full object-cover transition-all duration-300"
+            :class="{
+              'opacity-0': !props.imageLoaded,
+              'opacity-100 group-hover:scale-105': props.imageLoaded
+            }"
+            muted
+            autoplay
+            loop
+            preload="metadata"
+            @loadeddata="handleImageLoad"
+            @error="handleImageError"
+          />
+
           <img
-            v-if="imgSrc"
-            :src="imgSrc"
+            v-else-if="currentMediaSrc"
+            :src="currentMediaSrc"
             :alt="model.versions?.[0]?.version || model.name"
             :crossorigin="
-              typeof imgSrc === 'string' && imgSrc.startsWith('blob:') ? 'anonymous' : undefined
+              typeof currentMediaSrc === 'string' && currentMediaSrc.startsWith('blob:')
+                ? 'anonymous'
+                : undefined
             "
             class="absolute inset-0 w-full h-full object-cover transition-all duration-300"
             :class="{
@@ -159,6 +208,7 @@
             @load="handleImageLoad"
             @error="handleImageError"
           />
+
           <div v-if="!props.imageLoaded" class="absolute inset-0 flex items-center justify-center">
             <vDefaultPic />
           </div>

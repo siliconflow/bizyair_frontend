@@ -350,7 +350,7 @@
     "modalTitle": "提示",
     "uploadButton": "上传",
     "cancelButton": "取消",
-    "uploadImage": "上传封面",
+    "uploadImage": "上传图片或视频",
     "loading": "加载中",
     "foundUnfinishedUpload": "发现未完成的上传任务，将从断点处继续",
     "noResumeData": "无法找到断点续传数据",
