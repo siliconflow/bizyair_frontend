@@ -262,7 +262,7 @@
 
   // 获取当前时间格式化字符串
   const getCurrentTime = () => {
-    const now = new Date() 
+    const now = new Date()
     const hours = now.getHours().toString().padStart(2, '0')
     const minutes = now.getMinutes().toString().padStart(2, '0')
     return `${hours}:${minutes}`
@@ -431,7 +431,9 @@
         const assistantMessage = {
           role: 'assistant' as const,
           // 服务端模式下只展示"已为您生成图片"
-          content: serverMode.value ? '已为您生成图片' : '已为您生成图片（点击LoadImage节点可以应用）',
+          content: serverMode.value
+            ? '已为您生成图片'
+            : '已为您生成图片（点击LoadImage节点可以应用）',
           time: getCurrentTime(),
           hasImage: true,
           image: imageUrl
@@ -575,9 +577,9 @@
         }
       )
     } catch (error) {
-      console.error('请求过程出错:', error)   
+      console.error('请求过程出错:', error)
 
-      const errorMsgTime = getCurrentTime() 
+      const errorMsgTime = getCurrentTime()
 
       // 添加错误消息
       chatMessages.value.push({
