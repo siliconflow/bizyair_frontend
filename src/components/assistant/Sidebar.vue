@@ -53,7 +53,8 @@
                     v-if="
                       message.role === 'assistant' &&
                       sidebarStore.nodeInfo &&
-                      canApplyToNode(sidebarStore.nodeInfo)
+                      canApplyToNode(sidebarStore.nodeInfo) &&
+                      !serverMode
                     "
                     class="image-actions"
                   >
@@ -261,7 +262,7 @@
 
   // 获取当前时间格式化字符串
   const getCurrentTime = () => {
-    const now = new Date()
+    const now = new Date() 
     const hours = now.getHours().toString().padStart(2, '0')
     const minutes = now.getMinutes().toString().padStart(2, '0')
     return `${hours}:${minutes}`
@@ -344,10 +345,13 @@
     }
   }
 
+  // 服务端模式
+  const serverMode = ref(false)
+
   // 生图功能
   const isGeneratingImage = ref(false)
 
-  const generateImageAction = () => {
+  const generateImageAction = async () => {
     if (isLoading.value) return
 
     // 在输入框中添加生成图片前缀
@@ -426,7 +430,8 @@
         // 生成成功后，添加带图片的助手消息
         const assistantMessage = {
           role: 'assistant' as const,
-          content: `已为您生成图片（点击LoadImage节点可以应用）`,
+          // 服务端模式下只展示"已为您生成图片"
+          content: serverMode.value ? '已为您生成图片' : '已为您生成图片（点击LoadImage节点可以应用）',
           time: getCurrentTime(),
           hasImage: true,
           image: imageUrl
@@ -570,9 +575,9 @@
         }
       )
     } catch (error) {
-      console.error('请求过程出错:', error)
+      console.error('请求过程出错:', error)   
 
-      const errorMsgTime = getCurrentTime()
+      const errorMsgTime = getCurrentTime() 
 
       // 添加错误消息
       chatMessages.value.push({
@@ -835,6 +840,17 @@
     }
 
     chatMessages.value = [welcomeMessage]
+
+    // 异步获取 server_mode
+    ;(async () => {
+      try {
+        const res = await fetch('/bizyair/server_mode')
+        const data = await res.json()
+        serverMode.value = !!data?.data?.server_mode
+      } catch (e) {
+        serverMode.value = false
+      }
+    })()
   })
 </script>
 
