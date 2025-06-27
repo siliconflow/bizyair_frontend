@@ -498,11 +498,14 @@ export async function handleImageWithKontextPro(prompt: string, imageBase64: str
     const response = await fetch('/bizyair/model/image-edit', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('bizy_token') || '', 
+        // ...(options as any)?.headers
+
       },
       body: JSON.stringify(requestBody)
     });
-    console.log(response,'请求结果');
+    console.log(response,'请求结果'); 
     
     // if (!response.ok) {
     //   const errorText = await response.text();
