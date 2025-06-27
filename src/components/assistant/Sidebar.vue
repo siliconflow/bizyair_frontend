@@ -53,7 +53,8 @@
                     v-if="
                       message.role === 'assistant' &&
                       sidebarStore.nodeInfo &&
-                      canApplyToNode(sidebarStore.nodeInfo)
+                      canApplyToNode(sidebarStore.nodeInfo) &&
+                      !serverMode
                     "
                     class="image-actions"
                   >
@@ -344,10 +345,13 @@
     }
   }
 
+  // 服务端模式
+  const serverMode = ref(false)
+
   // 生图功能
   const isGeneratingImage = ref(false)
 
-  const generateImageAction = () => {
+  const generateImageAction = async () => {
     if (isLoading.value) return
 
     // 在输入框中添加生成图片前缀
@@ -426,7 +430,10 @@
         // 生成成功后，添加带图片的助手消息
         const assistantMessage = {
           role: 'assistant' as const,
-          content: `已为您生成图片（点击LoadImage节点可以应用）`,
+          // 服务端模式下只展示"已为您生成图片"
+          content: serverMode.value
+            ? '已为您生成图片'
+            : '已为您生成图片（点击LoadImage节点可以应用）',
           time: getCurrentTime(),
           hasImage: true,
           image: imageUrl
@@ -835,6 +842,17 @@
     }
 
     chatMessages.value = [welcomeMessage]
+
+    // 异步获取 server_mode
+    ;(async () => {
+      try {
+        const res = await fetch('/bizyair/server_mode')
+        const data = await res.json()
+        serverMode.value = !!data?.data?.server_mode
+      } catch (e) {
+        serverMode.value = false
+      }
+    })()
   })
 </script>
 
