@@ -525,12 +525,13 @@ export async function handleImageWithKontextPro(prompt: string, imageBase64: str
       if (data.result && typeof data.result === 'string') {
         try {
           const resultJson = JSON.parse(data.result);
-          console.log('解析result字段:', resultJson);
-          
-          if (resultJson.data && resultJson.data.length > 0) {
-            const imageUrl = resultJson.data[0].url;
-            console.log('成功获取图片URL:', imageUrl);
-            return imageUrl;
+          if(resultJson.outputs){
+            const outputs = resultJson.outputs;      
+            const outputKeys = Object.keys(outputs);    
+            const firstKey = outputKeys[0];              
+            const outputArray = outputs[firstKey];   
+            const imageUrl = outputArray.outputs[0];
+              return imageUrl;                       
           }
         } catch (error) {
           console.error('解析result字段失败:', error);

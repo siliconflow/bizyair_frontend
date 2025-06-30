@@ -40,13 +40,13 @@
       "close": "Close",
       "nodeName": "Node Name",
       "nodeType": "Node Type",
-      "inputPlaceholder": "Type your message...",
+      "inputPlaceholder": "Enter a question or upload a picture...",
       "uploadImage": "Upload Image",
       "generateImage": "Generate Image",
       "removeImage": "Remove Image",
       "sendMessage": "Send Message",
       "abortGeneration": "Abort Generation",
-      "welcomeMessage": "Hello! I'm BizyBot. Click on images in nodes to upload them directly.",
+      "welcomeMessage": "Hello! I'm BizyBot. I can answer questions or edit pictures. I support local upload and click node upload (please use English prompt words to edit pictures).",
       "errorMessage": "Sorry, an error occurred. Please try again later.",
       "imageUploadError": "Please upload an image file"
     }
