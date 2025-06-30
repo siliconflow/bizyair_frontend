@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3 rounded-sm"
+    class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3 rounded-sm btn-community"
     @click="handleMenuClick"
   >
     <span class="mr-1 h-4 w-4">
