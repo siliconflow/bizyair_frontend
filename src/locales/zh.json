@@ -42,7 +42,7 @@
       "nodeType": "节点类型",
       "inputPlaceholder": "输入问题或上传图片...",
       "uploadImage": "上传图片",
-      "generateImage": "生成图片", 
+      "generateImage": "生成图片",
       "removeImage": "移除图片",
       "sendMessage": "发送消息",
       "abortGeneration": "中止生成",
