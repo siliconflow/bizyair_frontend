@@ -23,7 +23,6 @@
           </button>
         </div>
       </div>
-        <!-- 聊天标签页内容 -->
         <div class="chat-container" >
           <div class="chat-messages" ref="chatMessagesRef">
             <div
@@ -121,14 +120,7 @@
                   />
                 </svg>
               </button>
-              <!-- <button
-                class="upload-image-btn interactive-element"
-                @click="generateImageAction"
-                :disabled="isLoading"
-                :title="$t('sidebar.assistant.generateImage')"
-              >
-                生图
-              </button> -->
+
               <div class="textarea-container interactive-element">
                 <textarea
                   class="interactive-element"
@@ -195,7 +187,6 @@
   const { t } = useI18n()
   const sidebarStore = useSidebarStore()
 
-  // 拖拽调整大小---------------------------------------'
   // 侧边栏宽度相关变量
   const sidebarWidth = ref(550) // 默认宽度
   const minWidth = 50 // 最小宽度
@@ -336,7 +327,6 @@
       time: getCurrentTime()
     }
 
-    // 延迟更新UI显示，确保所有正在进行的操作已停止
     setTimeout(() => {
       chatMessages.value = [welcomeMessage]
       console.log('历史记录已清空，并添加了欢迎消息')
@@ -394,13 +384,8 @@
     }, 0)
 
     try {
-      // 判断是否是图片编辑请求（带图片的普通消息）
-      console.log('hasImage:', hasImage);
-      console.log('isImageGeneration:', isImageGeneration);
       if (hasImage && !isImageGeneration) {
-        processingStatus.value = '正在编辑图片...'
-        console.log('调用到这边了');
-        
+        processingStatus.value = '正在编辑图片...'      
         try {
           // 调用图片编辑API
           const imageUrl = await handleImageWithKontextPro(messageText || '请编辑这张图片', previewImage.value)
