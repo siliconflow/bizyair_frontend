@@ -73,7 +73,6 @@ export function buildChatRequestBody(
   const mergedOptions = { ...defaultApiOptions, ...options }
   return {
     model: mergedOptions.model,
-    // 不默认设置stream，让调用者自己决定是否流式
     max_tokens: mergedOptions.max_tokens,
     temperature: mergedOptions.temperature,
     top_p: mergedOptions.top_p,
@@ -261,9 +260,6 @@ export async function sendStreamChatRequest(
     const response = await fetch(SERVER_MODEL_API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: Cookies.get('bizy_token') || '',
-        ...(options as any)?.headers
         'Content-Type': 'application/json',
         Authorization: Cookies.get('bizy_token') || '',
         ...(options as any)?.headers
@@ -512,11 +508,6 @@ export async function handleImageWithKontextPro(prompt: string, imageBase64: str
     });
     console.log(response,'请求结果'); 
     
-    // if (!response.ok) {
-    //   const errorText = await response.text();
-    //   console.error('API请求失败:', response.status, errorText);
-    //   throw new Error(`图像编辑API请求失败: ${response.status} ${response.statusText}`);
-    // }
     
     const responseData = await response.json();
     console.log('API响应数据:', responseData);
