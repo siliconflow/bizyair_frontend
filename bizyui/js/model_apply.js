@@ -34,53 +34,39 @@ const NodeInfoLogger = (function() {
         return `${baseUrl}?filename=${filename}&subfolder=&type=${type}&rand=${Math.random()}`;
     };
 
-    // 获取图片并转换为base64
+    // 获取图片并转换为base64（根据 server_mode 判断逻辑）
     const getImageAsBase64 = async (filename, type) => {
         try {
             // 检查服务器模式
             const serverModeResponse = await fetch("/bizyair/server_mode");
             const serverModeData = await serverModeResponse.json();
             
-            let token = null;
-            if (serverModeData.data.server_mode) {
-                // 服务器模式，需要token
-                token = await new Promise((resolve) => {
-                    const checkToken = () => {
-                        const token = getCookie("bizy_token");
-                        if (token) {
-                            clearInterval(timer);
-                            resolve(token);
-                        }
-                    };
-                    
-                    const timer = setInterval(checkToken, 300);
-                    checkToken(); // 立即执行一次检查
-                });
-            }
-
-            const imageUrl = buildImageUrl(filename, type);
-            const headers = {};
-            if (token) {
-                headers["Authorization"] = `Bearer ${token}`;
+            // 非服务器模式下，如果 filename 已经是 base64 数据，直接返回
+            if (!serverModeData.data.server_mode && filename.startsWith('data:')) {
+                console.log('本地模式：filename 已经是 base64 数据，直接返回');
+                return filename;
             }
             
-            const response = await fetch(imageUrl, {
-                headers: headers
-            });
+            let imageUrl;
+            let headers = {};
+            
+            if (serverModeData.data.server_mode) {
+                // 服务器模式，改为请求后端转发接口
+                imageUrl = `/bizyair/proxy_view?filename=${encodeURIComponent(filename)}`;
+            } else {
+                // 本地模式，使用原有 buildImageUrl
+                imageUrl = buildImageUrl(filename, type);
+            }
+            
+            const response = await fetch(imageUrl, { headers });
             if (!response.ok) {
                 throw new Error(`获取图片失败: ${response.status} ${response.statusText}`);
             }
             const blob = await response.blob();
-            
-            // 将blob转为File对象
+            // 转 base64
             const file = new File([blob], filename, { type: blob.type });
-            
-            // 使用formatToWebp进行压缩
             const { base64: compressedBase64 } = await formatToWebp(file);
-            
             return compressedBase64;
-            
-     
         } catch (error) {
             console.error('获取图片并转换为base64失败:', error);
             return null;
@@ -121,17 +107,32 @@ const NodeInfoLogger = (function() {
         const blob = new Blob([byteArray], { type: mimeType || base64.split(':')[1].split(';')[0] })
         return new File([blob], filename, { type: blob.type })
       }
-    // 构建图片信息对象
-    const buildImageInfo = (imageData) => {
+    // 构建图片信息对象（根据 server_mode 判断逻辑）
+    const buildImageInfo = async (imageData) => {
         if (!imageData?.filename) return null;
-
-        // 根据节点类型确定图片类型
-        const type = imageData.type || 'temp'; 
+        // 检查服务器模式
+        const serverModeResponse = await fetch("/bizyair/server_mode");
+        const serverModeData = await serverModeResponse.json();
+        const type = imageData.type || 'temp';
         const path = `/${type}/${imageData.filename}`;
-
+        let url;
+        
+        if (serverModeData.data.server_mode) {
+            // 服务器模式，使用 view 接口
+            url = `/view?filename=${encodeURIComponent(imageData.filename)}`;
+        } else {
+            // 本地模式，如果 filename 是 base64 数据，直接使用
+            if (imageData.filename.startsWith('data:')) {
+                url = imageData.filename;
+            } else {
+                // 否则使用 buildImageUrl 构建 URL
+                url = buildImageUrl(imageData.filename, type);
+            }
+        }
+        
         return {
             filename: imageData.filename,
-            url: buildImageUrl(imageData.filename, type),
+            url: url,
             path: path,
             type: type
         };
@@ -252,7 +253,7 @@ const NodeInfoLogger = (function() {
                             // 使用异步IIFE处理图片，不阻塞主流程
                             (async () => {
                                 try {
-                                    const imageInfo = buildImageInfo(this.images[0]);
+                                    const imageInfo = await buildImageInfo(this.images[0]);
                                     
                                     // 检查是否存在全局bizyAirLib对象及logNodeInfo函数
                                     if (typeof bizyAirLib !== 'undefined' && typeof bizyAirLib.logNodeInfo === 'function') {

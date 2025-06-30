@@ -264,6 +264,9 @@ export async function sendStreamChatRequest(
         'Content-Type': 'application/json',
         Authorization: Cookies.get('bizy_token') || '',
         ...(options as any)?.headers
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('bizy_token') || '',
+        ...(options as any)?.headers
       },
       body: JSON.stringify(requestBody),
       signal: abortController.signal // 添加中止信号
@@ -430,7 +433,9 @@ export async function generateImage(options: {
     const response = await fetch('/bizyair/model/images', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('bizy_token') || '',
+        ...(options as any)?.headers
       },
       body: JSON.stringify({
         prompt: prompt,
