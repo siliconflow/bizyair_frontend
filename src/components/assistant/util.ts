@@ -122,7 +122,6 @@ export function createTextUserMessage(text: string): ChatMessage {
 export async function prepareMessagesWithHistory(
   currentMessage: ChatMessage
 ): Promise<ChatMessage[]> {
-  // 由于不再使用数据库，直接返回包含当前消息的数组
   return [currentMessage]
 }
 
@@ -232,7 +231,20 @@ export async function sendStreamChatRequest(
     messagesArray = messages
   }
 
-  const requestBody = buildChatRequestBody(messagesArray, options)
+  const filteredMessages = messagesArray.map(message => {
+    const filteredMessage = { ...message };
+    if (Array.isArray(filteredMessage.content)) {
+      const textContents = filteredMessage.content.filter(item => item.type === 'text');
+      if (textContents.length > 0 && textContents[0].text) {
+        filteredMessage.content = textContents[0].text;
+      } else {
+        filteredMessage.content = '';
+      }
+    }
+    
+    return filteredMessage;
+  });
+  const requestBody = buildChatRequestBody(filteredMessages, options)
 
   requestBody.stream = true
 
