@@ -359,7 +359,7 @@
     // 创建用户消息并添加到聊天记录
     const userMessage = {
       role: 'user' as const,
-      content: messageText || '', 
+      content: messageText || '',
       time: currentTime,
       hasImage: hasImage,
       image: previewImage.value
