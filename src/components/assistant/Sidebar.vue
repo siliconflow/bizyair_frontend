@@ -23,152 +23,143 @@
           </button>
         </div>
       </div>
-
-      <div class="sidebar-content">
-        <div class="chat-container">
-          <div class="chat-messages" ref="chatMessagesRef">
-            <div
-              v-for="(message, index) in chatMessages"
-              :key="index"
-              :class="['message', message.role === 'user' ? 'user-message' : 'ai-message']"
-            >
-              <div class="message-avatar">
-                <div class="avatar-icon">
-                  {{ message.role === 'user' ? '👤' : '🤖' }}
-                </div>
+      <div class="chat-container">
+        <div class="chat-messages" ref="chatMessagesRef">
+          <div
+            v-for="(message, index) in chatMessages"
+            :key="index"
+            :class="['message', message.role === 'user' ? 'user-message' : 'ai-message']"
+          >
+            <div class="message-avatar">
+              <div class="avatar-icon">
+                {{ message.role === 'user' ? '👤' : '🤖' }}
               </div>
-              <div class="message-content">
-                <div class="message-header">
-                  <span class="message-sender">{{
-                    message.role === 'user' ? 'You' : $t('sidebar.assistant.title')
-                  }}</span>
-                  <span class="message-time">{{ message.time }}</span>
-                </div>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <span class="message-sender">{{
+                  message.role === 'user' ? 'You' : $t('sidebar.assistant.title')
+                }}</span>
+                <span class="message-time">{{ message.time }}</span>
+              </div>
 
-                <!-- 图片消息 -->
-                <div v-if="message.hasImage" class="message-image">
-                  <img :src="message.image" alt="用户上传图片" />
-                  <!-- 生图消息，显示应用按钮 -->
-                  <div
-                    v-if="
-                      message.role === 'assistant' &&
-                      sidebarStore.nodeInfo &&
-                      canApplyToNode(sidebarStore.nodeInfo) &&
-                      !serverMode
-                    "
-                    class="image-actions"
+              <!-- 图片消息 -->
+              <div v-if="message.hasImage" class="message-image">
+                <img
+                  :src="message.image"
+                  alt="用户上传图片"
+                  @click="message.image && selectExistingImage(message.image)"
+                  class="clickable-image"
+                />
+                <div
+                  v-if="
+                    message.role === 'assistant' &&
+                    sidebarStore.nodeInfo &&
+                    canApplyToNode(sidebarStore.nodeInfo) &&
+                    !serverMode
+                  "
+                  class="image-actions"
+                >
+                  <button
+                    class="apply-to-node-btn"
+                    @click="applyImageToNode(message.image)"
+                    :title="getNodeActionTitle(sidebarStore.nodeInfo)"
                   >
-                    <button
-                      class="apply-to-node-btn"
-                      @click="applyImageToNode(message.image)"
-                      :title="getNodeActionTitle(sidebarStore.nodeInfo)"
-                    >
-                      {{ getNodeActionText(sidebarStore.nodeInfo) }}
-                    </button>
-                  </div>
+                    {{ getNodeActionText(sidebarStore.nodeInfo) }}
+                  </button>
                 </div>
-
-                <!-- 文本消息 -->
-                <div class="message-text" v-html="message.content"></div>
               </div>
+
+              <!-- 文本消息 -->
+              <div class="message-text" v-html="message.content"></div>
             </div>
-
-            <!-- 加载指示器 -->
-            <div v-if="isLoading" class="loading-indicator">
-              <div class="loading-text">{{ processingStatus }}</div>
-              <div class="loading-dots">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-              </div>
+          </div>
+          <div v-if="isLoading" class="loading-indicator">
+            <div class="loading-text">{{ processingStatus }}</div>
+            <div class="loading-dots">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+        </div>
+        <!-- 输入区域 -->
+        <div class="chat-input-area">
+          <div v-if="sidebarStore?.nodeInfo" style="display: flex; justify-content: space-around">
+            <div class="info-item">
+              <span class="label">{{ $t('sidebar.assistant.nodeName') }}:</span>
+              <span class="value">{{ sidebarStore.nodeInfo.title }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">{{ $t('sidebar.assistant.nodeType') }}:</span>
+              <span class="value">{{ sidebarStore.nodeInfo.type }}</span>
+            </div>
+          </div>
+          <div class="image-preview-area" v-if="previewImage">
+            <div class="preview-image-container">
+              <img :src="previewImage" alt="图片预览" class="preview-image-small" />
+              <button class="remove-image-btn" @click="removeImage">×</button>
             </div>
           </div>
 
-          <!-- 输入区域 -->
-          <div class="chat-input-area">
-            <div v-if="sidebarStore?.nodeInfo" style="display: flex; justify-content: space-around">
-              <div class="info-item">
-                <span class="label">{{ $t('sidebar.assistant.nodeName') }}:</span>
-                <span class="value">{{ sidebarStore.nodeInfo.title }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">{{ $t('sidebar.assistant.nodeType') }}:</span>
-                <span class="value">{{ sidebarStore.nodeInfo.type }}</span>
-              </div>
-            </div>
-            <div class="image-preview-area" v-if="previewImage">
-              <div class="preview-image-container">
-                <img :src="previewImage" alt="图片预览" class="preview-image-small" />
-                <button class="remove-image-btn" @click="removeImage">×</button>
-              </div>
-            </div>
+          <div class="input-controls">
+            <button
+              class="upload-image-btn interactive-element"
+              @click="triggerImageUpload"
+              :disabled="isLoading"
+              :title="$t('sidebar.assistant.uploadImage')"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M19 5v14H5V5h14zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14L6 17h12l-3.86-5.14z"
+                />
+              </svg>
+            </button>
 
-            <div class="input-controls">
-              <button
-                class="upload-image-btn interactive-element"
-                @click="triggerImageUpload"
+            <div class="textarea-container interactive-element">
+              <textarea
+                class="interactive-element"
+                v-model="userInput"
+                :placeholder="$t('sidebar.assistant.inputPlaceholder')"
+                @keydown.enter="handleKeyDown"
+                ref="textareaRef"
                 :disabled="isLoading"
-                :title="$t('sidebar.assistant.uploadImage')"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M19 5v14H5V5h14zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14L6 17h12l-3.86-5.14z"
-                  />
-                </svg>
-              </button>
-              <button
-                class="upload-image-btn interactive-element"
-                @click="generateImageAction"
-                :disabled="isLoading"
-                :title="$t('sidebar.assistant.generateImage')"
-              >
-                生图
-              </button>
-              <div class="textarea-container interactive-element">
-                <textarea
-                  class="interactive-element"
-                  v-model="userInput"
-                  :placeholder="$t('sidebar.assistant.inputPlaceholder')"
-                  @keydown.enter="handleKeyDown"
-                  ref="textareaRef"
-                  :disabled="isLoading"
-                ></textarea>
-              </div>
-
-              <!-- 发送按钮 - 在加载时禁用但保持显示 -->
-              <button
-                class="send-message-btn interactive-element"
-                @click="sendMessage()"
-                :disabled="isGenerating"
-                :title="$t('sidebar.assistant.sendMessage')"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2l.01 7z" />
-                </svg>
-              </button>
-
-              <!-- 取消按钮 - 仅在加载时显示 -->
-              <button
-                v-if="isGenerating"
-                class="control-btn stop-btn interactive-element"
-                @click="abortGeneration"
-                title="取消生成"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M6 6h12v12H6z" />
-                </svg>
-              </button>
+              ></textarea>
             </div>
 
-            <input
-              type="file"
-              ref="imageInputRef"
-              style="display: none"
-              accept="image/*"
-              @change="handleImageUpload"
-            />
+            <!-- 回答时时禁用发送按钮 -->
+            <button
+              class="send-message-btn interactive-element"
+              @click="sendMessage()"
+              :disabled="isGenerating"
+              :title="$t('sidebar.assistant.sendMessage')"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2l.01 7z" />
+              </svg>
+            </button>
+
+            <!-- 生成时显示取消按钮 -->
+            <button
+              v-if="isGenerating"
+              class="control-btn stop-btn interactive-element"
+              @click="abortGeneration"
+              title="取消生成"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M6 6h12v12H6z" />
+              </svg>
+            </button>
           </div>
+
+          <input
+            type="file"
+            ref="imageInputRef"
+            style="display: none"
+            accept="image/*"
+            @change="handleImageUpload"
+          />
         </div>
       </div>
     </div>
@@ -182,7 +173,7 @@
     sendStreamChatRequest,
     createImageUserMessage,
     formatOutputTextLight,
-    generateImage
+    handleImageWithKontextPro
   } from './util'
   import { useI18n } from 'vue-i18n'
   import { useToaster } from '@/components/modules/toats/index'
@@ -190,7 +181,7 @@
 
   const { t } = useI18n()
   const sidebarStore = useSidebarStore()
-  // 拖拽调整大小---------------------------------------'
+
   // 侧边栏宽度相关变量
   const sidebarWidth = ref(550) // 默认宽度
   const minWidth = 50 // 最小宽度
@@ -321,6 +312,9 @@
 
   // 清空对话历史
   const clearHistory = () => {
+    if (isGenerating.value) {
+      abortGeneration()
+    }
     // 创建一个新的欢迎消息
     const welcomeMessage = {
       role: 'assistant' as const,
@@ -328,10 +322,10 @@
       time: getCurrentTime()
     }
 
-    // 更新UI显示
-    chatMessages.value = [welcomeMessage]
-    console.log('历史记录已清空，并添加了欢迎消息')
-    generateNewPromptId()
+    setTimeout(() => {
+      chatMessages.value = [welcomeMessage]
+      generateNewPromptId()
+    }, 10)
   }
 
   // 中止生成
@@ -341,30 +335,12 @@
       abortController.value = null
       isLoading.value = false
       isGenerating.value = false
-      console.log('已手动中止生成')
+      processingStatus.value = ''
     }
   }
 
   // 服务端模式
   const serverMode = ref(false)
-
-  // 生图功能
-  const isGeneratingImage = ref(false)
-
-  const generateImageAction = async () => {
-    if (isLoading.value) return
-
-    // 在输入框中添加生成图片前缀
-    userInput.value = `生成图片: ${userInput.value.trim()}`
-    // 聚焦到输入框最后一个字
-    setTimeout(() => {
-      textareaRef.value?.focus()
-      if (textareaRef.value) {
-        const position = '生成图片:'.length + 1
-        textareaRef.value.setSelectionRange(position, position)
-      }
-    }, 0)
-  }
 
   const sendMessage = async () => {
     if (!canSendMessage.value || isLoading.value) return
@@ -383,7 +359,7 @@
     // 创建用户消息并添加到聊天记录
     const userMessage = {
       role: 'user' as const,
-      content: messageText,
+      content: messageText || '',
       time: currentTime,
       hasImage: hasImage,
       image: previewImage.value
@@ -399,68 +375,59 @@
     }, 0)
 
     try {
-      // 判断是否是图片生成请求
-      if (isImageGeneration) {
-        isGeneratingImage.value = true
-        processingStatus.value = '正在生成图片...'
+      if (hasImage && !isImageGeneration) {
+        processingStatus.value = '正在编辑图片...'
+        try {
+          // 创建AbortController用于中止图片编辑请求
+          abortController.value = new AbortController()
+          const imageUrl = await handleImageWithKontextPro(
+            messageText || '请编辑这张图片',
+            previewImage.value,
+            abortController.value.signal
+          )
 
-        // 提取提示词
-        const prompt = messageText.replace('生成图片:', '').trim() || '一张漂亮的图片'
-
-        // 调用图像生成API
-        const imageUrl = await generateImage({
-          prompt,
-          model: 'Kwai-Kolors/Kolors',
-          loading_callback: loading => {
-            // 加载状态更新
-            if (!loading) {
-              processingStatus.value = ''
-            } else {
-              processingStatus.value = '正在生成图片...'
-            }
-          },
-          error_callback: error => {
-            useToaster({
-              type: 'error',
-              message: '生成图片失败: ' + (error.message || '未知错误')
-            })
+          if (abortController.value?.signal.aborted) {
+            isLoading.value = false
+            isGenerating.value = false
+            processingStatus.value = ''
+            return
           }
-        })
+          // Image预加载
+          const img = new Image()
+          await new Promise((resolve, reject) => {
+            img.onload = () => resolve(true)
+            img.onerror = () => reject(new Error('图片加载失败'))
+            img.src = imageUrl
+          })
+          // 图片加载成功后，添加带图片的消息
+          const assistantMessage = {
+            role: 'assistant' as const,
+            content: serverMode.value
+              ? '已为您编辑图片'
+              : '已为您编辑图片，点击LoadImage节点可以直接应用。',
+            time: getCurrentTime(),
+            hasImage: true,
+            image: imageUrl
+          }
+          chatMessages.value.push(assistantMessage)
+          // 更新状态
+          isLoading.value = false
+          isGenerating.value = false
+          processingStatus.value = ''
+          removeImage() // 清除已处理的图片
+          // 滚动到底部
+          setTimeout(() => {
+            scrollToBottom()
+          }, 0)
 
-        // 生成成功后，添加带图片的助手消息
-        const assistantMessage = {
-          role: 'assistant' as const,
-          // 服务端模式下只展示"已为您生成图片"
-          content: serverMode.value
-            ? '已为您生成图片'
-            : '已为您生成图片（点击LoadImage节点可以应用）',
-          time: getCurrentTime(),
-          hasImage: true,
-          image: imageUrl
+          return
+        } catch (error: any) {
+          isLoading.value = false
+          isGenerating.value = false
+          processingStatus.value = ''
+          return
         }
-
-        chatMessages.value.push(assistantMessage)
-
-        // 成功提示
-        useToaster({
-          type: 'success',
-          message: '图片生成成功'
-        })
-
-        // 更新状态
-        isGeneratingImage.value = false
-        isLoading.value = false
-        isGenerating.value = false
-        processingStatus.value = ''
-
-        // 滚动到底部
-        setTimeout(() => {
-          scrollToBottom()
-        }, 0)
-
-        return
       }
-
       // 创建AbortController用于中止请求
       abortController.value = new AbortController()
 
@@ -571,20 +538,17 @@
           }
         },
         {
-          model: 'Qwen/Qwen2.5-VL-72B-Instruct',
+          model: 'Pro/deepseek-ai/DeepSeek-V3',
           prompt_id: promptId.value,
           request_id: requestId.value
         }
       )
     } catch (error) {
-      console.error('请求过程出错:', error)
-
       const errorMsgTime = getCurrentTime()
-
       // 添加错误消息
       chatMessages.value.push({
         role: 'assistant',
-        content: t('sidebar.assistant.errorMessage'),
+        content: String(error),
         time: errorMsgTime
       })
 
@@ -710,58 +674,47 @@
       console.error('没有图片URL')
       return
     }
+    let base64Data = imageUrl
 
-    try {
-      // 获取图片的base64数据
-      let base64Data = imageUrl
-
-      // 如果图片URL不是base64格式，需要获取并转换
-      if (!imageUrl.startsWith('data:')) {
-        try {
-          const response = await fetch(imageUrl)
-          const blob = await response.blob()
-          base64Data = await new Promise(resolve => {
-            const reader = new FileReader()
-            reader.onloadend = () => resolve(reader.result as string)
-            reader.readAsDataURL(blob)
-          })
-        } catch (error) {
-          console.error('获取图片数据失败:', error)
-          useToaster({
-            type: 'error',
-            message: '获取图片数据失败，无法应用到节点'
-          })
-          return
-        }
-      }
-
-      // 创建要发送到节点的图片数据对象
-      const imageData = {
-        nodeId: sidebarStore.nodeInfo.id,
-        imageBase64: base64Data,
-        nodeType: sidebarStore.nodeInfo.type
-      }
-      console.log(window.bizyAirLib, 'window.bizyAirLib-----')
-
-      // 如果window.bizyAirLib存在并有updateNodeImage方法，调用它
-      if (
-        typeof window.bizyAirLib !== 'undefined' &&
-        typeof window.bizyAirLib.updateNodeImage === 'function'
-      ) {
-        window.bizyAirLib.updateNodeImage(imageData)
-        useToaster({
-          type: 'success',
-          message: '图片已应用到节点: ' + sidebarStore.nodeInfo.title
+    if (!imageUrl.startsWith('data:')) {
+      try {
+        const response = await fetch(imageUrl)
+        const blob = await response.blob()
+        base64Data = await new Promise(resolve => {
+          const reader = new FileReader()
+          reader.onloadend = () => resolve(reader.result as string)
+          reader.readAsDataURL(blob)
         })
-      } else {
-        console.error('bizyAirLib.updateNodeImage未定义')
+      } catch (error) {
+        console.error('获取图片数据失败:', error)
         useToaster({
           type: 'error',
-          message: '系统功能未就绪，无法应用图片到节点'
+          message: '获取图片数据失败，无法应用到节点'
         })
+        return
       }
-    } catch (error) {
-      console.error('应用图片到节点失败:', error)
+    }
+
+    // 创建要发送到节点的图片数据对象
+    const imageData = {
+      nodeId: sidebarStore.nodeInfo.id,
+      imageBase64: base64Data,
+      nodeType: sidebarStore.nodeInfo.type
+    }
+    console.log(window.bizyAirLib, 'window.bizyAirLib-----')
+
+    // 如果window.bizyAirLib存在并有updateNodeImage方法，调用它
+    if (
+      typeof window.bizyAirLib !== 'undefined' &&
+      typeof window.bizyAirLib.updateNodeImage === 'function'
+    ) {
+      window.bizyAirLib.updateNodeImage(imageData)
+      useToaster({
+        type: 'success',
+        message: '图片已应用到节点: ' + sidebarStore.nodeInfo.title
+      })
+    } else {
+      console.error('bizyAirLib.updateNodeImage未定义')
       useToaster({
         type: 'error',
         message: '应用图片到节点失败'
@@ -777,6 +730,57 @@
     // enter键，发送消息
     e.preventDefault()
     sendMessage()
+  }
+
+  // 选择现有图片
+  const selectExistingImage = (imageUrl: string) => {
+    if (!imageUrl) return
+    previewImage.value = imageUrl
+    // 如果图片URL以data:开头，则为base64格式
+    if (previewImage.value.includes('data:')) {
+      try {
+        // 提取base64部分
+        const base64Part = previewImage.value.split('base64,')[1]
+        if (base64Part) {
+          uploadedImageBase64.value = base64Part
+          console.log('已设置base64数据，长度:', uploadedImageBase64.value.length)
+        } else {
+          console.error('无法从图片URL提取base64数据')
+        }
+      } catch (error) {
+        console.error('解析base64数据出错:', error)
+      }
+    } else if (imageUrl.startsWith('http')) {
+      // 否则尝试将图片转换为base64
+      console.log('正在获取远程图片:', imageUrl.substring(0, 50) + '...')
+      fetch(imageUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`无法获取图片: ${response.status} ${response.statusText}`)
+          }
+          return response.blob()
+        })
+        .then(blob => {
+          const reader = new FileReader()
+          reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+              previewImage.value = reader.result
+              const base64data = reader.result.split('base64,')[1]
+              if (base64data) {
+                uploadedImageBase64.value = base64data
+                console.log('已转换远程图片为base64，长度:', uploadedImageBase64.value.length)
+              }
+            }
+          }
+          reader.readAsDataURL(blob)
+        })
+        .catch(error => console.error('获取图片出错:', error))
+    }
+
+    // 聚焦到输入框
+    setTimeout(() => {
+      textareaRef.value?.focus()
+    }, 0)
   }
 
   onMounted(() => {
@@ -1366,5 +1370,60 @@
   .close-btn:hover {
     color: #fff;
     background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* 添加标签页样式 */
+  .tab-navigation {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+  }
+
+  .tab-btn {
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.2s;
+  }
+
+  .flux-kontext-container {
+    height: calc(100% - 50px);
+    overflow-y: auto;
+  }
+
+  /* 可点击图片样式 */
+  .clickable-image {
+    cursor: pointer;
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
+  }
+
+  .clickable-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .clickable-image::after {
+    content: '点击复用此图片';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .clickable-image:hover::after {
+    opacity: 1;
   }
 </style>
