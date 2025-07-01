@@ -232,18 +232,18 @@ export async function sendStreamChatRequest(
   }
 
   const filteredMessages = messagesArray.map(message => {
-    const filteredMessage = { ...message };
+    const filteredMessage = { ...message }
     if (Array.isArray(filteredMessage.content)) {
-      const textContents = filteredMessage.content.filter(item => item.type === 'text');
+      const textContents = filteredMessage.content.filter(item => item.type === 'text')
       if (textContents.length > 0 && textContents[0].text) {
-        filteredMessage.content = textContents[0].text;
+        filteredMessage.content = textContents[0].text
       } else {
-        filteredMessage.content = '';
+        filteredMessage.content = ''
       }
     }
-    
-    return filteredMessage;
-  });
+
+    return filteredMessage
+  })
   const requestBody = buildChatRequestBody(filteredMessages, options)
 
   requestBody.stream = true
