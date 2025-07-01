@@ -149,6 +149,9 @@ const NodeInfoLogger = (function() {
             
             // 使用装饰器模式扩展节点的onMouseDown方法
             node.onMouseDown = function(e, pos, canvas) {
+                if (this._isServerMode && this.type === 'LoadImage') {
+                    return;
+                }
                 // 对于小部件点击或右键点击，直接使用原始方法处理
                 if (e.widgetClick || e.button !== 0) {
                     return this._originalOnMouseDown?.apply(this, arguments);
