@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center hover:bg-[#4A238E] cursor-pointer relative px-3 rounded-sm" @click="toggleSidebar">
+  <div class="flex items-center btn-assistant hover:bg-[#4A238E] cursor-pointer relative px-3 rounded-sm" @click="toggleSidebar">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 1024 1024" class="mr-1">
       <path
         fill="currentColor"
