@@ -246,7 +246,7 @@ export async function sendStreamChatRequest(
   }
 
   const requestBody = buildChatRequestBody(messagesArray, options)
-  
+
   // 确保总是设置stream=true，因为这个函数是专门用于流式请求的
   requestBody.stream = true
 
@@ -339,7 +339,7 @@ export function formatOutputText(text: string): string {
   console.log('格式化前的原始文本:', text)
 
   // 替换井号标记（如 "###"，"####"等）
-  text = text.replace(/^(#{1,6})\s+(.+)$/gm, ( hashes, content) => {
+  text = text.replace(/^(#{1,6})\s+(.+)$/gm, (hashes, content) => {
     // 根据井号数量决定标题级别或者样式
     const level = Math.min(hashes.length, 6)
     // 对于标题内容，应用颜色样式而不是使用h标签
@@ -351,10 +351,10 @@ export function formatOutputText(text: string): string {
     // 检查标签内容是否包含HTML标签起始符号但没有闭合符号
     if (tagContent.includes('<') && !tagContent.includes('>')) {
       // 遇到不完整的HTML标签，返回原始文本
-      return match;
+      return match
     }
-    return `<span class="tag">#${tagContent}</span>`;
-  });
+    return `<span class="tag">#${tagContent}</span>`
+  })
 
   // 替换加粗文本
   text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -383,7 +383,7 @@ export function formatOutputTextLight(text: string): string {
   let formatted = text
 
   // 处理标题格式 (# 标题)
-  formatted = formatted.replace(/^(#{1,6})\s+(.+)$/gm, ( hashes, content) => {
+  formatted = formatted.replace(/^(#{1,6})\s+(.+)$/gm, (hashes, content) => {
     const level = Math.min(hashes.length, 6)
     return `<div class="markdown-heading level-${level}">${content}</div>`
   })
@@ -394,10 +394,10 @@ export function formatOutputTextLight(text: string): string {
     // 检查标签内容是否包含HTML标签起始符号但没有闭合符号
     if (tagContent.includes('<') && !tagContent.includes('>')) {
       // 在流式输出中遇到不完整的HTML标签，返回原始文本，等待完整内容
-      return match;
+      return match
     }
-    return `<span class="tag">#${tagContent}</span>`;
-  });
+    return `<span class="tag">#${tagContent}</span>`
+  })
 
   // 替换加粗文本
   formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -470,76 +470,73 @@ export async function generateImage(options: {
  * @returns Promise<string> 返回生成的图片URL
  */
 export async function handleImageWithKontextPro(prompt: string, imageBase64: string) {
-  console.log('进入handleImageWithKontextPro函数');
-  
+  console.log('进入handleImageWithKontextPro函数')
+
   try {
     // 验证imageBase64是否有效
     if (!imageBase64 || typeof imageBase64 !== 'string') {
-      console.error('无效的图片数据');
-      throw new Error('图片数据无效');
+      console.error('无效的图片数据')
+      throw new Error('图片数据无效')
     }
-    
+
     // 确保图片数据包含正确的前缀
-    let imageData = imageBase64;
+    let imageData = imageBase64
     if (!imageBase64.startsWith('data:')) {
       // 如果没有前缀，添加webp前缀
-      imageData = `data:image/webp;base64,${imageBase64}`;
+      imageData = `data:image/webp;base64,${imageBase64}`
     }
-    
+
     // 使用新的专用图像编辑API端点
     const requestBody = {
       model: 'flux-kontext-pro',
       prompt: prompt || '请编辑这张图片',
       image: imageData,
       stream: false
-    };
-    
-    console.log('发送图像编辑请求到新的图像编辑API端点');
-    
+    }
+
+    console.log('发送图像编辑请求到新的图像编辑API端点')
+
     const response = await fetch('/bizyair/model/image-edit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: Cookies.get('bizy_token') || '', 
+        Authorization: Cookies.get('bizy_token') || ''
         // ...(options as any)?.headers
-
       },
       body: JSON.stringify(requestBody)
-    });
-    console.log(response,'请求结果'); 
-    
-    
-    const responseData = await response.json();
-    console.log('API响应数据:', responseData);
-    
+    })
+    console.log(response, '请求结果')
+
+    const responseData = await response.json()
+    console.log('API响应数据:', responseData)
+
     // 处理包含在data字段中的实际响应
     if (responseData.code === 20000 && responseData.data) {
-      const data = responseData.data;
-      console.log('从data中提取的数据:', data);
-      
+      const data = responseData.data
+      console.log('从data中提取的数据:', data)
+
       // 处理result字段是字符串的情况
       if (data.result && typeof data.result === 'string') {
         try {
-          const resultJson = JSON.parse(data.result);
-          if(resultJson.outputs){
-            const outputs = resultJson.outputs;      
-            const outputKeys = Object.keys(outputs);    
-            const firstKey = outputKeys[0];              
-            const outputArray = outputs[firstKey];   
-            const imageUrl = outputArray.outputs[0];
-              return imageUrl;                       
+          const resultJson = JSON.parse(data.result)
+          if (resultJson.outputs) {
+            const outputs = resultJson.outputs
+            const outputKeys = Object.keys(outputs)
+            const firstKey = outputKeys[0]
+            const outputArray = outputs[firstKey]
+            const imageUrl = outputArray.outputs[0]
+            return imageUrl
           }
         } catch (error) {
-          console.error('解析result字段失败:', error);
+          console.error('解析result字段失败:', error)
         }
       }
- 
     } else {
-      console.error('API响应格式不符合预期:', responseData);
-      throw new Error(`API响应错误: ${responseData.message || '未知错误'}`);
+      console.error('API响应格式不符合预期:', responseData)
+      throw new Error(`API响应错误: ${responseData.message || '未知错误'}`)
     }
   } catch (error: any) {
-    console.error('图片编辑处理失败:', error);
-    throw error;
+    console.error('图片编辑处理失败:', error)
+    throw error
   }
 }
