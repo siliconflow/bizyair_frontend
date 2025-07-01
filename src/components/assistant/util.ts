@@ -461,8 +461,14 @@ export async function generateImage(options: {
  * @returns Promise<string> 返回生成的图片URL
  */
 export async function handleImageWithKontextPro(
+<<<<<<< HEAD
   prompt: string, 
   imageBase64: string, 
+=======
+  prompt: string,
+  imageBase64: string,
+  signal?: AbortSignal,
+>>>>>>> a9fb7ca663cf4b7f956d7067273cc04852317d9f
   options: Record<string, any> = {}
 ) {
   console.log('进入handleImageWithKontextPro函数')
