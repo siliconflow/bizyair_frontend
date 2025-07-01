@@ -12,16 +12,6 @@ export interface ChatApiOptions {
   request_id?: string
 }
 
-// 图像生成选项接口
-export interface ImageGenerationOptions {
-  prompt: string
-  n?: number
-  model?: string
-  size?: string
-  loading_callback?: (loading: boolean) => void
-  error_callback?: (error: any) => void
-}
-
 // 消息接口
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system'
@@ -467,15 +457,20 @@ export async function generateImage(options: {
  * 处理带图片的消息，使用flux-kontext-pro模型编辑图片
  * @param prompt 提示词
  * @param imageBase64 图片base64数据
+ * @param signal 可选的AbortSignal，用于取消请求
  * @returns Promise<string> 返回生成的图片URL
  */
-export async function handleImageWithKontextPro(prompt: string, imageBase64: string) {
+export async function handleImageWithKontextPro(
+  prompt: string, 
+  imageBase64: string, 
+  signal?: AbortSignal,
+  options: Record<string, any> = {}
+) {
   console.log('进入handleImageWithKontextPro函数')
 
   try {
     // 验证imageBase64是否有效
     if (!imageBase64 || typeof imageBase64 !== 'string') {
-      console.error('无效的图片数据')
       throw new Error('图片数据无效')
     }
 
@@ -500,8 +495,8 @@ export async function handleImageWithKontextPro(prompt: string, imageBase64: str
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: Cookies.get('bizy_token') || ''
-        // ...(options as any)?.headers
+        Authorization: Cookies.get('bizy_token') || '',
+        ...(options as any)?.headers
       },
       body: JSON.stringify(requestBody)
     })

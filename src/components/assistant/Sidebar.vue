@@ -341,15 +341,12 @@
       abortController.value = null
       isLoading.value = false
       isGenerating.value = false
-      console.log('已手动中止生成')
+      processingStatus.value = ''
     }
   }
 
   // 服务端模式
   const serverMode = ref(false)
-
-  // 生图功能
-  const isGeneratingImage = ref(false)
 
   const sendMessage = async () => {
     if (!canSendMessage.value || isLoading.value) return
@@ -377,7 +374,7 @@
     chatMessages.value.push(userMessage)
 
     // 清空输入并滚动到底部
-    userInput.value = ''
+    userInput.value = '' 
 
     setTimeout(() => {
       scrollToBottom()
@@ -387,12 +384,21 @@
       if (hasImage && !isImageGeneration) {
         processingStatus.value = '正在编辑图片...'
         try {
-          // 调用图片编辑API
+          // 创建AbortController用于中止图片编辑请求
+          abortController.value = new AbortController()
           const imageUrl = await handleImageWithKontextPro(
             messageText || '请编辑这张图片',
-            previewImage.value
+            previewImage.value,
+            abortController.value.signal
           )
 
+          // 如果控制器已中止，不继续处理
+          if (abortController.value?.signal.aborted) {
+            isLoading.value = false
+            isGenerating.value = false
+            processingStatus.value = ''
+            return
+          }
           // Image对象预加载图片
           const img = new Image()
           // Promise等待图片加载完成
@@ -404,7 +410,7 @@
           // 图片加载成功后，添加带图片的消息
           const assistantMessage = {
             role: 'assistant' as const,
-            content: '已为您编辑图片，点击LoadImage节点可以直接应用。',
+            content: serverMode.value ? '已为您编辑图片' : '已为您编辑图片，点击LoadImage节点可以直接应用。',
             time: getCurrentTime(),
             hasImage: true,
             image: imageUrl
@@ -424,81 +430,10 @@
         } catch (error: any) {
           isLoading.value = false
           isGenerating.value = false
-          processingStatus.value = ''
+          processingStatus.value = ''         
           return
         }
       }
-      // 判断是否是图片生成请求
-      if (isImageGeneration) {
-        isGeneratingImage.value = true
-        processingStatus.value = '正在生成图片...'
-
-        // 提取提示词
-        const prompt = messageText.replace('生成图片:', '').trim() || '一张漂亮的图片'
-
-        // 调用图像生成API
-        const imageUrl = await generateImage({
-          prompt,
-          model: 'Kwai-Kolors/Kolors',
-          loading_callback: loading => {
-            // 加载状态更新
-            if (!loading) {
-              processingStatus.value = ''
-            } else {
-              processingStatus.value = '正在生成图片...'
-            }
-          },
-          error_callback: error => {
-            useToaster({
-              type: 'error',
-              message: '生成图片失败: ' + (error.message || '未知错误')
-            })
-          }
-        })
-
-        // 预加载生成的图片
-        const img = new Image()
-        // 使用Promise等待图片加载完成
-        await new Promise((resolve, reject) => {
-          img.onload = () => resolve(true)
-          img.onerror = () => reject(new Error('图片加载失败'))
-          img.src = imageUrl
-        })
-
-        // 生成成功后，添加带图片的助手消息
-        const assistantMessage = {
-          role: 'assistant' as const,
-          // 服务端模式下只展示"已为您生成图片"
-          content: serverMode.value
-            ? '已为您生成图片'
-            : '已为您生成图片（点击LoadImage节点可以应用）',
-          time: getCurrentTime(),
-          hasImage: true,
-          image: imageUrl
-        }
-
-        chatMessages.value.push(assistantMessage)
-
-        // 成功提示
-        useToaster({
-          type: 'success',
-          message: '图片生成成功'
-        })
-
-        // 更新状态
-        isGeneratingImage.value = false
-        isLoading.value = false
-        isGenerating.value = false
-        processingStatus.value = ''
-
-        // 滚动到底部
-        setTimeout(() => {
-          scrollToBottom()
-        }, 0)
-
-        return
-      }
-
       // 创建AbortController用于中止请求
       abortController.value = new AbortController()
 
@@ -609,7 +544,7 @@
           }
         },
         {
-          model: 'Qwen/Qwen2.5-VL-72B-Instruct',
+          model: 'Pro/deepseek-ai/DeepSeek-V3',
           prompt_id: promptId.value,
           request_id: requestId.value
         }
