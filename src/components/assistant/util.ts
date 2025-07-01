@@ -48,8 +48,6 @@ export const defaultApiOptions: ChatApiOptions = {
 // 服务器API路径
 const SERVER_MODEL_API_URL = '/bizyair/model/chat'
 
-// context_API_KEY
-export const API_KEY = 'sk-bZ9JbKE7NKFql9y2ZVI7tezgezJOY1eAx6q1k0fovPUlkawK'
 /**
  * 构建聊天请求体
  * @param messages 消息数组
