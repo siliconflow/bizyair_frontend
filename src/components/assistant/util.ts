@@ -377,11 +377,8 @@ export function formatOutputTextLight(text: string): string {
   })
 
   // 处理中文标签格式 (#标签)
-  // 在流式输出时使用更安全的方式处理标签，避免HTML标签未闭合问题
   formatted = formatted.replace(/#(\S+?)(?=#|\s|$)/g, (match, tagContent) => {
-    // 检查标签内容是否包含HTML标签起始符号但没有闭合符号
     if (tagContent.includes('<') && !tagContent.includes('>')) {
-      // 在流式输出中遇到不完整的HTML标签，返回原始文本，等待完整内容
       return match
     }
     return `<span class="tag">#${tagContent}</span>`
@@ -452,7 +449,7 @@ export async function generateImage(options: {
 }
 
 /**
- * 处理带图片的消息，使用flux-kontext-pro模型编辑图片
+ * 处理带图片的消息
  * @param prompt 提示词
  * @param imageBase64 图片base64数据
  * @param signal 可选的AbortSignal，用于取消请求
@@ -463,30 +460,20 @@ export async function handleImageWithKontextPro(
   imageBase64: string,
   options: Record<string, any> = {}
 ) {
-  console.log('进入handleImageWithKontextPro函数')
-
   try {
-    // 验证imageBase64是否有效
     if (!imageBase64 || typeof imageBase64 !== 'string') {
       throw new Error('图片数据无效')
     }
-
-    // 确保图片数据包含正确的前缀
     let imageData = imageBase64
     if (!imageBase64.startsWith('data:')) {
-      // 如果没有前缀，添加webp前缀
       imageData = `data:image/webp;base64,${imageBase64}`
     }
-
-    // 使用新的专用图像编辑API端点
     const requestBody = {
-      model: 'flux-kontext-pro',
+      model: 'flux-kontext-dev',
       prompt: prompt || '请编辑这张图片',
       image: imageData,
       stream: false
     }
-
-    console.log('发送图像编辑请求到新的图像编辑API端点')
 
     const response = await fetch('/bizyair/model/image-edit', {
       method: 'POST',
@@ -497,15 +484,11 @@ export async function handleImageWithKontextPro(
       },
       body: JSON.stringify(requestBody)
     })
-    console.log(response, '请求结果')
-
     const responseData = await response.json()
-    console.log('API响应数据:', responseData)
 
     // 处理包含在data字段中的实际响应
     if (responseData.code === 20000 && responseData.data) {
       const data = responseData.data
-      console.log('从data中提取的数据:', data)
 
       // 处理result字段是字符串的情况
       if (data.result && typeof data.result === 'string') {
