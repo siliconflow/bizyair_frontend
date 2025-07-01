@@ -51,7 +51,6 @@
                   @click="message.image && selectExistingImage(message.image)"
                   class="clickable-image"
                 />
-                <!--应用图片按钮 -->
                 <div
                   v-if="
                     message.role === 'assistant' &&
@@ -75,8 +74,6 @@
               <div class="message-text" v-html="message.content"></div>
             </div>
           </div>
-
-          <!-- 加载指示器 -->
           <div v-if="isLoading" class="loading-indicator">
             <div class="loading-text">{{ processingStatus }}</div>
             <div class="loading-dots">
@@ -86,7 +83,6 @@
             </div>
           </div>
         </div>
-
         <!-- 输入区域 -->
         <div class="chat-input-area">
           <div v-if="sidebarStore?.nodeInfo" style="display: flex; justify-content: space-around">

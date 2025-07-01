@@ -235,10 +235,8 @@ export async function sendStreamChatRequest(
 
   const requestBody = buildChatRequestBody(messagesArray, options)
 
-  // 确保总是设置stream=true，因为这个函数是专门用于流式请求的
   requestBody.stream = true
 
-  // 创建AbortController用于中止请求
   const abortController = new AbortController()
 
   try {
@@ -328,17 +326,13 @@ export function formatOutputText(text: string): string {
 
   // 替换井号标记（如 "###"，"####"等）
   text = text.replace(/^(#{1,6})\s+(.+)$/gm, (hashes, content) => {
-    // 根据井号数量决定标题级别或者样式
     const level = Math.min(hashes.length, 6)
-    // 对于标题内容，应用颜色样式而不是使用h标签
+
     return `<div class="markdown-heading level-${level}">${content}</div>`
   })
 
-  // 防止连续的#标签被错误解析（如#标签1#标签2），先将非标题格式的#标签替换为安全标记
   text = text.replace(/#(\S+?)(?=#|\s|$)/g, (match, tagContent) => {
-    // 检查标签内容是否包含HTML标签起始符号但没有闭合符号
     if (tagContent.includes('<') && !tagContent.includes('>')) {
-      // 遇到不完整的HTML标签，返回原始文本
       return match
     }
     return `<span class="tag">#${tagContent}</span>`
@@ -370,13 +364,13 @@ export function formatOutputTextLight(text: string): string {
   // 基本的Markdown格式转换
   let formatted = text
 
-  // 处理标题格式 (# 标题)
+  // 处理标题格式 
   formatted = formatted.replace(/^(#{1,6})\s+(.+)$/gm, (hashes, content) => {
     const level = Math.min(hashes.length, 6)
     return `<div class="markdown-heading level-${level}">${content}</div>`
   })
 
-  // 处理中文标签格式 (#标签)
+  // 处理中文标签格式 
   formatted = formatted.replace(/#(\S+?)(?=#|\s|$)/g, (match, tagContent) => {
     if (tagContent.includes('<') && !tagContent.includes('>')) {
       return match
@@ -449,7 +443,7 @@ export async function generateImage(options: {
 }
 
 /**
- * 处理带图片的消息
+ * 编辑图片
  * @param prompt 提示词
  * @param imageBase64 图片base64数据
  * @param signal 可选的AbortSignal，用于取消请求
@@ -470,7 +464,7 @@ export async function handleImageWithKontextPro(
     }
     const requestBody = {
       model: 'flux-kontext-dev',
-      prompt: prompt || '请编辑这张图片',
+      prompt: prompt || '',
       image: imageData,
       stream: false
     }
@@ -486,11 +480,9 @@ export async function handleImageWithKontextPro(
     })
     const responseData = await response.json()
 
-    // 处理包含在data字段中的实际响应
     if (responseData.code === 20000 && responseData.data) {
       const data = responseData.data
 
-      // 处理result字段是字符串的情况
       if (data.result && typeof data.result === 'string') {
         try {
           const resultJson = JSON.parse(data.result)
