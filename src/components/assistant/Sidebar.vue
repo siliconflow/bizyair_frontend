@@ -374,7 +374,7 @@
     chatMessages.value.push(userMessage)
 
     // 清空输入并滚动到底部
-    userInput.value = '' 
+    userInput.value = ''
 
     setTimeout(() => {
       scrollToBottom()
@@ -410,7 +410,9 @@
           // 图片加载成功后，添加带图片的消息
           const assistantMessage = {
             role: 'assistant' as const,
-            content: serverMode.value ? '已为您编辑图片' : '已为您编辑图片，点击LoadImage节点可以直接应用。',
+            content: serverMode.value
+              ? '已为您编辑图片'
+              : '已为您编辑图片，点击LoadImage节点可以直接应用。',
             time: getCurrentTime(),
             hasImage: true,
             image: imageUrl
@@ -430,7 +432,7 @@
         } catch (error: any) {
           isLoading.value = false
           isGenerating.value = false
-          processingStatus.value = ''         
+          processingStatus.value = ''
           return
         }
       }
