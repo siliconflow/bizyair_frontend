@@ -177,7 +177,6 @@
     sendStreamChatRequest,
     createImageUserMessage,
     formatOutputTextLight,
-    generateImage,
     handleImageWithKontextPro
   } from './util'
   import { useI18n } from 'vue-i18n'

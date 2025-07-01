@@ -463,7 +463,6 @@ export async function generateImage(options: {
 export async function handleImageWithKontextPro(
   prompt: string, 
   imageBase64: string, 
-  signal?: AbortSignal,
   options: Record<string, any> = {}
 ) {
   console.log('进入handleImageWithKontextPro函数')
