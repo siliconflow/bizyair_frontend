@@ -364,13 +364,13 @@ export function formatOutputTextLight(text: string): string {
   // 基本的Markdown格式转换
   let formatted = text
 
-  // 处理标题格式 
+  // 处理标题格式
   formatted = formatted.replace(/^(#{1,6})\s+(.+)$/gm, (hashes, content) => {
     const level = Math.min(hashes.length, 6)
     return `<div class="markdown-heading level-${level}">${content}</div>`
   })
 
-  // 处理中文标签格式 
+  // 处理中文标签格式
   formatted = formatted.replace(/#(\S+?)(?=#|\s|$)/g, (match, tagContent) => {
     if (tagContent.includes('<') && !tagContent.includes('>')) {
       return match
