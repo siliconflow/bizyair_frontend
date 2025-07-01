@@ -461,8 +461,8 @@ export async function generateImage(options: {
  * @returns Promise<string> 返回生成的图片URL
  */
 export async function handleImageWithKontextPro(
-  prompt: string, 
-  imageBase64: string, 
+  prompt: string,
+  imageBase64: string,
   signal?: AbortSignal,
   options: Record<string, any> = {}
 ) {
