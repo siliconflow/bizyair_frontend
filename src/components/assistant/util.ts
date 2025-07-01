@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie'
-
 // API请求选项接口
 export interface ChatApiOptions {
   model: string
