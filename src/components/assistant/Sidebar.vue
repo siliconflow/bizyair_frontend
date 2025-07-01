@@ -51,7 +51,7 @@
                   @click="message.image && selectExistingImage(message.image)"
                   class="clickable-image"
                 />
-                <!-- 生图消息，显示应用按钮 -->
+                <!--应用图片按钮 -->
                 <div
                   v-if="
                     message.role === 'assistant' &&
@@ -132,7 +132,7 @@
               ></textarea>
             </div>
 
-            <!-- 发送按钮 - 在加载时禁用但保持显示 -->
+            <!-- 回答时时禁用发送按钮 -->
             <button
               class="send-message-btn interactive-element"
               @click="sendMessage()"
@@ -144,7 +144,7 @@
               </svg>
             </button>
 
-            <!-- 取消按钮 - 仅在加载时显示 -->
+            <!-- 生成时显示取消按钮 -->
             <button
               v-if="isGenerating"
               class="control-btn stop-btn interactive-element"
@@ -328,7 +328,6 @@
 
     setTimeout(() => {
       chatMessages.value = [welcomeMessage]
-      console.log('历史记录已清空，并添加了欢迎消息')
       generateNewPromptId()
     }, 10)
   }
@@ -364,7 +363,7 @@
     // 创建用户消息并添加到聊天记录
     const userMessage = {
       role: 'user' as const,
-      content: messageText || '请编辑这张图片', // 如果没有输入文本，默认添加编辑图片的提示
+      content: messageText || '', 
       time: currentTime,
       hasImage: hasImage,
       image: previewImage.value
@@ -391,16 +390,14 @@
             abortController.value.signal
           )
 
-          // 如果控制器已中止，不继续处理
           if (abortController.value?.signal.aborted) {
             isLoading.value = false
             isGenerating.value = false
             processingStatus.value = ''
             return
           }
-          // Image对象预加载图片
+          // Image预加载
           const img = new Image()
-          // Promise等待图片加载完成
           await new Promise((resolve, reject) => {
             img.onload = () => resolve(true)
             img.onerror = () => reject(new Error('图片加载失败'))
@@ -681,10 +678,8 @@
       console.error('没有图片URL')
       return
     }
-    // 获取图片的base64数据
     let base64Data = imageUrl
 
-    // 如果图片URL不是base64格式，需要获取并转换
     if (!imageUrl.startsWith('data:')) {
       try {
         const response = await fetch(imageUrl)
@@ -726,7 +721,7 @@
       console.error('bizyAirLib.updateNodeImage未定义')
       useToaster({
         type: 'error',
-        message: '系统功能未就绪，无法应用图片到节点'
+        message: '应用图片到节点失败'
       })
     }
   }
