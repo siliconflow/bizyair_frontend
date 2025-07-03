@@ -266,7 +266,7 @@ export async function sendStreamChatRequest(
     })
 
     if (!response.ok) {
-      throw new Error(`API请求失败: ${response.status} ${response.statusText}`)
+      throw new Error(`HTTP错误: [${response.status}] ${response.statusText}`)
     }
 
     if (!response.body) {
@@ -489,6 +489,9 @@ export async function handleImageWithKontextPro(
       },
       body: JSON.stringify(requestBody)
     })
+    if (!response.ok) {
+      throw new Error(`HTTP错误: [${response.status}] ${response.statusText}`)
+    }
     const responseData = await response.json()
 
     if (responseData.code === 20000 && responseData.data) {
@@ -511,10 +514,16 @@ export async function handleImageWithKontextPro(
       }
     } else {
       console.error('API响应格式不符合预期:', responseData)
-      throw new Error(`API响应错误: ${responseData.message || '未知错误'}`)
+      const statusCode = responseData.code || ''
+      const errorMsg = responseData.message || ''
+      throw new Error(`API响应错误: [${statusCode}] ${errorMsg}`)
     }
   } catch (error: any) {
-    console.error('图片编辑处理失败:', error)
-    throw error
+    const errorMessage = {
+      code: 50000,
+      message: error.message,
+      data: null
+    }
+    throw errorMessage
   }
 }

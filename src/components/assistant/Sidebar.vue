@@ -422,9 +422,23 @@
 
           return
         } catch (error: any) {
+          const errorMsgTime = getCurrentTime()
+          let errorMessage = ''
+          if (error) {
+            errorMessage = error.message
+          }
+          chatMessages.value.push({
+            role: 'assistant',
+            content: `发生错误: ${errorMessage}<br><br><span style="color: #ff4d4f;">建议检查Bizyair是否更新到最新版本，并检查网络状态或者代理</span>`,
+            time: errorMsgTime
+          })
           isLoading.value = false
           isGenerating.value = false
           processingStatus.value = ''
+          setTimeout(() => {
+            scrollToBottom()
+          }, 0)
+
           return
         }
       }
@@ -521,13 +535,15 @@
           },
           onError: error => {
             console.error('多模态请求失败:', error)
-
             const errorMsgTime = getCurrentTime()
-
+            let errorMessage = ''
+            if (error) {
+              errorMessage = error.message
+            }
             // 添加错误消息
             chatMessages.value.push({
               role: 'assistant',
-              content: t('sidebar.assistant.errorMessage'),
+              content: `发生错误: ${errorMessage}<br><br><span style="color: #ff4d4f;">建议检查Bizyair是否更新到最新版本，并检查网络状态或者代理</span>`,
               time: errorMsgTime
             })
 
@@ -545,6 +561,19 @@
       )
     } catch (error) {
       const errorMsgTime = getCurrentTime()
+      // 获取错误信息
+      let errorMessage = ''
+      if (
+        error &&
+        typeof error === 'object' &&
+        'message' in error &&
+        typeof error.message === 'string'
+      ) {
+        errorMessage = error.message
+      } else {
+        errorMessage = String(error)
+      }
+
       // 添加错误消息
       chatMessages.value.push({
         role: 'assistant',
@@ -553,7 +582,8 @@
       })
 
       // 更新状态
-      // isLoading.value = false;
+      isLoading.value = false
+      isGenerating.value = false
       processingStatus.value = ''
     } finally {
       console.log('请求处理完成，重置状态')
