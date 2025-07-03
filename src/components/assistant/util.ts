@@ -488,10 +488,10 @@ export async function handleImageWithKontextPro(
         ...(options as any)?.headers
       },
       body: JSON.stringify(requestBody)
-    })    
+    })
     if (!response.ok) {
       throw new Error(`HTTP错误: [${response.status}] ${response.statusText}`)
-    }  
+    }
     const responseData = await response.json()
 
     if (responseData.code === 20000 && responseData.data) {
@@ -523,7 +523,7 @@ export async function handleImageWithKontextPro(
       code: 50000,
       message: error.message,
       data: null
-    }   
+    }
     throw errorMessage
-  } 
+  }
 }
