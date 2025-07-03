@@ -422,7 +422,7 @@
 
           return
         } catch (error: any) {
-          const errorMsgTime = getCurrentTime()      
+          const errorMsgTime = getCurrentTime()
           let errorMessage = ''
           if (error) {
             errorMessage = error.message
@@ -434,11 +434,11 @@
           })
           isLoading.value = false
           isGenerating.value = false
-          processingStatus.value = ''    
+          processingStatus.value = ''
           setTimeout(() => {
             scrollToBottom()
           }, 0)
-          
+
           return
         }
       }
@@ -539,7 +539,7 @@
             let errorMessage = ''
             if (error) {
               errorMessage = error.message
-            }          
+            }
             // 添加错误消息
             chatMessages.value.push({
               role: 'assistant',
@@ -563,12 +563,17 @@
       const errorMsgTime = getCurrentTime()
       // 获取错误信息
       let errorMessage = ''
-      if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'message' in error &&
+        typeof error.message === 'string'
+      ) {
         errorMessage = error.message
       } else {
         errorMessage = String(error)
       }
-      
+
       // 添加错误消息
       chatMessages.value.push({
         role: 'assistant',
