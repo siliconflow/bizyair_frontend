@@ -561,18 +561,6 @@
       )
     } catch (error) {
       const errorMsgTime = getCurrentTime()
-      // 获取错误信息
-      let errorMessage = ''
-      if (
-        error &&
-        typeof error === 'object' &&
-        'message' in error &&
-        typeof error.message === 'string'
-      ) {
-        errorMessage = error.message
-      } else {
-        errorMessage = String(error)
-      }
 
       // 添加错误消息
       chatMessages.value.push({
