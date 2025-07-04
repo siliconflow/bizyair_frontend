@@ -28,7 +28,7 @@
 </script>
 
 <style scoped>
-  :global(.is-mini-box) .block {
+  .block {
     display: none;
   }
 </style>
