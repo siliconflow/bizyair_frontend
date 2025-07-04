@@ -26,5 +26,3 @@
     sidebarStore.toggleSidebar()
   }
 </script>
-
-
