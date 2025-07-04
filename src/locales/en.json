@@ -147,8 +147,8 @@
         "subtitle": "View your contents"
       },
       "tabs": {
-        "posts": "Posts",
-        "forked": "Forked"
+        "posts": "My Posts",
+        "forked": "My Forked"
       },
       "newContent": {
         "model": "New Model",
