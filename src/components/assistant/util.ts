@@ -11,16 +11,6 @@ export interface ChatApiOptions {
   request_id?: string
 }
 
-// 图像生成选项接口
-export interface ImageGenerationOptions {
-  prompt: string
-  n?: number
-  model?: string
-  size?: string
-  loading_callback?: (loading: boolean) => void
-  error_callback?: (error: any) => void
-}
-
 // 消息接口
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system'
@@ -70,7 +60,6 @@ export function buildChatRequestBody(
   const mergedOptions = { ...defaultApiOptions, ...options }
   return {
     model: mergedOptions.model,
-    stream: true,
     max_tokens: mergedOptions.max_tokens,
     temperature: mergedOptions.temperature,
     top_p: mergedOptions.top_p,
@@ -133,7 +122,6 @@ export function createTextUserMessage(text: string): ChatMessage {
 export async function prepareMessagesWithHistory(
   currentMessage: ChatMessage
 ): Promise<ChatMessage[]> {
-  // 由于不再使用数据库，直接返回包含当前消息的数组
   return [currentMessage]
 }
 
@@ -243,9 +231,23 @@ export async function sendStreamChatRequest(
     messagesArray = messages
   }
 
-  const requestBody = buildChatRequestBody(messagesArray, options)
+  const filteredMessages = messagesArray.map(message => {
+    const filteredMessage = { ...message }
+    if (Array.isArray(filteredMessage.content)) {
+      const textContents = filteredMessage.content.filter(item => item.type === 'text')
+      if (textContents.length > 0 && textContents[0].text) {
+        filteredMessage.content = textContents[0].text
+      } else {
+        filteredMessage.content = ''
+      }
+    }
 
-  // 创建AbortController用于中止请求
+    return filteredMessage
+  })
+  const requestBody = buildChatRequestBody(filteredMessages, options)
+
+  requestBody.stream = true
+
   const abortController = new AbortController()
 
   try {
@@ -264,7 +266,7 @@ export async function sendStreamChatRequest(
     })
 
     if (!response.ok) {
-      throw new Error(`API请求失败: ${response.status} ${response.statusText}`)
+      throw new Error(`HTTP错误: [${response.status}] ${response.statusText}`)
     }
 
     if (!response.body) {
@@ -334,11 +336,17 @@ export function formatOutputText(text: string): string {
   console.log('格式化前的原始文本:', text)
 
   // 替换井号标记（如 "###"，"####"等）
-  text = text.replace(/^(#{1,6})\s*(.+)$/gm, (hashes, content) => {
-    // 根据井号数量决定标题级别或者样式
+  text = text.replace(/^(#{1,6})\s+(.+)$/gm, (hashes, content) => {
     const level = Math.min(hashes.length, 6)
-    // 对于标题内容，应用颜色样式而不是使用h标签
+
     return `<div class="markdown-heading level-${level}">${content}</div>`
+  })
+
+  text = text.replace(/#(\S+?)(?=#|\s|$)/g, (match, tagContent) => {
+    if (tagContent.includes('<') && !tagContent.includes('>')) {
+      return match
+    }
+    return `<span class="tag">#${tagContent}</span>`
   })
 
   // 替换加粗文本
@@ -366,6 +374,20 @@ export function formatOutputTextLight(text: string): string {
 
   // 基本的Markdown格式转换
   let formatted = text
+
+  // 处理标题格式
+  formatted = formatted.replace(/^(#{1,6})\s+(.+)$/gm, (hashes, content) => {
+    const level = Math.min(hashes.length, 6)
+    return `<div class="markdown-heading level-${level}">${content}</div>`
+  })
+
+  // 处理中文标签格式
+  formatted = formatted.replace(/#(\S+?)(?=#|\s|$)/g, (match, tagContent) => {
+    if (tagContent.includes('<') && !tagContent.includes('>')) {
+      return match
+    }
+    return `<span class="tag">#${tagContent}</span>`
+  })
 
   // 替换加粗文本
   formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -428,5 +450,80 @@ export async function generateImage(options: {
     throw error
   } finally {
     loading_callback?.(false)
+  }
+}
+
+/**
+ * 编辑图片
+ * @param prompt 提示词
+ * @param imageBase64 图片base64数据
+ * @param signal 可选的AbortSignal，用于取消请求
+ * @returns Promise<string> 返回生成的图片URL
+ */
+export async function handleImageWithKontextPro(
+  prompt: string,
+  imageBase64: string,
+  options: Record<string, any> = {}
+) {
+  try {
+    if (!imageBase64 || typeof imageBase64 !== 'string') {
+      throw new Error('图片数据无效')
+    }
+    let imageData = imageBase64
+    if (!imageBase64.startsWith('data:')) {
+      imageData = `data:image/webp;base64,${imageBase64}`
+    }
+    const requestBody = {
+      model: 'flux-kontext-dev',
+      prompt: prompt || '',
+      image: imageData,
+      stream: false
+    }
+
+    const response = await fetch('/bizyair/model/image-edit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('bizy_token') || '',
+        ...(options as any)?.headers
+      },
+      body: JSON.stringify(requestBody)
+    })
+    if (!response.ok) {
+      throw new Error(`HTTP错误: [${response.status}] ${response.statusText}`)
+    }
+    const responseData = await response.json()
+
+    if (responseData.code === 20000 && responseData.data) {
+      const data = responseData.data
+
+      if (data.result && typeof data.result === 'string') {
+        try {
+          const resultJson = JSON.parse(data.result)
+          if (resultJson.outputs) {
+            const outputs = resultJson.outputs
+            const outputKeys = Object.keys(outputs)
+            const firstKey = outputKeys[0]
+            const outputArray = outputs[firstKey]
+            const imageUrl = outputArray.outputs[0]
+            return imageUrl
+          }
+        } catch (error) {
+          console.error('解析result字段失败:', error)
+        }
+      }
+    } else {
+      console.error('API响应格式不符合预期:', responseData)
+      const statusCode = responseData.code || ''
+      const errorMsg = responseData.message || ''
+      throw new Error(`API响应错误: [${statusCode}] ${errorMsg}`)
+    }
+  } catch (error: any) {
+    const errorMessage = {
+      code: 50000,
+      message: error.message,
+      data: null
+    }
+    throw errorMessage
   }
 }

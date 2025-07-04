@@ -138,7 +138,7 @@
         </div>
 
         <div
-          class="absolute right-3 top-3 min-w-[24px] h-[24px] flex items-center justify-center z-10"
+          class="absolute right-3 top-4 min-w-[24px] h-[24px] flex items-center justify-center z-10"
           @click.prevent.stop="$emit('action', model)"
         >
           <vTooltips :tips="actionTooltipText">
