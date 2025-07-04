@@ -148,7 +148,13 @@ const NodeInfoLogger = (function() {
             }
             
             // 使用装饰器模式扩展节点的onMouseDown方法
+            const serverModeResponse = await fetch("/bizyair/server_mode");
+            const serverModeData = await serverModeResponse.json();
             node.onMouseDown = function(e, pos, canvas) {
+                if (serverModeData.data.server_mode && this.type === 'LoadImage') {
+                    console.log(this.type, 'this=p------');
+                    return;
+                }
                 // 对于小部件点击或右键点击，直接使用原始方法处理
                 if (e.widgetClick || e.button !== 0) {
                     return this._originalOnMouseDown?.apply(this, arguments);

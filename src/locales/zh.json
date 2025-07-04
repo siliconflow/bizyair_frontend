@@ -40,13 +40,13 @@
       "close": "关闭",
       "nodeName": "节点名称",
       "nodeType": "节点类型",
-      "inputPlaceholder": "输入问题...",
+      "inputPlaceholder": "输入问题或上传图片...",
       "uploadImage": "上传图片",
       "generateImage": "生成图片",
       "removeImage": "移除图片",
       "sendMessage": "发送消息",
       "abortGeneration": "中止生成",
-      "welcomeMessage": "你好！我是BizyBot，点击节点中的图片可以直接上传",
+      "welcomeMessage": "你好！我是BizyBot，我可以回答问题或编辑图片，支持本地上传和点击节点上传（编辑图片请使用英文提示词）",
       "errorMessage": "抱歉，发生了错误。请刷新页面重试。",
       "imageUploadError": "请上传图片文件"
     }
@@ -147,8 +147,8 @@
         "subtitle": "查看我的内容"
       },
       "tabs": {
-        "posts": "发布",
-        "forked": "收藏"
+        "posts": "我的发布",
+        "forked": "我的收藏"
       },
       "newContent": {
         "model": "新建模型",
