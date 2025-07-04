@@ -27,8 +27,4 @@
   }
 </script>
 
-<style scoped>
-  .block {
-    display: none;
-  }
-</style>
+
