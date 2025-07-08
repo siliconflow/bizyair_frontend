@@ -30,9 +30,13 @@
     }
     // 如果没有当前文件但有媒体源，根据URL判断
     if (mediaSrc.value) {
-      return mediaSrc.value.includes('.mp4') || mediaSrc.value.includes('.webm') || 
-             mediaSrc.value.includes('.avi') || mediaSrc.value.includes('.mov') ||
-             mediaSrc.value.includes('video/')
+      return (
+        mediaSrc.value.includes('.mp4') ||
+        mediaSrc.value.includes('.webm') ||
+        mediaSrc.value.includes('.avi') ||
+        mediaSrc.value.includes('.mov') ||
+        mediaSrc.value.includes('video/')
+      )
     }
     return false
   })
