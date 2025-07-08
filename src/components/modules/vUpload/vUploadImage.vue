@@ -23,9 +23,18 @@
 
   // 检测文件类型
   const isVideo = computed(() => {
-    if (!currentFile.value) return false
-    console.log(mediaSrc.value)
-    return currentFile.value.type.startsWith('video/')
+    // 如果有当前文件，根据文件类型判断
+    if (currentFile.value) {
+      console.log(mediaSrc.value)
+      return currentFile.value.type.startsWith('video/')
+    }
+    // 如果没有当前文件但有媒体源，根据URL判断
+    if (mediaSrc.value) {
+      return mediaSrc.value.includes('.mp4') || mediaSrc.value.includes('.webm') || 
+             mediaSrc.value.includes('.avi') || mediaSrc.value.includes('.mov') ||
+             mediaSrc.value.includes('video/')
+    }
+    return false
   })
 
   // const isGif = computed(() => {
@@ -34,8 +43,16 @@
   // })
 
   const isImage = computed(() => {
-    if (!currentFile.value) return !isVideo.value
-    return currentFile.value.type.startsWith('image/')
+    // 如果有当前文件，根据文件类型判断
+    if (currentFile.value) {
+      return currentFile.value.type.startsWith('image/')
+    }
+    // 如果没有当前文件但有媒体源，根据URL判断
+    if (mediaSrc.value) {
+      // 如果不是视频，且有媒体源，则默认为图片
+      return !isVideo.value
+    }
+    return false
   })
 
   const handleFileChange = async (e: Event) => {
@@ -45,8 +62,11 @@
     emit('change', files)
     if (files) {
       const file = files[0]
+      if (!file) {
+        showLoading.value = false
+        return
+      }
       currentFile.value = file
-
       // 创建预览URL
       mediaSrc.value = URL.createObjectURL(file)
       emit('update:modelValue', mediaSrc.value)
@@ -81,10 +101,17 @@
     }
   }
 
+  const videoRef = ref<HTMLVideoElement | null>(null)
+  const handleVideoLoad = () => {
+    if (videoRef.value) {
+      videoRef.value.controls = false
+    }
+  }
+
   onMounted(() => {
     let previewPrc = props.previewPrc as string
     if (previewPrc.includes('.mp4')) {
-      previewPrc = `${previewPrc}?x-oss-process=video/snapshot,t_0000,f_jpg,w_300,h_600`
+      previewPrc = `${previewPrc}?x-oss-process=video/snapshot,t_0000,f_jpg`
     }
     mediaSrc.value = previewPrc
   })
@@ -115,7 +142,8 @@
         :src="mediaSrc"
         class="block object-cover w-full h-full rounded-lg absolute left-0 top-0 z-10"
         muted
-        controls
+        ref="videoRef"
+        @load="handleVideoLoad"
       />
 
       <!-- 图片预览 -->
