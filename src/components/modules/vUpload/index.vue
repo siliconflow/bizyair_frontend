@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
+  import { ref, computed, watchEffect } from 'vue'
   import { NButton } from 'naive-ui'
   import { DEFAULT_ALLOWED_EXTENSIONS } from './constants'
   import { UploadProps } from './types'
@@ -67,6 +67,19 @@
       emit(event as 'error' | 'progress' | 'uploadInfo' | 'success' | 'path' | 'start', payload)
     }
   )
+
+  // 当传入fileName时，设置为已上传完成状态
+  watchEffect(() => {
+    if (props.fileName) {
+      disableUpload.value = true
+      uploadSuccessful.value = true
+      emit('progress', 100)
+      emit('uploadInfo', {
+        fileName: props.fileName,
+        status: 'complete'
+      })
+    }
+  })
 
   function highlight(e: DragEvent) {
     preventDefaults(e)

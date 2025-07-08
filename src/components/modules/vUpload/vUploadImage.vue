@@ -81,10 +81,17 @@
     }
   }
 
+  const videoRef = ref<HTMLVideoElement | null>(null)
+  const handleVideoLoad = () => {
+    if (videoRef.value) {
+      videoRef.value.controls = false
+    }
+  }
+
   onMounted(() => {
     let previewPrc = props.previewPrc as string
     if (previewPrc.includes('.mp4')) {
-      previewPrc = `${previewPrc}?x-oss-process=video/snapshot,t_0000,f_jpg,w_300,h_600`
+      previewPrc = `${previewPrc}?x-oss-process=video/snapshot,t_0000,f_jpg`
     }
     mediaSrc.value = previewPrc
   })
@@ -115,7 +122,8 @@
         :src="mediaSrc"
         class="block object-cover w-full h-full rounded-lg absolute left-0 top-0 z-10"
         muted
-        controls
+        ref="videoRef"
+        @load="handleVideoLoad"
       />
 
       <!-- 图片预览 -->

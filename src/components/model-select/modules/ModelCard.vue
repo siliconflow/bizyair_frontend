@@ -53,7 +53,7 @@
     }
     // 添加OSS视频截图处理参数
     const separator = videoUrl.includes('?') ? '&' : '?'
-    return `${videoUrl}${separator}x-oss-process=video/snapshot,t_000,f_jpg,w_300,h_600`
+    return `${videoUrl}${separator}x-oss-process=video/snapshot,t_000,f_jpg`
   }
 
   // 当前显示的媒体源
