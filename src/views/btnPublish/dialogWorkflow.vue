@@ -378,7 +378,9 @@
     }
 
     useToaster.success(t('publish.workflow.success'))
-    onDialogClose()
+    setTimeout(() => {
+      onDialogClose()
+    }, 1500)
   }
   const onDialogClose = () => {
     modelStoreObject.setDialogStatusWorkflow(false, 0)
