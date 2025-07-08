@@ -355,7 +355,9 @@
       await create_models(tempData)
     }
     useToaster.success(t('publish.model.success'))
-    onDialogClose()
+    setTimeout(() => {
+      onDialogClose()
+    }, 1500)
   }
   const onDialogClose = () => {
     modelStoreObject.setDialogStatus(false, 0)

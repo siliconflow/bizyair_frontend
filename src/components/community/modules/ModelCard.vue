@@ -99,7 +99,7 @@
       return videoUrl
     }
     const separator = videoUrl.includes('?') ? '&' : '?'
-    return `${videoUrl}${separator}x-oss-process=video/snapshot,t_0000,f_jpg,w_300,h_600`
+    return `${videoUrl}${separator}x-oss-process=video/snapshot,t_0000,f_jpg`
   }
 
   const currentMediaSrc = computed(() => {
@@ -178,6 +178,7 @@
           <video
             v-if="isVideo && isHovering && currentMediaSrc"
             :src="currentMediaSrc"
+            controls
             class="absolute inset-0 w-full h-full object-cover transition-all duration-300"
             :class="{
               'opacity-0': !props.imageLoaded,
