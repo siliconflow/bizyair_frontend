@@ -913,7 +913,7 @@
                   <div v-if="currentVersion?.review_state === 1" class="flex items-center gap-1">
                     <span class="text-green-500">{{ t('community.detail.positive') }}</span>
                     <span class="text-gray-500">{{
-                      currentVersion?.review_at ? currentVersion?.review_at?.replace(/-/g, '') : ''
+                      currentVersion?.review_at ? currentVersion?.review_at?.replace(/-/g, '/').split(' ')[0] : ''
                     }}</span>
                   </div>
                   <span v-else class="text-red-500"> {{ t('community.detail.negative') }} </span>
