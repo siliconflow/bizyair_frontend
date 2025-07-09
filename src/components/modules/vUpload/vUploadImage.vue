@@ -114,9 +114,9 @@
 
   onMounted(() => {
     let previewPrc = props.previewPrc as string
-    if (previewPrc.includes('.mp4')) {
-      previewPrc = `${previewPrc}?x-oss-process=video/snapshot,t_0000,f_jpg`
-    }
+    // if (previewPrc.includes('.mp4')) {
+    //   previewPrc = `${previewPrc}?x-oss-process=video/snapshot,t_0000,f_jpg`
+    // }
     mediaSrc.value = previewPrc
   })
 </script>
