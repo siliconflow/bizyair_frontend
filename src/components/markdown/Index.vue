@@ -168,16 +168,23 @@
   }
 
   // 添加watch监听，确保所有值变化都会触发update:modelValue
-  watch(text, (newValue) => {
-    emit('update:modelValue', newValue)
-  }, { immediate: false })
+  watch(
+    text,
+    newValue => {
+      emit('update:modelValue', newValue)
+    },
+    { immediate: false }
+  )
 
   // 监听props.modelValue的变化，确保双向绑定正确工作
-  watch(() => props.modelValue, (newValue) => {
-    if (newValue !== text.value) {
-      text.value = newValue
+  watch(
+    () => props.modelValue,
+    newValue => {
+      if (newValue !== text.value) {
+        text.value = newValue
+      }
     }
-  })
+  )
 
   const handleKeydown = event => {
     if (BLOCKED_KEYS.includes(event.key)) {
