@@ -45,12 +45,30 @@
 
               <!-- 图片消息 -->
               <div v-if="message.hasImage" class="message-image">
-                <img
-                  :src="message.image"
-                  alt="用户上传图片"
-                  @click="message.image && selectExistingImage(message.image)"
-                  class="clickable-image"
-                />
+                <div class="image-container">
+                  <img
+                    :src="message.image"
+                    alt="用户上传图片"
+                    class="message-img"
+                  />
+                  <div class="image-overlay">
+                    <button class="image-action-btn expand-btn" @click="expandImage(message.image)" title="查看大图">
+                      <svg t="1752053278648" fill="white" width="24" height="24" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2363" ><path d="M919.920093 725.414549q3.014188 26.122962 7.033105 58.776664t7.53547 66.814498 7.53547 67.819227 7.033105 60.786122q6.028376 47.222277-41.193901 44.208089-25.118232-2.009459-56.767205-5.526011t-64.805039-7.53547-65.809769-8.037834-59.781393-7.033105q-29.137149-3.014188-37.174984-16.578033t9.042564-30.644243q11.052022-10.047293 27.127691-27.630056t27.127691-28.634785q11.052022-12.056752 7.033105-22.104044t-16.075669-23.108774q-28.13242-27.127691-51.241194-49.231735t-51.241194-51.241194q-6.028376-6.028376-12.056752-13.061481t-9.042564-15.573304-1.004729-18.085127 13.061481-20.59695q6.028376-6.028376 10.047293-10.549658t8.037834-8.037834 8.540199-8.037834 11.554387-12.559116q20.094586-20.094586 37.174984-17.080398t37.174984 23.108774 41.193901 40.691536 47.222277 46.719912q19.089857 18.085127 32.653702 25.118232t26.625326-6.028376q9.042564-9.042564 22.606409-21.60168t23.611138-22.606409q17.080398-17.080398 30.644243-13.061481t16.578033 30.141879zM43.79615 383.80659q-3.014188-26.122962-7.033105-58.776664t-7.53547-66.814498-7.53547-67.819227-7.033105-60.786122q-3.014188-26.122962 6.53074-36.170255t33.658431-8.037834q25.118232 2.009459 56.767205 5.526011t64.805039 7.53547 65.809769 8.037834 59.781393 7.033105q30.141879 3.014188 37.677348 16.578033t-9.544928 30.644243q-10.047293 10.047293-24.615868 26.122962t-25.620597 27.127691q-12.056752 12.056752-8.037834 22.104044t17.080398 23.108774q13.061481 14.06621 24.615868 24.615868t22.606409 21.099315 23.108774 22.606409l25.118232 25.118232q6.028376 6.028376 11.554387 14.06621t8.037834 17.080398-0.502365 19.089857-13.061481 20.094586l-11.052022 11.052022q-4.018917 4.018917-7.53547 8.037834t-8.540199 8.037834l-11.052022 12.056752q-20.094586 20.094586-34.663161 15.070939t-34.663161-25.118232-38.179713-37.677348-44.208089-43.705724q-18.085127-18.085127-32.151337-25.118232t-27.127691 6.028376q-9.042564 10.047293-25.118232 24.615868t-26.122962 24.615868q-17.080398 17.080398-30.141879 13.061481t-16.075669-30.141879zM905.853883 84.397261q26.122962-3.014188 36.170255 6.53074t8.037834 34.663161-5.526011 56.767205-7.53547 64.805039-8.037834 65.809769-7.033105 59.781393q-3.014188 29.137149-16.578033 37.174984t-30.644243-10.047293q-10.047293-10.047293-26.122962-24.615868t-27.127691-25.620597q-12.056752-11.052022-22.104044-7.53547t-23.108774 16.578033q-27.127691 27.127691-47.724641 49.231735t-48.729371 50.236465q-6.028376 6.028376-14.06621 11.554387t-17.080398 8.037834-19.089857-0.502365-20.094586-14.06621q-6.028376-6.028376-10.549658-10.047293t-8.540199-8.037834-8.540199-8.037834-11.554387-12.056752q-20.094586-20.094586-16.075669-35.165525t25.118232-35.165525l38.179713-40.189172q19.089857-20.094586 45.212818-46.217547 19.089857-18.085127 26.122962-32.151337t-7.033105-26.122962q-9.042564-9.042564-23.108774-24.615868t-24.113503-25.620597q-17.080398-17.080398-13.061481-30.141879t30.141879-16.075669 58.776664-7.033105 67.316863-7.53547 67.819227-7.53547 60.283758-7.033105zM350.238584 640.012559q6.028376 6.028376 10.549658 10.047293t8.540199 8.037834l8.037834 9.042564 12.056752 11.052022q20.094586 20.094586 17.582763 36.672619t-23.611138 37.677348q-19.089857 19.089857-40.189172 40.691536t-47.222277 47.724641q-18.085127 18.085127-22.606409 29.639514t8.540199 24.615868q10.047293 9.042564 22.606409 22.606409t22.606409 23.611138q17.080398 17.080398 12.559116 30.141879t-30.644243 16.075669-58.274299 7.033105-66.814498 8.037834-68.321592 8.037834-60.786122 7.033105q-25.118232 2.009459-35.66789-7.53547t-8.540199-33.658431q2.009459-25.118232 5.526011-56.767205t7.53547-64.805039 8.037834-65.809769 7.033105-59.781393q3.014188-30.141879 16.578033-37.677348t30.644243 9.544928q10.047293 10.047293 27.630056 26.122962t28.634785 27.127691q12.056752 12.056752 20.094586 10.549658t20.094586-14.568575q13.061481-13.061481 25.118232-25.620597t24.113503-24.615868 24.615868-25.118232 26.625326-27.127691q6.028376-6.028376 13.061481-12.056752t15.573304-9.042564 18.085127-0.502365 20.59695 13.563845z" p-id="2364"></path></svg>
+                    </button>
+                    <div class="top-right-actions">
+                      <button class="image-action-btn" @click="selectExistingImage(message.image||'')" title="添加到输入">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                          <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                      </button>
+                      <button class="image-action-btn" @click="downloadImage(message.image||'')" title="下载图片">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                          <path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 <div
                   v-if="
                     message.role === 'assistant' &&
@@ -163,6 +181,14 @@
         </div>
       </div>
     </div>
+    
+    <!-- 图片查看弹窗 -->
+    <div class="image-modal" v-if="showImageModal" @click="closeImageModal">
+      <div class="modal-content" @click.stop>
+        <img :src="modalImageSrc" alt="大图查看" class="modal-image" />
+        <button class="modal-close-btn" @click="closeImageModal">×</button>
+      </div>
+    </div>
   </Teleport>
 </template>
 
@@ -178,7 +204,7 @@
   import { useI18n } from 'vue-i18n'
   import { useToaster } from '@/components/modules/toats/index'
   import { v4 as uuidv4 } from 'uuid'
-
+  import {downloadImage} from '@/utils/tool'
   const { t } = useI18n()
   const sidebarStore = useSidebarStore()
 
@@ -801,6 +827,24 @@
     }, 0)
   }
 
+  // 图片弹窗相关状态
+  const showImageModal = ref(false)
+  const modalImageSrc = ref('')
+  
+  // 放大查看图片
+  const expandImage = (imageSrc: string | undefined) => {
+    if (!imageSrc) return
+    modalImageSrc.value = imageSrc
+    showImageModal.value = true
+  }
+  
+  // 关闭图片弹窗
+  const closeImageModal = () => {
+    showImageModal.value = false
+  }
+  
+
+
   onMounted(() => {
     // 从本地存储加载宽度设置
     const savedWidth = localStorage.getItem('bizyair-sidebar-width')
@@ -1128,11 +1172,143 @@
   .message-image {
     margin-bottom: 8px;
   }
-
-  .message-image img {
+  
+  .image-container {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    border-radius: 6px;
+  }
+  
+  .message-img {
     max-width: 100%;
     max-height: 200px;
     border-radius: 6px;
+    display: block;
+  }
+  
+  .image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .image-container:hover .image-overlay {
+    opacity: 1;
+  }
+  
+  .image-action-btn {
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin: 0 4px;
+  }
+  
+  .image-action-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  .expand-btn {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .top-right-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 8px;
+  }
+  
+  /* 弹窗样式 */
+  .image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+  }
+  
+  .modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+  }
+  
+  .modal-image {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 8px;
+  }
+  
+  .modal-close-btn {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .clickable-image {
+    cursor: pointer;
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
+  }
+
+  .clickable-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .clickable-image::after {
+    content: '点击复用此图片';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .clickable-image:hover::after {
+    opacity: 1;
   }
 
   .chat-input-area {
@@ -1149,16 +1325,21 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    width: 100%;
+    margin-top: 8px;
   }
 
   .textarea-container {
     flex: 1;
     position: relative;
+    height: 40px; 
+    display: flex;
+    align-items: center;
   }
 
   .textarea-container textarea {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 12px;
     border-radius: 18px;
     background-color: #444;
     border: 1px solid #555;
@@ -1168,23 +1349,28 @@
     line-height: 20px;
     outline: none;
     transition: border-color 0.2s;
+    box-sizing: border-box; 
   }
 
   .textarea-container textarea:focus {
     border-color: #7c3aed;
   }
 
-  .upload-image-btn {
-    width: 40px;
+  .upload-image-btn, .send-message-btn, .control-btn {
+    min-width: 40px;
     height: 40px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    background-color: #444;
     border: none;
     color: white;
+    flex-shrink: 0; 
+  }
+
+  .upload-image-btn {
+    background-color: #444;
     transition: background-color 0.2s;
   }
 
@@ -1199,16 +1385,7 @@
   }
 
   .send-message-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
     background-color: #7c3aed;
-    border: none;
-    color: white;
     transition: background-color 0.2s;
   }
 
@@ -1244,8 +1421,10 @@
   }
 
   .image-preview-area {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
   }
 
   .preview-image-container {
