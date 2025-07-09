@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import screenfull from 'screenfull'
   import highlight from 'highlight.js'
   import prettier from 'prettier'
@@ -162,9 +162,29 @@
   const text = ref(props.modelValue)
   const emit = defineEmits(['update:modelValue', 'isUploading'])
 
+  // 修复handleInput函数中的bug
   const handleInput = () => {
-    emit('update:modelValue', text)
+    emit('update:modelValue', text.value)
   }
+
+  // 添加watch监听，确保所有值变化都会触发update:modelValue
+  watch(
+    text,
+    newValue => {
+      emit('update:modelValue', newValue)
+    },
+    { immediate: false }
+  )
+
+  // 监听props.modelValue的变化，确保双向绑定正确工作
+  watch(
+    () => props.modelValue,
+    newValue => {
+      if (newValue !== text.value) {
+        text.value = newValue
+      }
+    }
+  )
 
   const handleKeydown = event => {
     if (BLOCKED_KEYS.includes(event.key)) {
