@@ -331,22 +331,24 @@
     modelSelectStore.showCommunityDetail = false
   }
 
+  const showCopyDialog = ref(false)
+  const copyText = ref('')
+
   const handleCopy = async (sign: string) => {
-    try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(sign || '')
-        useToaster.success(t('community.detail.copiedSuccessfully'))
-      } else {
-        const input = document.createElement('input')
-        input.value = sign || ''
-        document.body.appendChild(input)
-        input.select()
-        document.execCommand('copy')
-        document.body.removeChild(input)
-      }
-    } catch (err) {
-      useToaster.error(t('community.detail.copyFailed'))
+    if (!navigator.clipboard) {
+      copyText.value = sign
+      showCopyDialog.value = true
+      return;
     }
+
+    navigator.clipboard
+      .writeText(sign)
+      .then(() => useToaster.success(t('community.detail.copiedSuccessfully')))
+      .catch(error => {
+        console.error('复制失败:', error);
+        copyText.value = sign
+        showCopyDialog.value = true
+      });
   }
 
   const handleTagClick = (tagId: string) => {
@@ -1100,6 +1102,42 @@
     </div>
     <div v-if="isLoading" class="min-h-[60vh]">
       <LoadingOverlay v-if="isLoading" />
+    </div>
+  </v-dialog>
+
+  <!-- 复制失败弹框 -->
+  <v-dialog
+    v-model:open="showCopyDialog"
+    class="px-6 overflow-visible pb-6 z-[10002] max-w-[500px] bg-[#353535]"
+    layout-class="z-[10001]"
+    content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+  >
+    <div class="p-6 flex flex-col gap-4 items-start justify-start relative">
+      <div class="flex flex-col gap-4 items-start justify-start self-stretch shrink-0 relative">
+        <div class="flex flex-row gap-2 items-center justify-start self-stretch shrink-0 relative">
+          <div
+            class="text-text-text-foreground text-left font-['Inter-SemiBold',_sans-serif] text-lg leading-[18px] font-semibold relative"
+            style="letter-spacing: -0.025em"
+          >
+            {{ t('community.detail.manualCopy') }}
+          </div>
+        </div>
+        <div class="flex flex-col gap-2 items-start justify-start self-stretch shrink-0 relative">
+          <div
+            class="text-text-text-muted-foreground text-left font-['Inter-Regular',_sans-serif] text-sm leading-5 font-normal relative"
+          >
+            {{ t('community.detail.manualCopyDesc') }}
+          </div>
+          <div class="w-full">
+            <input
+              :value="copyText"
+              readonly
+              class="w-full px-3 py-2 bg-[#424242] border border-[#6b7280] rounded-md text-[#F9FAFB] text-sm font-mono focus:outline-none focus:border-[#6D28D9]"
+              @focus="(event) => (event.target as HTMLInputElement)?.select()"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </v-dialog>
 </template>

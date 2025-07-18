@@ -133,6 +133,7 @@ export const useModelSelectStore = defineStore('modelSelect', {
     },
 
     setSelectedModelTypes(page: ModeTabType, types: string[]) {
+      console.log('setSelectedModelTypes', page, types)
       this.mine[page].filterState.model_types = types
     },
     resetPageState(page: ModeTabType) {
@@ -168,15 +169,28 @@ export const useModelSelectStore = defineStore('modelSelect', {
           model_types(),
           base_model_types()
         ])
-
+        
         if (modelTypesResponse?.data) {
           if (modelTypes && modelTypes.length > 0) {
+            const predefinedTypes = ['LoRA', 'Controlnet', 'Checkpoint', 'VAE', 'Upscaler', 'Detection']
+            const matchedTypes = modelTypes.map(inputType => {
+              const matchedType = predefinedTypes.find(predefinedType => 
+              {
+                // 特殊处理
+                if (inputType.toLowerCase() === 'upscalemodel' && predefinedType.toLowerCase() === 'upscaler') {
+                  return true
+                }
+                return predefinedType.toLowerCase() === inputType.toLowerCase()
+              }
+              )
+              return matchedType || 'Other'
+            })
             this.modelTypes = modelTypesResponse.data.filter((type: CommonModelType) =>
-              modelTypes.includes(type.value)
+              matchedTypes.includes(type.value)
             )
-            this.setSelectedModelTypes('posts', modelTypes)
-            this.setSelectedModelTypes('forked', modelTypes)
-            this.setSelectedModelTypes('community', modelTypes)
+            this.setSelectedModelTypes('posts', matchedTypes)
+            this.setSelectedModelTypes('forked', matchedTypes)
+            this.setSelectedModelTypes('community', matchedTypes)
           } else {
             this.modelTypes = modelTypesResponse.data
           }

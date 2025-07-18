@@ -238,6 +238,8 @@
       "failedRemoveModel": "Failed to remove model.",
       "noModelVersionsFound": "No model versions found",
       "copiedSuccessfully": "Copied successfully.",
+      "manualCopy": "Manual Copy",
+      "manualCopyDesc": "Due to environment restrictions, the content cannot be automatically copied to clipboard. Please manually select and copy the following content:",
       "failedLoadWorkflow": "Failed to load workflow.",
       "nodeAddedSuccessfully": "Node added successfully.",
       "failedDownloadWorkflow": "Failed to download workflow.",
