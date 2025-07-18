@@ -238,6 +238,8 @@
       "failedRemoveModel": "删除模型失败",
       "noModelVersionsFound": "未找到模型版本",
       "copiedSuccessfully": "复制成功",
+      "manualCopy": "手动复制",
+      "manualCopyDesc": "由于环境限制，无法自动复制到剪贴板。请手动选择并复制以下内容：",
       "failedLoadWorkflow": "加载工作流失败",
       "nodeAddedSuccessfully": "节点添加成功",
       "failedDownloadWorkflow": "下载工作流失败",
