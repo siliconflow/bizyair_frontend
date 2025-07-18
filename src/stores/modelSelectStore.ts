@@ -169,20 +169,28 @@ export const useModelSelectStore = defineStore('modelSelect', {
           model_types(),
           base_model_types()
         ])
-        
+
         if (modelTypesResponse?.data) {
           if (modelTypes && modelTypes.length > 0) {
-            const predefinedTypes = ['LoRA', 'Controlnet', 'Checkpoint', 'VAE', 'Upscaler', 'Detection']
+            const predefinedTypes = [
+              'LoRA',
+              'Controlnet',
+              'Checkpoint',
+              'VAE',
+              'Upscaler',
+              'Detection'
+            ]
             const matchedTypes = modelTypes.map(inputType => {
-              const matchedType = predefinedTypes.find(predefinedType => 
-              {
+              const matchedType = predefinedTypes.find(predefinedType => {
                 // 特殊处理
-                if (inputType.toLowerCase() === 'upscalemodel' && predefinedType.toLowerCase() === 'upscaler') {
+                if (
+                  inputType.toLowerCase() === 'upscalemodel' &&
+                  predefinedType.toLowerCase() === 'upscaler'
+                ) {
                   return true
                 }
                 return predefinedType.toLowerCase() === inputType.toLowerCase()
-              }
-              )
+              })
               return matchedType || 'Other'
             })
             this.modelTypes = modelTypesResponse.data.filter((type: CommonModelType) =>

@@ -338,17 +338,17 @@
     if (!navigator.clipboard) {
       copyText.value = sign
       showCopyDialog.value = true
-      return;
+      return
     }
 
     navigator.clipboard
       .writeText(sign)
       .then(() => useToaster.success(t('community.detail.copiedSuccessfully')))
       .catch(error => {
-        console.error('复制失败:', error);
+        console.error('复制失败:', error)
         copyText.value = sign
         showCopyDialog.value = true
-      });
+      })
   }
 
   const handleTagClick = (tagId: string) => {
@@ -1133,7 +1133,7 @@
               :value="copyText"
               readonly
               class="w-full px-3 py-2 bg-[#424242] border border-[#6b7280] rounded-md text-[#F9FAFB] text-sm font-mono focus:outline-none focus:border-[#6D28D9]"
-              @focus="(event) => (event.target as HTMLInputElement)?.select()"
+              @focus="event => (event.target as HTMLInputElement)?.select()"
             />
           </div>
         </div>
