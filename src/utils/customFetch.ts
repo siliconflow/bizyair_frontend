@@ -26,8 +26,11 @@ export function customFetch(url: string, options = {}, needDebounce = true, need
     ...options,
     headers
   }
-
-  const host = `${window.location.origin}${window.location.pathname === '/' ? '' : window.location.pathname}`
+  let host = `${window.location.origin}${window.location.pathname === '/' ? '' : window.location.pathname}`
+  const win = window as Window & { bizyAirHost?: string }
+  if (win.bizyAirHost) {
+    host = win.bizyAirHost
+  }
   return window
     .fetch(`${host}${url}`, updatedOptions)
     .then(response => {
