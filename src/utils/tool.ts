@@ -137,26 +137,26 @@ export const setDictData = (key: string, data: CommonDict, expires?: number): vo
  */
 export const downloadImage = async (imageSrc: string, fileName?: string): Promise<boolean> => {
   if (!imageSrc) return false
-    // 创建一个临时链接
-    const a = document.createElement('a')
-    
-    // 如果是base64格式
-    if (imageSrc.startsWith('data:')) {
-      a.href = imageSrc
-    } else {
-      // 如果是URL，需要先获取图片内容
-      const response = await fetch(imageSrc)
-      const blob = await response.blob()
-      a.href = URL.createObjectURL(blob)
-    }
-    
-    // 设置下载文件名
-    a.download = fileName || `bizyair-image-${Date.now()}.png`
-    
-    // 触发点击下载
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    
-    return true
+  // 创建一个临时链接
+  const a = document.createElement('a')
+
+  // 如果是base64格式
+  if (imageSrc.startsWith('data:')) {
+    a.href = imageSrc
+  } else {
+    // 如果是URL，需要先获取图片内容
+    const response = await fetch(imageSrc)
+    const blob = await response.blob()
+    a.href = URL.createObjectURL(blob)
+  }
+
+  // 设置下载文件名
+  a.download = fileName || `bizyair-image-${Date.now()}.png`
+
+  // 触发点击下载
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+
+  return true
 }
