@@ -108,30 +108,31 @@ const NodeInfoLogger = (function() {
         return new File([blob], filename, { type: blob.type })
       }
     // 构建图片信息对象（根据 server_mode 判断逻辑）
-    const buildImageInfo = async (imageData) => {
-        if (!imageData?.filename) return null;
+    const buildImageInfo = async (imageData, nodeType, widgetsValues) => {
+        console.log(imageData, 'imageData');
+        if (!imageData) return null;
         // 检查服务器模式
         const serverModeResponse = await fetch("/bizyair/server_mode");
         const serverModeData = await serverModeResponse.json();
-        const type = imageData.type || 'temp';
-        const path = `/${type}/${imageData.filename}`;
+        let type = imageData.type || 'temp';
+        let filename = imageData.filename;
+        // 如果是LoadImage节点且服务器模式，filename取widgetsValues[0]
+        if (serverModeData.data.server_mode && nodeType === 'LoadImage' && Array.isArray(widgetsValues) && widgetsValues.length > 0) {
+            filename = widgetsValues[0];
+        }
+        const path = `/${type}/${filename}`;
         let url;
-        
         if (serverModeData.data.server_mode) {
-            // 服务器模式，使用 view 接口
-            url = `/view?filename=${encodeURIComponent(imageData.filename)}`;
+            url = `/view?filename=${encodeURIComponent(filename)}`;
         } else {
-            // 本地模式，如果 filename 是 base64 数据，直接使用
-            if (imageData.filename.startsWith('data:')) {
-                url = imageData.filename;
+            if (filename.startsWith('data:')) {
+                url = filename;
             } else {
-                // 否则使用 buildImageUrl 构建 URL
-                url = buildImageUrl(imageData.filename, type);
+                url = buildImageUrl(filename, type);
             }
         }
-        
         return {
-            filename: imageData.filename,
+            filename: filename,
             url: url,
             path: path,
             type: type
@@ -151,10 +152,6 @@ const NodeInfoLogger = (function() {
             const serverModeResponse = await fetch("/bizyair/server_mode");
             const serverModeData = await serverModeResponse.json();
             node.onMouseDown = function(e, pos, canvas) {
-                if (serverModeData.data.server_mode && this.type === 'LoadImage') {
-                    console.log(this.type, 'this=p------');
-                    return;
-                }
                 // 对于小部件点击或右键点击，直接使用原始方法处理
                 if (e.widgetClick || e.button !== 0) {
                     return this._originalOnMouseDown?.apply(this, arguments);
@@ -226,6 +223,8 @@ const NodeInfoLogger = (function() {
                     // 只有当不处于拖动状态时才记录信息
                     if (!canvas.is_dragging) {
                         // 收集节点信息
+                        console.log(this,'this----');
+                        
                         console.log("节点信息:", {
                             id: this.id,
                             type: this.type,
@@ -234,11 +233,8 @@ const NodeInfoLogger = (function() {
                             inputs: this.inputs,
                             outputs: this.outputs,
                             properties: this.properties,
-                            widgets: this.widgets?.map(w => ({
-                                name: w.name,
-                                value: w.value,
-                                type: w.type
-                            }))
+                            widgets: this.widgets,
+                            options: this.options
                         });
                         
                         console.log(this.images, 'this');
@@ -259,7 +255,9 @@ const NodeInfoLogger = (function() {
                             // 使用异步IIFE处理图片，不阻塞主流程
                             (async () => {
                                 try {
-                                    const imageInfo = await buildImageInfo(this.images[0]);
+                                    console.log(this.images, 'this.images[0]');
+                                    // 调用 buildImageInfo 时传入节点类型和 widgets_values
+                                    const imageInfo = await buildImageInfo(this.images[0], this.type, this.widgets_values);
                                     
                                     // 检查是否存在全局bizyAirLib对象及logNodeInfo函数
                                     if (typeof bizyAirLib !== 'undefined' && typeof bizyAirLib.logNodeInfo === 'function') {
