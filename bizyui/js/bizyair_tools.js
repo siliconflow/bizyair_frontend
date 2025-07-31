@@ -33,6 +33,21 @@ async function convert(){
       .catch(error => console.error("Error:", error));
 }
 
+
+async function convert_back(){
+    const p2 = await app.graphToPrompt();
+    const json = JSON.stringify(p2["workflow"], null, 2);
+    await api.fetchApi("/bizyair/node_converter_back", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: json
+      }).then(response => response.json())
+      .then(data => handleFile(data))
+      .catch(error => console.error("Error:", error));
+}
+
 // 全局变量，用于节流控制
 // let lastConvertTime = 0;
 // const MIN_CONVERT_INTERVAL = 3000; // 最小间隔3秒
@@ -66,6 +81,12 @@ app.registerExtension({
                             content: "convert to bizyair node",
                             callback: async () => {
                                 await convert()
+                            },
+                        },
+                        {
+                            content: "convert bizyair node to comfyui node",
+                            callback: async () => {
+                                await convert_back()
                             },
                         },
                     ],
