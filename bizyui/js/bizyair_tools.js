@@ -19,33 +19,23 @@ async function handleFile(json_data) {
 //         return serverModeData.data.server_mode === true;
 // }
 
-async function convert(){
+
+async function convert(toBizyAir=true) {
     const p2 = await app.graphToPrompt();
-    const json = JSON.stringify(p2["workflow"], null, 2);
+    const workflow = p2["workflow"];
+    workflow.comfy2bizyair = toBizyAir;
+    const json = JSON.stringify(workflow, null, 2);
+
     await api.fetchApi("/bizyair/node_converter", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: json
-      }).then(response => response.json())
-      .then(data => handleFile(data))
-      .catch(error => console.error("Error:", error));
-}
-
-
-async function convert_back(){
-    const p2 = await app.graphToPrompt();
-    const json = JSON.stringify(p2["workflow"], null, 2);
-    await api.fetchApi("/bizyair/node_converter_back", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: json
-      }).then(response => response.json())
-      .then(data => handleFile(data))
-      .catch(error => console.error("Error:", error));
+    })
+    .then(response => response.json())
+    .then(data => handleFile(data))
+    .catch(error => console.error("Error:", error));
 }
 
 // 全局变量，用于节流控制
@@ -78,16 +68,23 @@ app.registerExtension({
                 submenu: {
                     options: [
                         {
-                            content: "convert to bizyair node",
-                            callback: async () => {
-                                await convert()
-                            },
-                        },
-                        {
-                            content: "convert bizyair node to comfyui node",
-                            callback: async () => {
-                                await convert_back()
-                            },
+                            content: "Convert Nodes",
+                            submenu: {
+                                options: [
+                                    {
+                                        content: "BizyAir",
+                                        callback: async () => {
+                                            await convert(true)
+                                        },
+                                    },
+                                    {
+                                        content: "ComfyUI",
+                                        callback: async () => {
+                                            await convert(false)
+                                        },
+                                    },
+                                ],
+                            }
                         },
                     ],
                 },
