@@ -68,7 +68,7 @@ app.registerExtension({
                 submenu: {
                     options: [
                         {
-                            content: "Convert Nodes",
+                            content: "Convert Nodes to",
                             submenu: {
                                 options: [
                                     {
