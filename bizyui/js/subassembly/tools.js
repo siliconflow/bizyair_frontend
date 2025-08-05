@@ -24,3 +24,13 @@ export function getCookie(name) {
   if (parts.length === 2) return parts.pop().split(';').shift();
   return null;
 }
+
+let isServerMode = null
+export async function getIsServerMode() {
+  if (isServerMode === null) {
+    const serverModeResponse = await fetch("/bizyair/server_mode");
+    const serverModeData = await serverModeResponse.json();
+    isServerMode = serverModeData.data.server_mode
+  }
+  return isServerMode
+}

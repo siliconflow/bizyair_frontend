@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
-import { get_user_info, get_metadata, get_coins, get_wallet, logout, server_mode } from '@/api/user'
+import { get_user_info, get_metadata, get_coins, get_wallet, logout } from '@/api/user'
 // , put_smetadata, post_real_name, get_wallet, get_coins
 import { WebSocketClient } from '@/utils/socket.ts'
 // import useClipboard from 'vue-clipboard3'
 import { useToaster } from '@/components/modules/toats/index'
+import { useServerModeStore } from './isServerMode'
 // const { toClipboard } = useClipboard()
 interface UserInfo {
   level: number
@@ -89,8 +90,8 @@ export const useStatusStore = defineStore('userStatus', {
   }),
   actions: {
     async loginRefresh(isLoading?: string) {
-      const serverModeRes = await server_mode()
-      const isServerMode = serverModeRes?.data?.server_mode
+      const serverModeStore = useServerModeStore()
+      const isServerMode = await serverModeStore.setIsServerMode()
       if (isServerMode) {
         return
       }
@@ -111,8 +112,8 @@ export const useStatusStore = defineStore('userStatus', {
       }
     },
     async sendSocket(fn: (res: any) => void) {
-      const serverModeRes = await server_mode()
-      const isServerMode = serverModeRes?.data?.server_mode
+      const serverModeStore = useServerModeStore()
+      const isServerMode = await serverModeStore.setIsServerMode()
       if (isServerMode) {
         return
       }

@@ -1,5 +1,5 @@
 import { app } from "../../scripts/app.js";
-import { getCookie } from "./subassembly/tools.js";
+import { getCookie, getIsServerMode } from "./subassembly/tools.js";
 
 function inspectNode(node) {
     console.log('节点信息:', {
@@ -39,11 +39,10 @@ window.addEventListener('message', async function(event) {
             }
             
             // 检查服务器模式
-            const serverModeResponse = await fetch("/bizyair/server_mode");
-            const serverModeData = await serverModeResponse.json();
+            const isServerMode = await getIsServerMode();
             
             let token = null;
-            if (serverModeData.data.server_mode) {
+            if (isServerMode) {
                 // 服务器模式，需要token
                 token = await new Promise((resolve) => {
                     const checkToken = () => {

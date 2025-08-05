@@ -2,7 +2,7 @@ import { app } from "../../scripts/app.js";
 
 import './bizyair_frontend.js'
 import './apply_image_to_node.js'
-import { hideWidget } from './subassembly/tools.js'
+import { hideWidget, getIsServerMode } from './subassembly/tools.js'
 import { getCookie } from './subassembly/tools.js'
 const possibleWidgetNames=[
     "clip_name",
@@ -38,11 +38,10 @@ const NodeInfoLogger = (function() {
     const getImageAsBase64 = async (filename, type) => {
         try {
             // 检查服务器模式
-            const serverModeResponse = await fetch("/bizyair/server_mode");
-            const serverModeData = await serverModeResponse.json();
+            const isServerMode = await getIsServerMode();
             
             // 非服务器模式下，如果 filename 已经是 base64 数据，直接返回
-            if (!serverModeData.data.server_mode && filename.startsWith('data:')) {
+            if (!isServerMode && filename.startsWith('data:')) {
                 console.log('本地模式：filename 已经是 base64 数据，直接返回');
                 return filename;
             }
@@ -50,7 +49,7 @@ const NodeInfoLogger = (function() {
             let imageUrl;
             let headers = {};
             
-            if (serverModeData.data.server_mode) {
+            if (isServerMode) {
                 // 服务器模式，改为请求后端转发接口
                 imageUrl = `/bizyair/proxy_view?filename=${encodeURIComponent(filename)}`;
             } else {
@@ -112,17 +111,16 @@ const NodeInfoLogger = (function() {
         console.log(imageData, 'imageData');
         if (!imageData) return null;
         // 检查服务器模式
-        const serverModeResponse = await fetch("/bizyair/server_mode");
-        const serverModeData = await serverModeResponse.json();
+        const isServerMode = await getIsServerMode();
         let type = imageData.type || 'temp';
         let filename = imageData.filename;
         // 如果是LoadImage节点且服务器模式，filename取widgetsValues[0]
-        if (serverModeData.data.server_mode && nodeType === 'LoadImage' && Array.isArray(widgetsValues) && widgetsValues.length > 0) {
+        if (isServerMode && nodeType === 'LoadImage' && Array.isArray(widgetsValues) && widgetsValues.length > 0) {
             filename = widgetsValues[0];
         }
         const path = `/${type}/${filename}`;
         let url;
-        if (serverModeData.data.server_mode) {
+        if (isServerMode) {
             url = `/view?filename=${encodeURIComponent(filename)}`;
         } else {
             if (filename.startsWith('data:')) {
@@ -149,8 +147,8 @@ const NodeInfoLogger = (function() {
             }
             
             // 使用装饰器模式扩展节点的onMouseDown方法
-            const serverModeResponse = await fetch("/bizyair/server_mode");
-            const serverModeData = await serverModeResponse.json();
+            // const serverModeResponse = await fetch("/bizyair/server_mode");
+            // const serverModeData = await serverModeResponse.json();
             node.onMouseDown = function(e, pos, canvas) {
                 // 对于小部件点击或右键点击，直接使用原始方法处理
                 if (e.widgetClick || e.button !== 0) {
