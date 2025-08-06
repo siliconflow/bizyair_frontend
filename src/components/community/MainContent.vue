@@ -7,6 +7,7 @@
   import { Model } from '@/types/model'
   import { useModelGrid } from '@/composables/useModelGrid'
   import { useI18n } from 'vue-i18n'
+  import { useServerModeStore } from '@/stores/isServerMode'
 
   defineOptions({
     name: 'MainContent'
@@ -27,8 +28,10 @@
   })
 
   const handleAddNode = async (model: Model) => {
+    const serverModeStore = useServerModeStore()
+    const isServerMode = await serverModeStore.setIsServerMode()
     try {
-      const nodeTypes: Record<string, string> = {
+      let nodeTypes: Record<string, string> = {
         LoRA: 'BizyAir_LoraLoader',
         Controlnet: 'BizyAir_ControlNetLoader',
         Checkpoint: 'BizyAir_CheckpointLoaderSimple',
@@ -40,13 +43,29 @@
         Instantid: 'BizyAir_InstantIDModelLoader',
         Pulid: 'BizyAir_PulidFluxModelLoader'
       }
+      if (isServerMode) {
+        nodeTypes = {
+          LoRA: 'LoraLoader',
+          Controlnet: 'ControlNetLoader',
+          Checkpoint: 'CheckpointLoaderSimple',
+          Clip: 'CLIPVisionLoader',
+          Ipadapter: 'IPAdapterModelLoade',
+          Unet: 'MZ_KolorsUNETLoaderV2',
+          Vae: 'VAELoader',
+          Upscale_models: 'UpscaleModelLoader',
+          Instantid: 'InstantIDModelLoader',
+          Pulid: 'PulidFluxModelLoader'
+        }
+      }
       let nodeID = nodeTypes[model.type] || 'BizyAir_ControlNetLoader'
       let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
       const canvas = window.LGraphCanvas?.active_canvas
 
       if (loraLoaderNode && canvas) {
-        loraLoaderNode.title = `☁️BizyAir Load ${model.type}`
-        loraLoaderNode.color = '#7C3AED'
+        if (!isServerMode) {
+          loraLoaderNode.title = `☁️BizyAir Load ${model.type}`
+          loraLoaderNode.color = '#7C3AED'
+        }
 
         const widgetValues =
           model.type === 'LoRA'

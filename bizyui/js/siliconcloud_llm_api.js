@@ -1,5 +1,5 @@
 import { app } from "../../scripts/app.js";
-import { getCookie } from "./subassembly/tools.js";
+import { getCookie, getIsServerMode } from "./subassembly/tools.js";
 
 const createModelFetchExtension = (nodeName, endpoint) => {
     return {
@@ -17,10 +17,9 @@ const createModelFetchExtension = (nodeName, endpoint) => {
                     const fetchModels = async () => {
                         try {
                             // 首先检查服务器模式
-                            const serverModeResponse = await fetch("/bizyair/server_mode");
-                            const serverModeData = await serverModeResponse.json();
+                            const isServerMode = await getIsServerMode();
                             
-                            if (serverModeData.data.server_mode) {
+                            if (isServerMode) {
                                 // 服务器模式，需要token
                                 return new Promise((resolve) => {
                                     const checkToken = () => {

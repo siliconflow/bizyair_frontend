@@ -7,7 +7,7 @@ import {
   get_message_unread_count
 } from '@/api/message-box'
 import { useDictStore } from './dictStore'
-import { server_mode } from '@/api/user'
+import { useServerModeStore } from './isServerMode'
 
 export const useNotificationStore = defineStore('notification', {
   state: () => ({
@@ -376,8 +376,8 @@ export const useNotificationStore = defineStore('notification', {
 
     async loadUnreadCount() {
       try {
-        const serverModeRes = await server_mode()
-        const isServerMode = serverModeRes?.data?.server_mode
+        const serverModeStore = useServerModeStore()
+        const isServerMode = await serverModeStore.setIsServerMode()
         if (isServerMode) {
           return
         }
@@ -422,8 +422,8 @@ export const useNotificationStore = defineStore('notification', {
     },
     async loadUnreadCountWithError() {
       try {
-        const serverModeRes = await server_mode()
-        const isServerMode = serverModeRes?.data?.server_mode
+        const serverModeStore = useServerModeStore()
+        const isServerMode = await serverModeStore.setIsServerMode()
         if (isServerMode) {
           return
         }
