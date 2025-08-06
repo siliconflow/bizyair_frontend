@@ -136,8 +136,13 @@
         >
           {{ model.type }}
         </div>
-
         <div
+          v-if="
+            model.type == 'LoRA' ||
+            model.type == 'Controlnet' ||
+            model.type == 'Checkpoint' ||
+            model.type == 'Workflow'
+          "
           class="absolute right-3 top-4 min-w-[24px] h-[24px] flex items-center justify-center z-10"
           @click.prevent.stop="$emit('action', model)"
         >

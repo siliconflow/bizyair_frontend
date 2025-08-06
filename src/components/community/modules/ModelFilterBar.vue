@@ -111,6 +111,11 @@
       if (!hasWorkflow) {
         store.modelTypes.push({ label: 'Workflow', value: 'Workflow' })
       }
+      if (store[props.page].filterState.selected_model_types.length === 0) {
+        store[props.page].filterState.model_types = store.modelTypes
+          .filter(type => type.value !== 'Application')
+          .map(type => type.value)
+      }
     }
 
     await nextTick()

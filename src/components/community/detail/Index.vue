@@ -41,6 +41,7 @@
   import { debounce } from 'lodash-es'
   import { create_share_code } from '@/api/model'
   import { useI18n } from 'vue-i18n'
+import { useServerModeStore } from '@/stores/isServerMode'
 
   const communityStore = useCommunityStore()
   const userStatusStore = useStatusStore()
@@ -382,9 +383,11 @@
   }
 
   const handleAddNode = async () => {
+    const serverModeStore = useServerModeStore()
+    const isServerMode = await serverModeStore.setIsServerMode()
     try {
       isLoading.value = true
-      const nodeTypes: Record<string, string> = {
+      let nodeTypes: Record<string, string> = {
         LoRA: 'BizyAir_LoraLoader',
         Controlnet: 'BizyAir_ControlNetLoader',
         Checkpoint: 'BizyAir_CheckpointLoaderSimple',
@@ -396,12 +399,27 @@
         Instantid: 'BizyAir_InstantIDModelLoader',
         Pulid: 'BizyAir_PulidFluxModelLoader'
       }
+      if (isServerMode) {
+        nodeTypes = {
+          LoRA: 'LoraLoader',
+          Controlnet: 'ControlNetLoader',
+          Checkpoint: 'CheckpointLoaderSimple',
+          Clip: 'CLIPVisionLoader',
+          Ipadapter: 'IPAdapterModelLoade',
+          Unet: 'MZ_KolorsUNETLoaderV2',
+          Vae: 'VAELoader',
+          Upscale_models: 'UpscaleModelLoader',
+          Instantid: 'InstantIDModelLoader',
+          Pulid: 'PulidFluxModelLoader'
+        }
+      }
       let nodeID = nodeTypes[(model.value as any).type] || 'BizyAir_ControlNetLoader'
       let loraLoaderNode = window.LiteGraph?.createNode(nodeID)
       const canvas = window.LGraphCanvas?.active_canvas
-
-      loraLoaderNode.title = `☁️BizyAir Load ${(model.value as any).type}`
-      loraLoaderNode.color = '#7C3AED'
+      if (!isServerMode) {
+        loraLoaderNode.title = `☁️BizyAir Load ${(model.value as any).type}`
+        loraLoaderNode.color = '#7C3AED'
+      }
 
       const widgetValues =
         model.value?.type === 'LoRA'
@@ -927,7 +945,12 @@
                 </template>
               </Button>
               <Button
-                v-if="model?.type !== 'Workflow'"
+                v-if="
+                  model?.type !== 'Workflow' && (
+                  model?.type == 'LoRA' ||
+                  model?.type == 'Controlnet' ||
+                  model?.type == 'Checkpoint'
+                )"
                 class="flex w-[170px] px-8 py-2 justify-center items-center gap-2 bg-[#F43F5E] hover:bg-[#F43F5E]/90 rounded-[6px]"
                 :disabled="isLoading"
                 @click="handleAddNode"
