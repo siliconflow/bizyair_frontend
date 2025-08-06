@@ -7,7 +7,7 @@
   import { Model } from '@/types/model'
   import { useModelGrid } from '@/composables/useModelGrid'
   import { useI18n } from 'vue-i18n'
-import { useServerModeStore } from '@/stores/isServerMode'
+  import { useServerModeStore } from '@/stores/isServerMode'
 
   defineOptions({
     name: 'MainContent'

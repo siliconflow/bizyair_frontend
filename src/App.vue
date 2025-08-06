@@ -174,7 +174,7 @@
   import { useToaster } from '@/components/modules/toats/index'
   import vTheme from './components/modules/vTheme.vue'
   import Sidebar from '@/components/assistant/Sidebar.vue'
-import { useServerModeStore } from './stores/isServerMode'
+  import { useServerModeStore } from './stores/isServerMode'
 
   const { t, locale } = useI18n()
   const languageStore = useLanguageStore()
@@ -185,7 +185,7 @@ import { useServerModeStore } from './stores/isServerMode'
     try {
       // const serverModeRes = await server_mode()
       // const isServerMode = serverModeRes?.data?.server_mode
-      
+
       const serverModeStore = useServerModeStore()
       const isServerMode = await serverModeStore.setIsServerMode()
       if (isServerMode) {

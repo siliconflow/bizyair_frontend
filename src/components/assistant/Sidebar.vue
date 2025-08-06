@@ -238,7 +238,7 @@
   import { useToaster } from '@/components/modules/toats/index'
   import { v4 as uuidv4 } from 'uuid'
   import { downloadImage } from '@/utils/tool'
-import { useServerModeStore } from '@/stores/isServerMode'
+  import { useServerModeStore } from '@/stores/isServerMode'
   const { t } = useI18n()
   const sidebarStore = useSidebarStore()
 

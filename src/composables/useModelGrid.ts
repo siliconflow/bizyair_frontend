@@ -56,10 +56,10 @@ export function useModelGrid({ pageKey }: UseModelGridOptions): UseModelGridRetu
       console.log(storeData.filterState)
       const response = await get_model_list(
         {
-          ...storeData.modelListPathParams,
+          ...storeData.modelListPathParams
         },
         {
-          ...storeData.filterState,
+          ...storeData.filterState
           // model_types: ['LoRA', 'Controlnet', 'Checkpoint'] // 添加你想要的模型类型
         }
       )

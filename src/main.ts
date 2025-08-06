@@ -238,12 +238,12 @@ app.directive('debounce', {
 export function mount(container: string | Element, comfyUIApp?: any) {
   app.provide('comfyUIApp', comfyUIApp)
   const serverModeStore = useServerModeStore()
-  serverModeStore.setIsServerMode().then((e) => {
+  serverModeStore.setIsServerMode().then(e => {
     if (!e) {
       app.use(i18n)
       app.mount(container)
     } else {
-        const timer = setInterval(() => {
+      const timer = setInterval(() => {
         const authToken = document.cookie
           .split(';')
           .find(cookie => cookie.trim().startsWith('bizy_token='))
