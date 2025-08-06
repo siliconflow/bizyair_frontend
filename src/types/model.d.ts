@@ -59,8 +59,8 @@ export interface ModelListPathParams {
   current: number 
   page_size: number 
   mode: string 
-  total:number 
-
+  total: number 
+  model_types?: string[] // 新增可选的模型类型过滤参数
 }
 
 export interface FilterState {

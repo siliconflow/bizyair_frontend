@@ -238,6 +238,7 @@
   import { useToaster } from '@/components/modules/toats/index'
   import { v4 as uuidv4 } from 'uuid'
   import { downloadImage } from '@/utils/tool'
+  import { useServerModeStore } from '@/stores/isServerMode'
   const { t } = useI18n()
   const sidebarStore = useSidebarStore()
 
@@ -943,9 +944,9 @@
     // 异步获取 server_mode
     ;(async () => {
       try {
-        const res = await fetch('/bizyair/server_mode')
-        const data = await res.json()
-        serverMode.value = !!data?.data?.server_mode
+        const serverModeStore = useServerModeStore()
+        const isServerMode = await serverModeStore.setIsServerMode()
+        serverMode.value = !isServerMode
       } catch (e) {
         serverMode.value = false
       }

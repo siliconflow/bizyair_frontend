@@ -168,12 +168,13 @@
 
   import { useCommunityStore } from '@/stores/communityStore'
   import { get_share_code } from '@/api/model'
-  import { get_user_language_profile, put_user_language_profile, server_mode } from '@/api/user'
+  import { get_user_language_profile, put_user_language_profile } from '@/api/user'
 
   import ModelDetail from '@/components/community/detail/Index.vue'
   import { useToaster } from '@/components/modules/toats/index'
   import vTheme from './components/modules/vTheme.vue'
   import Sidebar from '@/components/assistant/Sidebar.vue'
+  import { useServerModeStore } from './stores/isServerMode'
 
   const { t, locale } = useI18n()
   const languageStore = useLanguageStore()
@@ -182,8 +183,11 @@
 
   const getUserLanguageProfile = async () => {
     try {
-      const serverModeRes = await server_mode()
-      const isServerMode = serverModeRes?.data?.server_mode
+      // const serverModeRes = await server_mode()
+      // const isServerMode = serverModeRes?.data?.server_mode
+
+      const serverModeStore = useServerModeStore()
+      const isServerMode = await serverModeStore.setIsServerMode()
       if (isServerMode) {
         return
       }

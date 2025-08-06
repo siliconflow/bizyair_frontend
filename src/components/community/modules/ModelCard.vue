@@ -7,6 +7,7 @@
   import { useDictStore } from '@/stores/dictStore'
   import { ref, watch, onMounted, computed } from 'vue'
   import { useI18n } from 'vue-i18n'
+  import { useServerModeStore } from '@/stores/isServerMode'
 
   defineOptions({
     name: 'ModelCard'
@@ -27,6 +28,7 @@
   const emit = defineEmits(['action', 'image-load', 'image-error'])
 
   const isHovering = ref(false)
+  const isServerMode = ref(false)
 
   const actionTooltipText = computed(() => {
     return props.model?.type === 'Workflow'
@@ -79,6 +81,8 @@
   )
 
   onMounted(async () => {
+    const serverModeStore = useServerModeStore()
+    isServerMode.value = await serverModeStore.setIsServerMode()
     const coverUrls = props.model?.versions?.[0]?.cover_urls
     if (coverUrls && Array.isArray(coverUrls) && coverUrls.length > 0) {
       const timestamp = new Date().getTime()
@@ -136,8 +140,15 @@
         >
           {{ model.type }}
         </div>
-
         <div
+          v-if="
+            (isServerMode && model?.type !== 'Detection' && model?.type !== 'Other') ||
+            (!isServerMode &&
+              (model?.type === 'LoRA' ||
+                model?.type === 'Controlnet' ||
+                model?.type === 'Checkpoint' ||
+                model?.type === 'Workflow'))
+          "
           class="absolute right-3 top-4 min-w-[24px] h-[24px] flex items-center justify-center z-10"
           @click.prevent.stop="$emit('action', model)"
         >
