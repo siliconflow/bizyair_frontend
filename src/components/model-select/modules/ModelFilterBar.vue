@@ -54,6 +54,21 @@
     emit('update:showSortPopover', false)
   }
 
+  const handleModelTypeChange = async (modelType: string) => {
+    const types = [...store[props.page].filterState.model_types]
+    const typeIndex = types.indexOf(String(modelType))
+    if (typeIndex === -1) {
+      types.push(String(modelType))
+    } else {
+      types.splice(typeIndex, 1)
+    }
+    store[props.page].filterState.model_types = types
+
+    await nextTick()
+    emit('fetchData')
+    emit('update:showSortPopover', false)
+  }
+
   const getStoreRef = (path: ModeTabType) => {
     return store[path]
   }
@@ -80,15 +95,15 @@
       }
     }
 
-    // 确保所有BaseModel在初始化时都被选中
-    if (
-      store.baseModelTypes &&
-      store.baseModelTypes.length > 0 &&
-      (!store[props.page].filterState.base_models ||
-        store[props.page].filterState.base_models.length === 0)
-    ) {
-      store[props.page].filterState.base_models = store.baseModelTypes.map(model => model.value)
-    }
+    // 注释掉自动选中所有BaseModel的逻辑，让用户手动选择或通过props传入
+    // if (
+    //   store.baseModelTypes &&
+    //   store.baseModelTypes.length > 0 &&
+    //   (!store[props.page].filterState.base_models ||
+    //     store[props.page].filterState.base_models.length === 0)
+    // ) {
+    //   store[props.page].filterState.base_models = store.baseModelTypes.map(model => model.value)
+    // }
 
     await nextTick()
     emit('filter-data-ready')
@@ -286,6 +301,7 @@
                         ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
                         : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
+                    @click="handleModelTypeChange(type.value)"
                   >
                     {{ type.label }}
                   </Badge>
