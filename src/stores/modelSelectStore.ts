@@ -178,7 +178,7 @@ export const useModelSelectStore = defineStore('modelSelect', {
         if (modelTypesResponse?.data) {
           // 总是显示所有模型类型
           this.modelTypes = modelTypesResponse.data
-          
+
           if (modelTypes && modelTypes.length > 0) {
             const predefinedTypes = modelTypesResponse.data.map((e: CommonModelType) => e.value)
             const matchedTypes = modelTypes.map(inputType => {
@@ -212,7 +212,7 @@ export const useModelSelectStore = defineStore('modelSelect', {
         if (baseModelResponse?.data) {
           // 总是显示所有基础模型类型
           this.baseModelTypes = baseModelResponse.data
-          
+
           if (baseModelTypes && baseModelTypes.length > 0) {
             // 只设置传入的基础模型类型为选中状态
             this.setSelectedBaseModels('posts', baseModelTypes)
