@@ -11,7 +11,7 @@
   import BaseModelGrid from '@/components/community/modules/BaseModelGrid.vue'
   import { useModelGrid } from '@/composables/useModelGrid'
   import { useI18n } from 'vue-i18n'
-import { useServerModeStore } from '@/stores/isServerMode'
+  import { useServerModeStore } from '@/stores/isServerMode'
 
   defineOptions({
     name: 'Mine'
@@ -77,7 +77,7 @@ import { useServerModeStore } from '@/stores/isServerMode'
         UNet: 'BizyAir_MZ_KolorsUNETLoaderV2',
         Upscaler: 'BizyAir_UpscaleModelLoader',
         Detection: 'BizyAir_CLIPVisionLoader',
-        Other: 'BizyAir_IPAdapterModelLoade',
+        Other: 'BizyAir_IPAdapterModelLoade'
       }
       if (isServerMode) {
         nodeTypes = {
@@ -88,7 +88,7 @@ import { useServerModeStore } from '@/stores/isServerMode'
           UNet: 'UNetLoader',
           Upscaler: 'UpscaleModelLoader',
           Detection: 'CLIPVisionLoader',
-          Other: 'IPAdapterModelLoade',
+          Other: 'IPAdapterModelLoade'
         }
       }
       let nodeID = nodeTypes[model.type] || 'BizyAir_ControlNetLoader'

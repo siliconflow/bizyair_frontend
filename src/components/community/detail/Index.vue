@@ -396,7 +396,7 @@
         UNet: 'BizyAir_MZ_KolorsUNETLoaderV2',
         Upscaler: 'BizyAir_UpscaleModelLoader',
         Detection: 'BizyAir_CLIPVisionLoader',
-        Other: 'BizyAir_IPAdapterModelLoade',
+        Other: 'BizyAir_IPAdapterModelLoade'
       }
       if (isServerMode.value) {
         nodeTypes = {
@@ -407,7 +407,7 @@
           UNet: 'UNetLoader',
           Upscaler: 'UpscaleModelLoader',
           Detection: 'CLIPVisionLoader',
-          Other: 'Other',
+          Other: 'Other'
         }
       }
       let nodeID = nodeTypes[(model.value as any).type] || 'BizyAir_ControlNetLoader'
@@ -943,14 +943,12 @@
               </Button>
               <Button
                 v-if="
-                  model?.type !== 'Workflow' && (
-                    (isServerMode && model?.type !== 'Detection' && model?.type !== 'Other') ||
-                    (!isServerMode && (
-                      model?.type === 'LoRA' ||
-                      model?.type === 'Controlnet' ||
-                      model?.type === 'Checkpoint'
-                    ))
-                  )
+                  model?.type !== 'Workflow' &&
+                  ((isServerMode && model?.type !== 'Detection' && model?.type !== 'Other') ||
+                    (!isServerMode &&
+                      (model?.type === 'LoRA' ||
+                        model?.type === 'Controlnet' ||
+                        model?.type === 'Checkpoint')))
                 "
                 class="flex w-[170px] px-8 py-2 justify-center items-center gap-2 bg-[#F43F5E] hover:bg-[#F43F5E]/90 rounded-[6px]"
                 :disabled="isLoading"
