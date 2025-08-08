@@ -136,6 +136,11 @@ export const useModelSelectStore = defineStore('modelSelect', {
       console.log('setSelectedModelTypes', page, types)
       this.mine[page].filterState.model_types = types
     },
+
+    setSelectedBaseModels(page: ModeTabType, models: string[]) {
+      console.log('setSelectedBaseModels', page, models)
+      this.mine[page].filterState.base_models = models
+    },
     resetPageState(page: ModeTabType) {
       this.mine[page] = {
         modelTypes: [],
@@ -171,6 +176,9 @@ export const useModelSelectStore = defineStore('modelSelect', {
         ])
 
         if (modelTypesResponse?.data) {
+          // 总是显示所有模型类型
+          this.modelTypes = modelTypesResponse.data
+
           if (modelTypes && modelTypes.length > 0) {
             const predefinedTypes = modelTypesResponse.data.map((e: CommonModelType) => e.value)
             const matchedTypes = modelTypes.map(inputType => {
@@ -186,14 +194,15 @@ export const useModelSelectStore = defineStore('modelSelect', {
               })
               return matchedType || 'Other'
             })
-            this.modelTypes = modelTypesResponse.data.filter((type: CommonModelType) =>
-              matchedTypes.includes(type.value)
-            )
+            // 只设置传入的类型为选中状态
             this.setSelectedModelTypes('posts', matchedTypes)
             this.setSelectedModelTypes('forked', matchedTypes)
             this.setSelectedModelTypes('community', matchedTypes)
           } else {
-            this.modelTypes = modelTypesResponse.data
+            // 如果没有传入类型，则清空选中状态
+            this.setSelectedModelTypes('posts', [])
+            this.setSelectedModelTypes('forked', [])
+            this.setSelectedModelTypes('community', [])
           }
           if (this.modelTypes.length > 0 && this.baseModelTypes.length > 0) {
             this.filterDataLoaded = true
@@ -201,12 +210,19 @@ export const useModelSelectStore = defineStore('modelSelect', {
         }
 
         if (baseModelResponse?.data) {
+          // 总是显示所有基础模型类型
+          this.baseModelTypes = baseModelResponse.data
+
           if (baseModelTypes && baseModelTypes.length > 0) {
-            this.baseModelTypes = baseModelResponse.data.filter((type: CommonModelType) =>
-              baseModelTypes.includes(type.value)
-            )
+            // 只设置传入的基础模型类型为选中状态
+            this.setSelectedBaseModels('posts', baseModelTypes)
+            this.setSelectedBaseModels('forked', baseModelTypes)
+            this.setSelectedBaseModels('community', baseModelTypes)
           } else {
-            this.baseModelTypes = baseModelResponse.data
+            // 如果没有传入基础模型类型，则清空选中状态
+            this.setSelectedBaseModels('posts', [])
+            this.setSelectedBaseModels('forked', [])
+            this.setSelectedBaseModels('community', [])
           }
           if (this.modelTypes.length > 0 && this.baseModelTypes.length > 0) {
             this.filterDataLoaded = true

@@ -73,26 +73,22 @@
         LoRA: 'BizyAir_LoraLoader',
         Controlnet: 'BizyAir_ControlNetLoader',
         Checkpoint: 'BizyAir_CheckpointLoaderSimple',
-        Clip: 'BizyAir_CLIPVisionLoader',
-        Ipadapter: 'BizyAir_IPAdapterModelLoade',
-        Unet: 'BizyAir_MZ_KolorsUNETLoaderV2',
-        Vae: 'BizyAir_VAELoader',
-        Upscale_models: 'BizyAir_UpscaleModelLoader',
-        Instantid: 'BizyAir_InstantIDModelLoader',
-        Pulid: 'BizyAir_PulidFluxModelLoader'
+        VAE: 'BizyAir_VAELoader',
+        UNet: 'BizyAir_MZ_KolorsUNETLoaderV2',
+        Upscaler: 'BizyAir_UpscaleModelLoader',
+        Detection: 'BizyAir_CLIPVisionLoader',
+        Other: 'BizyAir_IPAdapterModelLoade'
       }
       if (isServerMode) {
         nodeTypes = {
           LoRA: 'LoraLoader',
           Controlnet: 'ControlNetLoader',
           Checkpoint: 'CheckpointLoaderSimple',
-          Clip: 'CLIPVisionLoader',
-          Ipadapter: 'IPAdapterModelLoade',
-          Unet: 'MZ_KolorsUNETLoaderV2',
-          Vae: 'VAELoader',
-          Upscale_models: 'UpscaleModelLoader',
-          Instantid: 'InstantIDModelLoader',
-          Pulid: 'PulidFluxModelLoader'
+          VAE: 'VAELoader',
+          UNet: 'UNetLoader',
+          Upscaler: 'UpscaleModelLoader',
+          Detection: 'CLIPVisionLoader',
+          Other: 'IPAdapterModelLoade'
         }
       }
       let nodeID = nodeTypes[model.type] || 'BizyAir_ControlNetLoader'
