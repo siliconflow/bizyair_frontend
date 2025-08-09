@@ -285,12 +285,16 @@
         acActiveIndex.value = i
         break
       }
-      // if (e.cover_urls && !e.imageDone) {
-      //   e.imageError = true
-      //   useToaster.error(`Please wait until the image is uploaded for version ${i + 1}`)
-      //   acActiveIndex.value = i
-      //   break
-      // }
+      if (
+        !e.cover_urls ||
+        (Array.isArray(e.cover_urls) && e.cover_urls.length === 0) ||
+        (typeof e.cover_urls === 'string' && (e.cover_urls as string).trim() === '')
+      ) {
+        e.imageError = true
+        useToaster.error(t('publish.workflow.errors.uploadImage', { index: i + 1 }))
+        acActiveIndex.value = i
+        break
+      }
       if (!e.sign) {
         e.filePathError = true
         useToaster.error(t('publish.workflow.errors.enterFilePath', { index: i + 1 }))
@@ -298,7 +302,13 @@
         break
       }
     }
-    return tempData.versions.every((e: any) => e.version && e.base_model && e.sign)
+    return tempData.versions.every((e: any) => {
+      const hasCoverUrls =
+        e.cover_urls &&
+        ((Array.isArray(e.cover_urls) && e.cover_urls.length > 0) ||
+          (typeof e.cover_urls === 'string' && (e.cover_urls as string).trim() !== ''))
+      return e.version && e.base_model && e.sign && hasCoverUrls
+    })
   }
   const fnProgress = (p: number, i: number) => {
     formData.value.versions[i].progress = p
