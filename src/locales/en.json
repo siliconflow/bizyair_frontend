@@ -643,6 +643,87 @@
     "price": "Pricing Strategy",
     "doc": "Documentation"
   },
+  "publish": {
+    "workflow": {
+      "title": "Publish Workflow",
+      "name": {
+        "label": "Workflow Name",
+        "placeholder": "Enter workflow name"
+      },
+      "nextStep": "Next Step",
+      "addVersion": "Add Version",
+      "version": {
+        "name": "Version Name",
+        "placeholder": "Enter version name"
+      },
+      "baseModel": "Base Model",
+      "baseModelPlaceholder": "Select base model",
+      "uploadImage": "Upload Cover Image",
+      "introduction": "Introduction",
+      "publicVisible": "Public Visible",
+      "file": "Workflow File",
+      "uploaded": "Uploaded",
+      "speed": "Speed",
+      "cancel": "Cancel",
+      "loadFromWorkspace": "Load from Workspace",
+      "publish": "Publish",
+      "success": "Published successfully!",
+      "confirmDelete": {
+        "title": "Confirm Delete",
+        "desc": "Are you sure you want to delete this version?",
+        "cancel": "Cancel",
+        "continue": "Delete"
+      },
+      "errors": {
+        "enterName": "Please enter workflow name",
+        "enterVersion": "Please enter version name for version {index}",
+        "selectBaseModel": "Please select base model for version {index}",
+        "uploadImage": "Please upload cover image for version {index}",
+        "enterFilePath": "Please upload workflow file for version {index}"
+      }
+    },
+    "model": {
+      "title": "Publish Model",
+      "name": {
+        "label": "Model Name",
+        "placeholder": "Enter model name"
+      },
+      "type": {
+        "label": "Model Type",
+        "placeholder": "Select model type"
+      },
+      "nextStep": "Next Step",
+      "addVersion": "Add Version",
+      "version": {
+        "name": "Version Name",
+        "placeholder": "Enter version name"
+      },
+      "baseModel": "Base Model",
+      "baseModelPlaceholder": "Select base model",
+      "uploadImage": "Upload Cover Image",
+      "introduction": "Introduction",
+      "publicVisible": "Public Visible",
+      "file": "Model File",
+      "uploaded": "Uploaded",
+      "speed": "Speed",
+      "publish": "Publish",
+      "success": "Published successfully!",
+      "confirmDelete": {
+        "title": "Confirm Delete",
+        "desc": "Are you sure you want to delete this version?",
+        "cancel": "Cancel",
+        "continue": "Delete"
+      },
+      "errors": {
+        "enterName": "Please enter model name",
+        "selectType": "Please select model type",
+        "enterVersion": "Please enter version name for version {index}",
+        "selectBaseModel": "Please select base model for version {index}",
+        "uploadImage": "Please upload cover image for version {index}",
+        "enterFilePath": "Please upload model file for version {index}"
+      }
+    }
+  },
   "resumableUpload": {
     "title": "Resumable Upload",
     "uploadStatus": "Upload Status",
