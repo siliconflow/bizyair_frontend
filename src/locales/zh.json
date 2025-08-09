@@ -635,6 +635,87 @@
     "price": "定价策略",
     "doc": "使用文档"
   },
+  "publish": {
+    "workflow": {
+      "title": "发布工作流",
+      "name": {
+        "label": "工作流名称",
+        "placeholder": "请输入工作流名称"
+      },
+      "nextStep": "下一步",
+      "addVersion": "添加版本",
+      "version": {
+        "name": "版本名称",
+        "placeholder": "请输入版本名称"
+      },
+      "baseModel": "基础模型",
+      "baseModelPlaceholder": "请选择基础模型",
+      "uploadImage": "上传封面图片",
+      "introduction": "介绍",
+      "publicVisible": "公开可见",
+      "file": "工作流文件",
+      "uploaded": "已上传",
+      "speed": "速度",
+      "cancel": "取消",
+      "loadFromWorkspace": "从工作区加载",
+      "publish": "发布",
+      "success": "发布成功！",
+      "confirmDelete": {
+        "title": "确认删除",
+        "desc": "确定要删除这个版本吗？",
+        "cancel": "取消",
+        "continue": "删除"
+      },
+      "errors": {
+        "enterName": "请输入工作流名称",
+        "enterVersion": "请输入第 {index} 个版本的版本名称",
+        "selectBaseModel": "请选择第 {index} 个版本的基础模型",
+        "uploadImage": "请为第 {index} 个版本上传封面图片",
+        "enterFilePath": "请为第 {index} 个版本上传工作流文件"
+      }
+    },
+    "model": {
+      "title": "发布模型",
+      "name": {
+        "label": "模型名称",
+        "placeholder": "请输入模型名称"
+      },
+      "type": {
+        "label": "模型类型",
+        "placeholder": "请选择模型类型"
+      },
+      "nextStep": "下一步",
+      "addVersion": "添加版本",
+      "version": {
+        "name": "版本名称",
+        "placeholder": "请输入版本名称"
+      },
+      "baseModel": "基础模型",
+      "baseModelPlaceholder": "请选择基础模型",
+      "uploadImage": "上传封面图片",
+      "introduction": "介绍",
+      "publicVisible": "公开可见",
+      "file": "模型文件",
+      "uploaded": "已上传",
+      "speed": "速度",
+      "publish": "发布",
+      "success": "发布成功！",
+      "confirmDelete": {
+        "title": "确认删除",
+        "desc": "确定要删除这个版本吗？",
+        "cancel": "取消",
+        "continue": "删除"
+      },
+      "errors": {
+        "enterName": "请输入模型名称",
+        "selectType": "请选择模型类型",
+        "enterVersion": "请输入第 {index} 个版本的版本名称",
+        "selectBaseModel": "请选择第 {index} 个版本的基础模型",
+        "uploadImage": "请为第 {index} 个版本上传封面图片",
+        "enterFilePath": "请为第 {index} 个版本上传模型文件"
+      }
+    }
+  },
   "resumableUpload": {
     "title": "断点续传",
     "uploadStatus": "上传状态",

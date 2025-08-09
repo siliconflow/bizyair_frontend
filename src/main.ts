@@ -10,6 +10,8 @@ import enMessages from './locales/en.json'
 import zhMessages from './locales/zh.json'
 import { useSidebarStore } from '@/stores/sidebarStore'
 import { useServerModeStore } from '@/stores/isServerMode'
+import { useLanguageStore } from '@/stores/languageStore'
+import languageSwitcher from '@/utils/languageSwitcher'
 
 // 创建i18n实例
 const i18n = createI18n({
@@ -242,6 +244,14 @@ export function mount(container: string | Element, comfyUIApp?: any) {
     if (!e) {
       app.use(i18n)
       app.mount(container)
+      
+      // 初始化语言切换器
+      setTimeout(() => {
+        const languageStore = useLanguageStore()
+        languageSwitcher.init(i18n, languageStore).catch(error => {
+          console.warn('语言切换器初始化失败:', error)
+        })
+      }, 100)
     } else {
       const timer = setInterval(() => {
         const authToken = document.cookie
@@ -251,6 +261,14 @@ export function mount(container: string | Element, comfyUIApp?: any) {
           clearInterval(timer)
           app.use(i18n)
           app.mount(container)
+          
+          // 初始化语言切换器
+          setTimeout(() => {
+            const languageStore = useLanguageStore()
+            languageSwitcher.init(i18n, languageStore).catch(error => {
+              console.warn('语言切换器初始化失败:', error)
+            })
+          }, 100)
         }
       }, 300)
     }
