@@ -17,7 +17,7 @@
   import { sliceString, formatSize, formatNumber } from '@/utils/tool'
   import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
   import { Button } from '@/components/ui/button'
-  import { ref, onMounted, nextTick, inject } from 'vue'
+  import { ref, onMounted, nextTick, inject, computed } from 'vue'
   import { NImageGroup, NImage } from 'naive-ui'
   import vTooltips from '@/components/modules/v-tooltip.vue'
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
@@ -61,6 +61,20 @@
   const showCopyDialog = ref(false)
   const copyText = ref('')
   const isServerMode = ref(false)
+
+  // 计算编辑按钮是否应该被禁用
+  const isEditDisabled = computed(() => {
+    if (!model.value) return true
+
+    // 如果模型类型是 Workflow 且存在任何版本的 draft_id > 0，则禁用
+    if (model.value.type === 'Workflow' && model.value.versions) {
+      return model.value.versions.some(
+        version => (version as any).draft_id && (version as any).draft_id > 0
+      )
+    }
+
+    return false
+  })
 
   // 添加视频检测函数
   const isVideoUrl = (url: string) => {
@@ -294,6 +308,11 @@
 
   const handleModelOperation = async (type: 'edit' | 'remove', id: string | number) => {
     if (type === 'edit') {
+      // 如果编辑被禁用，则不执行任何操作
+      if (isEditDisabled.value) {
+        return
+      }
+
       modelStoreInstance.setModelDetail(model)
       if (model.value?.type === 'Workflow') {
         modelStoreInstance.setDialogStatusWorkflow(true, Number(currentVersion.value?.id))
@@ -807,7 +826,13 @@
                       <CommandItem
                         v-if="['my'].includes(communityStore.TabSource)"
                         value="edit"
-                        class="px-2 py-1.5 mb-1 text-[#F9FAFB] cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]"
+                        :disabled="isEditDisabled"
+                        :class="[
+                          'px-2 py-1.5 mb-1 text-[#F9FAFB]',
+                          isEditDisabled
+                            ? 'cursor-not-allowed opacity-50'
+                            : 'cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]'
+                        ]"
                         @click="handleModelOperation('edit', model?.id)"
                       >
                         {{ t('community.detail.edit') }}
