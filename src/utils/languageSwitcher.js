@@ -24,10 +24,10 @@ class LanguageSwitcher {
    */
   async init(vueI18n = null, languageStore = null) {
     if (this.isInitialized) return
-    
+
     this.vueI18n = vueI18n
     this.languageStore = languageStore
-    
+
     try {
       await this.loadCurrentLanguage()
       this.isInitialized = true
@@ -55,12 +55,12 @@ class LanguageSwitcher {
         this.currentLanguage = savedLang
       }
     }
-    
+
     // 如果有Vue i18n实例，同步当前语言
     if (this.vueI18n && this.vueI18n.global) {
       this.currentLanguage = this.vueI18n.global.locale.value || this.currentLanguage
     }
-    
+
     // 如果有语言Store，同步当前语言
     if (this.languageStore) {
       this.currentLanguage = this.languageStore.locale || this.currentLanguage
@@ -92,24 +92,24 @@ class LanguageSwitcher {
 
       // 更新本地状态
       this.currentLanguage = language
-      
+
       // 更新Vue i18n
       if (this.vueI18n && this.vueI18n.global) {
         this.vueI18n.global.locale.value = language
       }
-      
+
       // 更新语言Store
       if (this.languageStore && this.languageStore.setLocale) {
         this.languageStore.setLocale(language)
       }
-      
+
       // 保存到localStorage
       localStorage.setItem('locale', language)
       localStorage.setItem('bizyair_language', language)
-      
+
       // 触发语言变更回调
       this.triggerCallbacks(previousLanguage, this.currentLanguage)
-      
+
       console.log(`语言已切换为: ${this.currentLanguage}`)
       return {
         success: true,
@@ -119,28 +119,28 @@ class LanguageSwitcher {
       }
     } catch (error) {
       console.error('语言切换失败:', error)
-      
+
       // 如果API失败，仍然尝试更新前端状态
       try {
         this.currentLanguage = language
-        
+
         // 更新Vue i18n
         if (this.vueI18n && this.vueI18n.global) {
           this.vueI18n.global.locale.value = language
         }
-        
+
         // 更新语言Store
         if (this.languageStore && this.languageStore.setLocale) {
           this.languageStore.setLocale(language)
         }
-        
+
         // 保存到localStorage
         localStorage.setItem('locale', language)
         localStorage.setItem('bizyair_language', language)
-        
+
         // 触发语言变更回调
         this.triggerCallbacks(previousLanguage, this.currentLanguage)
-        
+
         console.log(`语言已切换为: ${this.currentLanguage} (仅前端)`)
         return {
           success: true,
@@ -225,8 +225,8 @@ class LanguageSwitcher {
    */
   getLanguageDisplayName(langCode) {
     const displayNames = {
-      'en': 'English',
-      'zh': '中文'
+      en: 'English',
+      zh: '中文'
     }
     return displayNames[langCode] || langCode
   }
@@ -239,33 +239,33 @@ const languageSwitcher = new LanguageSwitcher()
 window.languageSwitcher = languageSwitcher
 
 // 提供简化的全局函数
-window.switchLanguage = function(language) {
+window.switchLanguage = function (language) {
   return languageSwitcher.switchLanguage(language)
 }
 
-window.getCurrentLanguage = function() {
+window.getCurrentLanguage = function () {
   return languageSwitcher.getCurrentLanguage()
 }
 
-window.getAvailableLanguages = function() {
+window.getAvailableLanguages = function () {
   return languageSwitcher.getAvailableLanguages()
 }
 
-window.switchToNextLanguage = function() {
+window.switchToNextLanguage = function () {
   return languageSwitcher.switchToNextLanguage()
 }
 
-window.getLanguageDisplayName = function(langCode) {
+window.getLanguageDisplayName = function (langCode) {
   return languageSwitcher.getLanguageDisplayName(langCode)
 }
 
-window.onLanguageChange = function(callback) {
+window.onLanguageChange = function (callback) {
   return languageSwitcher.onLanguageChange(callback)
 }
 
-window.offLanguageChange = function(callback) {
+window.offLanguageChange = function (callback) {
   return languageSwitcher.offLanguageChange(callback)
 }
 
 // 导出语言切换器实例
-export default languageSwitcher 
+export default languageSwitcher

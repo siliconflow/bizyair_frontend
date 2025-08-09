@@ -285,9 +285,11 @@
         acActiveIndex.value = i
         break
       }
-      if (!e.cover_urls || 
-          (Array.isArray(e.cover_urls) && e.cover_urls.length === 0) || 
-          (typeof e.cover_urls === 'string' && (e.cover_urls as string).trim() === '')) {
+      if (
+        !e.cover_urls ||
+        (Array.isArray(e.cover_urls) && e.cover_urls.length === 0) ||
+        (typeof e.cover_urls === 'string' && (e.cover_urls as string).trim() === '')
+      ) {
         e.imageError = true
         useToaster.error(t('publish.workflow.errors.uploadImage', { index: i + 1 }))
         acActiveIndex.value = i
@@ -301,9 +303,10 @@
       }
     }
     return tempData.versions.every((e: any) => {
-      const hasCoverUrls = e.cover_urls && 
-        ((Array.isArray(e.cover_urls) && e.cover_urls.length > 0) || 
-         (typeof e.cover_urls === 'string' && (e.cover_urls as string).trim() !== ''))
+      const hasCoverUrls =
+        e.cover_urls &&
+        ((Array.isArray(e.cover_urls) && e.cover_urls.length > 0) ||
+          (typeof e.cover_urls === 'string' && (e.cover_urls as string).trim() !== ''))
       return e.version && e.base_model && e.sign && hasCoverUrls
     })
   }

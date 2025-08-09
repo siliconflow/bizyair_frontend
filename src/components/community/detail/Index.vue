@@ -65,12 +65,14 @@
   // 计算编辑按钮是否应该被禁用
   const isEditDisabled = computed(() => {
     if (!model.value) return true
-    
+
     // 如果模型类型是 Workflow 且存在任何版本的 draft_id > 0，则禁用
     if (model.value.type === 'Workflow' && model.value.versions) {
-      return model.value.versions.some(version => (version as any).draft_id && (version as any).draft_id > 0)
+      return model.value.versions.some(
+        version => (version as any).draft_id && (version as any).draft_id > 0
+      )
     }
-    
+
     return false
   })
 
@@ -310,7 +312,7 @@
       if (isEditDisabled.value) {
         return
       }
-      
+
       modelStoreInstance.setModelDetail(model)
       if (model.value?.type === 'Workflow') {
         modelStoreInstance.setDialogStatusWorkflow(true, Number(currentVersion.value?.id))
@@ -827,8 +829,8 @@
                         :disabled="isEditDisabled"
                         :class="[
                           'px-2 py-1.5 mb-1 text-[#F9FAFB]',
-                          isEditDisabled 
-                            ? 'cursor-not-allowed opacity-50' 
+                          isEditDisabled
+                            ? 'cursor-not-allowed opacity-50'
                             : 'cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]'
                         ]"
                         @click="handleModelOperation('edit', model?.id)"
