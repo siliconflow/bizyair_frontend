@@ -244,7 +244,7 @@ export function mount(container: string | Element, comfyUIApp?: any) {
     if (!e) {
       app.use(i18n)
       app.mount(container)
-      
+
       // 初始化语言切换器
       setTimeout(() => {
         const languageStore = useLanguageStore()
@@ -261,7 +261,7 @@ export function mount(container: string | Element, comfyUIApp?: any) {
           clearInterval(timer)
           app.use(i18n)
           app.mount(container)
-          
+
           // 初始化语言切换器
           setTimeout(() => {
             const languageStore = useLanguageStore()
