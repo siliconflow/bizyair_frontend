@@ -823,20 +823,28 @@
                 <Command>
                   <CommandList>
                     <CommandGroup>
-                      <CommandItem
-                        v-if="['my'].includes(communityStore.TabSource)"
-                        value="edit"
-                        :disabled="isEditDisabled"
-                        :class="[
-                          'px-2 py-1.5 mb-1 text-[#F9FAFB]',
-                          isEditDisabled
-                            ? 'cursor-not-allowed opacity-50'
-                            : 'cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]'
-                        ]"
-                        @click="handleModelOperation('edit', model?.id)"
-                      >
-                        {{ t('community.detail.edit') }}
-                      </CommandItem>
+                      <template v-if="['my'].includes(communityStore.TabSource)">
+                        <vTooltips v-if="isEditDisabled" :tips="'请去网页端编辑'">
+                          <div
+                            class="px-2 py-1.5 mb-1 text-[#F9FAFB] cursor-not-allowed opacity-50 select-none"
+                            role="button"
+                            aria-disabled="true"
+                          >
+                            {{ t('community.detail.edit') }}
+                          </div>
+                        </vTooltips>
+                        <CommandItem
+                          v-else
+                          value="edit"
+                          :class="[
+                            'px-2 py-1.5 mb-1 text-[#F9FAFB]',
+                            'cursor-pointer [&:hover]:!bg-[#6D28D9] [&:hover]:!text-[#F9FAFB]'
+                          ]"
+                          @click="handleModelOperation('edit', model?.id)"
+                        >
+                          {{ t('community.detail.edit') }}
+                        </CommandItem>
+                      </template>
                       <CommandSeparator />
                       <CommandItem
                         value="remove"
