@@ -946,7 +946,7 @@
       try {
         const serverModeStore = useServerModeStore()
         const isServerMode = await serverModeStore.setIsServerMode()
-        serverMode.value = !isServerMode
+        serverMode.value = isServerMode
       } catch (e) {
         serverMode.value = false
       }
