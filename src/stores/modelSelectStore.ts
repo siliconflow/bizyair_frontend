@@ -190,6 +190,7 @@ export const useModelSelectStore = defineStore('modelSelect', {
                 ) {
                   return true
                 }
+                // return predefinedType.toLowerCase() === inputType.toLowerCase()
                 return inputType.toLowerCase().includes(predefinedType.toLowerCase())
               })
               return matchedType || 'Other'
