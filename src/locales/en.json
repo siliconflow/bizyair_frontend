@@ -101,6 +101,7 @@
       "ANNOUNCEMENT": "Announcement",
       "BILLING": "Billing",
       "REVIEW_RESULT": "Review Result",
+      "SYSTEM": "System Notification",
       "USER_LIKE": "User Like",
       "USER_FORK": "User Fork"
     }
