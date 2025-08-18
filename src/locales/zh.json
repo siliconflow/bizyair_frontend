@@ -101,6 +101,7 @@
       "ANNOUNCEMENT": "公告",
       "BILLING": "账单",
       "REVIEW_RESULT": "审核结果",
+      "SYSTEM": "系统通知",
       "USER_LIKE": "用户点赞",
       "USER_FORK": "用户收藏"
     }
