@@ -227,7 +227,7 @@
         </div>
 
         <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/0">
-          <vTooltips :tips="model.name">
+          
             <div class="flex items-center gap-2">
               <span
                 v-if="
@@ -239,11 +239,19 @@
                   t('community.modelCard.tags.new')
                 }}</span
               >
-              <h3 class="text-base text-white font-medium mb-2 truncate">
-                {{ sliceString(model.name, 24) }}
-              </h3>
+              <span v-else>
+                <vTooltips :tips="t('community.modelCard.tooltips.cloud')">
+                  <span v-if="model.type === 'Workflow' && model.versions.filter((version: any) => version.draft_id).length > 0" className="text-xs text-white bg-[#7C3AED] px-1 inline-block h-[18px] rounded">
+                    ☁️
+                  </span>
+                </vTooltips>
+              </span>
+              <vTooltips :tips="model.name">
+                <h3 class="text-base text-white font-medium mb-2 truncate">
+                  {{ sliceString(model.name, 24) }}
+                </h3>
+              </vTooltips>
             </div>
-          </vTooltips>
           <div class="flex items-center space-x-3 text-white/90 text-xs">
             <span
               v-if="model?.type === 'Workflow' && model?.counter?.downloaded_count"

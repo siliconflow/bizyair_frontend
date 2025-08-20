@@ -50,7 +50,7 @@ export interface ModelVersion {
   parent_id:number
   user_avatar:string
   user_name:string
-  
+  draft_id?:number
 
 }
 
@@ -68,7 +68,10 @@ export interface FilterState {
   model_types: string[]
   base_models: string[]
   selected_model_types: string[]
+  selected_base_models: string[]
   sort:SortValue
+  is_user_cleared?: boolean
+  has_draft?: boolean
 }
 
 export interface CommonModelType {
@@ -76,12 +79,7 @@ export interface CommonModelType {
   value: string
 }
 
-export interface FilterState {
-  keyword: string
-  model_types: string[]
-  base_models: string[]
-  sort: SortValue
-}
+
 
 
 export interface MineState {

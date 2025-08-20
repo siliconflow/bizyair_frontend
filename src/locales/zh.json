@@ -188,7 +188,10 @@
         "downloaded": "下载量",
         "used": "使用量",
         "forked": "收藏量",
-        "liked": "点赞量"
+        "liked": "点赞量",
+        "cloud": "可在线运行",
+        "verified": "已验证",
+        "unverified": "未验证"
       },
       "tags": {
         "new": "新品"

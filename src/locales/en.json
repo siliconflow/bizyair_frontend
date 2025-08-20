@@ -188,7 +188,10 @@
         "downloaded": "Downloaded",
         "used": "Used",
         "forked": "Forked",
-        "liked": "Liked"
+        "liked": "Liked",
+        "cloud": "Can run online",
+        "verified": "Verified",
+        "unverified": "Unverified"
       },
       "tags": {
         "new": "New"
