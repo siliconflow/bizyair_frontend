@@ -74,7 +74,9 @@ export const modelStore = defineStore('modelStore', {
       model_types: [],
       base_models: [],
       selected_model_types: [],
-      sort: 'Recently'
+      selected_base_models: [],
+      sort: 'Recently',
+      is_user_cleared: false
     } as FilterState,
     typeLis: [{ value: '', label: '' }],
     baseTypeLis: [{ value: '', label: '' }]
@@ -149,7 +151,9 @@ export const modelStore = defineStore('modelStore', {
         model_types: [],
         base_models: [],
         selected_model_types: [],
-        sort: 'Recently'
+        selected_base_models: [],
+        sort: 'Recently',
+        is_user_cleared: false
       }
     },
     updatePagination(page: number) {
