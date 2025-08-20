@@ -40,14 +40,14 @@
   }
 
   const handleBaseModelChange = async (model: string) => {
-    const models = [...store[props.page].filterState.selected_base_models || []]
+    const models = [...(store[props.page].filterState.selected_base_models || [])]
     const modelIndex = models.indexOf(String(model))
     if (modelIndex === -1) {
       models.push(String(model))
     } else {
       models.splice(modelIndex, 1)
     }
-    
+
     store[props.page].filterState.selected_base_models = models
 
     if (models.length === 0) {
@@ -64,14 +64,14 @@
   }
 
   const handleModelTypeChange = async (modelType: string) => {
-    const types = [...store[props.page].filterState.selected_model_types || []]
+    const types = [...(store[props.page].filterState.selected_model_types || [])]
     const typeIndex = types.indexOf(String(modelType))
     if (typeIndex === -1) {
       types.push(String(modelType))
     } else {
       types.splice(typeIndex, 1)
     }
-    
+
     store[props.page].filterState.selected_model_types = types
 
     if (types.length === 0) {
@@ -116,16 +116,24 @@
     }
 
     // 确保状态同步：如果selected字段为空但model_types不为空，且不是用户主动清空的状态，说明是预选状态
-    if (store[props.page].filterState.selected_model_types.length === 0 && 
-        store[props.page].filterState.model_types.length > 0 &&
-        !store[props.page].filterState.is_user_cleared) {
-      store[props.page].filterState.selected_model_types = [...store[props.page].filterState.model_types]
+    if (
+      store[props.page].filterState.selected_model_types.length === 0 &&
+      store[props.page].filterState.model_types.length > 0 &&
+      !store[props.page].filterState.is_user_cleared
+    ) {
+      store[props.page].filterState.selected_model_types = [
+        ...store[props.page].filterState.model_types
+      ]
     }
-    
-    if (store[props.page].filterState.selected_base_models.length === 0 && 
-        store[props.page].filterState.base_models.length > 0 &&
-        !store[props.page].filterState.is_user_cleared) {
-      store[props.page].filterState.selected_base_models = [...store[props.page].filterState.base_models]
+
+    if (
+      store[props.page].filterState.selected_base_models.length === 0 &&
+      store[props.page].filterState.base_models.length > 0 &&
+      !store[props.page].filterState.is_user_cleared
+    ) {
+      store[props.page].filterState.selected_base_models = [
+        ...store[props.page].filterState.base_models
+      ]
     }
 
     await nextTick()
@@ -320,7 +328,9 @@
                     variant="secondary"
                     :class="[
                       'cursor-pointer transition-colors duration-200',
-                      (store[props.page].filterState.selected_model_types || []).includes(type.value)
+                      (store[props.page].filterState.selected_model_types || []).includes(
+                        type.value
+                      )
                         ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
                         : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
@@ -346,7 +356,9 @@
                     variant="secondary"
                     :class="[
                       'cursor-pointer transition-colors duration-200',
-                      (store[props.page].filterState.selected_base_models || []).includes(model.value)
+                      (store[props.page].filterState.selected_base_models || []).includes(
+                        model.value
+                      )
                         ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
                         : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
@@ -363,4 +375,3 @@
     </Popover>
   </div>
 </template>
-

@@ -392,26 +392,28 @@
               </div>
               <CommandItem value="cloud" class="p-2">
                 <div class="flex flex-wrap gap-2">
-                  <Badge 
+                  <Badge
                     :class="[
                       'cursor-pointer transition-colors duration-200',
                       store[props.page].filterState.has_draft === true
                         ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
                         : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
-                    @click="handleHasDraftChange(true)" 
-                    variant="secondary">
+                    @click="handleHasDraftChange(true)"
+                    variant="secondary"
+                  >
                     {{ t('community.modelCard.tooltips.verified') }}
                   </Badge>
-                  <Badge 
+                  <Badge
                     :class="[
                       'cursor-pointer transition-colors duration-200',
                       store[props.page].filterState.has_draft === false
                         ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
                         : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
-                    @click="handleHasDraftChange(false)" 
-                    variant="secondary">
+                    @click="handleHasDraftChange(false)"
+                    variant="secondary"
+                  >
                     {{ t('community.modelCard.tooltips.unverified') }}
                   </Badge>
                 </div>
