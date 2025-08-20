@@ -40,14 +40,23 @@
   }
 
   const handleBaseModelChange = async (model: string) => {
-    const models = [...store[props.page].filterState.base_models]
+    const models = [...store[props.page].filterState.selected_base_models || []]
     const modelIndex = models.indexOf(String(model))
     if (modelIndex === -1) {
       models.push(String(model))
     } else {
       models.splice(modelIndex, 1)
     }
-    store[props.page].filterState.base_models = models
+    
+    store[props.page].filterState.selected_base_models = models
+
+    if (models.length === 0) {
+      store[props.page].filterState.base_models = store.baseModelTypes.map(type => type.value)
+      store[props.page].filterState.is_user_cleared = true
+    } else {
+      store[props.page].filterState.base_models = models
+      store[props.page].filterState.is_user_cleared = false
+    }
 
     await nextTick()
     emit('fetchData')
@@ -55,14 +64,23 @@
   }
 
   const handleModelTypeChange = async (modelType: string) => {
-    const types = [...store[props.page].filterState.model_types]
+    const types = [...store[props.page].filterState.selected_model_types || []]
     const typeIndex = types.indexOf(String(modelType))
     if (typeIndex === -1) {
       types.push(String(modelType))
     } else {
       types.splice(typeIndex, 1)
     }
-    store[props.page].filterState.model_types = types
+    
+    store[props.page].filterState.selected_model_types = types
+
+    if (types.length === 0) {
+      store[props.page].filterState.model_types = store.modelTypes.map(type => type.value)
+      store[props.page].filterState.is_user_cleared = true
+    } else {
+      store[props.page].filterState.model_types = types
+      store[props.page].filterState.is_user_cleared = false
+    }
 
     await nextTick()
     emit('fetchData')
@@ -88,22 +106,27 @@
     if (!store[props.page].filterState) {
       store[props.page].filterState = {
         selected_model_types: [],
+        selected_base_models: [],
         model_types: [],
         base_models: [],
         keyword: '',
-        sort: 'Recently'
+        sort: 'Recently',
+        is_user_cleared: false
       }
     }
 
-    // 注释掉自动选中所有BaseModel的逻辑，让用户手动选择或通过props传入
-    // if (
-    //   store.baseModelTypes &&
-    //   store.baseModelTypes.length > 0 &&
-    //   (!store[props.page].filterState.base_models ||
-    //     store[props.page].filterState.base_models.length === 0)
-    // ) {
-    //   store[props.page].filterState.base_models = store.baseModelTypes.map(model => model.value)
-    // }
+    // 确保状态同步：如果selected字段为空但model_types不为空，且不是用户主动清空的状态，说明是预选状态
+    if (store[props.page].filterState.selected_model_types.length === 0 && 
+        store[props.page].filterState.model_types.length > 0 &&
+        !store[props.page].filterState.is_user_cleared) {
+      store[props.page].filterState.selected_model_types = [...store[props.page].filterState.model_types]
+    }
+    
+    if (store[props.page].filterState.selected_base_models.length === 0 && 
+        store[props.page].filterState.base_models.length > 0 &&
+        !store[props.page].filterState.is_user_cleared) {
+      store[props.page].filterState.selected_base_models = [...store[props.page].filterState.base_models]
+    }
 
     await nextTick()
     emit('filter-data-ready')
@@ -297,7 +320,7 @@
                     variant="secondary"
                     :class="[
                       'cursor-pointer transition-colors duration-200',
-                      store[props.page].filterState.model_types.includes(type.value)
+                      (store[props.page].filterState.selected_model_types || []).includes(type.value)
                         ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
                         : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
@@ -323,7 +346,7 @@
                     variant="secondary"
                     :class="[
                       'cursor-pointer transition-colors duration-200',
-                      store[props.page].filterState.base_models.includes(model.value)
+                      (store[props.page].filterState.selected_base_models || []).includes(model.value)
                         ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
                         : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
@@ -340,3 +363,4 @@
     </Popover>
   </div>
 </template>
+
