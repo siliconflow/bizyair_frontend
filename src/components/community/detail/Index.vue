@@ -635,6 +635,18 @@
           </div>
         </div>
         <div class="flex flex-wrap gap-2 mb-1">
+          <vTooltips :tips="t('community.modelCard.tooltips.cloud')">
+            <span
+              v-if="
+                model?.type === 'Workflow' &&
+                Array.isArray(model?.versions) &&
+                model.versions.filter(version => version?.draft_id).length > 0
+              "
+              class="text-xs text-white bg-[#7C3AED] px-1 inline-block h-[18px] rounded"
+            >
+              ☁️
+            </span>
+          </vTooltips>
           <template v-for="tagId in (model?.tags || []).slice(0, 6)" :key="tagId">
             <div
               class="px-2 py-0.5 text-xs text-[#F9FAFB] rounded cursor-pointer transition-colors"

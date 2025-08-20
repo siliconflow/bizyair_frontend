@@ -74,6 +74,17 @@
     emit('update:showSortPopover', false)
   }
 
+  const handleHasDraftChange = async (hasDraft: boolean | undefined) => {
+    if (store[props.page].filterState.has_draft === hasDraft) {
+      delete store[props.page].filterState.has_draft
+    } else {
+      store[props.page].filterState.has_draft = hasDraft
+    }
+    await nextTick()
+    emit('fetchData')
+    emit('update:showSortPopover', false)
+  }
+
   const getStoreRef = (path: PageType) => {
     return store[path]
   }
@@ -93,10 +104,12 @@
     if (!store[props.page].filterState) {
       store[props.page].filterState = {
         selected_model_types: [],
+        selected_base_models: [],
         model_types: [],
         base_models: [],
         keyword: '',
-        sort: 'Recently'
+        sort: 'Recently',
+        is_user_cleared: false
       }
     }
     if (props.page === 'mainContent') {
@@ -367,6 +380,41 @@
                     @click="handleBaseModelChange(model.value)"
                   >
                     {{ model.label }}
+                  </Badge>
+                </div>
+              </CommandItem>
+            </CommandGroup>
+            <CommandGroup v-if="props.page === 'workflows' || props.page === 'posts'">
+              <div class="p-2">
+                <div class="text-sm font-medium text-[#F9FAFB] mb-2">
+                  {{ t('community.modelCard.tooltips.cloud') }}
+                </div>
+              </div>
+              <CommandItem value="cloud" class="p-2">
+                <div class="flex flex-wrap gap-2">
+                  <Badge
+                    :class="[
+                      'cursor-pointer transition-colors duration-200',
+                      store[props.page].filterState.has_draft === true
+                        ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
+                        : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
+                    ]"
+                    @click="handleHasDraftChange(true)"
+                    variant="secondary"
+                  >
+                    {{ t('community.modelCard.tooltips.verified') }}
+                  </Badge>
+                  <Badge
+                    :class="[
+                      'cursor-pointer transition-colors duration-200',
+                      store[props.page].filterState.has_draft === false
+                        ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
+                        : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
+                    ]"
+                    @click="handleHasDraftChange(false)"
+                    variant="secondary"
+                  >
+                    {{ t('community.modelCard.tooltips.unverified') }}
                   </Badge>
                 </div>
               </CommandItem>

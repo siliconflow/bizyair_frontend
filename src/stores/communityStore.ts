@@ -42,7 +42,7 @@ export const useCommunityStore = defineStore('community', {
         scrollRatio: 0,
         totalItems: 0
       }
-    } as PageState,
+    } as unknown as PageState,
     quickStart: {
       modelListPathParams: {
         mode: 'official',
@@ -69,7 +69,7 @@ export const useCommunityStore = defineStore('community', {
         scrollRatio: 0,
         totalItems: 0
       }
-    } as PageState,
+    } as unknown as PageState,
     workflows: {
       modelListPathParams: {
         mode: 'publicity',
@@ -96,7 +96,7 @@ export const useCommunityStore = defineStore('community', {
         scrollRatio: 0,
         totalItems: 0
       }
-    } as PageState,
+    } as unknown as PageState,
 
     mine: {
       posts: {
@@ -125,7 +125,7 @@ export const useCommunityStore = defineStore('community', {
           scrollRatio: 0,
           totalItems: 0
         }
-      } as PageState,
+      } as unknown as PageState,
       forked: {
         modelListPathParams: {
           mode: 'my_fork',
@@ -152,7 +152,7 @@ export const useCommunityStore = defineStore('community', {
           scrollRatio: 0,
           totalItems: 0
         }
-      } as PageState
+      } as unknown as PageState
     },
 
     get posts() {
@@ -199,7 +199,8 @@ export const useCommunityStore = defineStore('community', {
             model_types: [],
             base_models: [],
             selected_model_types: [],
-            sort: 'Recently'
+            sort: 'Recently',
+            selected_base_models: []
           },
           scrollPosition: 0
         }
@@ -219,7 +220,8 @@ export const useCommunityStore = defineStore('community', {
             model_types: [],
             base_models: [],
             selected_model_types: [],
-            sort: 'Recently'
+            sort: 'Recently',
+            selected_base_models: []
           },
           scrollPosition: 0
         }

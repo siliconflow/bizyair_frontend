@@ -40,7 +40,9 @@ export const useModelSelectStore = defineStore('modelSelect', {
           sort: 'Recently',
           model_types: [],
           base_models: [],
-          selected_model_types: []
+          selected_model_types: [],
+          selected_base_models: [],
+          is_user_cleared: false
         },
         scrollPosition: 0,
         lastState: {
@@ -67,7 +69,9 @@ export const useModelSelectStore = defineStore('modelSelect', {
           sort: 'Recently',
           model_types: [],
           base_models: [],
-          selected_model_types: []
+          selected_model_types: [],
+          selected_base_models: [],
+          is_user_cleared: false
         },
         scrollPosition: 0,
         lastState: {
@@ -94,7 +98,9 @@ export const useModelSelectStore = defineStore('modelSelect', {
           sort: 'Recently',
           model_types: [],
           base_models: [],
-          selected_model_types: []
+          selected_model_types: [],
+          selected_base_models: [],
+          is_user_cleared: false
         },
         scrollPosition: 0,
         lastState: {
@@ -134,11 +140,13 @@ export const useModelSelectStore = defineStore('modelSelect', {
 
     setSelectedModelTypes(page: ModeTabType, types: string[]) {
       console.log('setSelectedModelTypes', page, types)
+      this.mine[page].filterState.selected_model_types = types
       this.mine[page].filterState.model_types = types
     },
 
     setSelectedBaseModels(page: ModeTabType, models: string[]) {
       console.log('setSelectedBaseModels', page, models)
+      this.mine[page].filterState.selected_base_models = models
       this.mine[page].filterState.base_models = models
     },
     resetPageState(page: ModeTabType) {
@@ -157,7 +165,9 @@ export const useModelSelectStore = defineStore('modelSelect', {
           model_types: [],
           base_models: [],
           selected_model_types: [],
-          sort: 'Recently'
+          selected_base_models: [],
+          sort: 'Recently',
+          is_user_cleared: false
         },
         scrollPosition: 0
       }
@@ -190,6 +200,7 @@ export const useModelSelectStore = defineStore('modelSelect', {
                 ) {
                   return true
                 }
+                // return predefinedType.toLowerCase() === inputType.toLowerCase()
                 return inputType.toLowerCase().includes(predefinedType.toLowerCase())
               })
               return matchedType || 'Other'
