@@ -839,8 +839,6 @@
                         <vTooltips v-if="isEditDisabled" :tips="'请去网页端编辑'">
                           <div
                             class="px-2 py-1.5 mb-1 text-[#F9FAFB] cursor-not-allowed opacity-50 select-none"
-                            role="button"
-                            aria-disabled="true"
                           >
                             {{ t('community.detail.edit') }}
                           </div>
