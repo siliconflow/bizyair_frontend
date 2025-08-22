@@ -110,7 +110,6 @@ class LanguageSwitcher {
       // 触发语言变更回调
       this.triggerCallbacks(previousLanguage, this.currentLanguage)
 
-      console.log(`语言已切换为: ${this.currentLanguage}`)
       return {
         success: true,
         previousLanguage: previousLanguage,
@@ -141,7 +140,6 @@ class LanguageSwitcher {
         // 触发语言变更回调
         this.triggerCallbacks(previousLanguage, this.currentLanguage)
 
-        console.log(`语言已切换为: ${this.currentLanguage} (仅前端)`)
         return {
           success: true,
           previousLanguage: previousLanguage,

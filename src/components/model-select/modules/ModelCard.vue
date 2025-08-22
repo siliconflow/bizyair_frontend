@@ -96,9 +96,10 @@
     () => props.model?.versions?.[0]?.cover_urls,
     newUrls => {
       if (newUrls && Array.isArray(newUrls) && newUrls.length > 0) {
-        const timestamp = new Date().getTime()
-        const url = newUrls[0]
-        imgSrc.value = url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`
+        // const timestamp = new Date().getTime()
+        // const url = newUrls[0]
+        // imgSrc.value = url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`
+        imgSrc.value = newUrls[0]
       }
     }
   )
@@ -106,9 +107,10 @@
   onMounted(async () => {
     const coverUrls = props.model?.versions?.[0]?.cover_urls
     if (coverUrls && Array.isArray(coverUrls) && coverUrls.length > 0) {
-      const timestamp = new Date().getTime()
-      const url = coverUrls[0]
-      imgSrc.value = url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`
+      // const timestamp = new Date().getTime()
+      // const url = coverUrls[0]
+      // imgSrc.value = url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`
+      imgSrc.value = coverUrls[0]
     }
   })
 </script>
