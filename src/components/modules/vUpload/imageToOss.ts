@@ -1,13 +1,27 @@
 import OSS from 'ali-oss'
 import { oss_upload_token } from '@/api/public'
 export function base64ToFile(base64: string, filename: string, mimeType: any): File {
-  const byteCharacters = atob(base64.split(',')[1])
+  // 处理不同格式的 base64 数据
+  let base64Data = base64
+  let detectedMimeType = mimeType
+  
+  if (base64.includes(',')) {
+    // 包含 data: 前缀的格式
+    const parts = base64.split(',')
+    base64Data = parts[1]
+    if (!mimeType && parts[0].includes(':')) {
+      // 从 data: 前缀中提取 MIME 类型
+      detectedMimeType = parts[0].split(':')[1].split(';')[0]
+    }
+  }
+  
+  const byteCharacters = atob(base64Data)
   const byteNumbers = new Array(byteCharacters.length)
   for (let i = 0; i < byteCharacters.length; i++) {
     byteNumbers[i] = byteCharacters.charCodeAt(i)
   }
   const byteArray = new Uint8Array(byteNumbers)
-  const blob = new Blob([byteArray], { type: mimeType || base64.split(':')[1].split(';')[0] })
+  const blob = new Blob([byteArray], { type: detectedMimeType || 'image/webp' })
   return new File([blob], filename, { type: blob.type })
 }
 export const formatToWebp = (file: File): Promise<{ file: File; base64: string }> => {
