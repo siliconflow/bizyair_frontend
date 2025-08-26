@@ -309,9 +309,8 @@ body.resizing {
 .status-indicator {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  padding: 4px 8px;
+  gap: 4px;
+  font-size: 18px;
   opacity: 1;
 }
 
