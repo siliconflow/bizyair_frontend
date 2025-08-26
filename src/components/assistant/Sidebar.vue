@@ -6,20 +6,10 @@
         <h2>{{ $t('sidebar.assistant.title') }}</h2>
         <div class="header-actions">
           <button class="action-btn interactive-element" @click="clearHistory" title="清空对话历史">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-              />
-            </svg>
+            <span v-html="iconDelete"></span>
           </button>
           <button class="close-btn interactive-element" @click="sidebarStore.closeSidebar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z"
-              />
-            </svg>
+            <span v-html="iconClose"></span>
           </button>
         </div>
       </div>
@@ -48,64 +38,19 @@
                   >
                     <!-- 正在生成 -->
                     <template v-if="getMessageStatus(message) === 'generating'">
-                      <svg
-                        class="status-icon typing"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8 12H8.01M12 12H12.01M16 12H16.01"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
+                      <span class="status-icon typing" v-html="iconTyping"></span>
                       <span class="status-text">正在生成</span>
                     </template>
 
                     <!-- 正在进行工具调用 -->
                     <template v-else-if="getMessageStatus(message) === 'tool-calling'">
-                      <svg
-                        class="status-icon spinning"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12 2V6M12 18V22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M2 12H6M18 12H22M4.93 19.07L7.76 16.24M16.24 7.76L19.07 4.93"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
+                      <span class="status-icon spinning" v-html="iconSpinner"></span>
                       <span class="status-text">正在使用工具</span>
                     </template>
 
                     <!-- 工具调用完成 -->
                     <template v-else-if="getMessageStatus(message) === 'tool-completed'">
-                      <svg
-                        class="status-icon"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M20 6L9 17L4 12"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
+                      <span class="status-icon" v-html="iconCheck"></span>
                       <span class="status-text">已使用工具</span>
                     </template>
                   </div>
@@ -124,22 +69,7 @@
                         @click="expandImage(img)"
                         title="查看大图"
                       >
-                        <svg
-                          t="1752053278648"
-                          fill="white"
-                          width="24"
-                          height="24"
-                          class="icon"
-                          viewBox="0 0 1024 1024"
-                          version="1.1"
-                          xmlns="http://www.w3.org/2000/svg"
-                          p-id="2363"
-                        >
-                          <path
-                            d="M919.920093 725.414549q3.014188 26.122962 7.033105 58.776664t7.53547 66.814498 7.53547 67.819227 7.033105 60.786122q6.028376 47.222277-41.193901 44.208089-25.118232-2.009459-56.767205-5.526011t-64.805039-7.53547-65.809769-8.037834-59.781393-7.033105q-29.137149-3.014188-37.174984-16.578033t9.042564-30.644243q11.052022-10.047293 27.127691-27.630056t27.127691-28.634785q11.052022-12.056752 7.033105-22.104044t-16.075669-23.108774q-28.13242-27.127691-51.241194-49.231735t-51.241194-51.241194q-6.028376-6.028376-12.056752-13.061481t-9.042564-15.573304-1.004729-18.085127 13.061481-20.59695q6.028376-6.028376 10.047293-10.549658t8.037834-8.037834 8.540199-8.037834 11.554387-12.559116q20.094586-20.094586 37.174984-17.080398t37.174984 23.108774 41.193901 40.691536 47.222277 46.719912q19.089857 18.085127 32.653702 25.118232t26.625326-6.028376q9.042564-9.042564 22.606409-21.60168t23.611138-22.606409q17.080398-17.080398 30.644243-13.061481t16.578033 30.141879zM43.79615 383.80659q-3.014188-26.122962-7.033105-58.776664t-7.53547-66.814498-7.53547-67.819227-7.033105-60.786122q-3.014188-26.122962 6.53074-36.170255t33.658431-8.037834q25.118232 2.009459 56.767205 5.526011t64.805039 7.53547 65.809769 8.037834 59.781393 7.033105q30.141879 3.014188 37.677348 16.578033t-9.544928 30.644243q-10.047293 10.047293-24.615868 26.122962t-25.620597 27.127691q-12.056752 12.056752-8.037834 22.104044t17.080398 23.108774q13.061481 14.06621 24.615868 24.615868t22.606409 21.099315 23.108774 22.606409l25.118232 25.118232q6.028376 6.028376 11.554387 14.06621t8.037834 17.080398-0.502365 19.089857-13.061481 20.094586l-11.052022 11.052022q-4.018917 4.018917-7.53547 8.037834t-8.540199 8.037834l-11.052022 12.056752q-20.094586 20.094586-34.663161 15.070939t-34.663161-25.118232-38.179713-37.677348-44.208089-43.705724q-18.085127-18.085127-32.151337-25.118232t-27.127691 6.028376q-9.042564 10.047293-25.118232 24.615868t-26.122962 24.615868q-17.080398 17.080398-30.141879 13.061481t-16.075669-30.141879zM905.853883 84.397261q26.122962-3.014188 36.170255 6.53074t8.037834 34.663161-5.526011 56.767205-7.53547 64.805039-8.037834 65.809769-7.033105 59.781393q-3.014188 29.137149-16.578033 37.174984t-30.644243-10.047293q-10.047293-10.047293-26.122962-24.615868t-27.127691-25.620597q-12.056752-11.052022-22.104044-7.53547t-23.108774 16.578033q-27.127691 27.127691-47.724641 49.231735t-48.729371 50.236465q-6.028376 6.028376-14.06621 11.554387t-17.080398 8.037834-19.089857-0.502365-20.094586-14.06621q-6.028376-6.028376-10.549658-10.047293t-8.540199-8.037834-8.540199-8.037834-11.554387-12.056752q-20.094586-20.094586-16.075669-35.165525t25.118232-35.165525l38.179713-40.189172q19.089857-20.094586 45.212818-46.217547 19.089857-18.085127 26.122962-32.151337t-7.033105-26.122962q-9.042564-9.042564-23.108774-24.615868t-24.113503-25.620597q-17.080398-17.080398-13.061481-30.141879t30.141879-16.075669 58.776664-7.033105 67.316863-7.53547 67.819227-7.53547 60.283758-7.033105zM350.238584 640.012559q6.028376 6.028376 10.549658 10.047293t8.540199 8.037834l8.037834 9.042564 12.056752 11.052022q20.094586 20.094586 17.582763 36.672619t-23.611138 37.677348q-19.089857 19.089857-40.189172 40.691536t-47.222277 47.724641q-18.085127 18.085127-22.606409 29.639514t8.540199 24.615868q10.047293 9.042564 22.606409 22.606409t22.606409 23.611138q17.080398 17.080398 12.559116 30.141879t-30.644243 16.075669-58.274299 7.033105-66.814498 8.037834-68.321592 8.037834-60.786122 7.033105q-25.118232 2.009459-35.66789-7.53547t-8.540199-33.658431q2.009459-25.118232 5.526011-56.767205t7.53547-64.805039 8.037834-65.809769 7.033105-59.781393q3.014188-30.141879 16.578033-37.677348t30.644243 9.544928q10.047293 10.047293 27.630056 26.122962t28.634785 27.127691q12.056752 12.056752 20.094586 10.549658t20.094586-14.568575q13.061481-13.061481 25.118232-25.620597t24.113503-24.615868 24.615868-25.118232 26.625326-27.127691q6.028376-6.028376 13.061481-12.056752t15.573304-9.042564 18.085127-0.502365 20.59695 13.563845z"
-                            p-id="2364"
-                          ></path>
-                        </svg>
+                        <span v-html="iconExpand"></span>
                       </button>
                       <div class="top-right-actions">
                         <button
@@ -147,31 +77,14 @@
                           @click="selectExistingImage(img || '')"
                           title="添加到输入"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                          >
-                            <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                          </svg>
+                          <span v-html="iconPlus"></span>
                         </button>
                         <button
                           class="image-action-btn"
                           @click="downloadImage(img || '')"
                           title="下载图片"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fill="currentColor"
-                              d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"
-                            />
-                          </svg>
+                          <span v-html="iconDownload"></span>
                         </button>
                       </div>
                     </div>
@@ -185,22 +98,7 @@
                       @click="expandImage(message.image)"
                       title="查看大图"
                     >
-                      <svg
-                        t="1752053278648"
-                        fill="white"
-                        width="24"
-                        height="24"
-                        class="icon"
-                        viewBox="0 0 1024 1024"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        p-id="2363"
-                      >
-                        <path
-                          d="M919.920093 725.414549q3.014188 26.122962 7.033105 58.776664t7.53547 66.814498 7.53547 67.819227 7.033105 60.786122q6.028376 47.222277-41.193901 44.208089-25.118232-2.009459-56.767205-5.526011t-64.805039-7.53547-65.809769-8.037834-59.781393-7.033105q-29.137149-3.014188-37.174984-16.578033t9.042564-30.644243q11.052022-10.047293 27.127691-27.630056t27.127691-28.634785q11.052022-12.056752 7.033105-22.104044t-16.075669-23.108774q-28.13242-27.127691-51.241194-49.231735t-51.241194-51.241194q-6.028376-6.028376-12.056752-13.061481t-9.042564-15.573304-1.004729-18.085127 13.061481-20.59695q6.028376-6.028376 10.047293-10.549658t8.037834-8.037834 8.540199-8.037834 11.554387-12.559116q20.094586-20.094586 37.174984-17.080398t37.174984 23.108774 41.193901 40.691536 47.222277 46.719912q19.089857 18.085127 32.653702 25.118232t26.625326-6.028376q9.042564-9.042564 22.606409-21.60168t23.611138-22.606409q17.080398-17.080398 30.644243-13.061481t16.578033 30.141879zM43.79615 383.80659q-3.014188-26.122962-7.033105-58.776664t-7.53547-66.814498-7.53547-67.819227-7.033105-60.786122q-3.014188-26.122962 6.53074-36.170255t33.658431-8.037834q25.118232 2.009459 56.767205 5.526011t64.805039 7.53547 65.809769 8.037834 59.781393 7.033105q30.141879 3.014188 37.677348 16.578033t-9.544928 30.644243q-10.047293 10.047293-24.615868 26.122962t-25.620597 27.127691q-12.056752 12.056752-8.037834 22.104044t17.080398 23.108774q13.061481 14.06621 24.615868 24.615868t22.606409 21.099315 23.108774 22.606409l25.118232 25.118232q6.028376 6.028376 11.554387 14.06621t8.037834 17.080398-0.502365 19.089857-13.061481 20.094586l-11.052022 11.052022q-4.018917 4.018917-7.53547 8.037834t-8.540199 8.037834l-11.052022 12.056752q-20.094586 20.094586-34.663161 15.070939t-34.663161-25.118232-38.179713-37.677348-44.208089-43.705724q-18.085127-18.085127-32.151337-25.118232t-27.127691 6.028376q-9.042564 10.047293-25.118232 24.615868t-26.122962 24.615868q-17.080398 17.080398-30.141879 13.061481t-16.075669-30.141879zM905.853883 84.397261q26.122962-3.014188 36.170255 6.53074t8.037834 34.663161-5.526011 56.767205-7.53547 64.805039-8.037834 65.809769-7.033105 59.781393q-3.014188 29.137149-16.578033 37.174984t-30.644243-10.047293q-10.047293-10.047293-26.122962-24.615868t-27.127691-25.620597q-12.056752-11.052022-22.104044-7.53547t-23.108774 16.578033q-27.127691 27.127691-47.724641 49.231735t-48.729371 50.236465q-6.028376 6.028376-14.06621 11.554387t-17.080398 8.037834-19.089857-0.502365-20.094586-14.06621q-6.028376-6.028376-10.549658-10.047293t-8.540199-8.037834-8.540199-8.037834-11.554387-12.056752q-20.094586-20.094586-16.075669-35.165525t25.118232-35.165525l38.179713-40.189172q19.089857-20.094586 45.212818-46.217547 19.089857-18.085127 26.122962-32.151337t-7.033105-26.122962q-9.042564-9.042564-23.108774-24.615868t-24.113503-25.620597q-17.080398-17.080398-13.061481-30.141879t30.141879-16.075669 58.776664-7.033105 67.316863-7.53547 67.819227-7.53547 60.283758-7.033105zM350.238584 640.012559q6.028376 6.028376 10.549658 10.047293t8.540199 8.037834l8.037834 9.042564 12.056752 11.052022q20.094586 20.094586 17.582763 36.672619t-23.611138 37.677348q-19.089857 19.089857-40.189172 40.691536t-47.222277 47.724641q-18.085127 18.085127-22.606409 29.639514t8.540199 24.615868q10.047293 9.042564 22.606409 22.606409t22.606409 23.611138q17.080398 17.080398 12.559116 30.141879t-30.644243 16.075669-58.274299 7.033105-66.814498 8.037834-68.321592 8.037834-60.786122 7.033105q-25.118232 2.009459-35.66789-7.53547t-8.540199-33.658431q2.009459-25.118232 5.526011-56.767205t7.53547-64.805039 8.037834-65.809769 7.033105-59.781393q3.014188-30.141879 16.578033-37.677348t30.644243 9.544928q10.047293 10.047293 27.630056 26.122962t28.634785 27.127691q12.056752 12.056752 20.094586 10.549658t20.094586-14.568575q13.061481-13.061481 25.118232-25.620597t24.113503-24.615868 24.615868-25.118232 26.625326-27.127691q6.028376-6.028376 13.061481-12.056752t15.573304-9.042564 18.085127-0.502365 20.59695 13.563845z"
-                          p-id="2364"
-                        ></path>
-                      </svg>
+                      <span v-html="iconExpand"></span>
                     </button>
                     <div class="top-right-actions">
                       <button
@@ -208,28 +106,14 @@
                         @click="selectExistingImage(message.image || '')"
                         title="添加到输入"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                        >
-                          <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                        </svg>
+                        <span v-html="iconPlus"></span>
                       </button>
                       <button
                         class="image-action-btn"
                         @click="downloadImage(message.image || '')"
                         title="下载图片"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                        >
-                          <path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                        </svg>
+                        <span v-html="iconDownload"></span>
                       </button>
                     </div>
                   </div>
@@ -309,32 +193,7 @@
         <div class="chat-input-area">
           <div v-if="sidebarStore?.nodeInfo" class="node-info-card">
             <div class="node-info-header">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 2L2 7L12 12L22 7L12 2Z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M2 17L12 22L22 17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M2 12L12 17L22 12"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linejoin="round"
-                />
-              </svg>
+              <span v-html="iconLayers"></span>
               <span class="node-info-title">当前节点</span>
             </div>
             <div class="node-info-main">
@@ -372,12 +231,7 @@
               :disabled="isLoading"
               :title="$t('sidebar.assistant.uploadImage')"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M19 5v14H5V5h14zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14L6 17h12l-3.86-5.14z"
-                />
-              </svg>
+              <span v-html="iconImage"></span>
             </button>
 
             <div class="textarea-container interactive-element">
@@ -398,24 +252,8 @@
               :disabled="!isGenerating && !canSendMessage"
               :title="isGenerating ? '停止生成' : $t('sidebar.assistant.sendMessage')"
             >
-              <svg
-                v-if="!isGenerating"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-              >
-                <path fill="currentColor" d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2l.01 7z" />
-              </svg>
-              <svg
-                v-else
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-              >
-                <path fill="currentColor" d="M6 6h12v12H6z" />
-              </svg>
+              <span v-if="!isGenerating" v-html="iconSend"></span>
+              <span v-else v-html="iconStop"></span>
             </button>
           </div>
 
@@ -456,6 +294,19 @@
   import { useServerModeStore } from '@/stores/isServerMode'
   import { imageToOss, base64ToFile } from '@/components/modules/vUpload/imageToOss'
   import './Sidebar.css'
+  // icons
+  import iconDelete from '@/assets/icons/delete.svg?raw'
+  import iconClose from '@/assets/icons/close.svg?raw'
+  import iconTyping from '@/assets/icons/typing.svg?raw'
+  import iconSpinner from '@/assets/icons/spinner.svg?raw'
+  import iconCheck from '@/assets/icons/check.svg?raw'
+  import iconExpand from '@/assets/icons/expand.svg?raw'
+  import iconPlus from '@/assets/icons/plus.svg?raw'
+  import iconDownload from '@/assets/icons/download.svg?raw'
+  import iconLayers from '@/assets/icons/layers.svg?raw'
+  import iconImage from '@/assets/icons/image.svg?raw'
+  import iconSend from '@/assets/icons/send.svg?raw'
+  import iconStop from '@/assets/icons/stop.svg?raw'
   const { t } = useI18n()
   const sidebarStore = useSidebarStore()
 
@@ -503,25 +354,24 @@
   ;('---------------------------------------')
 
   // 聊天相关状态
-  const chatMessages = ref<
-    Array<{
-      role: 'user' | 'assistant'
-      content: string
-      time: string
-      hasImage?: boolean
-      image?: string
-      images?: string[]
-      id?: string
-      rawText?: string
-      toolName?: string
-      toolId?: string
-      toolCallArgs?: string
-      showToolArgs?: boolean
-      toolResultText?: string
-      preToolContent?: string // 工具调用前的内容
-      postToolContent?: string // 工具调用后的内容
-    }>
-  >([])
+  interface ChatUIMessage {
+    role: 'user' | 'assistant'
+    content: string
+    time: string
+    hasImage?: boolean
+    image?: string
+    images?: string[]
+    id?: string
+    rawText?: string
+    toolName?: string
+    toolId?: string
+    toolCallArgs?: string
+    showToolArgs?: boolean
+    toolResultText?: string
+    preToolContent?: string
+    postToolContent?: string
+  }
+  const chatMessages = ref<ChatUIMessage[]>([])
   const userInput = ref('')
   const isLoading = ref(false)
   const isGenerating = ref(false)
@@ -633,12 +483,14 @@
   }
 
   // 切换工具参数显示
-  const toggleToolArgs = (message: any) => {
+  const toggleToolArgs = (message: ChatUIMessage) => {
     message.showToolArgs = !message.showToolArgs
   }
 
   // 获取消息状态
-  const getMessageStatus = (message: any) => {
+  const getMessageStatus = (
+    message: ChatUIMessage
+  ): 'tool-calling' | 'generating' | 'tool-completed' | null => {
     if (message.role !== 'assistant') return null
 
     // 如果是当前正在生成的消息
