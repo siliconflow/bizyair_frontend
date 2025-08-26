@@ -37,15 +37,114 @@
             </div>
             <div class="message-content">
               <div class="message-header">
-                <span class="message-sender">{{
-                  message.role === 'user' ? 'You' : $t('sidebar.assistant.title')
-                }}</span>
+                <div class="sender-info">
+                  <span class="message-sender">{{
+                    message.role === 'user' ? 'You' : $t('sidebar.assistant.title')
+                  }}</span>
+                  <div
+                    v-if="getMessageStatus(message)"
+                    class="status-indicator"
+                    :class="getMessageStatus(message)"
+                  >
+                    <!-- 正在生成 -->
+                    <template v-if="getMessageStatus(message) === 'generating'">
+                      <svg
+                        class="status-icon typing"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M8 12H8.01M12 12H12.01M16 12H16.01"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span class="status-text">正在生成</span>
+                    </template>
+
+                    <!-- 正在进行工具调用 -->
+                    <template v-else-if="getMessageStatus(message) === 'tool-calling'">
+                      <svg
+                        class="status-icon spinning"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 2V6M12 18V22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M2 12H6M18 12H22M4.93 19.07L7.76 16.24M16.24 7.76L19.07 4.93"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span class="status-text">正在使用工具</span>
+                    </template>
+
+                    <!-- 工具调用完成 -->
+                    <template v-else-if="getMessageStatus(message) === 'tool-completed'">
+                      <svg
+                        class="status-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M20 6L9 17L4 12"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span class="status-text">已使用工具</span>
+                    </template>
+                  </div>
+                </div>
                 <span class="message-time">{{ message.time }}</span>
               </div>
 
               <!-- 图片消息 -->
               <div v-if="message.hasImage" class="message-image">
-                <div class="image-container">
+                <div v-if="message.images && message.images.length > 1" class="image-grid">
+                  <div v-for="(img, idx) in message.images" :key="idx" class="image-container">
+                    <img :src="img" alt="用户上传图片" class="message-img" />
+                    <div class="image-overlay">
+                      <button
+                        class="image-action-btn expand-btn"
+                        @click="expandImage(img)"
+                        title="查看大图"
+                      >
+                        <svg
+                          t="1752053278648"
+                          fill="white"
+                          width="24"
+                          height="24"
+                          class="icon"
+                          viewBox="0 0 1024 1024"
+                          version="1.1"
+                          xmlns="http://www.w3.org/2000/svg"
+                          p-id="2363"
+                        >
+                          <path
+                            d="M919.920093 725.414549q3.014188 26.122962 7.033105 58.776664t7.53547 66.814498 7.53547 67.819227 7.033105 60.786122q6.028376 47.222277-41.193901 44.208089-25.118232-2.009459-56.767205-5.526011t-64.805039-7.53547-65.809769-8.037834-59.781393-7.033105q-29.137149-3.014188-37.174984-16.578033t9.042564-30.644243q11.052022-10.047293 27.127691-27.630056t27.127691-28.634785q11.052022-12.056752 7.033105-22.104044t-16.075669-23.108774q-28.13242-27.127691-51.241194-49.231735t-51.241194-51.241194q-6.028376-6.028376-12.056752-13.061481t-9.042564-15.573304-1.004729-18.085127 13.061481-20.59695q6.028376-6.028376 10.047293-10.549658t8.037834-8.037834 8.540199-8.037834 11.554387-12.559116q20.094586-20.094586 37.174984-17.080398t37.174984 23.108774 41.193901 40.691536 47.222277 46.719912q19.089857 18.085127 32.653702 25.118232t26.625326-6.028376q9.042564-9.042564 22.606409-21.60168t23.611138-22.606409q17.080398-17.080398 30.644243-13.061481t16.578033 30.141879zM43.79615 383.80659q-3.014188-26.122962-7.033105-58.776664t-7.53547-66.814498-7.53547-67.819227-7.033105-60.786122q-3.014188-26.122962 6.53074-36.170255t33.658431-8.037834q25.118232 2.009459 56.767205 5.526011t64.805039 7.53547 65.809769 8.037834 59.781393 7.033105q30.141879 3.014188 37.677348 16.578033t-9.544928 30.644243q-10.047293 10.047293-24.615868 26.122962t-25.620597 27.127691q-12.056752 12.056752-8.037834 22.104044t17.080398 23.108774q13.061481 14.06621 24.615868 24.615868t22.606409 21.099315 23.108774 22.606409l25.118232 25.118232q6.028376 6.028376 11.554387 14.06621t8.037834 17.080398-0.502365 19.089857-13.061481 20.094586l-11.052022 11.052022q-4.018917 4.018917-7.53547 8.037834t-8.540199 8.037834l-11.052022 12.056752q-20.094586 20.094586-34.663161 15.070939t-34.663161-25.118232-38.179713-37.677348-44.208089-43.705724q-18.085127-18.085127-32.151337-25.118232t-27.127691 6.028376q-9.042564 10.047293-25.118232 24.615868t-26.122962 24.615868q-17.080398 17.080398-30.141879 13.061481t-16.075669-30.141879zM905.853883 84.397261q26.122962-3.014188 36.170255 6.53074t8.037834 34.663161-5.526011 56.767205-7.53547 64.805039-8.037834 65.809769-7.033105 59.781393q-3.014188 29.137149-16.578033 37.174984t-30.644243-10.047293q-10.047293-10.047293-26.122962-24.615868t-27.127691-25.620597q-12.056752-11.052022-22.104044-7.53547t-23.108774 16.578033q-27.127691 27.127691-47.724641 49.231735t-48.729371 50.236465q-6.028376 6.028376-14.06621 11.554387t-17.080398 8.037834-19.089857-0.502365-20.094586-14.06621q-6.028376-6.028376-10.549658-10.047293t-8.540199-8.037834-8.540199-8.037834-11.554387-12.056752q-20.094586-20.094586-16.075669-35.165525t25.118232-35.165525l38.179713-40.189172q19.089857-20.094586 45.212818-46.217547 19.089857-18.085127 26.122962-32.151337t-7.033105-26.122962q-9.042564-9.042564-23.108774-24.615868t-24.113503-25.620597q-17.080398-17.080398-13.061481-30.141879t30.141879-16.075669 58.776664-7.033105 67.316863-7.53547 67.819227-7.53547 60.283758-7.033105zM350.238584 640.012559q6.028376 6.028376 10.549658 10.047293t8.540199 8.037834l8.037834 9.042564 12.056752 11.052022q20.094586 20.094586 17.582763 36.672619t-23.611138 37.677348q-19.089857 19.089857-40.189172 40.691536t-47.222277 47.724641q-18.085127 18.085127-22.606409 29.639514t8.540199 24.615868q10.047293 9.042564 22.606409 22.606409t22.606409 23.611138q17.080398 17.080398 12.559116 30.141879t-30.644243 16.075669-58.274299 7.033105-66.814498 8.037834-68.321592 8.037834-60.786122 7.033105q-25.118232 2.009459-35.66789-7.53547t-8.540199-33.658431q2.009459-25.118232 5.526011-56.767205t7.53547-64.805039 8.037834-65.809769 7.033105-59.781393q3.014188-30.141879 16.578033-37.677348t30.644243 9.544928q10.047293 10.047293 27.630056 26.122962t28.634785 27.127691q12.056752 12.056752 20.094586 10.549658t20.094586-14.568575q13.061481-13.061481 25.118232-25.620597t24.113503-24.615868 24.615868-25.118232 26.625326-27.127691q6.028376-6.028376 13.061481-12.056752t15.573304-9.042564 18.085127-0.502365 20.59695 13.563845z"
+                            p-id="2364"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div v-else class="image-container">
                   <img :src="message.image" alt="用户上传图片" class="message-img" />
                   <div class="image-overlay">
                     <button
@@ -121,8 +220,47 @@
                 </div>
               </div>
 
-              <!-- 文本消息 -->
-              <div class="message-text" v-html="message.content"></div>
+              <!-- 工具调用前的内容 -->
+              <div
+                v-if="message.preToolContent"
+                class="message-text pre-tool-content"
+                v-html="message.preToolContent"
+              ></div>
+
+              <!-- 没有工具调用时的完整内容 -->
+              <div
+                v-else-if="!message.toolName"
+                class="message-text"
+                v-html="message.content"
+              ></div>
+
+              <!-- 工具调用与结果 -->
+              <div v-if="message.toolName" class="tool-section">
+                <div class="tool-header">
+                  <span class="tool-title">调用工具: {{ message.toolName }}</span>
+                  <button
+                    class="tool-args-toggle interactive-element"
+                    @click="toggleToolArgs(message)"
+                  >
+                    {{ message.showToolArgs ? '隐藏参数' : '显示参数' }}
+                  </button>
+                </div>
+                <div v-if="message.showToolArgs" class="tool-args">
+                  <pre class="code-block"><code>{{ message.toolCallArgs }}</code></pre>
+                </div>
+
+                <div v-if="message.toolResultText && !message.hasImage" class="tool-result">
+                  <div class="tool-result-label">工具结果:</div>
+                  <pre class="code-block"><code>{{ message.toolResultText }}</code></pre>
+                </div>
+              </div>
+
+              <!-- 工具调用后的内容 -->
+              <div
+                v-if="message.postToolContent"
+                class="message-text post-tool-content"
+                v-html="message.postToolContent"
+              ></div>
             </div>
           </div>
           <div v-if="isLoading" class="loading-indicator">
@@ -136,14 +274,58 @@
         </div>
         <!-- 输入区域 -->
         <div class="chat-input-area">
-          <div v-if="sidebarStore?.nodeInfo" style="display: flex; justify-content: space-around">
-            <div class="info-item">
-              <span class="label">{{ $t('sidebar.assistant.nodeName') }}:</span>
-              <span class="value">{{ sidebarStore.nodeInfo.title }}</span>
+          <div v-if="sidebarStore?.nodeInfo" class="node-info-card">
+            <div class="node-info-header">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2L2 7L12 12L22 7L12 2Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M2 17L12 22L22 17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M2 12L12 17L22 12"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <span class="node-info-title">当前节点</span>
             </div>
-            <div class="info-item">
-              <span class="label">{{ $t('sidebar.assistant.nodeType') }}:</span>
-              <span class="value">{{ sidebarStore.nodeInfo.type }}</span>
+            <div class="node-info-main">
+              <div class="node-info-content">
+                <div class="info-item">
+                  <span class="label">{{ $t('sidebar.assistant.nodeName') }}</span>
+                  <span class="value">{{ sidebarStore.nodeInfo.title }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">{{ $t('sidebar.assistant.nodeType') }}</span>
+                  <span class="value">{{ sidebarStore.nodeInfo.type }}</span>
+                </div>
+              </div>
+              <div
+                v-if="sidebarStore.nodeInfo.imageInfo?.url"
+                class="node-image-preview"
+              >
+                <img
+                  :src="sidebarStore.nodeInfo.imageInfo.url"
+                  alt="节点图片"
+                  class="node-preview-img"
+                  @click="expandImage(sidebarStore.nodeInfo.imageInfo.url)"
+                />
+              </div>
             </div>
           </div>
           <div class="image-preview-area" v-if="previewImage">
@@ -179,26 +361,29 @@
               ></textarea>
             </div>
 
-            <!-- 回答时时禁用发送按钮 -->
+            <!-- 发送/停止按钮合并 -->
             <button
-              class="send-message-btn interactive-element"
-              @click="sendMessage()"
-              :disabled="isGenerating"
-              :title="$t('sidebar.assistant.sendMessage')"
+              class="send-stop-btn interactive-element"
+              @click="isGenerating ? abortGeneration() : sendMessage()"
+              :disabled="!isGenerating && !canSendMessage"
+              :title="isGenerating ? '停止生成' : $t('sidebar.assistant.sendMessage')"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+              <svg
+                v-if="!isGenerating"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+              >
                 <path fill="currentColor" d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2l.01 7z" />
               </svg>
-            </button>
-
-            <!-- 生成时显示取消按钮 -->
-            <button
-              v-if="isGenerating"
-              class="control-btn stop-btn interactive-element"
-              @click="abortGeneration"
-              title="取消生成"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+              <svg
+                v-else
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+              >
                 <path fill="currentColor" d="M6 6h12v12H6z" />
               </svg>
             </button>
@@ -228,17 +413,13 @@
 <script setup lang="ts">
   import { useSidebarStore } from '../../stores/sidebarStore'
   import { onMounted, watch, ref, computed, onBeforeUnmount, nextTick } from 'vue'
-  import {
-    sendStreamChatRequest,
-    createImageUserMessage,
-    formatOutputTextLight,
-    handleImageWithKontextPro
-  } from './util'
+  import { sendStreamChatRequest, formatOutputTextLight, convertToApiHistory } from './util'
   import { useI18n } from 'vue-i18n'
   import { useToaster } from '@/components/modules/toats/index'
   import { v4 as uuidv4 } from 'uuid'
   import { downloadImage } from '@/utils/tool'
   import { useServerModeStore } from '@/stores/isServerMode'
+  import { imageToOss, base64ToFile } from '@/components/modules/vUpload/imageToOss'
   const { t } = useI18n()
   const sidebarStore = useSidebarStore()
 
@@ -293,7 +474,16 @@
       time: string
       hasImage?: boolean
       image?: string
+      images?: string[]
       id?: string
+      rawText?: string
+      toolName?: string
+      toolId?: string
+      toolCallArgs?: string
+      showToolArgs?: boolean
+      toolResultText?: string
+      preToolContent?: string // 工具调用前的内容
+      postToolContent?: string // 工具调用后的内容
     }>
   >([])
   const userInput = ref('')
@@ -301,7 +491,7 @@
   const isGenerating = ref(false)
   const processingStatus = ref('')
   const previewImage = ref('')
-  const uploadedImageBase64 = ref('')
+  const uploadedImageOssUrl = ref('')
   const chatMessagesRef = ref<HTMLElement | null>(null)
   const textareaRef = ref<HTMLTextAreaElement | null>(null)
   const imageInputRef = ref<HTMLInputElement | null>(null)
@@ -323,7 +513,7 @@
   const triggerImageUpload = () => imageInputRef.value?.click()
 
   // 处理图片上传
-  const handleImageUpload = (event: Event) => {
+  const handleImageUpload = async (event: Event) => {
     const target = event.target as HTMLInputElement
     if (!target.files?.length) return
 
@@ -338,19 +528,25 @@
       return
     }
 
-    const reader = new FileReader()
-    reader.onload = e => {
-      const result = e.target?.result as string
-      previewImage.value = result
-      uploadedImageBase64.value = result.split(',')[1] // 去掉 data:image/png;base64, 前缀
+    // 上传到 OSS
+    try {
+      const { url } = await imageToOss(file)
+      uploadedImageOssUrl.value = url
+      previewImage.value = url // 直接使用OSS URL作为预览
+      console.log('图片已上传到 OSS:', url)
+    } catch (error) {
+      console.error('上传图片到 OSS 失败:', error)
+      useToaster({
+        type: 'error',
+        message: '图片上传失败'
+      })
     }
-    reader.readAsDataURL(file)
   }
 
   // 移除已选图片
   const removeImage = () => {
     previewImage.value = ''
-    uploadedImageBase64.value = ''
+    uploadedImageOssUrl.value = ''
     if (imageInputRef.value) {
       imageInputRef.value.value = ''
     }
@@ -371,10 +567,11 @@
   }
 
   // 清空对话历史
-  const clearHistory = () => {
+  const clearHistory = async () => {
     if (isGenerating.value) {
       abortGeneration()
     }
+
     // 创建一个新的欢迎消息
     const welcomeMessage = {
       role: 'assistant' as const,
@@ -399,6 +596,35 @@
     }
   }
 
+  // 切换工具参数显示
+  const toggleToolArgs = (message: any) => {
+    message.showToolArgs = !message.showToolArgs
+  }
+
+  // 获取消息状态
+  const getMessageStatus = (message: any) => {
+    if (message.role !== 'assistant') return null
+
+    // 如果是当前正在生成的消息
+    const isCurrentMessage = isGenerating.value && message.rawText !== undefined
+
+    if (isCurrentMessage) {
+      // 如果有工具调用但还没有工具调用后的内容
+      if (message.toolName && !message.postToolContent) {
+        return 'tool-calling' // 正在进行工具调用
+      }
+      // 如果没有工具调用，或者工具调用已完成但还在生成后续内容
+      return 'generating' // 正在生成
+    }
+
+    // 对于已完成的消息，如果有工具调用则显示完成状态
+    if (message.toolName && message.postToolContent) {
+      return 'tool-completed' // 工具调用完成
+    }
+
+    return null
+  }
+
   // 服务端模式
   const serverMode = ref(false)
 
@@ -409,7 +635,6 @@
     const messageText = userInput.value
     const currentTime = getCurrentTime()
     const hasImage = !!previewImage.value
-    const isImageGeneration = messageText.trim().startsWith('生成图片:')
 
     nextTick(() => {
       isLoading.value = true
@@ -419,7 +644,7 @@
     // 创建用户消息并添加到聊天记录
     const userMessage = {
       role: 'user' as const,
-      content: messageText || '',
+      content: messageText || (hasImage ? '请分析这张图片' : ''),
       time: currentTime,
       hasImage: hasImage,
       image: previewImage.value
@@ -429,108 +654,40 @@
 
     // 清空输入并滚动到底部
     userInput.value = ''
-
     setTimeout(() => {
       scrollToBottom()
     }, 0)
 
     try {
-      if (hasImage && !isImageGeneration) {
-        processingStatus.value = '正在编辑图片...'
-        try {
-          // 创建AbortController用于中止图片编辑请求
-          abortController.value = new AbortController()
-          const imageUrl = await handleImageWithKontextPro(
-            messageText || '请编辑这张图片',
-            previewImage.value,
-            abortController.value.signal
-          )
-
-          if (abortController.value?.signal.aborted) {
-            isLoading.value = false
-            isGenerating.value = false
-            processingStatus.value = ''
-            return
-          }
-          // Image预加载
-          const img = new Image()
-          await new Promise((resolve, reject) => {
-            img.onload = () => resolve(true)
-            img.onerror = () => reject(new Error('图片加载失败'))
-            img.src = imageUrl
-          })
-          // 图片加载成功后，添加带图片的消息
-          const assistantMessage = {
-            role: 'assistant' as const,
-            content: serverMode.value
-              ? '已为您编辑图片'
-              : '已为您编辑图片，点击LoadImage节点可以直接应用。',
-            time: getCurrentTime(),
-            hasImage: true,
-            image: imageUrl
-          }
-          chatMessages.value.push(assistantMessage)
-          // 更新状态
-          isLoading.value = false
-          isGenerating.value = false
-          processingStatus.value = ''
-          removeImage() // 清除已处理的图片
-          // 滚动到底部
-          setTimeout(() => {
-            scrollToBottom()
-          }, 0)
-
-          return
-        } catch (error: any) {
-          const errorMsgTime = getCurrentTime()
-          let errorMessage = ''
-          if (error) {
-            errorMessage = error.message
-          }
-          chatMessages.value.push({
-            role: 'assistant',
-            content: `发生错误: ${errorMessage}<br><br><span style="color: #ff4d4f;">建议检查Bizyair是否更新到最新版本，并检查网络状态或者代理</span>`,
-            time: errorMsgTime
-          })
-          isLoading.value = false
-          isGenerating.value = false
-          processingStatus.value = ''
-          setTimeout(() => {
-            scrollToBottom()
-          }, 0)
-
-          return
-        }
-      }
       // 创建AbortController用于中止请求
       abortController.value = new AbortController()
-
-      // 准备历史对话数据
-      const historyMessages = chatMessages.value
-        .filter(msg => msg.role === 'user' || msg.role === 'assistant')
-        .slice(-6) // 保留最近6条消息传入
-        .map(msg => {
-          // 处理带图片的消息
-          if (msg.hasImage && msg.image && msg.role === 'user') {
-            return createImageUserMessage(msg.content, msg.image)
-          } else {
-            return {
-              role: msg.role,
-              content: msg.content
-            }
-          }
-        })
 
       // 记录当前消息时间，用于标识当前回答
       const currentMsgTime = getCurrentTime()
       let isFirstToken = true
 
-      // 使用流式聊天请求
+      // 构建对话历史 - 转换前端消息格式为API格式
+      const conversationHistory = convertToApiHistory(chatMessages.value.slice(0, -1)) // 排除刚添加的用户消息
+
+      // 构建当前消息
+      let currentMessage: string | null = null
+      if (hasImage && previewImage.value) {
+        // 如果有图片，将图片URL作为文本内容的一部分
+        const imageUrl = uploadedImageOssUrl.value || previewImage.value
+        const textContent = messageText || '请分析这张图片'
+        currentMessage = `${textContent}\n\n图片地址：${imageUrl}`
+      } else {
+        // 纯文本消息
+        currentMessage = messageText
+      }
+
+      // 使用统一的流式聊天请求
       abortController.value = await sendStreamChatRequest(
-        historyMessages,
+        currentMessage,
+        conversationHistory,
         {
           onStart: () => {
-            console.log('开始请求多模态模型...')
+            console.log('开始请求聊天模型...')
             isLoading.value = true
             // 立即滚动到底部
             setTimeout(() => {
@@ -543,7 +700,8 @@
             if (isFirstToken) {
               chatMessages.value.push({
                 role: 'assistant',
-                content: token,
+                content: formatOutputTextLight(token),
+                rawText: token,
                 time: currentMsgTime
               })
               isFirstToken = false
@@ -555,11 +713,22 @@
                 .pop()
 
               if (currentAssistantMsg) {
-                currentAssistantMsg.content += token
+                currentAssistantMsg.rawText = (currentAssistantMsg.rawText || '') + token
 
-                // 实时应用格式化
-                const formattedText = formatOutputTextLight(currentAssistantMsg.content)
-                currentAssistantMsg.content = formattedText
+                // 如果有工具调用，将新内容作为工具调用后的内容
+                if (currentAssistantMsg.toolName) {
+                  // 工具调用后的内容，需要单独保存
+                  const postToolRawText = currentAssistantMsg.rawText || ''
+                  currentAssistantMsg.postToolContent = formatOutputTextLight(postToolRawText)
+                  
+                  // 显示完整内容：工具调用前 + 工具调用后
+                  const preContent = currentAssistantMsg.preToolContent || ''
+                  const postContent = currentAssistantMsg.postToolContent || ''
+                  currentAssistantMsg.content = preContent + postContent
+                } else {
+                  // 没有工具调用时，正常更新content
+                  currentAssistantMsg.content = formatOutputTextLight(currentAssistantMsg.rawText)
+                }
               }
             }
 
@@ -568,8 +737,82 @@
               scrollToBottom()
             }, 0)
           },
+          onToolCall: tool => {
+            // 合并到当前助手消息；若不存在则创建
+            let currentAssistantMsg = chatMessages.value
+              .filter(msg => msg.role === 'assistant' && msg.time === currentMsgTime)
+              .pop()
+            if (!currentAssistantMsg) {
+              currentAssistantMsg = {
+                role: 'assistant',
+                content: '',
+                time: currentMsgTime
+              }
+              chatMessages.value.push(currentAssistantMsg)
+            }
+
+            // 保存工具调用前的内容
+            if (currentAssistantMsg.rawText) {
+              currentAssistantMsg.preToolContent = formatOutputTextLight(
+                currentAssistantMsg.rawText
+              )
+            }
+
+            currentAssistantMsg.toolName = tool.name
+            currentAssistantMsg.toolId = tool.id
+            currentAssistantMsg.toolCallArgs = tool.arguments
+            currentAssistantMsg.showToolArgs = false
+
+            // 清空rawText，准备接收工具调用后的内容
+            currentAssistantMsg.rawText = ''
+
+            setTimeout(() => {
+              scrollToBottom()
+            }, 0)
+          },
+          onToolResult: payload => {
+            let resultContent = ''
+            try {
+              resultContent =
+                typeof payload.result === 'string' ? payload.result : JSON.stringify(payload.result)
+            } catch (e) {
+              resultContent = String(payload.result)
+            }
+
+            const isImageUrl =
+              /^https?:\/\/\S+\.(png|jpg|jpeg|webp|gif)(\?\S*)?$/i.test(resultContent) ||
+              /^https?:\/\//i.test(resultContent)
+
+            const currentAssistantMsg = chatMessages.value
+              .filter(msg => msg.role === 'assistant' && msg.time === currentMsgTime)
+              .pop()
+
+            if (currentAssistantMsg) {
+              // 保存工具结果文本，用于对话历史记录
+              currentAssistantMsg.toolResultText = resultContent
+              
+              if (isImageUrl) {
+                const urls = resultContent
+                  .split(/\s+/)
+                  .map(u => u.trim())
+                  .filter(u => /^https?:\/\//i.test(u))
+
+                if (urls.length > 1) {
+                  currentAssistantMsg.hasImage = true
+                  currentAssistantMsg.images = urls
+                } else if (urls.length === 1) {
+                  currentAssistantMsg.hasImage = true
+                  currentAssistantMsg.image = urls[0]
+                  currentAssistantMsg.images = [urls[0]]
+                }
+              }
+            }
+            setTimeout(() => {
+              scrollToBottom()
+            }, 0)
+          },
           onComplete: (fullText: string) => {
-            console.log('多模态模型响应完成')
+            console.log('聊天模型响应完成')
 
             // 更新状态
             isLoading.value = false
@@ -582,19 +825,26 @@
               .pop()
 
             if (currentAssistantMsg) {
-              currentAssistantMsg.content = fullText
+              // 如果有工具调用，确保工具调用后的内容正确显示
+              if (currentAssistantMsg.toolName) {
+                // 显示完整内容：工具调用前 + 工具调用后
+                const preContent = currentAssistantMsg.preToolContent || ''
+                const postContent = currentAssistantMsg.postToolContent || ''
+                currentAssistantMsg.content = preContent + postContent
+              } else {
+                // 没有工具调用时，正常更新content
+                currentAssistantMsg.content = formatOutputTextLight(fullText)
+              }
+              currentAssistantMsg.rawText = undefined
             }
 
             // 滚动到底部
             setTimeout(() => {
               scrollToBottom()
             }, 0)
-
-            // 清除上传的图片
-            // removeImage();
           },
           onError: error => {
-            console.error('多模态请求失败:', error)
+            console.error('聊天请求失败:', error)
             const errorMsgTime = getCurrentTime()
             let errorMessage = ''
             if (error) {
@@ -614,9 +864,10 @@
           }
         },
         {
-          model: 'Pro/deepseek-ai/DeepSeek-V3',
-          prompt_id: promptId.value,
-          request_id: requestId.value
+          model_config: {
+            temperature: 0.5,
+            max_tokens: 128000
+          }
         }
       )
     } catch (error) {
@@ -656,39 +907,47 @@
   // 处理节点信息更新
   watch(
     () => sidebarStore.nodeInfo,
-    newValue => {
+    async newValue => {
       console.log('节点信息更新:', newValue)
       if (newValue?.imageInfo?.url || newValue?.imageInfo?.base64) {
-        // 直接设置预览图片，就像用户上传了一样
-        const imageUrl = newValue.imageInfo.base64 || newValue.imageInfo.url || ''
+        let ossUrl = ''
 
-        // 设置上传的图片以便用户可以输入文本后发送
-        previewImage.value = imageUrl
+        try {
+          if (newValue.imageInfo.filename && newValue.imageInfo.filename.startsWith('https://')) {
+            // 已经是 OSS URL，直接使用
+            ossUrl = newValue.imageInfo.filename
+          } else if (newValue.imageInfo.url && newValue.imageInfo.url.startsWith('https://')) {
+            // 已经是 OSS URL，直接使用
+            ossUrl = newValue.imageInfo.url
+          } else if (newValue.imageInfo.base64) {
+            // 如果有 base64，需要上传到 OSS
+            const base64Data = newValue.imageInfo.base64.startsWith('data:')
+              ? newValue.imageInfo.base64
+              : `data:image/webp;base64,${newValue.imageInfo.base64}`
 
-        // 处理base64数据
-        if (newValue.imageInfo.base64) {
-          // 检查是否已包含data:前缀
-          if (typeof newValue.imageInfo.base64 === 'string') {
-            uploadedImageBase64.value = newValue.imageInfo.base64.startsWith('data:')
-              ? newValue.imageInfo.base64.split(',')[1]
-              : newValue.imageInfo.base64
+            const file = base64ToFile(base64Data, 'image.webp', 'image/webp')
+            const { url } = await imageToOss(file)
+            ossUrl = url
+          } else if (newValue.imageInfo.url) {
+            // 从本地 URL 获取文件并上传到 OSS
+            const response = await fetch(newValue.imageInfo.url)
+            const blob = await response.blob()
+            const file = new File([blob], 'image.webp', { type: 'image/webp' })
+            const { url } = await imageToOss(file)
+            ossUrl = url
           }
-        } else if (newValue.imageInfo.url) {
-          // 如果没有base64，则尝试从URL加载并转换
-          fetch(newValue.imageInfo.url)
-            .then(response => response.blob())
-            .then(blob => {
-              const reader = new FileReader()
-              reader.onloadend = () => {
-                const base64data = reader.result
-                if (typeof base64data === 'string') {
-                  uploadedImageBase64.value = base64data.split(',')[1] // 移除data:image/...前缀
-                }
-              }
-              reader.readAsDataURL(blob)
-            })
-            .catch(error => console.error('获取图片出错:', error))
+        } catch (error) {
+          console.error('处理图片失败:', error)
+          useToaster({
+            type: 'error',
+            message: '图片处理失败'
+          })
+          return
         }
+
+        // 设置预览图片和 OSS URL（统一使用 OSS URL）
+        previewImage.value = ossUrl
+        uploadedImageOssUrl.value = ossUrl
 
         // 聚焦到输入框
         setTimeout(() => {
@@ -752,31 +1011,11 @@
       console.error('没有图片URL')
       return
     }
-    let base64Data = imageUrl
 
-    if (!imageUrl.startsWith('data:')) {
-      try {
-        const response = await fetch(imageUrl)
-        const blob = await response.blob()
-        base64Data = await new Promise(resolve => {
-          const reader = new FileReader()
-          reader.onloadend = () => resolve(reader.result as string)
-          reader.readAsDataURL(blob)
-        })
-      } catch (error) {
-        console.error('获取图片数据失败:', error)
-        useToaster({
-          type: 'error',
-          message: '获取图片数据失败，无法应用到节点'
-        })
-        return
-      }
-    }
-
-    // 创建要发送到节点的图片数据对象
+    // 创建要发送到节点的图片数据对象（直接使用OSS URL）
     const imageData = {
       nodeId: sidebarStore.nodeInfo.id,
-      imageBase64: base64Data,
+      imageUrl: imageUrl, // 直接使用OSS URL
       nodeType: sidebarStore.nodeInfo.type
     }
     console.log(window.bizyAirLib, 'window.bizyAirLib-----')
@@ -811,48 +1050,46 @@
   }
 
   // 选择现有图片
-  const selectExistingImage = (imageUrl: string) => {
+  const selectExistingImage = async (imageUrl: string) => {
     if (!imageUrl) return
-    previewImage.value = imageUrl
-    // 如果图片URL以data:开头，则为base64格式
-    if (previewImage.value.includes('data:')) {
-      try {
-        // 提取base64部分
-        const base64Part = previewImage.value.split('base64,')[1]
-        if (base64Part) {
-          uploadedImageBase64.value = base64Part
-          console.log('已设置base64数据，长度:', uploadedImageBase64.value.length)
-        } else {
-          console.error('无法从图片URL提取base64数据')
+
+    try {
+      if (imageUrl.startsWith('data:')) {
+        // 如果是base64格式，需要上传到OSS
+        const file = base64ToFile(imageUrl, 'image.webp', 'image/webp')
+        const { url } = await imageToOss(file)
+        previewImage.value = url
+        uploadedImageOssUrl.value = url
+        console.log('Base64图片已上传到 OSS:', url)
+      } else if (imageUrl.includes('oss-') || imageUrl.includes('aliyuncs.com')) {
+        // 已经是 OSS URL，直接使用
+        previewImage.value = imageUrl
+        uploadedImageOssUrl.value = imageUrl
+        console.log('使用现有 OSS URL:', imageUrl)
+      } else if (imageUrl.startsWith('http')) {
+        // 不是 OSS URL，需要下载并上传到 OSS
+        console.log('正在获取远程图片并上传到 OSS:', imageUrl.substring(0, 50) + '...')
+        const response = await fetch(imageUrl)
+        if (!response.ok) {
+          throw new Error(`无法获取图片: ${response.status} ${response.statusText}`)
         }
-      } catch (error) {
-        console.error('解析base64数据出错:', error)
+        const blob = await response.blob()
+        const file = new File([blob], 'image.webp', { type: 'image/webp' })
+        const { url } = await imageToOss(file)
+        previewImage.value = url
+        uploadedImageOssUrl.value = url
+        console.log('远程图片已上传到 OSS:', url)
+      } else {
+        // 其他情况，直接使用原URL
+        previewImage.value = imageUrl
+        uploadedImageOssUrl.value = imageUrl
       }
-    } else if (imageUrl.startsWith('http')) {
-      // 否则尝试将图片转换为base64
-      console.log('正在获取远程图片:', imageUrl.substring(0, 50) + '...')
-      fetch(imageUrl)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`无法获取图片: ${response.status} ${response.statusText}`)
-          }
-          return response.blob()
-        })
-        .then(blob => {
-          const reader = new FileReader()
-          reader.onloadend = () => {
-            if (typeof reader.result === 'string') {
-              previewImage.value = reader.result
-              const base64data = reader.result.split('base64,')[1]
-              if (base64data) {
-                uploadedImageBase64.value = base64data
-                console.log('已转换远程图片为base64，长度:', uploadedImageBase64.value.length)
-              }
-            }
-          }
-          reader.readAsDataURL(blob)
-        })
-        .catch(error => console.error('获取图片出错:', error))
+    } catch (error) {
+      console.error('处理图片失败:', error)
+      useToaster({
+        type: 'error',
+        message: '图片处理失败'
+      })
     }
 
     // 聚焦到输入框
@@ -893,6 +1130,7 @@
     } else {
       generateNewPromptId()
     }
+
     generateNewRequestId()
 
     // 确保全局bizyAirLib对象存在
@@ -903,7 +1141,7 @@
     // 直接定义updateNodeImage方法
     if (typeof (window as any).bizyAirLib.updateNodeImage !== 'function') {
       ;(window as any).bizyAirLib.updateNodeImage = function (imageData: any) {
-        if (!imageData || !imageData.nodeId || !imageData.imageBase64) {
+        if (!imageData || !imageData.nodeId || !imageData.imageUrl) {
           console.error('应用图片到节点失败: 缺少必要的参数')
           return
         }
@@ -918,7 +1156,7 @@
               type: 'APPLY_IMAGE_TO_NODE',
               data: {
                 nodeId: imageData.nodeId,
-                base64Data: imageData.imageBase64
+                imageUrl: imageData.imageUrl // 使用OSS URL而不是base64
               }
             },
             '*'
@@ -938,7 +1176,6 @@
       content: t('sidebar.assistant.welcomeMessage'),
       time: getCurrentTime()
     }
-
     chatMessages.value = [welcomeMessage]
 
     // 异步获取 server_mode
@@ -1087,6 +1324,85 @@
     word-break: break-all;
   }
 
+  .node-info-card {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+    backdrop-filter: blur(10px);
+  }
+
+  .node-info-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #7c3aed;
+  }
+
+  .node-info-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .node-info-main {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .node-info-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .node-info-content .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .node-info-content .label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+  }
+
+  .node-info-content .value {
+    font-size: 12px;
+    color: #ffffff;
+    font-weight: 500;
+    word-break: break-all;
+  }
+
+  .node-image-preview {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(124, 58, 237, 0.3);
+  }
+
+  .node-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .node-preview-img:hover {
+    transform: scale(1.05);
+  }
+
   /* 聊天界面样式 */
   .chat-container {
     flex: 1;
@@ -1111,6 +1427,8 @@
   .message {
     display: flex;
     margin-bottom: 16px;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .user-message {
@@ -1154,6 +1472,9 @@
     border-radius: 12px;
     padding: 12px;
     overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    min-width: 0; /* 确保flex子元素可以收缩 */
   }
 
   .user-message .message-content {
@@ -1169,8 +1490,16 @@
   .message-header {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 4px;
     font-size: 12px;
+  }
+
+  .sender-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
   }
 
   .message-sender {
@@ -1181,9 +1510,130 @@
     color: rgba(255, 255, 255, 0.6);
   }
 
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    padding: 4px 8px;
+    opacity: 1;
+  }
+
+  /* 正在生成状态 - 鲜艳蓝色 */
+  .status-indicator.generating {
+    color: #007bff;
+  }
+
+  /* 正在进行工具调用状态 - 鲜艳紫色 */
+  .status-indicator.tool-calling {
+    color: #7c3aed;
+  }
+
+  /* 工具调用完成状态 - 鲜艳绿色 */
+  .status-indicator.tool-completed {
+    color: #00cc44;
+  }
+
+  .status-icon.spinning {
+    animation: spin 1s linear infinite;
+  }
+
+  .status-icon.typing {
+    animation: typing 1.4s ease-in-out infinite;
+  }
+
+  .status-text {
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes typing {
+    0%,
+    60%,
+    100% {
+      opacity: 0.3;
+    }
+    30% {
+      opacity: 1;
+    }
+  }
+
   .message-text {
     word-wrap: break-word;
     line-height: 1.4;
+  }
+
+  .pre-tool-content {
+    margin-bottom: 12px;
+  }
+
+  .post-tool-content {
+    margin-top: 12px;
+  }
+
+  /* Markdown 标题样式 */
+  .message-text h1,
+  .message-text h2,
+  .message-text h3,
+  .message-text h4,
+  .message-text h5,
+  .message-text h6 {
+    margin: 8px 0 6px;
+    line-height: 1.3;
+    color: #fff;
+  }
+  .message-text h1 {
+    font-size: 20px;
+    border-bottom: 1px solid #454545;
+    padding-bottom: 6px;
+  }
+  .message-text h2 {
+    font-size: 18px;
+    border-bottom: 1px solid #454545;
+    padding-bottom: 6px;
+  }
+  .message-text h3 {
+    font-size: 16px;
+  }
+  .message-text h4 {
+    font-size: 15px;
+  }
+  .message-text h5 {
+    font-size: 14px;
+  }
+  .message-text h6 {
+    font-size: 13px;
+  }
+
+  /* Markdown 表格样式 */
+  .message-text table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    background: #2f2f2f;
+    border: 1px solid #444;
+  }
+  .message-text th,
+  .message-text td {
+    border: 1px solid #444;
+    padding: 8px 10px;
+    text-align: left;
+  }
+  .message-text thead th {
+    background: #3a3a3a;
+    color: #fff;
+  }
+  .message-text tbody tr:nth-child(odd) {
+    background: #343434;
   }
 
   /* 让列表和段落有更好的间距 */
@@ -1201,8 +1651,88 @@
     margin-bottom: 4px;
   }
 
+  /* 代码块样式 */
+  .message-text pre code,
+  .message-text code {
+    background: #2d2d2d;
+    color: #e6e6e6;
+    border-radius: 4px;
+  }
+  .message-text code {
+    padding: 1px 4px;
+  }
+  .message-text pre {
+    padding: 10px;
+    overflow: auto;
+    border: 1px solid #444;
+    border-radius: 6px;
+  }
+
   .message-image {
     margin-bottom: 8px;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .tool-section {
+    margin: 12px 0;
+    padding: 12px;
+    border: 1px solid #5b21b6;
+    border-radius: 10px;
+    background: #7c3aed;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .tool-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .tool-title {
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .tool-args-toggle {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+  }
+
+  .tool-args-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  .tool-args {
+    margin-top: 6px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .tool-result {
+    margin-top: 8px;
+  }
+  .tool-result-label {
+    color: #ccc;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .code-block {
+    background: #2d2d2d;
+    color: #e6e6e6;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
   }
 
   .image-container {
@@ -1210,6 +1740,8 @@
     display: inline-block;
     overflow: hidden;
     border-radius: 6px;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .message-img {
@@ -1217,6 +1749,15 @@
     max-height: 200px;
     border-radius: 6px;
     display: block;
+  }
+
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .image-overlay {
@@ -1344,9 +1885,8 @@
   }
 
   .chat-input-area {
-    background-color: #2a2a2a;
-    border-top: 1px solid #444;
-    padding: 16px;
+    background-color: #333;
+    padding: 12px;
     flex-shrink: 0;
     position: relative;
     z-index: 10001 !important;
@@ -1371,25 +1911,30 @@
 
   .textarea-container textarea {
     width: 100%;
-    padding: 8px 12px;
-    border-radius: 18px;
-    background-color: #444;
-    border: 1px solid #555;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
     color: white;
     resize: none;
     height: 40px;
     line-height: 20px;
     outline: none;
-    transition: border-color 0.2s;
+    transition: all 0.2s ease;
     box-sizing: border-box;
+    font-size: 14px;
   }
 
   .textarea-container textarea:focus {
-    border-color: #7c3aed;
+    background: rgba(124, 58, 237, 0.15);
+  }
+
+  .textarea-container textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
   }
 
   .upload-image-btn,
-  .send-message-btn,
+  .send-stop-btn,
   .control-btn {
     min-width: 40px;
     height: 40px;
@@ -1401,36 +1946,46 @@
     border: none;
     color: white;
     flex-shrink: 0;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
   }
 
   .upload-image-btn {
-    background-color: #444;
-    transition: background-color 0.2s;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
   }
 
   .upload-image-btn:hover {
-    background-color: #555;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
   }
 
   .upload-image-btn:disabled {
-    background-color: #555;
+    background: transparent;
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.3;
+    color: rgba(255, 255, 255, 0.3);
   }
 
-  .send-message-btn {
-    background-color: #7c3aed;
-    transition: background-color 0.2s;
+  .send-stop-btn {
+    background: transparent;
+    border: none;
+    color: #7c3aed;
+    transition: all 0.2s ease;
   }
 
-  .send-message-btn:hover {
-    background-color: #6429d9;
+  .send-stop-btn:hover:not(:disabled) {
+    background: rgba(124, 58, 237, 0.15);
+    color: #8b5cf6;
   }
 
-  .send-message-btn:disabled {
-    background-color: #555;
+  .send-stop-btn:disabled {
+    background: transparent;
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.3;
+    color: rgba(124, 58, 237, 0.3);
   }
 
   .image-actions {
@@ -1455,7 +2010,7 @@
   }
 
   .image-preview-area {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -1464,31 +2019,45 @@
   .preview-image-container {
     position: relative;
     display: inline-block;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
   }
 
   .preview-image-small {
-    max-width: 100px;
-    max-height: 100px;
-    border-radius: 6px;
-    border: 1px solid #555;
+    max-width: 80px;
+    max-height: 80px;
+    border-radius: 8px;
+    border: 2px solid rgba(124, 58, 237, 0.3);
+    display: block;
   }
 
   .remove-image-btn {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 20px;
-    height: 20px;
+    top: -6px;
+    right: -6px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    background-color: #ff4d4f;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 14px;
     cursor: pointer;
-    border: none;
+    border: 2px solid #1f1f1f;
     font-weight: bold;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  }
+
+  .remove-image-btn:hover {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
   }
 
   /* 加载指示器 */
@@ -1545,21 +2114,14 @@
   }
 
   .control-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    background-color: #e53e3e;
+    background: transparent;
     border: none;
-    color: white;
-    transition: background-color 0.2s;
+    color: #ef4444;
   }
 
   .control-btn:hover {
-    background-color: #c53030;
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
   }
 
   .stop-btn {
