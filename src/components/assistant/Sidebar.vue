@@ -141,6 +141,39 @@
                           ></path>
                         </svg>
                       </button>
+                      <div class="top-right-actions">
+                        <button
+                          class="image-action-btn"
+                          @click="selectExistingImage(img || '')"
+                          title="添加到输入"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                          >
+                            <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                          </svg>
+                        </button>
+                        <button
+                          class="image-action-btn"
+                          @click="downloadImage(img || '')"
+                          title="下载图片"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              fill="currentColor"
+                              d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -201,7 +234,7 @@
                     </div>
                   </div>
                 </div>
-                <div
+                <!-- <div
                   v-if="
                     message.role === 'assistant' &&
                     sidebarStore.nodeInfo &&
@@ -217,7 +250,7 @@
                   >
                     {{ getNodeActionText(sidebarStore.nodeInfo) }}
                   </button>
-                </div>
+                </div> -->
               </div>
 
               <!-- 工具调用前的内容 -->
@@ -315,10 +348,7 @@
                   <span class="value">{{ sidebarStore.nodeInfo.type }}</span>
                 </div>
               </div>
-              <div
-                v-if="sidebarStore.nodeInfo.imageInfo?.url"
-                class="node-image-preview"
-              >
+              <div v-if="sidebarStore.nodeInfo.imageInfo?.url" class="node-image-preview">
                 <img
                   :src="sidebarStore.nodeInfo.imageInfo.url"
                   alt="节点图片"
@@ -413,13 +443,19 @@
 <script setup lang="ts">
   import { useSidebarStore } from '../../stores/sidebarStore'
   import { onMounted, watch, ref, computed, onBeforeUnmount, nextTick } from 'vue'
-  import { sendStreamChatRequest, formatOutputTextLight, convertToApiHistory } from './util'
+  import {
+    sendStreamChatRequest,
+    formatOutputTextLight,
+    formatOutputText,
+    convertToApiHistory
+  } from './util'
   import { useI18n } from 'vue-i18n'
   import { useToaster } from '@/components/modules/toats/index'
   import { v4 as uuidv4 } from 'uuid'
   import { downloadImage } from '@/utils/tool'
   import { useServerModeStore } from '@/stores/isServerMode'
   import { imageToOss, base64ToFile } from '@/components/modules/vUpload/imageToOss'
+  import './Sidebar.css'
   const { t } = useI18n()
   const sidebarStore = useSidebarStore()
 
@@ -719,8 +755,8 @@
                 if (currentAssistantMsg.toolName) {
                   // 工具调用后的内容，需要单独保存
                   const postToolRawText = currentAssistantMsg.rawText || ''
-                  currentAssistantMsg.postToolContent = formatOutputTextLight(postToolRawText)
-                  
+                  currentAssistantMsg.postToolContent = formatOutputText(postToolRawText)
+
                   // 显示完整内容：工具调用前 + 工具调用后
                   const preContent = currentAssistantMsg.preToolContent || ''
                   const postContent = currentAssistantMsg.postToolContent || ''
@@ -753,9 +789,7 @@
 
             // 保存工具调用前的内容
             if (currentAssistantMsg.rawText) {
-              currentAssistantMsg.preToolContent = formatOutputTextLight(
-                currentAssistantMsg.rawText
-              )
+              currentAssistantMsg.preToolContent = formatOutputText(currentAssistantMsg.rawText)
             }
 
             currentAssistantMsg.toolName = tool.name
@@ -790,7 +824,7 @@
             if (currentAssistantMsg) {
               // 保存工具结果文本，用于对话历史记录
               currentAssistantMsg.toolResultText = resultContent
-              
+
               if (isImageUrl) {
                 const urls = resultContent
                   .split(/\s+/)
@@ -827,13 +861,16 @@
             if (currentAssistantMsg) {
               // 如果有工具调用，确保工具调用后的内容正确显示
               if (currentAssistantMsg.toolName) {
-                // 显示完整内容：工具调用前 + 工具调用后
-                const preContent = currentAssistantMsg.preToolContent || ''
-                const postContent = currentAssistantMsg.postToolContent || ''
-                currentAssistantMsg.content = preContent + postContent
+                // 工具调用后的内容已经在onToken中更新了
+                if (currentAssistantMsg.postToolContent) {
+                  currentAssistantMsg.content = currentAssistantMsg.postToolContent
+                } else {
+                  // 如果没有工具调用后的内容，只显示工具调用前的内容
+                  currentAssistantMsg.content = currentAssistantMsg.preToolContent || ''
+                }
               } else {
                 // 没有工具调用时，正常更新content
-                currentAssistantMsg.content = formatOutputTextLight(fullText)
+                currentAssistantMsg.content = formatOutputText(fullText)
               }
               currentAssistantMsg.rawText = undefined
             }
@@ -959,85 +996,85 @@
   )
 
   // 修改canApplyToNode函数来返回更具体的操作类型
-  const canApplyToNode = (nodeInfo: any) => {
-    // 根据节点类型返回不同的操作类型
-    if (!nodeInfo || !nodeInfo.type) return false
+  // const canApplyToNode = (nodeInfo: any) => {
+  //   // 根据节点类型返回不同的操作类型
+  //   if (!nodeInfo || !nodeInfo.type) return false
 
-    const nodeType = nodeInfo.type
-    if (nodeType === 'LoadImage') {
-      return 'apply' // 应用到节点
-    } else if (nodeType === 'SaveImage') {
-      return 'save-output' // 保存到output目录
-    } else if (nodeType === 'PreviewImage') {
-      return 'save-temp' // 保存到temp目录
-    }
-    return false // 其他类型节点不支持操作
-  }
+  //   const nodeType = nodeInfo.type
+  //   if (nodeType === 'LoadImage') {
+  //     return 'apply' // 应用到节点
+  //   } else if (nodeType === 'SaveImage') {
+  //     return 'save-output' // 保存到output目录
+  //   } else if (nodeType === 'PreviewImage') {
+  //     return 'save-temp' // 保存到temp目录
+  //   }
+  //   return false // 其他类型节点不支持操作
+  // }
 
-  // 添加getNodeActionText函数，返回按钮文本
-  const getNodeActionText = (nodeInfo: any) => {
-    const actionType = canApplyToNode(nodeInfo)
-    if (actionType === 'apply') {
-      return '应用到当前节点'
-    } else if (actionType === 'save-output') {
-      return '保存到output目录'
-    } else if (actionType === 'save-temp') {
-      return '保存到temp目录'
-    }
-    return '应用到节点'
-  }
+  // // 添加getNodeActionText函数，返回按钮文本
+  // const getNodeActionText = (nodeInfo: any) => {
+  //   const actionType = canApplyToNode(nodeInfo)
+  //   if (actionType === 'apply') {
+  //     return '应用到当前节点'
+  //   } else if (actionType === 'save-output') {
+  //     return '保存到output目录'
+  //   } else if (actionType === 'save-temp') {
+  //     return '保存到temp目录'
+  //   }
+  //   return '应用到节点'
+  // }
 
-  // 添加getNodeActionTitle函数，返回提示文本
-  const getNodeActionTitle = (nodeInfo: any) => {
-    const actionType = canApplyToNode(nodeInfo)
-    if (actionType === 'apply') {
-      return '将图片应用到LoadImage节点'
-    } else if (actionType === 'save-output') {
-      return '将图片保存到output目录'
-    } else if (actionType === 'save-temp') {
-      return '将图片保存到temp目录'
-    }
-    return ''
-  }
+  // // 添加getNodeActionTitle函数，返回提示文本
+  // const getNodeActionTitle = (nodeInfo: any) => {
+  //   const actionType = canApplyToNode(nodeInfo)
+  //   if (actionType === 'apply') {
+  //     return '将图片应用到LoadImage节点'
+  //   } else if (actionType === 'save-output') {
+  //     return '将图片保存到output目录'
+  //   } else if (actionType === 'save-temp') {
+  //     return '将图片保存到temp目录'
+  //   }
+  //   return ''
+  // }
 
   // 应用图片到当前节点
-  const applyImageToNode = async (imageUrl: string | undefined) => {
-    if (!sidebarStore.nodeInfo) {
-      console.error('没有选中的节点信息')
-      return
-    }
+  // const applyImageToNode = async (imageUrl: string | undefined) => {
+  //   if (!sidebarStore.nodeInfo) {
+  //     console.error('没有选中的节点信息')
+  //     return
+  //   }
 
-    if (!imageUrl) {
-      console.error('没有图片URL')
-      return
-    }
+  //   if (!imageUrl) {
+  //     console.error('没有图片URL')
+  //     return
+  //   }
 
-    // 创建要发送到节点的图片数据对象（直接使用OSS URL）
-    const imageData = {
-      nodeId: sidebarStore.nodeInfo.id,
-      imageUrl: imageUrl, // 直接使用OSS URL
-      nodeType: sidebarStore.nodeInfo.type
-    }
-    console.log(window.bizyAirLib, 'window.bizyAirLib-----')
+  //   // 创建要发送到节点的图片数据对象（直接使用OSS URL）
+  //   const imageData = {
+  //     nodeId: sidebarStore.nodeInfo.id,
+  //     imageUrl: imageUrl, // 直接使用OSS URL
+  //     nodeType: sidebarStore.nodeInfo.type
+  //   }
+  //   console.log(window.bizyAirLib, 'window.bizyAirLib-----')
 
-    // 如果window.bizyAirLib存在并有updateNodeImage方法，调用它
-    if (
-      typeof window.bizyAirLib !== 'undefined' &&
-      typeof window.bizyAirLib.updateNodeImage === 'function'
-    ) {
-      window.bizyAirLib.updateNodeImage(imageData)
-      useToaster({
-        type: 'success',
-        message: '图片已应用到节点: ' + sidebarStore.nodeInfo.title
-      })
-    } else {
-      console.error('bizyAirLib.updateNodeImage未定义')
-      useToaster({
-        type: 'error',
-        message: '应用图片到节点失败'
-      })
-    }
-  }
+  //   // 如果window.bizyAirLib存在并有updateNodeImage方法，调用它
+  //   if (
+  //     typeof window.bizyAirLib !== 'undefined' &&
+  //     typeof window.bizyAirLib.updateNodeImage === 'function'
+  //   ) {
+  //     window.bizyAirLib.updateNodeImage(imageData)
+  //     useToaster({
+  //       type: 'success',
+  //       message: '图片已应用到节点: ' + sidebarStore.nodeInfo.title
+  //     })
+  //   } else {
+  //     console.error('bizyAirLib.updateNodeImage未定义')
+  //     useToaster({
+  //       type: 'error',
+  //       message: '应用图片到节点失败'
+  //     })
+  //   }
+  // }
 
   // enter发送，shift+enter换行
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -1061,24 +1098,15 @@
         previewImage.value = url
         uploadedImageOssUrl.value = url
         console.log('Base64图片已上传到 OSS:', url)
-      } else if (imageUrl.includes('oss-') || imageUrl.includes('aliyuncs.com')) {
+      } else if (
+        imageUrl.startsWith('https') ||
+        imageUrl.includes('oss-') ||
+        imageUrl.includes('aliyuncs.com')
+      ) {
         // 已经是 OSS URL，直接使用
         previewImage.value = imageUrl
         uploadedImageOssUrl.value = imageUrl
         console.log('使用现有 OSS URL:', imageUrl)
-      } else if (imageUrl.startsWith('http')) {
-        // 不是 OSS URL，需要下载并上传到 OSS
-        console.log('正在获取远程图片并上传到 OSS:', imageUrl.substring(0, 50) + '...')
-        const response = await fetch(imageUrl)
-        if (!response.ok) {
-          throw new Error(`无法获取图片: ${response.status} ${response.statusText}`)
-        }
-        const blob = await response.blob()
-        const file = new File([blob], 'image.webp', { type: 'image/webp' })
-        const { url } = await imageToOss(file)
-        previewImage.value = url
-        uploadedImageOssUrl.value = url
-        console.log('远程图片已上传到 OSS:', url)
       } else {
         // 其他情况，直接使用原URL
         previewImage.value = imageUrl
@@ -1190,1033 +1218,3 @@
     })()
   })
 </script>
-
-<style>
-  .sidebar-wrapper {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100%;
-    background-color: #2d2d2d;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    z-index: 99999;
-    transition: width 0.1s ease;
-    pointer-events: auto;
-  }
-
-  .resize-handle {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 5px;
-    height: 100%;
-    cursor: col-resize;
-    background-color: transparent;
-  }
-
-  .resize-handle:hover,
-  .resize-handle:active {
-    background-color: rgba(124, 58, 237, 0.3);
-  }
-
-  /* 拖拽过程中添加样式到body */
-  body.resizing {
-    cursor: col-resize;
-    user-select: none;
-  }
-
-  .sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background-color: #333;
-    border-bottom: 1px solid #444;
-    flex-shrink: 0;
-  }
-
-  .sidebar-header h2 {
-    margin: 0;
-    font-size: 16px;
-    color: #fff;
-  }
-
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .action-btn,
-  .close-btn {
-    background: none;
-    border: none;
-    color: #ccc;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-  }
-
-  .action-btn {
-    pointer-events: auto;
-    position: relative;
-    z-index: 1000;
-  }
-
-  .close-btn {
-    pointer-events: auto;
-    position: relative;
-    z-index: 1000;
-  }
-
-  .action-btn:hover,
-  .close-btn:hover {
-    color: #fff;
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .sidebar-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    color: #eee;
-    height: 100%;
-    padding: 16px;
-  }
-
-  .node-info {
-    background-color: #333;
-    border-radius: 6px;
-    padding: 16px;
-    margin-bottom: 16px;
-    border: 1px solid #444;
-  }
-
-  .node-info h3 {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    color: #fff;
-    border-bottom: 1px solid #444;
-    padding-bottom: 8px;
-  }
-
-  .info-item {
-    margin-bottom: 8px;
-    display: flex;
-  }
-
-  .info-item .label {
-    color: #aaa;
-    margin-right: 8px;
-    min-width: 60px;
-    font-weight: bold;
-  }
-
-  .info-item .value {
-    color: #eee;
-    word-break: break-all;
-  }
-
-  .node-info-card {
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-    border: 1px solid rgba(124, 58, 237, 0.2);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 10px;
-    backdrop-filter: blur(10px);
-  }
-
-  .node-info-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    color: #7c3aed;
-  }
-
-  .node-info-title {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .node-info-main {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-
-  .node-info-content {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .node-info-content .info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .node-info-content .label {
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.6);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 500;
-  }
-
-  .node-info-content .value {
-    font-size: 12px;
-    color: #ffffff;
-    font-weight: 500;
-    word-break: break-all;
-  }
-
-  .node-image-preview {
-    flex-shrink: 0;
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid rgba(124, 58, 237, 0.3);
-  }
-
-  .node-preview-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-
-  .node-preview-img:hover {
-    transform: scale(1.05);
-  }
-
-  /* 聊天界面样式 */
-  .chat-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background-color: #333;
-    border-radius: 6px;
-    border: 1px solid #444;
-    overflow: hidden;
-    height: 100%;
-  }
-
-  .chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .message {
-    display: flex;
-    margin-bottom: 16px;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-
-  .user-message {
-    align-self: flex-end;
-    flex-direction: row-reverse;
-  }
-
-  .ai-message {
-    align-self: flex-start;
-  }
-
-  .message-avatar {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    margin: 0 8px;
-  }
-
-  .avatar-icon {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    background-color: #444;
-    font-size: 18px;
-  }
-
-  .user-message .avatar-icon {
-    background-color: #7c3aed;
-  }
-
-  .ai-message .avatar-icon {
-    background-color: #4b9ef9;
-  }
-
-  .message-content {
-    max-width: 80%;
-    background-color: #444;
-    border-radius: 12px;
-    padding: 12px;
-    overflow: hidden;
-    word-wrap: break-word;
-    box-sizing: border-box;
-    min-width: 0; /* 确保flex子元素可以收缩 */
-  }
-
-  .user-message .message-content {
-    background-color: #7c3aed;
-    border-top-right-radius: 0;
-  }
-
-  .ai-message .message-content {
-    background-color: #3a3a3a;
-    border-top-left-radius: 0;
-  }
-
-  .message-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 4px;
-    font-size: 12px;
-  }
-
-  .sender-info {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .message-sender {
-    font-weight: bold;
-  }
-
-  .message-time {
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  .status-indicator {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    padding: 4px 8px;
-    opacity: 1;
-  }
-
-  /* 正在生成状态 - 鲜艳蓝色 */
-  .status-indicator.generating {
-    color: #007bff;
-  }
-
-  /* 正在进行工具调用状态 - 鲜艳紫色 */
-  .status-indicator.tool-calling {
-    color: #7c3aed;
-  }
-
-  /* 工具调用完成状态 - 鲜艳绿色 */
-  .status-indicator.tool-completed {
-    color: #00cc44;
-  }
-
-  .status-icon.spinning {
-    animation: spin 1s linear infinite;
-  }
-
-  .status-icon.typing {
-    animation: typing 1.4s ease-in-out infinite;
-  }
-
-  .status-text {
-    font-weight: 600;
-    font-size: 12px;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  @keyframes typing {
-    0%,
-    60%,
-    100% {
-      opacity: 0.3;
-    }
-    30% {
-      opacity: 1;
-    }
-  }
-
-  .message-text {
-    word-wrap: break-word;
-    line-height: 1.4;
-  }
-
-  .pre-tool-content {
-    margin-bottom: 12px;
-  }
-
-  .post-tool-content {
-    margin-top: 12px;
-  }
-
-  /* Markdown 标题样式 */
-  .message-text h1,
-  .message-text h2,
-  .message-text h3,
-  .message-text h4,
-  .message-text h5,
-  .message-text h6 {
-    margin: 8px 0 6px;
-    line-height: 1.3;
-    color: #fff;
-  }
-  .message-text h1 {
-    font-size: 20px;
-    border-bottom: 1px solid #454545;
-    padding-bottom: 6px;
-  }
-  .message-text h2 {
-    font-size: 18px;
-    border-bottom: 1px solid #454545;
-    padding-bottom: 6px;
-  }
-  .message-text h3 {
-    font-size: 16px;
-  }
-  .message-text h4 {
-    font-size: 15px;
-  }
-  .message-text h5 {
-    font-size: 14px;
-  }
-  .message-text h6 {
-    font-size: 13px;
-  }
-
-  /* Markdown 表格样式 */
-  .message-text table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 8px 0;
-    background: #2f2f2f;
-    border: 1px solid #444;
-  }
-  .message-text th,
-  .message-text td {
-    border: 1px solid #444;
-    padding: 8px 10px;
-    text-align: left;
-  }
-  .message-text thead th {
-    background: #3a3a3a;
-    color: #fff;
-  }
-  .message-text tbody tr:nth-child(odd) {
-    background: #343434;
-  }
-
-  /* 让列表和段落有更好的间距 */
-  .message-text p {
-    margin: 8px 0;
-  }
-
-  .message-text ul,
-  .message-text ol {
-    margin: 8px 0;
-    padding-left: 20px;
-  }
-
-  .message-text li {
-    margin-bottom: 4px;
-  }
-
-  /* 代码块样式 */
-  .message-text pre code,
-  .message-text code {
-    background: #2d2d2d;
-    color: #e6e6e6;
-    border-radius: 4px;
-  }
-  .message-text code {
-    padding: 1px 4px;
-  }
-  .message-text pre {
-    padding: 10px;
-    overflow: auto;
-    border: 1px solid #444;
-    border-radius: 6px;
-  }
-
-  .message-image {
-    margin-bottom: 8px;
-    max-width: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-
-  .tool-section {
-    margin: 12px 0;
-    padding: 12px;
-    border: 1px solid #5b21b6;
-    border-radius: 10px;
-    background: #7c3aed;
-    max-width: 100%;
-    overflow: hidden;
-  }
-  .tool-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-  }
-  .tool-title {
-    color: #ffffff;
-    font-size: 12px;
-    font-weight: bold;
-  }
-  .tool-args-toggle {
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    border-radius: 4px;
-    padding: 2px 8px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.2s;
-  }
-
-  .tool-args-toggle:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-  .tool-args {
-    margin-top: 6px;
-    max-width: 100%;
-    overflow: hidden;
-  }
-  .tool-result {
-    margin-top: 8px;
-  }
-  .tool-result-label {
-    color: #ccc;
-    font-size: 12px;
-    margin-bottom: 4px;
-  }
-  .code-block {
-    background: #2d2d2d;
-    color: #e6e6e6;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 10px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    max-width: 100%;
-  }
-
-  .image-container {
-    position: relative;
-    display: inline-block;
-    overflow: hidden;
-    border-radius: 6px;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-
-  .message-img {
-    max-width: 100%;
-    max-height: 200px;
-    border-radius: 6px;
-    display: block;
-  }
-
-  .image-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    max-width: 100%;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .image-container:hover .image-overlay {
-    opacity: 1;
-  }
-
-  .image-action-btn {
-    background: rgba(0, 0, 0, 0.6);
-    border: none;
-    color: white;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin: 0 4px;
-  }
-
-  .image-action-btn:hover {
-    background: rgba(0, 0, 0, 0.8);
-  }
-
-  .expand-btn {
-    width: 48px;
-    height: 48px;
-  }
-
-  .top-right-actions {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    display: flex;
-    gap: 8px;
-  }
-
-  /* 弹窗样式 */
-  .image-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100000;
-  }
-
-  .modal-content {
-    position: relative;
-    max-width: 90%;
-    max-height: 90%;
-  }
-
-  .modal-image {
-    max-width: 100%;
-    max-height: 90vh;
-    border-radius: 8px;
-  }
-
-  .modal-close-btn {
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .clickable-image {
-    cursor: pointer;
-    transition:
-      transform 0.2s,
-      box-shadow 0.2s;
-  }
-
-  .clickable-image:hover {
-    transform: scale(1.02);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-  }
-
-  .clickable-image::after {
-    content: '点击复用此图片';
-    position: absolute;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    opacity: 0;
-    transition: opacity 0.2s;
-    pointer-events: none;
-  }
-  .clickable-image:hover::after {
-    opacity: 1;
-  }
-
-  .chat-input-area {
-    background-color: #333;
-    padding: 12px;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 10001 !important;
-    pointer-events: auto !important;
-  }
-
-  .input-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    margin-top: 8px;
-  }
-
-  .textarea-container {
-    flex: 1;
-    position: relative;
-    height: 40px;
-    display: flex;
-    align-items: center;
-  }
-
-  .textarea-container textarea {
-    width: 100%;
-    padding: 10px 16px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.08);
-    border: none;
-    color: white;
-    resize: none;
-    height: 40px;
-    line-height: 20px;
-    outline: none;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
-    font-size: 14px;
-  }
-
-  .textarea-container textarea:focus {
-    background: rgba(124, 58, 237, 0.15);
-  }
-
-  .textarea-container textarea::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-  }
-
-  .upload-image-btn,
-  .send-stop-btn,
-  .control-btn {
-    min-width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border: none;
-    color: white;
-    flex-shrink: 0;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .upload-image-btn {
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  .upload-image-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.9);
-  }
-
-  .upload-image-btn:disabled {
-    background: transparent;
-    cursor: not-allowed;
-    opacity: 0.3;
-    color: rgba(255, 255, 255, 0.3);
-  }
-
-  .send-stop-btn {
-    background: transparent;
-    border: none;
-    color: #7c3aed;
-    transition: all 0.2s ease;
-  }
-
-  .send-stop-btn:hover:not(:disabled) {
-    background: rgba(124, 58, 237, 0.15);
-    color: #8b5cf6;
-  }
-
-  .send-stop-btn:disabled {
-    background: transparent;
-    cursor: not-allowed;
-    opacity: 0.3;
-    color: rgba(124, 58, 237, 0.3);
-  }
-
-  .image-actions {
-    margin-top: 8px;
-    display: flex;
-    justify-content: center;
-  }
-
-  .apply-to-node-btn {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.2s;
-  }
-
-  .apply-to-node-btn:hover {
-    background-color: #3e8e41;
-  }
-
-  .image-preview-area {
-    margin-bottom: 12px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-  }
-
-  .preview-image-container {
-    position: relative;
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 8px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-  }
-
-  .preview-image-small {
-    max-width: 80px;
-    max-height: 80px;
-    border-radius: 8px;
-    border: 2px solid rgba(124, 58, 237, 0.3);
-    display: block;
-  }
-
-  .remove-image-btn {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px;
-    cursor: pointer;
-    border: 2px solid #1f1f1f;
-    font-weight: bold;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-  }
-
-  .remove-image-btn:hover {
-    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-  }
-
-  /* 加载指示器 */
-  .loading-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 10px 0;
-    height: 24px;
-  }
-
-  .loading-text {
-    margin-right: 8px;
-    color: #fff;
-  }
-
-  .loading-dots {
-    display: flex;
-    gap: 4px;
-  }
-
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #7c3aed;
-    margin: 0 4px;
-    animation: bounce 1.5s infinite ease-in-out;
-  }
-
-  .dot:nth-child(1) {
-    animation-delay: 0s;
-  }
-
-  .dot:nth-child(2) {
-    animation-delay: 0.3s;
-  }
-
-  .dot:nth-child(3) {
-    animation-delay: 0.6s;
-  }
-
-  @keyframes bounce {
-    0%,
-    80%,
-    100% {
-      transform: scale(0);
-      opacity: 0.5;
-    }
-    40% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  .control-btn {
-    background: transparent;
-    border: none;
-    color: #ef4444;
-  }
-
-  .control-btn:hover {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
-  }
-
-  .stop-btn {
-    color: white;
-  }
-
-  /* 处理需要交互的元素避免被modal挡住 */
-  .interactive-element {
-    pointer-events: auto !important;
-    position: relative;
-    z-index: 10000 !important;
-  }
-
-  .action-btn {
-    background: none;
-    border: none;
-    color: #ccc;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-  }
-
-  .close-btn {
-    background: none;
-    border: none;
-    color: #ccc;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-  }
-
-  .action-btn:hover,
-  .close-btn:hover {
-    color: #fff;
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  /* 添加标签页样式 */
-  .tab-navigation {
-    display: flex;
-    border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 10px;
-  }
-
-  .tab-btn {
-    padding: 8px 16px;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    font-weight: 500;
-    color: #666;
-    transition: all 0.2s;
-  }
-
-  .flux-kontext-container {
-    height: calc(100% - 50px);
-    overflow-y: auto;
-  }
-
-  /* 可点击图片样式 */
-  .clickable-image {
-    cursor: pointer;
-    transition:
-      transform 0.2s,
-      box-shadow 0.2s;
-  }
-
-  .clickable-image:hover {
-    transform: scale(1.02);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-  }
-
-  .clickable-image::after {
-    content: '点击复用此图片';
-    position: absolute;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    opacity: 0;
-    transition: opacity 0.2s;
-    pointer-events: none;
-  }
-  .clickable-image:hover::after {
-    opacity: 1;
-  }
-</style>
