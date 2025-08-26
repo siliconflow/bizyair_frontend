@@ -4,7 +4,7 @@ export function base64ToFile(base64: string, filename: string, mimeType: any): F
   // 处理不同格式的 base64 数据
   let base64Data = base64
   let detectedMimeType = mimeType
-  
+
   if (base64.includes(',')) {
     // 包含 data: 前缀的格式
     const parts = base64.split(',')
@@ -14,7 +14,7 @@ export function base64ToFile(base64: string, filename: string, mimeType: any): F
       detectedMimeType = parts[0].split(':')[1].split(';')[0]
     }
   }
-  
+
   const byteCharacters = atob(base64Data)
   const byteNumbers = new Array(byteCharacters.length)
   for (let i = 0; i < byteCharacters.length; i++) {
