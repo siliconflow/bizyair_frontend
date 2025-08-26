@@ -264,7 +264,7 @@
     }
     communityStore.setAndShowCommunityDetail(
       Number(res.data.data.bizy_model_id),
-      Number(res.data.data.biz_id) 
+      Number(res.data.data.biz_id)
     )
     shareCode.value = ''
   }
