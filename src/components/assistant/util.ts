@@ -370,7 +370,20 @@ export async function sendStreamChatRequest(
  * @returns 格式化后的HTML文本
  */
 export function formatOutputText(text: string): string {
-  return renderMarkdownSafely(text)
+  if (!text) return ''
+  
+  // 检查是否包含Markdown语法
+  const hasMarkdown = /[*_`#\[\]()!-]/.test(text) || 
+                     text.includes('\n\n') || 
+                     text.includes('- ') || 
+                     text.includes('* ')
+  
+  if (hasMarkdown) {
+    return renderMarkdownSafely(text)
+  } else {
+    // 对于纯文本，只进行换行转换
+    return text.replace(/\n/g, '<br>')
+  }
 }
 
 /**
@@ -379,7 +392,11 @@ export function formatOutputText(text: string): string {
  * @returns 格式化后的HTML文本
  */
 export function formatOutputTextLight(text: string): string {
-  return renderMarkdownSafely(text)
+  if (!text) return ''
+  
+  // 直接返回纯文本，让Vue模板处理显示
+  // 只进行基本的换行转换，不进行HTML转义
+  return text.replace(/\n/g, '<br>')
 }
 
 /**
