@@ -371,13 +371,14 @@ export async function sendStreamChatRequest(
  */
 export function formatOutputText(text: string): string {
   if (!text) return ''
-  
+
   // 检查是否包含Markdown语法
-  const hasMarkdown = /[*_`#\[\]()!-]/.test(text) || 
-                     text.includes('\n\n') || 
-                     text.includes('- ') || 
-                     text.includes('* ')
-  
+  const hasMarkdown =
+    /[*_`#[\]()!-]/.test(text) ||
+    text.includes('\n\n') ||
+    text.includes('- ') ||
+    text.includes('* ')
+
   if (hasMarkdown) {
     return renderMarkdownSafely(text)
   } else {
@@ -393,7 +394,7 @@ export function formatOutputText(text: string): string {
  */
 export function formatOutputTextLight(text: string): string {
   if (!text) return ''
-  
+
   // 直接返回纯文本，让Vue模板处理显示
   // 只进行基本的换行转换，不进行HTML转义
   return text.replace(/\n/g, '<br>')
@@ -477,7 +478,7 @@ export function convertToApiHistory(messages: any[]): ChatMessage[] {
     } else if (msg.role === 'assistant') {
       // 处理助手消息
       let assistantContent = ''
-      
+
       // 如果有工具调用，使用工具调用前的内容
       if (msg.toolName && msg.preToolContent) {
         assistantContent = msg.preToolContent.replace(/<[^>]*>/g, '').trim() // 移除HTML标签
@@ -521,7 +522,7 @@ export function convertToApiHistory(messages: any[]): ChatMessage[] {
 
       // 如果有工具调用后的内容，添加另一条assistant消息
       if (msg.toolName && msg.postToolContent) {
-        let postContent = msg.postToolContent.replace(/<[^>]*>/g, '').trim() // 移除HTML标签
+        const postContent = msg.postToolContent.replace(/<[^>]*>/g, '').trim() // 移除HTML标签
         if (postContent) {
           apiHistory.push({
             role: 'assistant',
