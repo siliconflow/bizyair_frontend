@@ -255,6 +255,13 @@
 
   const convert = async () => {
     const res = await get_share_code({ code: shareCode.value })
+    const respType = res.data?.type || res.data?.data?.type
+    if (respType === 'redeem_product') {
+      const productName = res.data?.data?.product_name || ''
+      useToaster({ type: 'success', message: `兑换成功 ${productName}` })
+      shareCode.value = ''
+      return
+    }
     communityStore.setAndShowCommunityDetail(
       Number(res.data.data.bizy_model_id),
       Number(res.data.data.biz_id)
