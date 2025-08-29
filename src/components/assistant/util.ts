@@ -232,14 +232,7 @@ async function processStreamResponse(
                   }
                   break
                 }
-                case 'final_content_delta': {
-                  const content: string | undefined = parsed.content
-                  if (typeof content === 'string' && content.length > 0) {
-                    fullText += content
-                    callbacks.onToken?.(content)
-                  }
-                  break
-                }
+                // 旧版 final_content_delta 已废弃，统一使用 content_delta
                 case 'tool_calls': {
                   const toolCalls = parsed.tool_calls
                   if (Array.isArray(toolCalls)) {
@@ -476,58 +469,107 @@ export function convertToApiHistory(messages: any[]): ChatMessage[] {
         })
       }
     } else if (msg.role === 'assistant') {
-      // 处理助手消息
-      let assistantContent = ''
+      // 处理助手消息（支持多轮工具事件）
+      const stripHtml = (s: string) => (s && s.includes('<') ? s.replace(/<[^>]*>/g, '').trim() : s || '')
 
-      // 如果有工具调用，使用工具调用前的内容
-      if (msg.toolName && msg.preToolContent) {
-        assistantContent = msg.preToolContent.replace(/<[^>]*>/g, '').trim() // 移除HTML标签
-      } else {
-        // 没有工具调用时，使用完整内容
-        assistantContent = msg.content || msg.rawText || ''
-        if (assistantContent.includes('<')) {
-          assistantContent = assistantContent.replace(/<[^>]*>/g, '').trim() // 移除HTML标签
+      // 新版：存在 toolEvents 时，按事件序列展开
+      if (Array.isArray(msg.toolEvents) && msg.toolEvents.length > 0) {
+        let pendingText = ''
+
+        const flushPendingText = () => {
+          const cleaned = stripHtml(pendingText)
+          if (cleaned) {
+            apiHistory.push({
+              role: 'assistant',
+              content: cleaned
+            })
+          }
+          pendingText = ''
         }
-      }
 
-      const assistantMsg: ChatMessage = {
-        role: 'assistant',
-        content: assistantContent
-      }
+        for (const ev of msg.toolEvents as any[]) {
+          if (ev && ev.type === 'text') {
+            pendingText += ev.text || ''
+          } else if (ev && ev.type === 'tool') {
+            // 在工具调用前输出累积文本
+            flushPendingText()
+            const toolId = ev.id || undefined
+            const toolName = ev.name || 'unknown_tool'
+            const toolArgs = typeof ev.arguments === 'string' ? ev.arguments : JSON.stringify(ev.arguments || '')
 
-      // 如果有工具调用
-      if (msg.toolName && msg.toolId && msg.toolCallArgs) {
-        assistantMsg.tool_calls = [
-          {
-            id: msg.toolId,
-            type: 'function',
-            function: {
-              name: msg.toolName,
-              arguments: msg.toolCallArgs
+            // assistant 消息携带 tool_calls
+            apiHistory.push({
+              role: 'assistant',
+              content: '',
+              tool_calls: [
+                {
+                  id: toolId || toolName,
+                  type: 'function',
+                  function: {
+                    name: toolName,
+                    arguments: toolArgs
+                  }
+                }
+              ]
+            })
+
+            // tool 结果
+            if (ev.resultText) {
+              apiHistory.push({
+                role: 'tool',
+                content: ev.resultText,
+                tool_call_id: toolId || toolName
+              })
             }
           }
-        ]
-      }
+        }
 
-      apiHistory.push(assistantMsg)
+        // 事件结束后如果还有文本，输出为assistant消息
+        flushPendingText()
+      } else {
+        // 旧版：保留原有单次工具调用兼容逻辑
+        let assistantContent = ''
+        if (msg.toolName && msg.preToolContent) {
+          assistantContent = stripHtml(msg.preToolContent)
+        } else {
+          assistantContent = stripHtml(msg.content || msg.rawText || '')
+        }
 
-      // 如果有工具结果，添加工具消息
-      if (msg.toolResultText && msg.toolId) {
-        apiHistory.push({
-          role: 'tool',
-          content: msg.toolResultText,
-          tool_call_id: msg.toolId
-        })
-      }
+        const assistantMsg: ChatMessage = {
+          role: 'assistant',
+          content: assistantContent
+        }
 
-      // 如果有工具调用后的内容，添加另一条assistant消息
-      if (msg.toolName && msg.postToolContent) {
-        const postContent = msg.postToolContent.replace(/<[^>]*>/g, '').trim() // 移除HTML标签
-        if (postContent) {
+        if (msg.toolName && msg.toolId && msg.toolCallArgs) {
+          assistantMsg.tool_calls = [
+            {
+              id: msg.toolId,
+              type: 'function',
+              function: {
+                name: msg.toolName,
+                arguments: msg.toolCallArgs
+              }
+            }
+          ]
+        }
+        apiHistory.push(assistantMsg)
+
+        if (msg.toolResultText && msg.toolId) {
           apiHistory.push({
-            role: 'assistant',
-            content: postContent
+            role: 'tool',
+            content: msg.toolResultText,
+            tool_call_id: msg.toolId
           })
+        }
+
+        if (msg.toolName && msg.postToolContent) {
+          const postContent = stripHtml(msg.postToolContent)
+          if (postContent) {
+            apiHistory.push({
+              role: 'assistant',
+              content: postContent
+            })
+          }
         }
       }
     }

@@ -478,6 +478,9 @@ body.resizing {
   background: #7c3aed;
   max-width: 100%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .tool-header {
   display: flex;
@@ -510,7 +513,7 @@ body.resizing {
   overflow: hidden;
 }
 .tool-result {
-  margin-top: 8px;
+  margin-top: 0px;
 }
 .tool-result-label {
   color: #ccc;
@@ -528,6 +531,7 @@ body.resizing {
   word-wrap: break-word;
   white-space: pre-wrap;
   max-width: 100%;
+  margin: 0px;
 }
 
 .image-container {

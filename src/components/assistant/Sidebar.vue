@@ -58,8 +58,8 @@
                 <span class="message-time">{{ message.time }}</span>
               </div>
 
-              <!-- 图片消息 -->
-              <div v-if="message.hasImage" class="message-image">
+              <!-- 图片消息（仅用户消息展示；助手工具输出图片在工具事件中展示） -->
+              <div v-if="message.hasImage && message.role === 'user'" class="message-image">
                 <div v-if="message.images && message.images.length > 1" class="image-grid">
                   <div v-for="(img, idx) in message.images" :key="idx" class="image-container">
                     <img :src="img" alt="用户上传图片" class="message-img" />
@@ -137,22 +137,74 @@
                 </div> -->
               </div>
 
-              <!-- 工具调用前的内容 -->
-              <div
-                v-if="message.preToolContent"
-                class="message-text pre-tool-content"
-                v-html="message.preToolContent"
-              ></div>
+              <!-- 新版：按事件流渲染（文本/多轮工具调用/结果） -->
+              <div v-if="message.toolEvents && message.toolEvents.length" class="tool-flow">
+                <template v-for="(ev, evIdx) in message.toolEvents" :key="evIdx">
+                  <div
+                    v-if="ev.type === 'text'"
+                    class="message-text"
+                    v-html="ev.html"
+                  ></div>
+                  <div v-else class="tool-section">
+                    <div class="tool-header">
+                      <span class="tool-title">调用工具: {{ ev.name }}</span>
+                      <button
+                        class="tool-args-toggle interactive-element"
+                        @click="ev.showArgs = !ev.showArgs"
+                      >
+                        {{ ev.showArgs ? '隐藏参数' : '显示参数' }}
+                      </button>
+                    </div>
+                    <div v-if="ev.showArgs" class="tool-args">
+                      <pre class="code-block"><code>{{ ev.arguments }}</code></pre>
+                    </div>
 
-              <!-- 没有工具调用时的完整内容 -->
+                    <div v-if="ev.resultText && !(ev.hasImage)" class="tool-result">
+                      <div class="tool-result-label">工具结果:</div>
+                      <pre class="code-block"><code>{{ ev.resultText }}</code></pre>
+                    </div>
+
+                    <div v-if="ev.hasImage && ev.images && ev.images.length" class="image-grid">
+                      <div v-for="(img, idx) in ev.images" :key="idx" class="image-container">
+                        <img :src="img" alt="工具输出图片" class="message-img" />
+                        <div class="image-overlay">
+                          <button
+                            class="image-action-btn expand-btn"
+                            @click="expandImage(img)"
+                            title="查看大图"
+                          >
+                            <span v-html="iconExpand"></span>
+                          </button>
+                          <div class="top-right-actions">
+                            <button
+                              class="image-action-btn"
+                              @click="selectExistingImage(img || '')"
+                              title="添加到输入"
+                            >
+                              <span v-html="iconPlus"></span>
+                            </button>
+                            <button
+                              class="image-action-btn"
+                              @click="downloadImage(img || '')"
+                              title="下载图片"
+                            >
+                              <span v-html="iconDownload"></span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+
+              <!-- 旧版渲染：仅文本或单次工具调用（向后兼容） -->
               <div
                 v-else-if="!message.toolName"
                 class="message-text"
                 v-html="message.content"
               ></div>
-
-              <!-- 工具调用与结果 -->
-              <div v-if="message.toolName" class="tool-section">
+              <div v-else class="tool-section">
                 <div class="tool-header">
                   <span class="tool-title">调用工具: {{ message.toolName }}</span>
                   <button
@@ -165,19 +217,16 @@
                 <div v-if="message.showToolArgs" class="tool-args">
                   <pre class="code-block"><code>{{ message.toolCallArgs }}</code></pre>
                 </div>
-
                 <div v-if="message.toolResultText && !message.hasImage" class="tool-result">
                   <div class="tool-result-label">工具结果:</div>
                   <pre class="code-block"><code>{{ message.toolResultText }}</code></pre>
                 </div>
+                <div
+                  v-if="message.postToolContent"
+                  class="message-text post-tool-content"
+                  v-html="message.postToolContent"
+                ></div>
               </div>
-
-              <!-- 工具调用后的内容 -->
-              <div
-                v-if="message.postToolContent"
-                class="message-text post-tool-content"
-                v-html="message.postToolContent"
-              ></div>
             </div>
           </div>
           <div v-if="isLoading" class="loading-indicator">
@@ -281,12 +330,7 @@
 <script setup lang="ts">
   import { useSidebarStore } from '../../stores/sidebarStore'
   import { onMounted, watch, ref, computed, onBeforeUnmount, nextTick } from 'vue'
-  import {
-    sendStreamChatRequest,
-    formatOutputTextLight,
-    formatOutputText,
-    convertToApiHistory
-  } from './util'
+  import { sendStreamChatRequest, formatOutputText, convertToApiHistory } from './util'
   import { useI18n } from 'vue-i18n'
   import { useToaster } from '@/components/modules/toats/index'
   import { v4 as uuidv4 } from 'uuid'
@@ -354,6 +398,24 @@
   ;('---------------------------------------')
 
   // 聊天相关状态
+  interface ToolTextEvent {
+    type: 'text'
+    text: string
+    html: string
+  }
+  interface ToolCallEvent {
+    type: 'tool'
+    id?: string
+    name: string
+    arguments: string
+    resultText?: string
+    hasImage?: boolean
+    images?: string[]
+    showArgs?: boolean
+    server_name?: string
+  }
+  type ToolFlowEvent = ToolTextEvent | ToolCallEvent
+
   interface ChatUIMessage {
     role: 'user' | 'assistant'
     content: string
@@ -370,6 +432,7 @@
     toolResultText?: string
     preToolContent?: string
     postToolContent?: string
+    toolEvents?: ToolFlowEvent[]
   }
   const chatMessages = ref<ChatUIMessage[]>([])
   const userInput = ref('')
@@ -433,7 +496,7 @@
   const removeImage = () => {
     previewImage.value = ''
     uploadedImageOssUrl.value = ''
-    if (imageInputRef.value) {
+    if (imageInputRef.value) { 
       imageInputRef.value.value = ''
     }
   }
@@ -493,23 +556,29 @@
   ): 'tool-calling' | 'generating' | 'tool-completed' | null => {
     if (message.role !== 'assistant') return null
 
-    // 如果是当前正在生成的消息
+    // 新版：基于事件判断
+    if (Array.isArray(message.toolEvents) && message.toolEvents.length > 0) {
+      const hasPendingTool = message.toolEvents.some(
+        (ev: any) => ev.type === 'tool' && !ev.resultText
+      )
+      const isCurrent = isGenerating.value && message.rawText !== undefined
+      if (hasPendingTool) return 'tool-calling'
+      if (isCurrent) return 'generating'
+      // 有工具事件且均有结果
+      return 'tool-completed'
+    }
+
+    // 旧版：保留原逻辑
     const isCurrentMessage = isGenerating.value && message.rawText !== undefined
-
     if (isCurrentMessage) {
-      // 如果有工具调用但还没有工具调用后的内容
       if (message.toolName && !message.postToolContent) {
-        return 'tool-calling' // 正在进行工具调用
+        return 'tool-calling'
       }
-      // 如果没有工具调用，或者工具调用已完成但还在生成后续内容
-      return 'generating' // 正在生成
+      return 'generating'
     }
-
-    // 对于已完成的消息，如果有工具调用则显示完成状态
     if (message.toolName && message.postToolContent) {
-      return 'tool-completed' // 工具调用完成
+      return 'tool-completed'
     }
-
     return null
   }
 
@@ -586,12 +655,20 @@
           onToken: (token: string) => {
             // 首次接收到token时创建新的助手消息
             if (isFirstToken) {
-              chatMessages.value.push({
+              const firstAssistantMsg: ChatUIMessage = {
                 role: 'assistant',
-                content: formatOutputTextLight(token),
+                content: formatOutputText(token),
                 rawText: token,
-                time: currentMsgTime
-              })
+                time: currentMsgTime,
+                toolEvents: [
+                  {
+                    type: 'text',
+                    text: token,
+                    html: formatOutputText(token)
+                  }
+                ]
+              }
+              chatMessages.value.push(firstAssistantMsg)
               isFirstToken = false
               isLoading.value = false
             } else {
@@ -603,20 +680,25 @@
               if (currentAssistantMsg) {
                 currentAssistantMsg.rawText = (currentAssistantMsg.rawText || '') + token
 
-                // 如果有工具调用，将新内容作为工具调用后的内容
-                if (currentAssistantMsg.toolName) {
-                  // 工具调用后的内容，需要单独保存
-                  const postToolRawText = currentAssistantMsg.rawText || ''
-                  currentAssistantMsg.postToolContent = formatOutputText(postToolRawText)
-
-                  // 显示完整内容：工具调用前 + 工具调用后
-                  const preContent = currentAssistantMsg.preToolContent || ''
-                  const postContent = currentAssistantMsg.postToolContent || ''
-                  currentAssistantMsg.content = preContent + postContent
-                } else {
-                  // 没有工具调用时，正常更新content
-                  currentAssistantMsg.content = formatOutputTextLight(currentAssistantMsg.rawText)
+                // 新版：将token追加到toolEvents中的最近文本事件
+                if (!currentAssistantMsg.toolEvents) {
+                  currentAssistantMsg.toolEvents = []
                 }
+                const events = currentAssistantMsg.toolEvents
+                const lastEvent = events[events.length - 1]
+                if (lastEvent && lastEvent.type === 'text') {
+                  lastEvent.text += token
+                  lastEvent.html = formatOutputText(lastEvent.text)
+                } else {
+                  events.push({
+                    type: 'text',
+                    text: token,
+                    html: formatOutputText(token)
+                  })
+                }
+
+                // 旧版回退：保持content用于向后兼容
+                currentAssistantMsg.content = formatOutputText(currentAssistantMsg.rawText)
               }
             }
 
@@ -634,22 +716,36 @@
               currentAssistantMsg = {
                 role: 'assistant',
                 content: '',
-                time: currentMsgTime
+                time: currentMsgTime,
+                toolEvents: []
               }
               chatMessages.value.push(currentAssistantMsg)
             }
 
-            // 保存工具调用前的内容
+            // 初始化事件队列
+            if (!currentAssistantMsg.toolEvents) currentAssistantMsg.toolEvents = []
+
+            // 旧版：保存工具调用前的内容（向后兼容）
             if (currentAssistantMsg.rawText) {
               currentAssistantMsg.preToolContent = formatOutputText(currentAssistantMsg.rawText)
             }
 
+            // 记录当前工具调用为一个事件
+            currentAssistantMsg.toolEvents.push({
+              type: 'tool',
+              id: tool.id,
+              name: tool.name,
+              arguments: tool.arguments,
+              showArgs: false
+            })
+
+            // 旧版字段（保留以兼容历史渲染）
             currentAssistantMsg.toolName = tool.name
             currentAssistantMsg.toolId = tool.id
             currentAssistantMsg.toolCallArgs = tool.arguments
             currentAssistantMsg.showToolArgs = false
 
-            // 清空rawText，准备接收工具调用后的内容
+            // 清空rawText，准备接收工具调用后的内容（新版会用新的text事件承接）
             currentAssistantMsg.rawText = ''
 
             setTimeout(() => {
@@ -674,8 +770,30 @@
               .pop()
 
             if (currentAssistantMsg) {
-              // 保存工具结果文本，用于对话历史记录
+              // 旧版：保存工具结果文本
               currentAssistantMsg.toolResultText = resultContent
+
+              // 新版：将结果记录到最近匹配的工具事件
+              if (!currentAssistantMsg.toolEvents) currentAssistantMsg.toolEvents = []
+              let targetToolEvent = currentAssistantMsg.toolEvents
+                .slice()
+                .reverse()
+                .find(
+                  ev => ev.type === 'tool' && (!payload.tool_call_id || ev.id === payload.tool_call_id)
+                ) as any
+              if (!targetToolEvent) {
+                // 若未找到匹配，则追加一个占位工具事件
+                targetToolEvent = {
+                  type: 'tool',
+                  id: payload.tool_call_id,
+                  name: 'unknown_tool',
+                  arguments: '',
+                  showArgs: false
+                }
+                currentAssistantMsg.toolEvents.push(targetToolEvent)
+              }
+              targetToolEvent.resultText = resultContent
+              targetToolEvent.server_name = payload.server_name
 
               if (isImageUrl) {
                 const urls = resultContent
@@ -683,6 +801,18 @@
                   .map(u => u.trim())
                   .filter(u => /^https?:\/\//i.test(u))
 
+                if (urls.length > 1) {
+                  targetToolEvent.hasImage = true
+                  targetToolEvent.images = urls
+                } else if (urls.length === 1) {
+                  targetToolEvent.hasImage = true
+                  targetToolEvent.images = [urls[0]]
+                }
+              }
+
+              // 旧版：为图片做兼容（用于历史模板回退）
+              if (isImageUrl) {
+                const urls = (targetToolEvent.images || [])
                 if (urls.length > 1) {
                   currentAssistantMsg.hasImage = true
                   currentAssistantMsg.images = urls
@@ -711,17 +841,15 @@
               .pop()
 
             if (currentAssistantMsg) {
-              // 如果有工具调用，确保工具调用后的内容正确显示
-              if (currentAssistantMsg.toolName) {
-                // 工具调用后的内容已经在onToken中更新了
-                if (currentAssistantMsg.postToolContent) {
-                  currentAssistantMsg.content = currentAssistantMsg.postToolContent
-                } else {
-                  // 如果没有工具调用后的内容，只显示工具调用前的内容
-                  currentAssistantMsg.content = currentAssistantMsg.preToolContent || ''
-                }
+              // 新版：根据事件流合并文本展示
+              if (currentAssistantMsg.toolEvents && currentAssistantMsg.toolEvents.length) {
+                const mergedHtml = currentAssistantMsg.toolEvents
+                  .filter(ev => ev.type === 'text')
+                  .map((ev: any) => ev.html || '')
+                  .join('')
+                currentAssistantMsg.content = mergedHtml || formatOutputText(fullText)
               } else {
-                // 没有工具调用时，正常更新content
+                // 旧版：没有工具调用时，正常更新content
                 currentAssistantMsg.content = formatOutputText(fullText)
               }
               currentAssistantMsg.rawText = undefined
