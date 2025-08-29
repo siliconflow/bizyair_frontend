@@ -470,7 +470,8 @@ export function convertToApiHistory(messages: any[]): ChatMessage[] {
       }
     } else if (msg.role === 'assistant') {
       // 处理助手消息（支持多轮工具事件）
-      const stripHtml = (s: string) => (s && s.includes('<') ? s.replace(/<[^>]*>/g, '').trim() : s || '')
+      const stripHtml = (s: string) =>
+        s && s.includes('<') ? s.replace(/<[^>]*>/g, '').trim() : s || ''
 
       // 新版：存在 toolEvents 时，按事件序列展开
       if (Array.isArray(msg.toolEvents) && msg.toolEvents.length > 0) {
@@ -495,7 +496,8 @@ export function convertToApiHistory(messages: any[]): ChatMessage[] {
             flushPendingText()
             const toolId = ev.id || undefined
             const toolName = ev.name || 'unknown_tool'
-            const toolArgs = typeof ev.arguments === 'string' ? ev.arguments : JSON.stringify(ev.arguments || '')
+            const toolArgs =
+              typeof ev.arguments === 'string' ? ev.arguments : JSON.stringify(ev.arguments || '')
 
             // assistant 消息携带 tool_calls
             apiHistory.push({
