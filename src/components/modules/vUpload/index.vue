@@ -100,7 +100,7 @@
     const files = e.dataTransfer?.files
     if (files && files.length > 0) {
       if (!allowedExtensions.value.includes(files[0].type)) {
-        console.log(allowedExtensions.value, 'allowedExtensions.value');
+        console.log(allowedExtensions.value, 'allowedExtensions.value')
         useToaster({
           type: 'error',
           message: t('vUpload.invalidFileFormat')
@@ -116,14 +116,14 @@
     const files = target.files
     if (files && files.length > 0) {
       if (!allowedExtensions.value.includes(files[0].type)) {
-        console.log(allowedExtensions.value, 'allowedExtensions.value');
+        console.log(allowedExtensions.value, 'allowedExtensions.value')
         useToaster({
           type: 'error',
           message: t('vUpload.invalidFileFormat')
         })
         return
       }
-        
+
       uploadFile(files[0])
       if (!disableUpload.value) {
         target.value = ''
