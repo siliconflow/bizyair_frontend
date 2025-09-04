@@ -1,12 +1,9 @@
 <template>
   <!-- Tab选项卡 -->
   <div class="tabs">
-    <!-- 隐藏月卡 -->
-    <!--
     <div class="tab-item" :class="{ active: activeTab === 'member' }" @click="switchTab('member')">
       {{ $t('btnProfile.product.memberRecharge') }}
     </div>
-    -->
     <div class="tab-item" :class="{ active: activeTab === 'coin' }" @click="switchTab('coin')">
       {{ $t('btnProfile.product.coinRecharge') }}
     </div>
@@ -383,8 +380,7 @@
     loading.value = false
 
     // 初始选择第一个月卡充值项目
-    // switchTab('member')
-    switchTab('coin')
+    switchTab('member')
   })
 
   onUnmounted(() => {
