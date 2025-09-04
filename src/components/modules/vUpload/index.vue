@@ -99,15 +99,15 @@
     unhighlight(e)
     const files = e.dataTransfer?.files
     if (files && files.length > 0) {
-      if (!allowedExtensions.value.includes(files[0].type)) {
-        console.log(allowedExtensions.value, 'allowedExtensions.value')
+      const suffix = files[0].name.split('.')[files[0].name.split('.').length - 1]
+      if (allowedExtensions.value.includes(suffix)) {
+        uploadFile(files[0])
+      } else {
         useToaster({
           type: 'error',
           message: t('vUpload.invalidFileFormat')
         })
-        return
       }
-      uploadFile(files[0])
     }
   }
 
@@ -115,16 +115,15 @@
     const target = e.target as HTMLInputElement
     const files = target.files
     if (files && files.length > 0) {
-      if (!allowedExtensions.value.includes(files[0].type)) {
-        console.log(allowedExtensions.value, 'allowedExtensions.value')
+      const suffix = files[0].name.split('.')[files[0].name.split('.').length - 1]
+      if (allowedExtensions.value.includes(suffix)) {
+        uploadFile(files[0])
+      } else {
         useToaster({
           type: 'error',
           message: t('vUpload.invalidFileFormat')
         })
-        return
       }
-
-      uploadFile(files[0])
       if (!disableUpload.value) {
         target.value = ''
       }
