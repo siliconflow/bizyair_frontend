@@ -371,7 +371,7 @@ function createSetWidgetCallback(modelType, selectedBaseModels = []) {
                                     const currentModel = currentNode.widgets.find(w => w.name === "model_version_id");
 
                                     if (model && currentModel && version) {
-                                        currentLora.value = model;
+                                        currentLora.value = version.file_name;
                                         currentModel.value = version.id;
                                         currentNode.setDirtyCanvas(true);
                                     }
