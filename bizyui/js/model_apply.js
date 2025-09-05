@@ -348,7 +348,11 @@ function createSetWidgetCallback(modelType, selectedBaseModels = []) {
                         e.preventDefault();
                         e.stopPropagation();
                         e.widgetClick = true;
-
+                        window.parent.postMessage({
+                            type: 'collapsePublishWorkflowDialog',
+                            method: 'collapsePublishWorkflowDialog',
+                            result: true
+                        }, '*');
                         const currentNode = this.node;
 
                         if (!currentNode || !currentNode.widgets) {
