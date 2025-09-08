@@ -478,9 +478,7 @@
       const { url } = await imageToOss(file)
       uploadedImageOssUrl.value = url
       previewImage.value = url // 直接使用OSS URL作为预览
-      console.log('图片已上传到 OSS:', url)
     } catch (error) {
-      console.error('上传图片到 OSS 失败:', error)
       useToaster({
         type: 'error',
         message: '图片上传失败'
@@ -647,7 +645,6 @@
         conversationHistory,
         {
           onStart: () => {
-            console.log('开始请求聊天模型...')
             isLoading.value = true
             // 立即滚动到底部
             setTimeout(() => {
@@ -773,10 +770,7 @@
               .pop()
 
             if (currentAssistantMsg) {
-              // 旧版：保存工具结果文本
-              currentAssistantMsg.toolResultText = resultContent
-
-              // 新版：将结果记录到最近匹配的工具事件
+              // 将结果记录到最近匹配的工具事件
               if (!currentAssistantMsg.toolEvents) currentAssistantMsg.toolEvents = []
               let targetToolEvent = currentAssistantMsg.toolEvents
                 .slice()
@@ -832,8 +826,6 @@
             }, 0)
           },
           onComplete: (fullText: string) => {
-            console.log('聊天模型响应完成')
-
             // 更新状态
             isLoading.value = false
             isGenerating.value = false
@@ -865,7 +857,6 @@
             }, 0)
           },
           onError: error => {
-            console.error('聊天请求失败:', error)
             const errorMsgTime = getCurrentTime()
             let errorMessage = ''
             if (error) {
@@ -906,7 +897,6 @@
       isGenerating.value = false
       processingStatus.value = ''
     } finally {
-      console.log('请求处理完成，重置状态')
       processingStatus.value = ''
       if (!abortController.value) {
         abortController.value = null
@@ -1081,7 +1071,6 @@
         const { url } = await imageToOss(file)
         previewImage.value = url
         uploadedImageOssUrl.value = url
-        console.log('Base64图片已上传到 OSS:', url)
       } else if (
         imageUrl.startsWith('https') ||
         imageUrl.includes('oss-') ||
@@ -1090,14 +1079,12 @@
         // 已经是 OSS URL，直接使用
         previewImage.value = imageUrl
         uploadedImageOssUrl.value = imageUrl
-        console.log('使用现有 OSS URL:', imageUrl)
       } else {
         // 其他情况，直接使用原URL
         previewImage.value = imageUrl
         uploadedImageOssUrl.value = imageUrl
       }
     } catch (error) {
-      console.error('处理图片失败:', error)
       useToaster({
         type: 'error',
         message: '图片处理失败'
@@ -1159,7 +1146,6 @@
         }
 
         try {
-          console.log('正在尝试应用图片到节点...')
 
           // 直接使用传入的imageData.nodeId通过IFRAME找到节点
           // bizyAirLib直接传递postMessage到父窗口
@@ -1174,12 +1160,10 @@
             '*'
           )
 
-          console.log('已发送图片应用消息到ComfyUI')
         } catch (error) {
           console.error('应用图片到节点时发生异常:', error)
         }
       }
-      console.log('已添加updateNodeImage方法到bizyAirLib对象')
     }
 
     // 显示欢迎消息
