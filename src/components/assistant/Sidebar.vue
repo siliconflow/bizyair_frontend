@@ -140,11 +140,7 @@
               <!-- 新版：按事件流渲染（文本/多轮工具调用/结果） -->
               <div v-if="message.toolEvents && message.toolEvents.length" class="tool-flow">
                 <template v-for="(ev, evIdx) in message.toolEvents" :key="evIdx">
-                  <div
-                    v-if="ev.type === 'text'"
-                    class="message-text"
-                    v-html="ev.html"
-                  ></div>
+                  <div v-if="ev.type === 'text'" class="message-text" v-html="ev.html"></div>
                   <div v-else class="tool-section">
                     <div class="tool-header">
                       <span class="tool-title">调用工具: {{ ev.name }}</span>
@@ -159,7 +155,7 @@
                       <pre class="code-block"><code>{{ ev.arguments }}</code></pre>
                     </div>
 
-                    <div v-if="ev.resultText && !(ev.hasImage)" class="tool-result">
+                    <div v-if="ev.resultText && !ev.hasImage" class="tool-result">
                       <div class="tool-result-label">工具结果:</div>
                       <pre class="code-block"><code>{{ ev.resultText }}</code></pre>
                     </div>
@@ -496,7 +492,7 @@
   const removeImage = () => {
     previewImage.value = ''
     uploadedImageOssUrl.value = ''
-    if (imageInputRef.value) { 
+    if (imageInputRef.value) {
       imageInputRef.value.value = ''
     }
   }
@@ -786,7 +782,8 @@
                 .slice()
                 .reverse()
                 .find(
-                  ev => ev.type === 'tool' && (!payload.tool_call_id || ev.id === payload.tool_call_id)
+                  ev =>
+                    ev.type === 'tool' && (!payload.tool_call_id || ev.id === payload.tool_call_id)
                 ) as any
               if (!targetToolEvent) {
                 // 若未找到匹配，则追加一个占位工具事件
@@ -819,7 +816,7 @@
 
               // 旧版：为图片做兼容（用于历史模板回退）
               if (isImageUrl) {
-                const urls = (targetToolEvent.images || [])
+                const urls = targetToolEvent.images || []
                 if (urls.length > 1) {
                   currentAssistantMsg.hasImage = true
                   currentAssistantMsg.images = urls
