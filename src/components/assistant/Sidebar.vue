@@ -296,7 +296,7 @@
 
             <!-- 发送/停止按钮合并 -->
             <button
-              class="send-stop-btn interactive-element"
+              :class="['send-stop-btn', 'interactive-element', { 'generating': isGenerating }]"
               @click="isGenerating ? abortGeneration() : sendMessage()"
               :disabled="!isGenerating && !canSendMessage"
               :title="isGenerating ? '停止生成' : $t('sidebar.assistant.sendMessage')"
@@ -558,10 +558,17 @@
 
     // 新版：基于事件判断
     if (Array.isArray(message.toolEvents) && message.toolEvents.length > 0) {
+      const hasAnyTool = message.toolEvents.some((ev: any) => ev.type === 'tool')
       const hasPendingTool = message.toolEvents.some(
         (ev: any) => ev.type === 'tool' && !ev.resultText
       )
       const isCurrent = isGenerating.value && message.rawText !== undefined
+
+      // 没有任何工具事件时，不应显示“已使用工具”
+      if (!hasAnyTool) {
+        return isCurrent ? 'generating' : null
+      }
+
       if (hasPendingTool) return 'tool-calling'
       if (isCurrent) return 'generating'
       // 有工具事件且均有结果

@@ -322,11 +322,13 @@ export async function sendStreamChatRequest(
     // 通知开始
     callbacks.onStart?.()
 
+    const Authorization = (window as any).bizyAirAuthorization || Cookies.get('bizy_token') || ''
+
     const response = await fetch(SERVER_MODEL_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: Cookies.get('bizy_token') || '',
+        Authorization,
         ...(options as any)?.headers
       },
       body: JSON.stringify(requestBody),
