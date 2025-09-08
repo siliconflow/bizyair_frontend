@@ -292,7 +292,7 @@
 
             <!-- 发送/停止按钮合并 -->
             <button
-              :class="['send-stop-btn', 'interactive-element', { 'generating': isGenerating }]"
+              :class="['send-stop-btn', 'interactive-element', { generating: isGenerating }]"
               @click="isGenerating ? abortGeneration() : sendMessage()"
               :disabled="!isGenerating && !canSendMessage"
               :title="isGenerating ? '停止生成' : $t('sidebar.assistant.sendMessage')"
