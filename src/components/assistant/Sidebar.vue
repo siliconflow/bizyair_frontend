@@ -1146,7 +1146,6 @@
         }
 
         try {
-
           // 直接使用传入的imageData.nodeId通过IFRAME找到节点
           // bizyAirLib直接传递postMessage到父窗口
           window.parent.postMessage(
@@ -1159,7 +1158,6 @@
             },
             '*'
           )
-
         } catch (error) {
           console.error('应用图片到节点时发生异常:', error)
         }
