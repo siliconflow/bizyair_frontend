@@ -348,7 +348,11 @@ function createSetWidgetCallback(modelType, selectedBaseModels = []) {
                         e.preventDefault();
                         e.stopPropagation();
                         e.widgetClick = true;
-
+                        window.parent.postMessage({
+                            type: 'collapsePublishWorkflowDialog',
+                            method: 'collapsePublishWorkflowDialog',
+                            result: true
+                        }, '*');
                         const currentNode = this.node;
 
                         if (!currentNode || !currentNode.widgets) {
@@ -367,7 +371,7 @@ function createSetWidgetCallback(modelType, selectedBaseModels = []) {
                                     const currentModel = currentNode.widgets.find(w => w.name === "model_version_id");
 
                                     if (model && currentModel && version) {
-                                        currentLora.value = model;
+                                        currentLora.value = version.file_name;
                                         currentModel.value = version.id;
                                         currentNode.setDirtyCanvas(true);
                                     }
