@@ -1,20 +1,33 @@
 import Cookies from 'js-cookie'
+import MarkdownIt from 'markdown-it'
+import { FilterXSS } from 'xss'
 // API请求选项接口
 export interface ChatApiOptions {
-  model: string
-  temperature: number
-  top_p: number
-  top_k: number
-  frequency_penalty: number
-  max_tokens: number
-  prompt_id?: string
-  request_id?: string
+  model_config?: {
+    temperature?: number
+    max_tokens?: number
+    top_p?: number
+    top_k?: number
+    frequency_penalty?: number
+  }
 }
 
-// 消息接口
+// 消息接口 - 支持新的对话历史格式
 export interface ChatMessage {
-  role: 'user' | 'assistant' | 'system'
+  role: 'user' | 'assistant' | 'system' | 'tool'
   content: string | ChatContent[]
+  tool_calls?: ToolCall[]
+  tool_call_id?: string
+}
+
+// 工具调用接口
+export interface ToolCall {
+  id: string
+  type: string
+  function: {
+    name: string
+    arguments: string
+  }
 }
 
 // 消息内容接口
@@ -32,74 +45,100 @@ export interface StreamCallbacks {
   onToken?: (token: string) => void
   onComplete?: (fullText: string) => void
   onError?: (error: any) => void
+  onConversationId?: (conversationId: string) => void
+  onToolCall?: (tool: { id?: string; name: string; arguments: string; type?: string }) => void
+  onToolResult?: (result: { tool_call_id?: string; result: any; server_name?: string }) => void
 }
 
 // 默认API选项
 export const defaultApiOptions: ChatApiOptions = {
-  model: 'Qwen/Qwen2.5-VL-72B-Instruct',
-  temperature: 0.7,
-  top_p: 0.7,
-  top_k: 50,
-  frequency_penalty: 0.5,
-  max_tokens: 1024
+  model_config: {
+    temperature: 0.7,
+    max_tokens: 1024,
+    top_p: 0.7,
+    top_k: 50,
+    frequency_penalty: 0.5
+  }
 }
 
 // 服务器API路径
 const SERVER_MODEL_API_URL = '/bizyair/model/chat'
 
+// Markdown 渲染与 XSS 过滤器
+const mdParser = new MarkdownIt({
+  html: false,
+  linkify: true,
+  breaks: true
+})
+
+const xssFilter = new FilterXSS({
+  whiteList: {
+    a: ['href', 'title', 'target', 'rel'],
+    p: [],
+    br: [],
+    hr: [],
+    strong: [],
+    b: [],
+    em: [],
+    i: [],
+    code: [],
+    pre: [],
+    ul: [],
+    ol: [],
+    li: [],
+    blockquote: [],
+    h1: [],
+    h2: [],
+    h3: [],
+    h4: [],
+    h5: [],
+    h6: [],
+    table: ['border', 'cellpadding', 'cellspacing'],
+    thead: [],
+    tbody: [],
+    tr: [],
+    th: [],
+    td: [],
+    del: [],
+    sup: [],
+    sub: []
+  },
+  stripIgnoreTag: true,
+  stripIgnoreTagBody: ['script', 'style']
+})
+
+function renderMarkdownSafely(text: string): string {
+  if (!text) return ''
+  const html = mdParser.render(text)
+  return xssFilter.process(html)
+}
+
 /**
  * 构建聊天请求体
- * @param messages 消息数组
+ * @param message 当前消息内容（可选，如果只发送历史则为空）
+ * @param conversationHistory 对话历史
  * @param options API选项
  * @returns 请求体对象
  */
 export function buildChatRequestBody(
-  messages: ChatMessage[],
+  message: string | null,
+  conversationHistory: ChatMessage[] = [],
   options: Partial<ChatApiOptions> = {}
 ): any {
-  const mergedOptions = { ...defaultApiOptions, ...options }
-  return {
-    model: mergedOptions.model,
-    max_tokens: mergedOptions.max_tokens,
-    temperature: mergedOptions.temperature,
-    top_p: mergedOptions.top_p,
-    top_k: mergedOptions.top_k,
-    frequency_penalty: mergedOptions.frequency_penalty,
-    n: 1,
-    stop: [],
-    messages: messages,
-    prompt_id: mergedOptions.prompt_id,
-    request_id: mergedOptions.request_id
+  const requestBody: any = {
+    conversation_history: conversationHistory,
+    model_config: {
+      ...defaultApiOptions.model_config,
+      ...options.model_config
+    }
   }
-}
 
-/**
- * 创建带有图片的用户消息
- * @param text 文本内容
- * @param imageBase64 图片的Base64编码（可以包含或不包含data:前缀）
- * @returns 用户消息对象
- */
-export function createImageUserMessage(text: string, imageBase64: string): ChatMessage {
-  // 确保imageBase64有正确的前缀
-  const imageUrl = imageBase64.startsWith('data:')
-    ? imageBase64
-    : `data:image/png;base64,${imageBase64}`
-
-  return {
-    role: 'user',
-    content: [
-      {
-        type: 'image_url',
-        image_url: {
-          url: imageUrl
-        }
-      },
-      {
-        type: 'text',
-        text: text || '请描述一下这张图片'
-      }
-    ]
+  // 如果有新消息，则添加到请求体中
+  if (message && message.trim()) {
+    requestBody.message = message
   }
+
+  return requestBody
 }
 
 /**
@@ -112,17 +151,6 @@ export function createTextUserMessage(text: string): ChatMessage {
     role: 'user',
     content: text
   }
-}
-
-/**
- * 准备包含历史记录的消息数组用于API请求
- * @param currentMessage 当前消息
- * @returns Promise<ChatMessage[]>
- */
-export async function prepareMessagesWithHistory(
-  currentMessage: ChatMessage
-): Promise<ChatMessage[]> {
-  return [currentMessage]
 }
 
 /**
@@ -185,14 +213,58 @@ async function processStreamResponse(
           }
 
           try {
-            const parsed = JSON.parse(data)
-            if (parsed.choices && parsed.choices[0]?.delta?.content !== undefined) {
-              const content = parsed.choices[0].delta.content
-              if (content) {
-                fullText += content
-                // 向UI回调发送当前token
-                callbacks.onToken?.(content)
+            const parsed: any = JSON.parse(data)
+
+            // 新版事件流格式处理
+            if (parsed && typeof parsed === 'object' && parsed.type) {
+              switch (parsed.type) {
+                case 'conversation_started': {
+                  if (parsed.conversation_id && callbacks.onConversationId) {
+                    callbacks.onConversationId(parsed.conversation_id)
+                  }
+                  break
+                }
+                case 'content_delta': {
+                  const content: string | undefined = parsed.content
+                  if (typeof content === 'string' && content.length > 0) {
+                    fullText += content
+                    callbacks.onToken?.(content)
+                  }
+                  break
+                }
+                // 旧版 final_content_delta 已废弃，统一使用 content_delta
+                case 'tool_calls': {
+                  const toolCalls = parsed.tool_calls
+                  if (Array.isArray(toolCalls)) {
+                    for (const tc of toolCalls) {
+                      const name = tc?.function?.name || tc?.name || ''
+                      const args = tc?.function?.arguments || tc?.arguments || ''
+                      const id = tc?.id
+                      callbacks.onToolCall?.({ id, name, arguments: String(args), type: tc?.type })
+                    }
+                  }
+                  break
+                }
+                case 'tool_result': {
+                  callbacks.onToolResult?.({
+                    tool_call_id: parsed.tool_call_id,
+                    result: parsed.result,
+                    server_name: parsed.server_name
+                  })
+                  break
+                }
+                case 'done': {
+                  const formattedText = formatOutputText(fullText)
+                  callbacks.onComplete?.(formattedText)
+                  return
+                }
+                default: {
+                  // 忽略未知的type，或在此加入日志
+                  break
+                }
               }
+              // 已按新版格式处理，继续读取下一行
+              continue
             }
           } catch (e) {
             console.error('解析响应数据出错:', e, data)
@@ -213,52 +285,50 @@ async function processStreamResponse(
 
 /**
  * 发送流式聊天请求
- * @param messages 消息数组或单条消息
+ * @param message 消息内容（字符串、ChatMessage对象或null）
+ * @param conversationHistory 对话历史
  * @param callbacks 流式回调
  * @param options API选项
  * @returns 用于中止请求的AbortController
  */
 export async function sendStreamChatRequest(
-  messages: ChatMessage[] | ChatMessage,
+  message: string | ChatMessage | null,
+  conversationHistory: ChatMessage[],
   callbacks: StreamCallbacks,
   options: Partial<ChatApiOptions> = {}
 ): Promise<AbortController> {
-  // 如果传入的是单条消息，则添加历史记录
-  let messagesArray: ChatMessage[]
-  if (!Array.isArray(messages)) {
-    messagesArray = await prepareMessagesWithHistory(messages)
-  } else {
-    messagesArray = messages
+  // 提取消息文本内容
+  let messageText: string | null = null
+
+  if (typeof message === 'string') {
+    messageText = message
+  } else if (message && typeof message === 'object') {
+    // 如果是ChatMessage对象，提取文本内容
+    if (Array.isArray(message.content)) {
+      const textContents = message.content.filter(item => item.type === 'text')
+      if (textContents.length > 0 && textContents[0].text) {
+        messageText = textContents[0].text
+      }
+    } else {
+      messageText = message.content
+    }
   }
 
-  const filteredMessages = messagesArray.map(message => {
-    const filteredMessage = { ...message }
-    if (Array.isArray(filteredMessage.content)) {
-      const textContents = filteredMessage.content.filter(item => item.type === 'text')
-      if (textContents.length > 0 && textContents[0].text) {
-        filteredMessage.content = textContents[0].text
-      } else {
-        filteredMessage.content = ''
-      }
-    }
-
-    return filteredMessage
-  })
-  const requestBody = buildChatRequestBody(filteredMessages, options)
-
-  requestBody.stream = true
-
+  const requestBody = buildChatRequestBody(messageText, conversationHistory, options)
+  console.log('requestBody', requestBody)
   const abortController = new AbortController()
 
   try {
     // 通知开始
     callbacks.onStart?.()
 
+    const Authorization = (window as any).bizyAirAuthorization || Cookies.get('bizy_token') || ''
+
     const response = await fetch(SERVER_MODEL_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: Cookies.get('bizy_token') || '',
+        Authorization,
         ...(options as any)?.headers
       },
       body: JSON.stringify(requestBody),
@@ -287,6 +357,42 @@ export async function sendStreamChatRequest(
   }
 
   return abortController // 返回控制器供外部使用
+}
+
+/**
+ * 格式化模型输出文本，保留换行和格式
+ * @param text 原始模型输出文本
+ * @returns 格式化后的HTML文本
+ */
+export function formatOutputText(text: string): string {
+  if (!text) return ''
+
+  // 检查是否包含Markdown语法
+  const hasMarkdown =
+    /[*_`#[\]()!-]/.test(text) ||
+    text.includes('\n\n') ||
+    text.includes('- ') ||
+    text.includes('* ')
+
+  if (hasMarkdown) {
+    return renderMarkdownSafely(text)
+  } else {
+    // 对于纯文本，只进行换行转换
+    return text.replace(/\n/g, '<br>')
+  }
+}
+
+/**
+ * 轻量级实时格式化文本函数，用于流式输出时的格式化
+ * @param text 原始模型输出文本
+ * @returns 格式化后的HTML文本
+ */
+export function formatOutputTextLight(text: string): string {
+  if (!text) return ''
+
+  // 直接返回纯文本，让Vue模板处理显示
+  // 只进行基本的换行转换，不进行HTML转义
+  return text.replace(/\n/g, '<br>')
 }
 
 /**
@@ -325,205 +431,153 @@ export function base64ToFile(
 }
 
 /**
- * 格式化模型输出文本，保留换行和格式
- * @param text 原始模型输出文本
- * @returns 格式化后的HTML文本
+ * 将前端消息格式转换为API所需的对话历史格式
+ * @param messages 前端消息数组
+ * @returns API格式的对话历史
  */
-export function formatOutputText(text: string): string {
-  if (!text) return ''
+export function convertToApiHistory(messages: any[]): ChatMessage[] {
+  const apiHistory: ChatMessage[] = []
 
-  // 记录处理前的文本用于调试
-  console.log('格式化前的原始文本:', text)
+  for (const msg of messages) {
+    if (msg.role === 'user') {
+      // 处理用户消息
+      if (msg.hasImage && (msg.image || msg.images)) {
+        // 带图片的消息 - 将图片URL作为文本内容的一部分
+        let textContent = msg.content || ''
 
-  // 替换井号标记（如 "###"，"####"等）
-  text = text.replace(/^(#{1,6})\s+(.+)$/gm, (hashes, content) => {
-    const level = Math.min(hashes.length, 6)
+        // 收集所有图片URL
+        const imageUrls: string[] = []
+        if (msg.images && msg.images.length > 0) {
+          imageUrls.push(...msg.images)
+        } else if (msg.image) {
+          imageUrls.push(msg.image)
+        }
 
-    return `<div class="markdown-heading level-${level}">${content}</div>`
-  })
+        // 将图片URL添加到文本内容中
+        if (imageUrls.length > 0) {
+          const imageUrlsText = imageUrls.map(url => `图片地址：${url}`).join('\n')
+          textContent = textContent ? `${textContent}\n\n${imageUrlsText}` : imageUrlsText
+        }
 
-  text = text.replace(/#(\S+?)(?=#|\s|$)/g, (match, tagContent) => {
-    if (tagContent.includes('<') && !tagContent.includes('>')) {
-      return match
-    }
-    return `<span class="tag">#${tagContent}</span>`
-  })
+        apiHistory.push({
+          role: 'user',
+          content: textContent
+        })
+      } else {
+        // 纯文本消息
+        apiHistory.push({
+          role: 'user',
+          content: msg.content || msg.rawText || ''
+        })
+      }
+    } else if (msg.role === 'assistant') {
+      // 处理助手消息（支持多轮工具事件）
+      const stripHtml = (s: string) =>
+        s && s.includes('<') ? s.replace(/<[^>]*>/g, '').trim() : s || ''
 
-  // 替换加粗文本
-  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      // 新版：存在 toolEvents 时，按事件序列展开
+      if (Array.isArray(msg.toolEvents) && msg.toolEvents.length > 0) {
+        let pendingText = ''
 
-  // 替换换行符为HTML换行标签
-  text = text.replace(/\n/g, '<br>')
-
-  // 去除连续的<br>标签
-  text = text.replace(/<br><br><br>/g, '<br><br>')
-
-  // 记录处理后的文本用于调试
-  console.log('格式化后的HTML文本:', text)
-
-  return text
-}
-
-/**
- * 轻量级实时格式化文本函数，用于流式输出时的格式化
- * @param text 原始模型输出文本
- * @returns 格式化后的HTML文本
- */
-export function formatOutputTextLight(text: string): string {
-  if (!text) return ''
-
-  // 基本的Markdown格式转换
-  let formatted = text
-
-  // 处理标题格式
-  formatted = formatted.replace(/^(#{1,6})\s+(.+)$/gm, (hashes, content) => {
-    const level = Math.min(hashes.length, 6)
-    return `<div class="markdown-heading level-${level}">${content}</div>`
-  })
-
-  // 处理中文标签格式
-  formatted = formatted.replace(/#(\S+?)(?=#|\s|$)/g, (match, tagContent) => {
-    if (tagContent.includes('<') && !tagContent.includes('>')) {
-      return match
-    }
-    return `<span class="tag">#${tagContent}</span>`
-  })
-
-  // 替换加粗文本
-  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-
-  // 替换换行符为HTML换行标签
-  formatted = formatted.replace(/\n/g, '<br>')
-
-  return formatted
-}
-
-/**
- * 生成图像
- * @param options 图像生成选项
- * @returns Promise<string> 返回生成的图像URL
- */
-export async function generateImage(options: {
-  prompt: string
-  n?: number
-  size?: string
-  model?: string
-  loading_callback?: (loading: boolean) => void
-  error_callback?: (error: any) => void
-}): Promise<string> {
-  const { prompt, loading_callback, error_callback } = options
-
-  try {
-    loading_callback?.(true)
-
-    const response = await fetch('/bizyair/model/images', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: Cookies.get('bizy_token') || '',
-        ...(options as any)?.headers
-      },
-      body: JSON.stringify({
-        prompt: prompt,
-        n: options.n || 1,
-        model: options.model || 'Kwai-Kolors/Kolors',
-        size: options.size || '1024x1024'
-      })
-    })
-
-    if (!response.ok) {
-      throw new Error(`图像生成API请求失败: ${response.status} ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    console.log('图像生成成功:', data)
-
-    // 返回生成的图像URL
-    if (data.data) {
-      return data.data.images[0].url
-    } else {
-      throw new Error('API返回的数据中没有图像URL')
-    }
-  } catch (error) {
-    console.error('生成图像时出错:', error)
-    error_callback?.(error)
-    throw error
-  } finally {
-    loading_callback?.(false)
-  }
-}
-
-/**
- * 编辑图片
- * @param prompt 提示词
- * @param imageBase64 图片base64数据
- * @param signal 可选的AbortSignal，用于取消请求
- * @returns Promise<string> 返回生成的图片URL
- */
-export async function handleImageWithKontextPro(
-  prompt: string,
-  imageBase64: string,
-  options: Record<string, any> = {}
-) {
-  try {
-    if (!imageBase64 || typeof imageBase64 !== 'string') {
-      throw new Error('图片数据无效')
-    }
-    let imageData = imageBase64
-    if (!imageBase64.startsWith('data:')) {
-      imageData = `data:image/webp;base64,${imageBase64}`
-    }
-    const requestBody = {
-      model: 'flux-kontext-dev',
-      prompt: prompt || '',
-      image: imageData,
-      stream: false
-    }
-
-    const response = await fetch('/bizyair/model/image-edit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: Cookies.get('bizy_token') || '',
-        ...(options as any)?.headers
-      },
-      body: JSON.stringify(requestBody)
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP错误: [${response.status}] ${response.statusText}`)
-    }
-    const responseData = await response.json()
-
-    if (responseData.code === 20000 && responseData.data) {
-      const data = responseData.data
-
-      if (data.result && typeof data.result === 'string') {
-        try {
-          const resultJson = JSON.parse(data.result)
-          if (resultJson.outputs) {
-            const outputs = resultJson.outputs
-            const outputKeys = Object.keys(outputs)
-            const firstKey = outputKeys[0]
-            const outputArray = outputs[firstKey]
-            const imageUrl = outputArray.outputs[0]
-            return imageUrl
+        const flushPendingText = () => {
+          const cleaned = stripHtml(pendingText)
+          if (cleaned) {
+            apiHistory.push({
+              role: 'assistant',
+              content: cleaned
+            })
           }
-        } catch (error) {
-          console.error('解析result字段失败:', error)
+          pendingText = ''
+        }
+
+        for (const ev of msg.toolEvents as any[]) {
+          if (ev && ev.type === 'text') {
+            pendingText += ev.text || ''
+          } else if (ev && ev.type === 'tool') {
+            // 在工具调用前输出累积文本
+            flushPendingText()
+            const toolId = ev.id || undefined
+            const toolName = ev.name || 'unknown_tool'
+            const toolArgs =
+              typeof ev.arguments === 'string' ? ev.arguments : JSON.stringify(ev.arguments || '')
+
+            // assistant 消息携带 tool_calls
+            apiHistory.push({
+              role: 'assistant',
+              content: '',
+              tool_calls: [
+                {
+                  id: toolId || toolName,
+                  type: 'function',
+                  function: {
+                    name: toolName,
+                    arguments: toolArgs
+                  }
+                }
+              ]
+            })
+
+            // tool 结果
+            if (ev.resultText) {
+              apiHistory.push({
+                role: 'tool',
+                content: ev.resultText,
+                tool_call_id: toolId || toolName
+              })
+            }
+          }
+        }
+
+        // 事件结束后如果还有文本，输出为assistant消息
+        flushPendingText()
+      } else {
+        // 旧版：保留原有单次工具调用兼容逻辑
+        let assistantContent = ''
+        if (msg.toolName && msg.preToolContent) {
+          assistantContent = stripHtml(msg.preToolContent)
+        } else {
+          assistantContent = stripHtml(msg.content || msg.rawText || '')
+        }
+
+        const assistantMsg: ChatMessage = {
+          role: 'assistant',
+          content: assistantContent
+        }
+
+        if (msg.toolName && msg.toolId && msg.toolCallArgs) {
+          assistantMsg.tool_calls = [
+            {
+              id: msg.toolId,
+              type: 'function',
+              function: {
+                name: msg.toolName,
+                arguments: msg.toolCallArgs
+              }
+            }
+          ]
+        }
+        apiHistory.push(assistantMsg)
+
+        if (msg.toolResultText && msg.toolId) {
+          apiHistory.push({
+            role: 'tool',
+            content: msg.toolResultText,
+            tool_call_id: msg.toolId
+          })
+        }
+
+        if (msg.toolName && msg.postToolContent) {
+          const postContent = stripHtml(msg.postToolContent)
+          if (postContent) {
+            apiHistory.push({
+              role: 'assistant',
+              content: postContent
+            })
+          }
         }
       }
-    } else {
-      console.error('API响应格式不符合预期:', responseData)
-      const statusCode = responseData.code || ''
-      const errorMsg = responseData.message || ''
-      throw new Error(`API响应错误: [${statusCode}] ${errorMsg}`)
     }
-  } catch (error: any) {
-    const errorMessage = {
-      code: 50000,
-      message: error.message,
-      data: null
-    }
-    throw errorMessage
   }
+
+  return apiHistory
 }
