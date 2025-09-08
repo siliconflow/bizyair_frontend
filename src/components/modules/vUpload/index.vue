@@ -55,7 +55,10 @@
   import { UploadProps } from './types'
   import { preventDefaults } from './utils'
   import { useUpload } from './useUpload'
+  import { useI18n } from 'vue-i18n'
+  import { useToaster } from '@/components/modules/toats/index'
 
+  const { t } = useI18n()
   const props = defineProps<UploadProps>()
   const fileInput = ref<HTMLInputElement | null>(null)
   const isHighlighted = ref(false)
@@ -96,7 +99,15 @@
     unhighlight(e)
     const files = e.dataTransfer?.files
     if (files && files.length > 0) {
-      uploadFile(files[0])
+      const suffix = files[0].name.split('.')[files[0].name.split('.').length - 1]
+      if (allowedExtensions.value.includes(suffix)) {
+        uploadFile(files[0])
+      } else {
+        useToaster({
+          type: 'error',
+          message: t('vUpload.invalidFileFormat')
+        })
+      }
     }
   }
 
@@ -104,7 +115,15 @@
     const target = e.target as HTMLInputElement
     const files = target.files
     if (files && files.length > 0) {
-      uploadFile(files[0])
+      const suffix = files[0].name.split('.')[files[0].name.split('.').length - 1]
+      if (allowedExtensions.value.includes(suffix)) {
+        uploadFile(files[0])
+      } else {
+        useToaster({
+          type: 'error',
+          message: t('vUpload.invalidFileFormat')
+        })
+      }
       if (!disableUpload.value) {
         target.value = ''
       }
