@@ -1170,15 +1170,15 @@
               </div>
             </div>
 
-            <div className="flex w-full">
+            <div className="flex w-full overflow-auto">
               <div className="w-[100px] bg-[#4E4E4E80] p-4  border-b border-[rgba(78,78,78,0.50)]">
                 {{ t('community.detail.hash') }}
               </div>
               <div
-                className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)] flex items-center gap-2"
+                className="flex-1 p-4 flex items-center overflow-auto border-b border-[rgba(78,78,78,0.50)] gap-2"
               >
-                <span>
-                  {{ currentVersion?.sign ? sliceString(currentVersion?.sign, 15) : '' }}
+                <span class="overflow-hidden text-ellipsis whitespace-nowrap">
+                  {{ currentVersion?.sign }}
                 </span>
                 <vTooltips :tips="t('community.detail.copy')">
                   <svg
@@ -1338,9 +1338,9 @@
             <div
               class="flex px-[8px] py-4 items-center self-stretch text-[#F9FAFB] font-inter text-xs font-medium leading-5"
             >
-              {{ currentVersion?.file_name ? sliceString(currentVersion?.file_name, 20) : '' }} ({{
-                formatSize(currentVersion?.file_size)
-              }})
+              <span class="text-ellipsis overflow-hidden whitespace-nowrap"
+                >{{ currentVersion?.file_name }} ({{ formatSize(currentVersion?.file_size) }})</span
+              >
               <span
                 v-if="model?.type === 'Workflow'"
                 class="cursor-pointer ml-2 hover:opacity-80"
