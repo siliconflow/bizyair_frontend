@@ -954,10 +954,10 @@
                 {{ t('community.detail.hash') }}
               </div>
               <div
-                className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)] flex items-center gap-2"
+                className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)] flex items-center gap-2 w-full"
               >
-                <span>
-                  {{ currentVersion?.sign ? sliceString(currentVersion?.sign, 15) : '' }}
+                <span class="text-ellipsis overflow-hidden whitespace-nowrap">
+                  {{ currentVersion?.sign }}
                 </span>
                 <vTooltips :tips="currentVersion?.sign ? t('community.detail.copy') : ''">
                   <svg
@@ -1115,9 +1115,9 @@
               {{ t('community.detail.file') }}
             </div>
             <div
-              class="flex px-[8px] py-4 items-center self-stretch text-[#F9FAFB] font-inter text-xs font-medium leading-5"
+              class="px-[8px] py-4 items-center self-stretch text-[#F9FAFB] font-inter text-xs font-medium leading-5 w-full text-ellipsis overflow-hidden whitespace-nowrap"
             >
-              {{ currentVersion?.file_name ? sliceString(currentVersion?.file_name, 20) : '' }} ({{
+              {{ currentVersion?.file_name }} ({{
                 formatSize(currentVersion?.file_size)
               }})
             </div>

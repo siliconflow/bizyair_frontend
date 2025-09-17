@@ -9,11 +9,11 @@
   const emit = defineEmits(['update:open'])
 </script>
 <template>
-  <div :class="cn('w-[100vw] h-[100vh] fixed inset-0 z-50 bg-black/80', props.z)">
+  <div :class="cn('w-[100vw] h-[100vh] fixed inset-0 z-50 bg-black/80 flex justify-center items-center', props.z)">
     <div
       :class="
         cn(
-          'flex p-10 overflow-hidden max-w-[500px] bg-[#222] fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 gap-2 border shadow-lg sm:rounded-lg',
+          'flex p-10 overflow-hidden max-w-[500px] bg-[#222]  w-full gap-2 border shadow-lg sm:rounded-lg',
           props.class
         )
       "

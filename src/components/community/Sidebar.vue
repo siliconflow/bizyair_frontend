@@ -48,7 +48,7 @@
 </script>
 
 <template>
-  <div class="w-64 bg-[#353535] h-full fixed left-0 top-0 border-r border-[#6E6E6E80]">
+  <div class="w-64 bg-[#353535] h-full absolute left-0 top-0 border-r border-[#6E6E6E80]">
     <div class="flex flex-col p-2 pl-8 pr-2 h-full">
       <div class="flex-1">
         <h3 class="pt-2 pb-4 text-[#F9FAFB] font-['Inter'] text-[14px] font-medium leading-[14px]">

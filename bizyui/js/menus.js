@@ -7,7 +7,7 @@ class FloatingButton {
         this.show_cases = show_cases
         this.button = $el("div.bizyair-comfy-floating-button", {
             parent: document.body,
-            style: { top: app.menu.element.style.display === 'none' ? '': '60px' },
+            style: { top: app.menu.element.style.display === 'none' ? '': '100px' },
             onmousedown: (e) => this.startDrag(e),
             id: 'bizyair-menu-item',
         }, [
