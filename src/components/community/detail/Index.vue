@@ -1338,9 +1338,9 @@
             <div
               class="flex px-[8px] py-4 items-center self-stretch text-[#F9FAFB] font-inter text-xs font-medium leading-5"
             >
-              <span class="text-ellipsis overflow-hidden whitespace-nowrap">{{ currentVersion?.file_name }} ({{
-                formatSize(currentVersion?.file_size)
-              }})</span>
+              <span class="text-ellipsis overflow-hidden whitespace-nowrap"
+                >{{ currentVersion?.file_name }} ({{ formatSize(currentVersion?.file_size) }})</span
+              >
               <span
                 v-if="model?.type === 'Workflow'"
                 class="cursor-pointer ml-2 hover:opacity-80"

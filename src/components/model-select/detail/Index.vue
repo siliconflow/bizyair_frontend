@@ -1117,9 +1117,7 @@
             <div
               class="px-[8px] py-4 items-center self-stretch text-[#F9FAFB] font-inter text-xs font-medium leading-5 w-full text-ellipsis overflow-hidden whitespace-nowrap"
             >
-              {{ currentVersion?.file_name }} ({{
-                formatSize(currentVersion?.file_size)
-              }})
+              {{ currentVersion?.file_name }} ({{ formatSize(currentVersion?.file_size) }})
             </div>
           </div>
         </div>

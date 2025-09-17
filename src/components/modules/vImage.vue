@@ -19,7 +19,9 @@
 </script>
 
 <template>
-  <div :class="`w-full h-full relative ${src ? 'bg-black' : ''} overflow-hidden image-box flex justify-center items-center`">
+  <div
+    :class="`w-full h-full relative ${src ? 'bg-black' : ''} overflow-hidden image-box flex justify-center items-center`"
+  >
     <img
       :src="src"
       :alt="alt"

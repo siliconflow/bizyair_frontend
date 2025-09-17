@@ -9,7 +9,14 @@
   const emit = defineEmits(['update:open'])
 </script>
 <template>
-  <div :class="cn('w-[100vw] h-[100vh] fixed inset-0 z-50 bg-black/80 flex justify-center items-center', props.z)">
+  <div
+    :class="
+      cn(
+        'w-[100vw] h-[100vh] fixed inset-0 z-50 bg-black/80 flex justify-center items-center',
+        props.z
+      )
+    "
+  >
     <div
       :class="
         cn(

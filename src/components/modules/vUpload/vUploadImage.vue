@@ -160,14 +160,10 @@
       <!-- 占位符 -->
       <div v-if="!mediaSrc">
         <div class="w-full h-full absolute left-0 top-0 flex justify-center items-center">
-          <div
-            class="w-[64%] h-1 bg-slate-400 rounded-md"
-          ></div>
+          <div class="w-[64%] h-1 bg-slate-400 rounded-md"></div>
         </div>
         <div class="w-full h-full absolute left-0 top-0 flex justify-center items-center">
-          <div
-            class="w-1 h-[64%] bg-slate-400 rounded-md"
-          ></div>
+          <div class="w-1 h-[64%] bg-slate-400 rounded-md"></div>
         </div>
       </div>
 
@@ -177,7 +173,10 @@
         @click="clearVal"
       />
     </div>
-    <div v-if="showLoading" class="fixed w-[100vw] h-[100vh] left-0 top-0 bg-black/40 z-13000 flex justify-center items-center flex-col">
+    <div
+      v-if="showLoading"
+      class="fixed w-[100vw] h-[100vh] left-0 top-0 bg-black/40 z-13000 flex justify-center items-center flex-col"
+    >
       <div class="pb-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24">
           <circle cx="12" cy="2" r="0" fill="currentColor">
