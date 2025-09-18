@@ -165,7 +165,8 @@
           "downloads": "Downloads",
           "most-used": "Most Used",
           "most-liked": "Most Liked",
-          "most-forked": "Most Forked"
+          "most-forked": "Most Forked",
+          "auto": "Recommended"
         }
       },
       "type": {
