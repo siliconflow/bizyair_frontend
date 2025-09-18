@@ -73,49 +73,50 @@
       <DialogOverlay
         :class="
           cn(
-            'fixed shadcn-root inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'fixed shadcn-root inset-0 z-50 bg-black/80 flex justify-center items-center data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             props.layoutClass
           )
         "
-      />
-      <DialogContent
-        v-bind="forwarded"
-        @interact-outside="
-          (event: any) => {
-            const target = event.target as HTMLElement
-            if (target?.closest('[data-sonner-toaster]')) return event.preventDefault()
-          }
-        "
-        :class="
-          cn(
-            'shadcn-root max-w-[900px] bg-[#222] fixed left-1/2 top-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 border p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg',
-            props.class
-          )
-        "
       >
-        <DialogHeader>
-          <DialogTitle>
-            <slot name="title" />
-          </DialogTitle>
-          <DialogDescription>
-            <slot name="description" />
-          </DialogDescription>
-        </DialogHeader>
-        <div :class="props.contentClass">
-          <slot />
-        </div>
-        <DialogFooter>
-          <slot name="foot" />
-        </DialogFooter>
-        <DialogClose
-          v-if="showClose"
-          class="absolute bg-transparent right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-          @click="closeDialog"
+        <DialogContent
+          v-bind="forwarded"
+          :class="
+            cn(
+              'shadcn-root max-w-[900px]  relative bg-[#222] grid w-full gap-4 p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg',
+              props.class
+            )
+          "
+          @interact-outside="
+            (event: any) => {
+              const target = event.target as HTMLElement
+              if (target?.closest('[data-sonner-toaster]')) return event.preventDefault()
+            }
+          "
         >
-          <X class="w-4 h-4" />
-          <span class="sr-only">Close</span>
-        </DialogClose>
-      </DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              <slot name="title" />
+            </DialogTitle>
+            <DialogDescription>
+              <slot name="description" />
+            </DialogDescription>
+          </DialogHeader>
+          <div :class="props.contentClass">
+            <slot />
+          </div>
+          <DialogFooter>
+            <slot name="foot" />
+          </DialogFooter>
+          <DialogClose
+            v-if="showClose"
+            class="absolute bg-transparent right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            @click="closeDialog"
+          >
+            <X class="w-4 h-4" />
+            <span class="sr-only">Close</span>
+          </DialogClose>
+        </DialogContent>
+      </DialogOverlay>
     </DialogPortal>
   </Dialog>
 </template>

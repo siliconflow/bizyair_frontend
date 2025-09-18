@@ -19,11 +19,13 @@
 </script>
 
 <template>
-  <div :class="`w-full h-full relative ${src ? 'bg-black' : ''} overflow-hidden image-box`">
+  <div
+    :class="`w-full h-full relative ${src ? 'bg-black' : ''} overflow-hidden image-box flex justify-center items-center`"
+  >
     <img
       :src="src"
       :alt="alt"
-      :class="`absolute ${aspectRatio ? 'w-[100%] h-auto' : 'w-auto h-[100%]'} left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all hover:scale-125`"
+      :class="`${aspectRatio ? 'w-[100%] h-auto' : 'w-auto h-[100%]'} transition-all hover:scale-125`"
     />
   </div>
 </template>

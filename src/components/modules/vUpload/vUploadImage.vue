@@ -143,10 +143,10 @@
       <!-- 视频预览 -->
       <video
         v-if="isVideo && mediaSrc"
+        ref="videoRef"
         :src="mediaSrc"
         class="block object-cover w-full h-full rounded-lg absolute left-0 top-0 z-10"
         muted
-        ref="videoRef"
         @load="handleVideoLoad"
       />
 
@@ -159,22 +159,25 @@
 
       <!-- 占位符 -->
       <div v-if="!mediaSrc">
-        <div
-          class="w-[64%] h-1 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-400 rounded-md"
-        ></div>
-        <div
-          class="w-1 h-[64%] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-400 rounded-md"
-        ></div>
+        <div class="w-full h-full absolute left-0 top-0 flex justify-center items-center">
+          <div class="w-[64%] h-1 bg-slate-400 rounded-md"></div>
+        </div>
+        <div class="w-full h-full absolute left-0 top-0 flex justify-center items-center">
+          <div class="w-1 h-[64%] bg-slate-400 rounded-md"></div>
+        </div>
       </div>
 
       <Trash2
-        class="absolute right-2 top-2 z-30 cursor-pointer text-white bg-black/50 rounded p-1"
         v-if="mediaSrc"
+        class="absolute right-2 top-2 z-30 cursor-pointer text-white bg-black/50 rounded p-1"
         @click="clearVal"
       />
     </div>
-    <div v-if="showLoading" class="fixed w-[100vw] h-[100vh] left-0 top-0 bg-black/40 z-13000">
-      <div class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+    <div
+      v-if="showLoading"
+      class="fixed w-[100vw] h-[100vh] left-0 top-0 bg-black/40 z-13000 flex justify-center items-center flex-col"
+    >
+      <div class="pb-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24">
           <circle cx="12" cy="2" r="0" fill="currentColor">
             <animate
@@ -266,7 +269,7 @@
           </circle>
         </svg>
       </div>
-      <div class="fixed left-1/2 top-[60%] -translate-x-1/2 text-white">
+      <div class="text-white">
         {{ $t('vUpload.loading') }}
       </div>
     </div>
