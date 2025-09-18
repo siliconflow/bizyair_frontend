@@ -1274,4 +1274,8 @@
     align-items: center;
     height: 20px;
   }
+  .moore {
+    background: #ff681f;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
+  }
 </style>
