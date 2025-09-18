@@ -302,7 +302,7 @@
   }
 
   :deep(.n-scrollbar-rail) {
-    position: fixed;
+    /* position: fixed; */
   }
 
   :deep(.n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical--right),
