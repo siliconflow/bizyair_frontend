@@ -307,9 +307,10 @@
 
   :deep(.n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical--right),
   :deep(.n-scrollbar + .n-scrollbar-rail.n-scrollbar-rail--vertical--right) {
-    right: 20px !important;
-    top: 120px !important;
-    bottom: 60px !important;
+    right: 0px !important;
+    top: 0px !important;
+    bottom: 0px !important;
+    z-index: 1000;
   }
 
   /* :deep(.v-vl:not(.v-vl--show-scrollbar)) {
