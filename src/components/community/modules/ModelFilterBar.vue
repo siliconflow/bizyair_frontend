@@ -108,10 +108,19 @@
         model_types: [],
         base_models: [],
         keyword: '',
-        sort: 'Recently',
+        sort: props.page === 'quickStart' ? 'Auto' : 'Recently',
         is_user_cleared: false
       }
     }
+    store[props.page].filterState.sort = props.page === 'quickStart' ? 'Auto' : 'Recently'
+    // 如果状态已存在，但 quickStart 页仍是默认的 'Recently'，将其调整为 'Auto'（不覆盖用户后续选择）
+    // if (
+    //   props.page === 'quickStart' &&
+    //   store[props.page].filterState &&
+    //   store[props.page].filterState.sort === 'Recently'
+    // ) {
+    //   store[props.page].filterState.sort = 'Auto'
+    // }
     if (props.page === 'mainContent') {
       if (store[props.page].filterState.selected_model_types.length === 0) {
         store[props.page].filterState.model_types = store.modelTypes
@@ -137,6 +146,8 @@
 
   const getSortLabel = (sort: SortValue) => {
     switch (sort) {
+      case 'Auto':
+        return t('community.filter.sort.options.auto')
       case 'Recently':
         return t('community.filter.sort.options.recently')
       case 'Most Forked':
@@ -234,6 +245,20 @@
         <Command>
           <CommandList>
             <CommandGroup>
+              <CommandItem
+                v-if="props.page === 'quickStart'"
+                value="Auto"
+                :class="[
+                  'px-2 py-1.5 text-[#F9FAFB] cursor-pointer',
+                  '[&:hover]:!bg-[#8B5CF6] [&:hover]:!text-[#F9FAFB]',
+                  store[props.page].filterState.sort === 'Auto'
+                    ? '!bg-[#6D28D9] !text-[#F9FAFB]'
+                    : ''
+                ]"
+                @click="handleSortChange('Auto')"
+              >
+                {{ t('community.filter.sort.options.auto') }}
+              </CommandItem>
               <CommandItem
                 value="recently"
                 :class="[
@@ -399,8 +424,8 @@
                         ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
                         : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
-                    @click="handleHasDraftChange(true)"
                     variant="secondary"
+                    @click="handleHasDraftChange(true)"
                   >
                     {{ t('community.modelCard.tooltips.verified') }}
                   </Badge>
@@ -411,8 +436,8 @@
                         ? 'bg-[#6D28D9] hover:!bg-[#8B5CF6]'
                         : 'bg-[#4E4E4E] hover:!bg-[#5D5D5D]'
                     ]"
-                    @click="handleHasDraftChange(false)"
                     variant="secondary"
+                    @click="handleHasDraftChange(false)"
                   >
                     {{ t('community.modelCard.tooltips.unverified') }}
                   </Badge>
