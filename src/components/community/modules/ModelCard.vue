@@ -41,17 +41,17 @@
     if (!props.model?.tags || !Array.isArray(props.model.tags)) {
       return false
     }
-    
+
     // 获取所有标签数据
     const allTags = tagsStore.getDict('tags') || []
-    
+
     // 查找 class 为 'item_right_top' 的标签（或者使用其他字段如 type）
     const rightTopTag = allTags.find((tag: any) => tag.class === 'item_right_top')
-    
+
     if (!rightTopTag) {
       return false
     }
-    
+
     // 检查 model.tags 是否包含该标签的 id
     return props.model.tags.includes(rightTopTag.id)
   })
