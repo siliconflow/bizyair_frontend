@@ -36,6 +36,26 @@
       : t('community.modelCard.tooltips.addNode')
   })
 
+  // 判断是否应该显示徽章
+  const shouldShowBadge = computed(() => {
+    if (!props.model?.tags || !Array.isArray(props.model.tags)) {
+      return false
+    }
+    
+    // 获取所有标签数据
+    const allTags = tagsStore.getDict('tags') || []
+    
+    // 查找 class 为 'item_right_top' 的标签（或者使用其他字段如 type）
+    const rightTopTag = allTags.find((tag: any) => tag.class === 'item_right_top')
+    
+    if (!rightTopTag) {
+      return false
+    }
+    
+    // 检查 model.tags 是否包含该标签的 id
+    return props.model.tags.includes(rightTopTag.id)
+  })
+
   const handleImageLoad = (e: Event) => {
     emit('image-load', e)
   }
@@ -225,7 +245,7 @@
           <div v-if="!props.imageLoaded" class="absolute inset-0 flex items-center justify-center">
             <vDefaultPic />
           </div>
-          <div v-if="model.tags && model.tags.includes(10005)" class="absolute right-1 -top-1">
+          <div v-if="shouldShowBadge" class="absolute right-1 -top-1">
             <svg
               width="48"
               height="49"
