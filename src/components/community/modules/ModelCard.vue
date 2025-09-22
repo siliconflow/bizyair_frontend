@@ -332,7 +332,7 @@
               }}</span
             >
             <!-- <span v-else> -->
-            <vTooltips 
+            <vTooltips
               v-if="
                 model.type &&
                 model.type === 'Workflow' &&
@@ -340,10 +340,9 @@
                 model.versions.filter((version: any) => version.draft_id).length > 0 &&
                 !hasRightTopPositionTag
               "
-              :tips="t('community.modelCard.tooltips.cloud')" >
-              <span
-                className="text-xs text-white bg-[#7C3AED] px-1 inline-block h-[18px] rounded"
-              >
+              :tips="t('community.modelCard.tooltips.cloud')"
+            >
+              <span className="text-xs text-white bg-[#7C3AED] px-1 inline-block h-[18px] rounded">
                 ☁️
               </span>
             </vTooltips>
