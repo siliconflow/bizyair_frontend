@@ -36,6 +36,17 @@
       : t('community.modelCard.tooltips.addNode')
   })
 
+  // 是否存在 position 为 'item_right_top' 的匹配标签
+  const hasRightTopPositionTag = computed(() => {
+    if (!props.model?.tags || !Array.isArray(props.model.tags)) {
+      return false
+    }
+    const allTags = tagsStore.getDict('tags') || []
+    return allTags.some(
+      (tag: any) => props.model.tags.includes(tag.id) && tag.position === 'item_right_top'
+    )
+  })
+
   // 判断是否应该显示徽章
   const shouldShowBadge = computed(() => {
     if (!props.model?.tags || !Array.isArray(props.model.tags)) {
@@ -46,7 +57,7 @@
     const allTags = tagsStore.getDict('tags') || []
 
     // 查找 class 为 'item_right_top' 的标签（或者使用其他字段如 type）
-    const rightTopTag = allTags.find((tag: any) => tag.class === 'item_right_top')
+    const rightTopTag = allTags.find((tag: any) => tag.position === 'item_right_top')
 
     if (!rightTopTag) {
       return false
@@ -309,7 +320,12 @@
         <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/0">
           <div class="flex items-center gap-2">
             <span
-              v-if="model.tags && model.tags.length > 0 && tagsStore.getHighestOrderTag(model.tags)"
+              v-if="
+                model.tags &&
+                model.tags.length > 0 &&
+                tagsStore.getHighestOrderTag(model.tags) &&
+                tagsStore.getHighestOrderTag(model.tags)?.position !== 'item_right_top'
+              "
               :class="tagsStore.getHighestOrderTag(model.tags)?.class || 'model-tag'"
               >{{
                 tagsStore.getHighestOrderTag(model.tags)?.label || t('community.modelCard.tags.new')
@@ -320,7 +336,8 @@
                 <span
                   v-if="
                     model.type === 'Workflow' &&
-                    model.versions.filter((version: any) => version.draft_id).length > 0
+                    model.versions.filter((version: any) => version.draft_id).length > 0 &&
+                    !hasRightTopPositionTag
                   "
                   className="text-xs text-white bg-[#7C3AED] px-1 inline-block h-[18px] rounded"
                 >
