@@ -331,20 +331,22 @@
                 tagsStore.getHighestOrderTag(model.tags)?.label || t('community.modelCard.tags.new')
               }}</span
             >
-            <span v-else>
-              <vTooltips :tips="t('community.modelCard.tooltips.cloud')">
-                <span
-                  v-if="
-                    model.type === 'Workflow' &&
-                    model.versions.filter((version: any) => version.draft_id).length > 0 &&
-                    !hasRightTopPositionTag
-                  "
-                  className="text-xs text-white bg-[#7C3AED] px-1 inline-block h-[18px] rounded"
-                >
-                  ☁️
-                </span>
-              </vTooltips>
-            </span>
+            <!-- <span v-else> -->
+            <vTooltips
+              v-if="
+                model.type &&
+                model.type === 'Workflow' &&
+                (!model.tags || model.tags.length === 0) &&
+                model.versions.filter((version: any) => version.draft_id).length > 0 &&
+                !hasRightTopPositionTag
+              "
+              :tips="t('community.modelCard.tooltips.cloud')"
+            >
+              <span className="text-xs text-white bg-[#7C3AED] px-1 inline-block h-[18px] rounded">
+                ☁️
+              </span>
+            </vTooltips>
+            <!-- </span> -->
             <vTooltips :tips="model.name">
               <h3 class="text-base text-white font-medium mb-2 truncate">
                 {{ sliceString(model.name, 24) }}
