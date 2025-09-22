@@ -954,12 +954,12 @@
                 {{ t('community.detail.hash') }}
               </div>
               <div
-                className="flex-1 p-4 border-b border-[rgba(78,78,78,0.50)] flex items-center gap-2 w-full"
+                className="flex-1 p-4 flex items-center overflow-auto border-b border-[rgba(78,78,78,0.50)] gap-2"
               >
-                <span class="text-ellipsis overflow-hidden whitespace-nowrap">
+                <span class="overflow-hidden text-ellipsis whitespace-nowrap">
                   {{ currentVersion?.sign }}
                 </span>
-                <vTooltips :tips="currentVersion?.sign ? t('community.detail.copy') : ''">
+                <vTooltips :tips="t('community.detail.copy')">
                   <svg
                     v-if="currentVersion?.sign"
                     xmlns="http://www.w3.org/2000/svg"
