@@ -317,7 +317,7 @@
           </div>
         </div>
 
-        <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-black/0">
+        <div class="absolute bottom-0 left-0 right-0 p-3 z-10" style="background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
           <div class="flex items-center gap-2">
             <span
               v-if="
