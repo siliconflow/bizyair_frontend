@@ -208,7 +208,9 @@
         </div>
 
         <div
-          class="absolute bottom-0 left-0 right-0 p-3 z-10" style="background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
+          class="absolute bottom-0 left-0 right-0 p-3 z-10"
+          style="background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent)"
+        >
           <vTooltips :tips="model.name">
             <div class="flex items-center gap-2">
               <span
