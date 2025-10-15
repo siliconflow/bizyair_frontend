@@ -70,17 +70,17 @@
                 @update:open="e.baseModelError = false"
               >
                 <SelectItem
-                  v-for="(e, i) in modelStoreObject.baseTypeLis"
+                  v-for="(e, i) in filteredBaseTypeLis"
                   :key="i"
                   :value="e.value"
-                  >{{ e.label }}</SelectItem
+                  >{{ e.value }}</SelectItem
                 >
               </v-select>
             </v-item>
             <v-item :label="t('publish.workflow.uploadImage')">
               <vUploadImage
                 v-model.modelValue="e.cover_urls"
-                :previewPrc="e.cover_urls ? e.cover_urls[0] : ''"
+                :preview-prc="e.cover_urls ? e.cover_urls[0] : ''"
                 :class-name="e.imageError ? 'border-red-500' : ''"
                 @done="imageUploadDone(i)"
               />
@@ -181,11 +181,17 @@
   import Markdown from '@/components/markdown/Index.vue'
   import { uploadFile } from '@/components/modules/vUpload/virtualUpload'
   import { useI18n } from 'vue-i18n'
+  import type { CommonModelType } from '@/types/model'
 
   const { t } = useI18n()
   const comfyUIApp: any = inject('comfyUIApp')
 
   const modelStoreObject = modelStore()
+  const filteredBaseTypeLis = computed<CommonModelType[]>(() =>
+    (modelStoreObject.baseTypeLis as unknown as CommonModelType[]).filter(
+      (o: CommonModelType | undefined) => !!o && !!o.value
+    )
+  )
   const modelBox = ref(true)
   const formData = ref({ ...modelStoreObject.modelDetail })
   const acActiveIndex = ref(-1)

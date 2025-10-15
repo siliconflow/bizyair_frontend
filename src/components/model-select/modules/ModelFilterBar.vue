@@ -364,7 +364,7 @@
                     ]"
                     @click="handleBaseModelChange(model.value)"
                   >
-                    {{ model.label }}
+                    {{ model.value }}
                   </Badge>
                 </div>
               </CommandItem>

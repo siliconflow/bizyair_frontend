@@ -4,12 +4,11 @@ import {
   ModelListPathParams,
   ModeTabType,
   Model,
-  ModelVersion
+  ModelVersion,
+  PageState
 } from '@/types/model'
-import { model_types, base_model_types } from '@/api/model'
+import { model_types, get_all_dict } from '@/api/model'
 import { useToaster } from '@/components/modules/toats'
-
-import { PageState } from '@/types/model'
 
 export const useModelSelectStore = defineStore('modelSelect', {
   state: () => ({
@@ -180,11 +179,11 @@ export const useModelSelectStore = defineStore('modelSelect', {
     async loadFilterData(modelTypes?: string[], baseModelTypes?: string[]) {
       if (this.filterDataLoaded) return
       try {
-        const [modelTypesResponse, baseModelResponse] = await Promise.all([
+        const [modelTypesResponse, dictResponse] = await Promise.all([
           model_types(),
-          base_model_types()
+          get_all_dict()
         ])
-
+        const baseModelResponse = dictResponse.data.base_models
         if (modelTypesResponse?.data) {
           // 总是显示所有模型类型
           this.modelTypes = modelTypesResponse.data
@@ -220,9 +219,9 @@ export const useModelSelectStore = defineStore('modelSelect', {
           }
         }
 
-        if (baseModelResponse?.data) {
+        if (baseModelResponse) {
           // 总是显示所有基础模型类型
-          this.baseModelTypes = baseModelResponse.data
+          this.baseModelTypes = baseModelResponse
 
           if (baseModelTypes && baseModelTypes.length > 0) {
             // 只设置传入的基础模型类型为选中状态

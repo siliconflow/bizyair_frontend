@@ -5,7 +5,7 @@ import {
   ModelListPathParams,
   ModelVersion as ModelVersionType
 } from '@/types/model'
-import { model_types, base_model_types } from '@/api/model'
+import { model_types, get_all_dict } from '@/api/model'
 import { defineStore } from 'pinia'
 interface ModelVersion {
   id?: number
@@ -78,8 +78,8 @@ export const modelStore = defineStore('modelStore', {
       sort: 'Recently',
       is_user_cleared: false
     } as FilterState,
-    typeLis: [{ value: '', label: '' }],
-    baseTypeLis: [{ value: '', label: '' }]
+    typeLis: [] as CommonModelType[],
+    baseTypeLis: [] as CommonModelType[]
   }),
   actions: {
     setModelDetail(data: any) {
@@ -161,9 +161,9 @@ export const modelStore = defineStore('modelStore', {
     },
     async getModelTypes() {
       const mt = await model_types()
-      const bmt = await base_model_types()
+      const bmt = await get_all_dict()
       this.typeLis = mt.data
-      this.baseTypeLis = bmt.data
+      this.baseTypeLis = bmt.data.base_models
     }
   }
 })
