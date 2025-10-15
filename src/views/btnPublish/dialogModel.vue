@@ -1,11 +1,11 @@
 <template>
   <v-dialog
     v-model:open="modelStoreObject.showDialog"
-    @onClose="onDialogClose"
     class="px-0 overflow-hidden pb-0 z-9000"
     v-if="modelStoreObject.showDialog"
-    layoutClass="z-9000"
-    contentClass="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+    layout-class="z-9000"
+    content-class="custom-scrollbar max-h-[80vh] overflow-y-auto w-full rounded-tl-lg rounded-tr-lg custom-shadow"
+    @on-close="onDialogClose"
   >
     <template #title
       ><span class="px-6 cursor-pointer" @click="handleToggleTitle">{{
@@ -29,14 +29,14 @@
           v-model:model-value="formData.type"
           :placeholder="t('publish.model.type.placeholder')"
         >
-          <SelectItem v-for="(e, i) in modelStoreObject.typeLis" :key="i" :value="e.value">{{
+          <SelectItem v-for="(e, i) in filteredTypeLis" :key="i" :value="e.value">{{
             e.label
           }}</SelectItem>
         </v-select>
       </v-item>
       <Button class="w-full mt-3" @click="nextStep">{{ t('publish.model.nextStep') }}</Button>
     </div>
-    <vCustomAccordion :multiple="true" :activeIndex="acActiveIndex">
+    <vCustomAccordion :multiple="true" :active-index="acActiveIndex">
       <vCustomAccordionItem
         v-for="(e, i) in formData.versions"
         :key="i"
@@ -82,23 +82,23 @@
                 :placeholder="t('publish.model.baseModelPlaceholder')"
               >
                 <SelectItem
-                  v-for="(e, i) in modelStoreObject.baseTypeLis"
+                  v-for="(e, i) in filteredBaseTypeLis"
                   :key="i"
                   :value="e.value"
-                  >{{ e.label }}</SelectItem
+                  >{{ e.value }}</SelectItem
                 >
               </v-select>
             </v-item>
             <v-item :label="t('publish.model.uploadImage')">
               <vUploadImage
-                :previewPrc="e.cover_urls ? e.cover_urls[0] : ''"
-                :className="e.imageError ? 'border-red-500' : ''"
                 v-model.modelValue="e.cover_urls"
+                :preview-prc="e.cover_urls ? e.cover_urls[0] : ''"
+                :class-name="e.imageError ? 'border-red-500' : ''"
                 @done="imageUploadDone(i)"
               />
             </v-item>
             <v-item :label="t('publish.model.introduction')">
-              <Markdown v-model.modelValue="e.intro" :editorId="`myeditor${i}`" />
+              <Markdown v-model.modelValue="e.intro" :editor-id="`myeditor${i}`" />
             </v-item>
             <v-item label="">
               <div class="flex items-center space-x-2 mt-2">
@@ -183,9 +183,20 @@
   import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import Markdown from '@/components/markdown/Index.vue'
   import { useI18n } from 'vue-i18n'
+  import type { CommonModelType } from '@/types/model'
 
   const { t } = useI18n()
   const modelStoreObject = modelStore()
+  const filteredTypeLis = computed<CommonModelType[]>(() =>
+    (modelStoreObject.typeLis as unknown as CommonModelType[]).filter(
+      (o: CommonModelType | undefined) => !!o && !!o.value
+    )
+  )
+  const filteredBaseTypeLis = computed<CommonModelType[]>(() =>
+    (modelStoreObject.baseTypeLis as unknown as CommonModelType[]).filter(
+      (o: CommonModelType | undefined) => !!o && !!o.value
+    )
+  )
   const modelBox = ref(true)
   const formData = ref({ ...modelStoreObject.modelDetail })
   const acActiveIndex = ref(-1)

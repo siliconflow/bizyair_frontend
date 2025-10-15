@@ -43,7 +43,7 @@
           :placeholder="t('publish.model.type.placeholder')"
           @update:open="formData.typeError = false"
         >
-          <SelectItem v-for="(e, i) in typeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
+          <SelectItem v-for="(e, i) in filteredTypeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
         </v-select>
       </v-item>
       <Button class="w-full mt-3" @click="nextStep">{{ t('publish.model.nextStep') }}</Button>
@@ -93,8 +93,8 @@
                 :placeholder="t('publish.model.baseModelPlaceholder')"
                 @update:open="e.baseModelError = false"
               >
-                <SelectItem v-for="(item, index) in baseTypeLis" :key="index" :value="item.value">{{
-                  item.label
+                <SelectItem v-for="(item, index) in filteredBaseTypeLis" :key="index" :value="item.value">{{
+                  item.value
                 }}</SelectItem>
               </v-select>
             </v-item>
@@ -166,7 +166,7 @@
 </template>
 <script setup lang="ts">
   import { useToaster } from '@/components/modules/toats/index'
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, watch, onMounted } from 'vue'
   import { SelectItem } from '@/components/ui/select'
   import { Input } from '@/components/ui/input'
   import { Button } from '@/components/ui/button'
@@ -175,8 +175,7 @@
   import { Progress } from '@/components/ui/progress'
   import { useAlertDialog } from '@/components/modules/vAlertDialog/index'
   import { modelStore } from '@/stores/modelStatus'
-  import { create_models, model_types, base_model_types, put_model } from '@/api/model'
-  import { onMounted } from 'vue'
+  import { create_models, model_types, get_all_dict, put_model } from '@/api/model'
   import { Trash2 } from 'lucide-vue-next'
   import vDialog from '@/components/modules/vDialog.vue'
   import vSelect from '@/components/modules/vSelect.vue'
@@ -187,12 +186,19 @@
   import vUploadImage from '@/components/modules/vUpload/vUploadImage.vue'
   import Markdown from '@/components/markdown/Index.vue'
   import { useI18n } from 'vue-i18n'
+  import type { CommonModelType } from '@/types/model'
 
   const { t } = useI18n()
   const modelStoreObject = modelStore()
   const modelBox = ref(true)
-  const typeLis = ref([{ value: '', label: '' }])
-  const baseTypeLis = ref([{ value: '', label: '' }])
+  const typeLis = ref<CommonModelType[]>([])
+  const baseTypeLis = ref<CommonModelType[]>([])
+  const filteredTypeLis = computed<CommonModelType[]>(() =>
+    typeLis.value.filter((o: CommonModelType | undefined) => !!o && !!o.value)
+  )
+  const filteredBaseTypeLis = computed<CommonModelType[]>(() =>
+    baseTypeLis.value.filter((o: CommonModelType | undefined) => !!o && !!o.value)
+  )
   const formData = ref({ ...modelStoreObject.modelDetail })
   const acActiveIndex = ref(-1)
   const showLayoutLoading = ref(false)
@@ -382,8 +388,8 @@
   onMounted(async () => {
     const mt = await model_types()
     typeLis.value = mt.data
-    const bmt = await base_model_types()
-    baseTypeLis.value = bmt.data
+    const bmt = await get_all_dict()
+    baseTypeLis.value = bmt.data.base_models
   })
 </script>
 <style scoped></style>

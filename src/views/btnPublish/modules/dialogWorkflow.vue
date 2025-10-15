@@ -38,7 +38,6 @@
             <span v-else>Add Version</span>
             <Trash2
               v-if="formData.versions.length !== 1"
-              #icon
               class="w-4 h-4"
               @click.capture.stop="delVersion(i)"
             />
@@ -68,17 +67,17 @@
                 @update:open="e.baseModelError = false"
               >
                 <SelectItem
-                  v-for="(e, i) in modelStoreObject.baseTypeLis"
+                  v-for="(e, i) in filteredBaseTypeLis"
                   :key="i"
                   :value="e.value"
-                  >{{ e.label }}</SelectItem
+                  >{{ e.value }}</SelectItem
                 >
               </v-select>
             </v-item>
             <v-item label="Upload Image">
               <vUploadImage
                 v-model.modelValue="e.cover_urls"
-                :previewPrc="e.cover_urls ? e.cover_urls[0] : ''"
+                :preview-prc="e.cover_urls ? e.cover_urls[0] : ''"
                 :class-name="e.imageError ? 'border-red-500' : ''"
                 @done="imageUploadDone(i)"
               />
@@ -152,6 +151,7 @@
   import { useToaster } from '@/components/modules/toats/index'
   import { computed, inject, ref, watch } from 'vue'
   import { SelectItem } from '@/components/ui/select'
+  import type { CommonModelType } from '@/types/model'
   // import { Input } from '@/components/ui/input'
   import { Button } from '@/components/ui/button'
   import { Label } from '@/components/ui/label'
@@ -174,6 +174,11 @@
   const comfyUIApp: any = inject('comfyUIApp')
 
   const modelStoreObject = modelStore()
+  const filteredBaseTypeLis = computed<CommonModelType[]>(() =>
+    (modelStoreObject.baseTypeLis as unknown as CommonModelType[]).filter(
+      (o: CommonModelType | undefined) => !!o && !!o.value
+    )
+  )
   const modelBox = ref(true)
   const formData = ref({ ...modelStoreObject.modelDetail })
   const acActiveIndex = ref(-1)
