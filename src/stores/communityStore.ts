@@ -1,9 +1,7 @@
 import { defineStore } from 'pinia'
-import { CommonModelType, Model, ModelListPathParams, PageType } from '@/types/model'
-import { model_types, base_model_types } from '@/api/model'
+import { CommonModelType, Model, ModelListPathParams, PageType, PageState } from '@/types/model'
+import { model_types, get_all_dict } from '@/api/model'
 import { useToaster } from '@/components/modules/toats'
-
-import { PageState } from '@/types/model'
 
 export const useCommunityStore = defineStore('community', {
   state: () => ({
@@ -232,17 +230,18 @@ export const useCommunityStore = defineStore('community', {
       if (this.filterDataLoaded) return
 
       try {
-        const [modelTypesResponse, baseModelResponse] = await Promise.all([
+        const [modelTypesResponse, dictResponse] = await Promise.all([
           model_types(),
-          base_model_types()
+          get_all_dict()
         ])
+        const baseModelResponse = dictResponse.data.base_models
 
         if (modelTypesResponse?.data) {
           this.modelTypes = modelTypesResponse.data
         }
 
-        if (baseModelResponse?.data) {
-          this.baseModelTypes = baseModelResponse.data
+        if (baseModelResponse) {
+          this.baseModelTypes = baseModelResponse
         }
 
         this.filterDataLoaded = true
