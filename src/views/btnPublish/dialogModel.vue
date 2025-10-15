@@ -81,12 +81,9 @@
                 v-model:model-value="e.base_model"
                 :placeholder="t('publish.model.baseModelPlaceholder')"
               >
-                <SelectItem
-                  v-for="(e, i) in filteredBaseTypeLis"
-                  :key="i"
-                  :value="e.value"
-                  >{{ e.value }}</SelectItem
-                >
+                <SelectItem v-for="(e, i) in filteredBaseTypeLis" :key="i" :value="e.value">{{
+                  e.value
+                }}</SelectItem>
               </v-select>
             </v-item>
             <v-item :label="t('publish.model.uploadImage')">

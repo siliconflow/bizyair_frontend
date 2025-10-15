@@ -66,12 +66,9 @@
                 placeholder="Select Base Model"
                 @update:open="e.baseModelError = false"
               >
-                <SelectItem
-                  v-for="(e, i) in filteredBaseTypeLis"
-                  :key="i"
-                  :value="e.value"
-                  >{{ e.value }}</SelectItem
-                >
+                <SelectItem v-for="(e, i) in filteredBaseTypeLis" :key="i" :value="e.value">{{
+                  e.value
+                }}</SelectItem>
               </v-select>
             </v-item>
             <v-item label="Upload Image">

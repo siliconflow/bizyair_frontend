@@ -43,7 +43,9 @@
           :placeholder="t('publish.model.type.placeholder')"
           @update:open="formData.typeError = false"
         >
-          <SelectItem v-for="(e, i) in filteredTypeLis" :key="i" :value="e.value">{{ e.label }}</SelectItem>
+          <SelectItem v-for="(e, i) in filteredTypeLis" :key="i" :value="e.value">{{
+            e.label
+          }}</SelectItem>
         </v-select>
       </v-item>
       <Button class="w-full mt-3" @click="nextStep">{{ t('publish.model.nextStep') }}</Button>
@@ -93,9 +95,12 @@
                 :placeholder="t('publish.model.baseModelPlaceholder')"
                 @update:open="e.baseModelError = false"
               >
-                <SelectItem v-for="(item, index) in filteredBaseTypeLis" :key="index" :value="item.value">{{
-                  item.value
-                }}</SelectItem>
+                <SelectItem
+                  v-for="(item, index) in filteredBaseTypeLis"
+                  :key="index"
+                  :value="item.value"
+                  >{{ item.value }}</SelectItem
+                >
               </v-select>
             </v-item>
             <v-item :label="t('publish.model.uploadImage')">
