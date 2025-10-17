@@ -183,6 +183,7 @@ export const useModelSelectStore = defineStore('modelSelect', {
           model_types(),
           get_all_dict()
         ])
+        if (!dictResponse || !dictResponse.data) return
         const baseModelResponse = dictResponse.data.base_models
         if (modelTypesResponse?.data) {
           // 总是显示所有模型类型
