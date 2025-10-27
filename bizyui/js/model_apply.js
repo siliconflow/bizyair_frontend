@@ -115,7 +115,11 @@ const NodeInfoLogger = (function() {
         let type = imageData.type || 'temp';
         let filename;
         if (isServerMode) {
-            filename = imageData.subfolder || imageData.filename;
+            if (imageData.subfolder) {
+                filename = `${imageData.subfolder}/${imageData.filename}`;
+            } else {
+                filename = imageData.filename;
+            }
         } else {
             filename = imageData.filename;
         }
