@@ -113,7 +113,16 @@ const NodeInfoLogger = (function() {
         // 检查服务器模式
         const isServerMode = await getIsServerMode();
         let type = imageData.type || 'temp';
-        let filename = imageData.filename;
+        let filename;
+        if (isServerMode) {
+            if (imageData.subfolder) {
+                filename = `${imageData.subfolder}/${imageData.filename}`;
+            } else {
+                filename = imageData.filename;
+            }
+        } else {
+            filename = imageData.filename;
+        }
         // 如果是LoadImage节点且服务器模式，filename取widgetsValues[0]
         if (isServerMode && nodeType === 'LoadImage' && Array.isArray(widgetsValues) && widgetsValues.length > 0) {
             filename = widgetsValues[0];
@@ -260,7 +269,15 @@ const NodeInfoLogger = (function() {
                                     // 检查是否存在全局bizyAirLib对象及logNodeInfo函数
                                     if (typeof bizyAirLib !== 'undefined' && typeof bizyAirLib.logNodeInfo === 'function') {
                                         // 获取图片的base64数据
-                                        const base64Data = await getImageAsBase64(this.images[0].filename, imageInfo.type);
+                                        const isServerMode = await getIsServerMode();
+                                        // 在服务端模式下，需要拼接 subfolder 和 filename 来获取完整的图片URL
+                                        let imageFilename;
+                                        if (isServerMode && this.images[0].subfolder) {
+                                            imageFilename = `${this.images[0].subfolder}/${this.images[0].filename}`;
+                                        } else {
+                                            imageFilename = this.images[0].filename;
+                                        }
+                                        const base64Data = await getImageAsBase64(imageFilename, imageInfo.type);
                                         
                                         // 添加base64数据到图片信息对象
                                         if (base64Data) {
