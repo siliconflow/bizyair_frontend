@@ -13,6 +13,6 @@ export const MULTIPART_UPLOAD_CONFIG = {
   PART_SIZE: 5 * 1024 * 1024
 }
 
-export const DEFAULT_ALLOWED_EXTENSIONS = '.safetensors, .pth, .bin, .pt, .ckpt, .gguf, .sft'
+export const DEFAULT_ALLOWED_EXTENSIONS = '.safetensors, .pth, .bin, .pt, .ckpt, .gguf, .sft, .onnx'
 
 export const STORAGE_KEY_PREFIX = 'upload_'
