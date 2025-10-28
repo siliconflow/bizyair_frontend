@@ -49,8 +49,14 @@ const NodeInfoLogger = (function() {
             let imageUrl;
             let headers = {};
             
-            if (isServerMode) {
-                // 服务器模式，改为请求后端转发接口
+            // 检查 filename 是否是完整的 URL（以 http:// 或 https:// 开头）
+            const isFullUrl = filename.startsWith('http://') || filename.startsWith('https://') || 
+                             filename.startsWith('http:/') || filename.startsWith('https:/');
+            
+            if (isFullUrl) {
+                imageUrl = filename.replace(/^(https?):\/(?!\/)/, '$1://');
+            } else if (isServerMode) {
+                // 服务器模式且非完整URL，使用后端转发接口
                 imageUrl = `/bizyair/proxy_view?filename=${encodeURIComponent(filename)}`;
             } else {
                 // 本地模式，使用原有 buildImageUrl
@@ -128,8 +134,15 @@ const NodeInfoLogger = (function() {
             filename = widgetsValues[0];
         }
         const path = `/${type}/${filename}`;
-        let url;
-        if (isServerMode) {
+        let url; 
+        // 检查 filename 是否是完整的 URL
+        const isFullUrl = filename.startsWith('http://') || filename.startsWith('https://') || 
+                         filename.startsWith('http:/') || filename.startsWith('https:/');
+        
+        if (isFullUrl) {
+            url = filename.replace(/^(https?):\/(?!\/)/, '$1://');
+        } else if (isServerMode) {
+            // 服务器模式且非完整URL，使用 /view 接口
             url = `/view?filename=${encodeURIComponent(filename)}`;
         } else {
             if (filename.startsWith('data:')) {
