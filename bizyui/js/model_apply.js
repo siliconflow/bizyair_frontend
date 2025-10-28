@@ -56,8 +56,7 @@ const NodeInfoLogger = (function() {
             if (isFullUrl) {
                 imageUrl = filename.replace(/^(https?):\/(?!\/)/, '$1://');
             } else if (isServerMode) {
-                // 服务器模式且非完整URL，使用后端转发接口
-                imageUrl = `/bizyair/proxy_view?filename=${encodeURIComponent(filename)}`;
+                return null;
             } else {
                 // 本地模式，使用原有 buildImageUrl
                 imageUrl = buildImageUrl(filename, type);
