@@ -161,15 +161,12 @@ export const modelStore = defineStore('modelStore', {
     },
     async getModelTypes() {
       try {
-        const [mt, bmt] = await Promise.all([
-          model_types(),
-          get_all_dict()
-        ])
-        
+        const [mt, bmt] = await Promise.all([model_types(), get_all_dict()])
+
         if (mt?.data) {
           this.typeLis = mt.data
         }
-        
+
         if (bmt?.data?.base_models) {
           this.baseTypeLis = bmt.data.base_models
         }
