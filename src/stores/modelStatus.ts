@@ -160,10 +160,22 @@ export const modelStore = defineStore('modelStore', {
       this.modelListPathParams.current = page
     },
     async getModelTypes() {
-      const mt = await model_types()
-      const bmt = await get_all_dict()
-      this.typeLis = mt.data
-      this.baseTypeLis = bmt.data.base_models
+      try {
+        const [mt, bmt] = await Promise.all([
+          model_types(),
+          get_all_dict()
+        ])
+        
+        if (mt?.data) {
+          this.typeLis = mt.data
+        }
+        
+        if (bmt?.data?.base_models) {
+          this.baseTypeLis = bmt.data.base_models
+        }
+      } catch (error) {
+        console.error('Failed to fetch model types:', error)
+      }
     }
   }
 })
