@@ -126,9 +126,7 @@ export function buildChatRequestBody(
   options: Partial<ChatApiOptions> = {}
 ): any {
   // 将当前消息合并到对话历史中，不再使用独立的 message 字段
-  const history: ChatMessage[] = Array.isArray(conversationHistory)
-    ? [...conversationHistory]
-    : []
+  const history: ChatMessage[] = Array.isArray(conversationHistory) ? [...conversationHistory] : []
   if (message && message.trim()) {
     history.push({
       role: 'user',
@@ -210,9 +208,7 @@ async function processStreamResponse(
 
         // 兼容 "data:" 与 "data: " 两种格式
         if (line.startsWith('data:') || line.startsWith('data: ')) {
-          const data = line.startsWith('data: ')
-            ? line.slice(6)
-            : line.slice(5).trimStart()
+          const data = line.startsWith('data: ') ? line.slice(6) : line.slice(5).trimStart()
 
           // 检查是否是结束标记
           if (data === '[DONE]') {
