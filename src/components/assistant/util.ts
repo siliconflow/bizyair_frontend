@@ -115,16 +115,28 @@ function renderMarkdownSafely(text: string): string {
 
 /**
  * 构建聊天请求体
- * @param conversationHistory 对话历史（应包含当前最新消息）
+ * @param message 当前消息内容（可选，如果只发送历史则为空）
+ * @param conversationHistory 对话历史
  * @param options API选项
  * @returns 请求体对象
  */
 export function buildChatRequestBody(
+  message: string | null,
   conversationHistory: ChatMessage[] = [],
   options: Partial<ChatApiOptions> = {}
 ): any {
+  // 将当前消息合并到对话历史中，不再使用独立的 message 字段
+  const history: ChatMessage[] = Array.isArray(conversationHistory) ? [...conversationHistory] : []
+  if (message && message.trim()) {
+    history.push({
+      role: 'user',
+      content: message.trim()
+    })
+  }
+
   const requestBody: any = {
-    conversation_history: conversationHistory,
+    conversation_history: history,
+    stream: true,
     model_config: {
       ...defaultApiOptions.model_config,
       ...options.model_config
@@ -194,8 +206,9 @@ async function processStreamResponse(
         const line = buffer.slice(0, lineEnd).trim()
         buffer = buffer.slice(lineEnd + 1)
 
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6)
+        // 兼容 "data:" 与 "data: " 两种格式
+        if (line.startsWith('data:') || line.startsWith('data: ')) {
+          const data = line.startsWith('data: ') ? line.slice(6) : line.slice(5).trimStart()
 
           // 检查是否是结束标记
           if (data === '[DONE]') {
@@ -225,7 +238,15 @@ async function processStreamResponse(
                   }
                   break
                 }
-                // 旧版 final_content_delta 已废弃，统一使用 content_delta
+                // 兼容旧版：final_content_delta
+                case 'final_content_delta': {
+                  const content: string | undefined = parsed.content
+                  if (typeof content === 'string' && content.length > 0) {
+                    fullText += content
+                    callbacks.onToken?.(content)
+                  }
+                  break
+                }
                 case 'tool_calls': {
                   const toolCalls = parsed.tool_calls
                   if (Array.isArray(toolCalls)) {
@@ -290,27 +311,24 @@ export async function sendStreamChatRequest(
   callbacks: StreamCallbacks,
   options: Partial<ChatApiOptions> = {}
 ): Promise<AbortController> {
-  // 提取消息文本内容并构建最新对话历史
-  let latestMessage: ChatMessage | null = null
+  // 提取消息文本内容
+  let messageText: string | null = null
 
   if (typeof message === 'string') {
-    const trimmed = message.trim()
-    if (trimmed) {
-      latestMessage = {
-        role: 'user',
-        content: trimmed
-      }
-    }
+    messageText = message
   } else if (message && typeof message === 'object') {
-    latestMessage = message
+    // 如果是ChatMessage对象，提取文本内容
+    if (Array.isArray(message.content)) {
+      const textContents = message.content.filter(item => item.type === 'text')
+      if (textContents.length > 0 && textContents[0].text) {
+        messageText = textContents[0].text
+      }
+    } else {
+      messageText = message.content
+    }
   }
 
-  const requestConversationHistory = [...conversationHistory]
-  if (latestMessage) {
-    requestConversationHistory.push(latestMessage)
-  }
-
-  const requestBody = buildChatRequestBody(requestConversationHistory, options)
+  const requestBody = buildChatRequestBody(messageText, conversationHistory, options)
   console.log('requestBody', requestBody)
   const abortController = new AbortController()
 
