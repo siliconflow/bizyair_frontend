@@ -115,13 +115,11 @@ function renderMarkdownSafely(text: string): string {
 
 /**
  * 构建聊天请求体
- * @param message 当前消息内容（可选，如果只发送历史则为空）
- * @param conversationHistory 对话历史
+ * @param conversationHistory 对话历史（应包含当前最新消息）
  * @param options API选项
  * @returns 请求体对象
  */
 export function buildChatRequestBody(
-  message: string | null,
   conversationHistory: ChatMessage[] = [],
   options: Partial<ChatApiOptions> = {}
 ): any {
@@ -131,11 +129,6 @@ export function buildChatRequestBody(
       ...defaultApiOptions.model_config,
       ...options.model_config
     }
-  }
-
-  // 如果有新消息，则添加到请求体中
-  if (message && message.trim()) {
-    requestBody.message = message
   }
 
   return requestBody
@@ -297,24 +290,27 @@ export async function sendStreamChatRequest(
   callbacks: StreamCallbacks,
   options: Partial<ChatApiOptions> = {}
 ): Promise<AbortController> {
-  // 提取消息文本内容
-  let messageText: string | null = null
+  // 提取消息文本内容并构建最新对话历史
+  let latestMessage: ChatMessage | null = null
 
   if (typeof message === 'string') {
-    messageText = message
-  } else if (message && typeof message === 'object') {
-    // 如果是ChatMessage对象，提取文本内容
-    if (Array.isArray(message.content)) {
-      const textContents = message.content.filter(item => item.type === 'text')
-      if (textContents.length > 0 && textContents[0].text) {
-        messageText = textContents[0].text
+    const trimmed = message.trim()
+    if (trimmed) {
+      latestMessage = {
+        role: 'user',
+        content: trimmed
       }
-    } else {
-      messageText = message.content
     }
+  } else if (message && typeof message === 'object') {
+    latestMessage = message
   }
 
-  const requestBody = buildChatRequestBody(messageText, conversationHistory, options)
+  const requestConversationHistory = [...conversationHistory]
+  if (latestMessage) {
+    requestConversationHistory.push(latestMessage)
+  }
+
+  const requestBody = buildChatRequestBody(requestConversationHistory, options)
   console.log('requestBody', requestBody)
   const abortController = new AbortController()
 
@@ -412,7 +408,7 @@ export function base64ToFile(
 
   // 将base64解码为二进制数据
   const byteCharacters = atob(base64Content)
-  const byteArrays: Uint8Array[] = []
+  const byteArrays: BlobPart[] = []
 
   for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
     const slice = byteCharacters.slice(offset, offset + 1024)
