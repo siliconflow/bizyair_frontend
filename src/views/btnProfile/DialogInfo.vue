@@ -82,7 +82,7 @@
           {{ statusStore.userWallte.total_balance_amount || 0
           }}<span>{{ $t('btnProfile.userInfo.coin') }}</span>
         </n-tooltip>
-        <span class="btn" @click="orderStore.showProduct = true">{{
+        <span class="btn" @click="handleRechargeClick">{{
           $t('btnProfile.userInfo.recharge')
         }}</span>
       </div>
@@ -203,13 +203,12 @@
 <script setup lang="ts">
   import { NModal, NTooltip } from 'naive-ui'
   import { useStatusStore } from '@/stores/userStatus'
-  import { useOrderStore } from '@/stores/orderStore'
   import { useI18n } from 'vue-i18n'
   import { computed } from 'vue'
+  import { useConfirm } from '@/components/modules/vConfirm'
 
   useI18n()
   const statusStore = useStatusStore()
-  const orderStore = useOrderStore()
   const toUploadInfo = () => {
     statusStore.showInfoDialog = false
     statusStore.showUploadInfoDialog = true
@@ -244,6 +243,16 @@
     }
     statusStore.coinsParam.expire_days = 365
     statusStore.handlePropertyDialog(true)
+  }
+
+  const handleRechargeClick = async () => {
+    const res = await useConfirm({
+      title: '提示',
+      content: '插件不再支持支付功能，请前往 bizyair.cn 操作',
+      cancelText: '取消',
+      continueText: '前往 bizyair.cn'
+    })
+    if (res) window.open('https://bizyair.cn', '_blank')
   }
 </script>
 <style scoped lang="less">
