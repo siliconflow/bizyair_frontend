@@ -19,12 +19,10 @@
 
   const { t } = useI18n()
   const store = useModelSelectStore()
-
   const props = defineProps<{
     showSortPopover: boolean
     page: ModeTabType
   }>()
-
   const emit = defineEmits<{
     (e: 'update:showSortPopover', value: boolean): void
     (e: 'fetchData'): void
@@ -135,7 +133,7 @@
         ...store[props.page].filterState.base_models
       ]
     }
-
+    console.log(store[props.page]) // test
     await nextTick()
     emit('filter-data-ready')
   }

@@ -143,7 +143,6 @@
     await nextTick()
     emit('filter-data-ready')
   }
-
   const getSortLabel = (sort: SortValue) => {
     switch (sort) {
       case 'Auto':
