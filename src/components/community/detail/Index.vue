@@ -1462,11 +1462,12 @@
   .Checkpoint {
     background: rgba(109, 40, 217, 0.4);
   }
-
   .LoRA {
     background: rgba(244, 63, 94, 0.4);
   }
-
+  .UNet {
+    background: rgba(111, 63, 94, 0.4);
+  }
   .Controlnet {
     background: rgba(255, 255, 255, 0.4);
   }

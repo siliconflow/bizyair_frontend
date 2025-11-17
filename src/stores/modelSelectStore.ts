@@ -94,7 +94,7 @@ export const useModelSelectStore = defineStore('modelSelect', {
         baseModelTypes: [],
         filterState: {
           keyword: '',
-          sort: 'Recently',
+          sort: 'Most Used',
           model_types: [],
           base_models: [],
           selected_model_types: [],
@@ -165,7 +165,7 @@ export const useModelSelectStore = defineStore('modelSelect', {
           base_models: [],
           selected_model_types: [],
           selected_base_models: [],
-          sort: 'Recently',
+          sort: page === 'community' ? 'Most Used' : 'Recently',
           is_user_cleared: false
         },
         scrollPosition: 0
