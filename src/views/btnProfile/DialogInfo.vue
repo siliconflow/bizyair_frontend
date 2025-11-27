@@ -8,22 +8,15 @@
     content-style="padding: 0 32px 24px 32px;"
     :bordered="false"
   >
-    <div class="info-container" :class="{ 'vip-container': statusStore.usersMetadata.level === 2 }">
-      <div
-        class="avatar-wrapper"
-        :class="{ 'vip-avatar-wrapper': statusStore.usersMetadata.level === 2 }"
-      >
+    <div class="info-container" :class="{ 'vip-container': isVip }">
+      <div class="avatar-wrapper" :class="{ 'vip-avatar-wrapper': isVip }">
         <img class="avatar" :src="statusStore.usersMetadata.avatar || statusStore.userAvatar" />
-        <n-tooltip v-if="statusStore.usersMetadata.level === 2" placement="bottom" trigger="hover">
-          <template #trigger>
-            <img class="vip-frame" src="@/assets/vip.png" />
-          </template>
-          {{ $t('btnProfile.userInfo.vipRemaining', { days: remainingDays }) }}
-        </n-tooltip>
+        <img v-if="isVip" class="vip-corner-badge" src="@/assets/user_level/headerVipLogo.svg" />
       </div>
       <div class="info" @click="toUploadInfo">
-        <p class="user-name" :class="{ 'vip-name': statusStore.usersMetadata.level === 2 }">
+        <p class="user-name" :class="{ 'vip-name': isVip }">
           {{ statusStore.usersMetadata.name }}
+          <span v-if="isVip" class="vip-badge">VIP</span>
         </p>
         <p class="user-title">
           {{ statusStore.usersMetadata.introduction || $t('btnProfile.userInfo.lazyText') }}
@@ -63,7 +56,31 @@
         </svg>
       </span>
     </div>
-    <div class="financial">
+    <!-- VIP会员卡片 -->
+    <div v-if="isVip" class="vip-membership-card">
+      <div class="vip-membership-content">
+        <div class="vip-membership-info">
+          <div class="vip-membership-title">
+            <svg class="vip-crown-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M510.955102 831.738776c-23.510204 0-45.453061-9.926531-61.64898-27.167347L138.971429 468.114286c-28.734694-31.346939-29.779592-79.412245-1.567347-111.804082l117.55102-135.314286c15.673469-18.285714 38.661224-28.734694 63.216327-28.734694H705.306122c24.032653 0 47.020408 10.44898 62.693878 28.734694l118.073469 135.314286c28.212245 32.391837 27.689796 80.457143-1.567347 111.804082L572.081633 804.571429c-15.673469 17.240816-38.138776 27.167347-61.126531 27.167347z"
+                fill="#fcb002"
+              />
+              <path
+                d="M506.77551 642.612245c-5.22449 0-10.971429-2.089796-15.15102-6.269388l-203.755102-208.979592c-7.836735-8.359184-7.836735-21.420408 0.522449-29.779592 8.359184-7.836735 21.420408-7.836735 29.779592 0.522449l189.12653 193.828572 199.053061-194.351021c8.359184-7.836735 21.420408-7.836735 29.779592 0.522449 7.836735 8.359184 7.836735 21.420408-0.522449 29.779592l-214.204081 208.979592c-4.179592 3.657143-9.404082 5.746939-14.628572 5.746939z"
+                fill="#FFF7E1"
+              />
+            </svg>
+            <span>{{ vipLevelName }}</span>
+          </div>
+          <div class="vip-membership-expire">有效期至{{ vipExpireDate }}</div>
+        </div>
+        <n-button class="vip-renew-button" @click="handleRenewClick">{{
+          $t('btnProfile.product.renewNow')
+        }}</n-button>
+      </div>
+    </div>
+    <div class="financial" :class="{ 'vip-connected': isVip }">
       <div class="balance-title">
         <img
           class="coin-icon"
@@ -214,16 +231,31 @@
     statusStore.showUploadInfoDialog = true
   }
 
-  const remainingDays = computed(() => {
-    const subExpireAt = (statusStore.usersMetadata as any).sub_expire_at
-    if (!subExpireAt?.[2]) return 0
+  // const remainingDays = computed(() => {
+  //   const subExpireAt = (statusStore.usersMetadata as any).sub_expire_at
+  //   if (!subExpireAt?.[2]) return 0
 
-    const expireDate = new Date(subExpireAt[2])
-    const today = new Date()
-    // 计算两个日期之间的差值（毫秒）
-    const diffTime = expireDate.getTime() - today.getTime()
-    // 转换为天数并向上取整
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  //   const expireDate = new Date(subExpireAt[2])
+  //   const today = new Date()
+  //   // 计算两个日期之间的差值（毫秒）
+  //   const diffTime = expireDate.getTime() - today.getTime()
+  //   // 转换为天数并向上取整
+  //   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  // })
+
+  const isVip = computed(() => {
+    const level = statusStore.usersMetadata.level
+    return level === 10 || level === 20
+  })
+
+  const vipExpireDate = computed(() => {
+    const metadata = statusStore.usersMetadata as any
+    if (!metadata || !metadata.sub_expire_at || !metadata.level) return ''
+    return metadata.sub_expire_at[metadata.level] || ''
+  })
+
+  const vipLevelName = computed(() => {
+    return (statusStore.usersMetadata as any).user_level_str || '会员'
   })
 
   const copyID = () => {
@@ -254,6 +286,16 @@
     })
     if (res) window.open('https://bizyair.cn', '_blank')
   }
+
+  const handleRenewClick = async () => {
+    const res = await useConfirm({
+      title: '提示',
+      content: '插件不再支持支付功能，请前往 bizyair.cn 操作',
+      cancelText: '取消',
+      continueText: '前往 bizyair.cn'
+    })
+    if (res) window.open('https://bizyair.cn', '_blank')
+  }
 </script>
 <style scoped lang="less">
   p,
@@ -276,6 +318,7 @@
       border-radius: 12px;
       padding: 32px 16px 0 16px;
     }
+
     .avatar-wrapper {
       position: relative;
     }
@@ -290,6 +333,15 @@
       height: 71px;
       top: -12px;
       left: -3px;
+      z-index: 2;
+    }
+
+    .vip-corner-badge {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      bottom: 0;
+      right: 0;
       z-index: 2;
     }
 
@@ -310,6 +362,7 @@
     .info {
       flex: 1;
       cursor: pointer;
+
       p {
         white-space: nowrap;
         overflow: hidden;
@@ -330,6 +383,18 @@
         color: #ffdb07;
       }
 
+      .vip-badge {
+        display: inline-block;
+        margin-left: 4px;
+        padding: 2px 8px;
+        font-size: 12px;
+        font-weight: 500;
+        background: linear-gradient(90deg, #fbbf24, #eab308);
+        color: #000;
+        border-radius: 4px;
+        line-height: 1.4;
+      }
+
       .user-title {
         font-size: 12px;
         line-height: 22px;
@@ -338,6 +403,7 @@
         display: flex;
         align-items: center;
         gap: 6px;
+
         span {
           font-size: 10px;
         }
@@ -360,6 +426,7 @@
       user-select: none;
       border: 1px solid #2c2c32;
       box-sizing: content-box;
+
       &:hover {
         background-color: #1f2937;
         border: 1px solid #334155;
@@ -380,6 +447,12 @@
     margin-top: 16px;
     box-sizing: content-box;
     background: linear-gradient(105deg, #fff3e2 0.27%, #fceacf 33.67%, #ffdba6 67.07%);
+
+    &.vip-connected {
+      margin-top: 0;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
 
     .coin-icon {
       width: 24px;
@@ -473,12 +546,14 @@
       }
     }
   }
+
   .handles {
     display: flex;
     padding-top: 24px;
     flex-wrap: wrap;
     width: 100%;
     box-sizing: border-box;
+
     .handles-item {
       width: 50%;
       box-sizing: border-box;
@@ -486,15 +561,18 @@
       cursor: pointer;
       transition: all 0.3s;
       user-select: none;
+
       &:hover {
         background-color: rgba(124, 58, 237, 0.2);
       }
     }
+
     .icon {
       display: block;
       width: 16px;
       margin: 0 auto;
     }
+
     .word {
       display: block;
       width: 100%;
@@ -502,5 +580,67 @@
       font-size: 12px;
       // margin-top: 4px;
     }
+  }
+
+  /* VIP会员卡片样式 */
+  .vip-membership-card {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: #ffd18e;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .vip-membership-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .vip-membership-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .vip-membership-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 16px;
+    font-weight: normal;
+    color: #1f2937;
+
+    .vip-crown-icon {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .vip-renew-button {
+    height: 32px;
+    padding: 10px;
+    padding-top: 4px;
+    font-size: inherit;
+    font-weight: normal;
+    color: #fff;
+    background: linear-gradient(270deg, #ff740a 0%, #ffb200 100%);
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    text-align: center;
+    box-sizing: border-box;
+    flex-shrink: 0;
+
+    &:hover {
+      background: linear-gradient(270deg, #ffb200 0%, #ffb200 100%);
+    }
+  }
+
+  .vip-membership-expire {
+    font-size: 12px;
+    color: #6b7280;
   }
 </style>
