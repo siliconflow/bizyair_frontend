@@ -10,7 +10,6 @@
     </span>
     <span class="button-text">{{ $t('buttons.docs') }}</span>
   </div>
-  
 </template>
 <script setup lang="ts">
   const openDocs = () => {
