@@ -284,7 +284,7 @@
       cancelText: '取消',
       continueText: '前往 bizyair.cn'
     })
-    if (res) window.open('https://bizyair.cn', '_blank')
+    if (res) window.open('https://bizyair.cn/user/topup', '_blank')
   }
 
   const handleRenewClick = async () => {
@@ -294,7 +294,7 @@
       cancelText: '取消',
       continueText: '前往 bizyair.cn'
     })
-    if (res) window.open('https://bizyair.cn', '_blank')
+    if (res) window.open('https://bizyair.cn/user/topup', '_blank')
   }
 </script>
 <style scoped lang="less">
