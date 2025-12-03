@@ -23,7 +23,7 @@ const createModelFetchExtension = (nodeName, endpoint) => {
                                 // 服务器模式，需要token
                                 return new Promise((resolve) => {
                                     const checkToken = () => {
-                                        const token = getCookie("bizy_token");
+                                        const token = getCookie("auth_token");                                
                                         if (token) {
                                             clearInterval(timer);
                                             fetchWithToken(token).then(resolve);
