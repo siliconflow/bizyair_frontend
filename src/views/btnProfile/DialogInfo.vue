@@ -223,6 +223,7 @@
   import { useI18n } from 'vue-i18n'
   import { computed } from 'vue'
   import { useConfirm } from '@/components/modules/vConfirm'
+  import { get_plugin_tmp_token } from '@/api/auth'
 
   useI18n()
   const statusStore = useStatusStore()
@@ -284,7 +285,11 @@
       cancelText: '取消',
       continueText: '前往 bizyair.cn'
     })
-    if (res) window.open('https://bizyair.cn/user/topup', '_blank')
+    if (res) {
+      const tmp_token = await get_plugin_tmp_token()
+      // window.open(`http://localhost:3000/user/topup?tmp_auth=${tmp_token.data.token}`, '_blank')
+      window.open(`https://bizyair.cn/user/topup?tmp_token=${tmp_token.data.token}`, '_blank')
+    }
   }
 
   const handleRenewClick = async () => {
@@ -294,7 +299,11 @@
       cancelText: '取消',
       continueText: '前往 bizyair.cn'
     })
-    if (res) window.open('https://bizyair.cn/user/topup', '_blank')
+    if (res) {
+      const tmp_token = await get_plugin_tmp_token()
+      // window.open(`http://localhost:3000/user/topup?tmp_auth=${tmp_token.data.token}`, '_blank')
+      window.open(`https://bizyair.cn/user/topup?tmp_token=${tmp_token.data.token}`, '_blank')
+    }
   }
 </script>
 <style scoped lang="less">
