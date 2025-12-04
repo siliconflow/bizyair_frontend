@@ -223,7 +223,6 @@
   import { useI18n } from 'vue-i18n'
   import { computed } from 'vue'
   import { useConfirm } from '@/components/modules/vConfirm'
-  import { customFetch } from '@/utils/customFetch'
   import { get_plugin_tmp_token } from '@/api/auth'
 
   useI18n()
