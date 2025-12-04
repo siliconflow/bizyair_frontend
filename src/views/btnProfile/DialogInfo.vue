@@ -224,6 +224,7 @@
   import { computed } from 'vue'
   import { useConfirm } from '@/components/modules/vConfirm'
   import { customFetch } from '@/utils/customFetch'
+  import { get_plugin_tmp_token } from '@/api/auth'
 
   useI18n()
   const statusStore = useStatusStore()
@@ -286,10 +287,7 @@
       continueText: '前往 bizyair.cn'
     })
     if (res) {
-      const tmp_token = await customFetch('/bizyair/auth/plugin_tmp_token', {
-        method: 'POST',
-        credentials: 'include'
-      })
+      const tmp_token = await get_plugin_tmp_token()
       // window.open(`http://localhost:3000/user/topup?tmp_auth=${tmp_token.data.token}`, '_blank')
       window.open(`https://bizyair.cn/user/topup?tmp_token=${tmp_token.data.token}`, '_blank')
     }
@@ -303,10 +301,7 @@
       continueText: '前往 bizyair.cn'
     })
     if (res) {
-      const tmp_token = await customFetch('/bizyair/auth/plugin_tmp_token', {
-        method: 'POST',
-        credentials: 'include'
-      })
+      const tmp_token = await get_plugin_tmp_token()
       // window.open(`http://localhost:3000/user/topup?tmp_auth=${tmp_token.data.token}`, '_blank')
       window.open(`https://bizyair.cn/user/topup?tmp_token=${tmp_token.data.token}`, '_blank')
     }
