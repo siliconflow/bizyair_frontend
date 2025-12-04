@@ -91,8 +91,8 @@
     statusStore.handleApiKeyDialog(false)
   }
   const openOAuthPopup = async (setKey: (key: string) => void) => {
-    // const clientId = 'SFtNABXGEb5rZxogl8p3cM'
-    const clientId = 'SF1RAE3KAmVBGTTHRkAL87'
+    const clientId = 'SFtNABXGEb5rZxogl8p3cM'
+    // const clientId = 'SF1RAE3KAmVBGTTHRkAL87'
     const ACCOUNT_ENDPOINT = 'https://account.siliconflow.cn'
     const authUrl = `${ACCOUNT_ENDPOINT}/oauth?client_id=${clientId}`
     const popup = window.open(authUrl, 'oauthPopup', 'width=600,height=600')
