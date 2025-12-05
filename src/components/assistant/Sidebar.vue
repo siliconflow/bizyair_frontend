@@ -920,51 +920,66 @@
     () => sidebarStore.nodeInfo,
     async newValue => {
       console.log('节点信息更新:', newValue)
-      if (newValue?.imageInfo?.url || newValue?.imageInfo?.base64) {
-        let ossUrl = ''
 
-        try {
-          if (newValue.imageInfo.filename && newValue.imageInfo.filename.startsWith('https://')) {
-            // 已经是 OSS URL，直接使用
-            ossUrl = newValue.imageInfo.filename
-          } else if (newValue.imageInfo.url && newValue.imageInfo.url.startsWith('https://')) {
-            // 已经是 OSS URL，直接使用
-            ossUrl = newValue.imageInfo.url
-          } else if (newValue.imageInfo.base64) {
-            // 如果有 base64，需要上传到 OSS
-            const base64Data = newValue.imageInfo.base64.startsWith('data:')
-              ? newValue.imageInfo.base64
-              : `data:image/webp;base64,${newValue.imageInfo.base64}`
-
-            const file = base64ToFile(base64Data, 'image.webp', 'image/webp')
-            const { url } = await imageToOss(file)
-            ossUrl = url
-          } else if (newValue.imageInfo.url) {
-            // 从本地 URL 获取文件并上传到 OSS
-            const response = await fetch(newValue.imageInfo.url)
-            const blob = await response.blob()
-            const file = new File([blob], 'image.webp', { type: 'image/webp' })
-            const { url } = await imageToOss(file)
-            ossUrl = url
-          }
-        } catch (error) {
-          console.error('处理图片失败:', error)
-          useToaster({
-            type: 'error',
-            message: '图片处理失败'
-          })
-          return
-        }
-
-        // 设置预览图片和 OSS URL（统一使用 OSS URL）
-        previewImage.value = ossUrl
-        uploadedImageOssUrl.value = ossUrl
-
-        // 聚焦到输入框
-        setTimeout(() => {
-          textareaRef.value?.focus()
-        }, 0)
+      // 如果节点信息为空或没有图片信息，直接返回
+      if (!newValue || !newValue.imageInfo) {
+        return
       }
+
+      // 检查是否有有效的 OSS 图片（filename 或 url 以 https:// 开头）或 base64
+      const hasOssFilename = newValue.imageInfo.filename?.startsWith('https://')
+      const hasOssUrl = newValue.imageInfo.url?.startsWith('https://')
+      const hasValidBase64 = newValue.imageInfo.base64 && newValue.imageInfo.base64.trim() !== ''
+
+      // 只有当有 OSS URL 或 base64 时才处理
+      if (!hasOssFilename && !hasOssUrl && !hasValidBase64) {
+        console.log('节点中没有有效的 OSS 图片，跳过处理')
+        return
+      }
+
+      let ossUrl = ''
+
+      try {
+        if (newValue.imageInfo.filename && newValue.imageInfo.filename.startsWith('https://')) {
+          // 已经是 OSS URL，直接使用
+          ossUrl = newValue.imageInfo.filename
+        } else if (newValue.imageInfo.url && newValue.imageInfo.url.startsWith('https://')) {
+          // 已经是 OSS URL，直接使用
+          ossUrl = newValue.imageInfo.url
+        } else if (newValue.imageInfo.base64) {
+          // 如果有 base64，需要上传到 OSS
+          const base64Data = newValue.imageInfo.base64.startsWith('data:')
+            ? newValue.imageInfo.base64
+            : `data:image/webp;base64,${newValue.imageInfo.base64}`
+
+          const file = base64ToFile(base64Data, 'image.webp', 'image/webp')
+          const { url } = await imageToOss(file)
+          ossUrl = url
+        } else if (newValue.imageInfo.url) {
+          // 从本地 URL 获取文件并上传到 OSS
+          const response = await fetch(newValue.imageInfo.url)
+          const blob = await response.blob()
+          const file = new File([blob], 'image.webp', { type: 'image/webp' })
+          const { url } = await imageToOss(file)
+          ossUrl = url
+        }
+      } catch (error) {
+        console.error('处理图片失败:', error)
+        useToaster({
+          type: 'error',
+          message: '图片处理失败'
+        })
+        return
+      }
+
+      // 设置预览图片和 OSS URL（统一使用 OSS URL）
+      previewImage.value = ossUrl
+      uploadedImageOssUrl.value = ossUrl
+
+      // 聚焦到输入框
+      setTimeout(() => {
+        textareaRef.value?.focus()
+      }, 0)
     },
     { deep: true }
   )
