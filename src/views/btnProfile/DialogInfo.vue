@@ -288,7 +288,7 @@
     if (res) {
       const tmp_token = await get_plugin_tmp_token()
       // window.open(`http://localhost:3000/user/topup?tmp_auth=${tmp_token.data.token}`, '_blank')
-      window.open(`https://bizyair.cn/user/topup?tmp_token=${tmp_token.data.token}`, '_blank')
+      window.open(`https://bizyair.cn/user/topup?tmp_auth=${tmp_token.data.token}`, '_blank')
     }
   }
 
@@ -302,7 +302,7 @@
     if (res) {
       const tmp_token = await get_plugin_tmp_token()
       // window.open(`http://localhost:3000/user/topup?tmp_auth=${tmp_token.data.token}`, '_blank')
-      window.open(`https://bizyair.cn/user/topup?tmp_token=${tmp_token.data.token}`, '_blank')
+      window.open(`https://bizyair.cn/user/topup?tmp_auth=${tmp_token.data.token}`, '_blank')
     }
   }
 </script>
