@@ -1,5 +1,5 @@
 import { app } from "../../scripts/app.js";
-import { $el } from "../../scripts/ui.js";
+import { $el } from "./utils/el.js";
 import { styleMenus } from "./subassembly/styleMenus.js";
 import './bizyair_frontend.js'
 class FloatingButton {

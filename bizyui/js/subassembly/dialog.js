@@ -1,4 +1,4 @@
-import { $el } from "../../../scripts/ui.js";
+import { $el } from "../utils/el.js";
 
 
 function generateUUID() {
