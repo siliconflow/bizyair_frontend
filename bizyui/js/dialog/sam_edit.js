@@ -1,6 +1,7 @@
 import { api } from "../../../scripts/api.js";
 import { ComfyApp } from "../../../scripts/app.js";
-import { $el, ComfyDialog, } from "../../../scripts/ui.js";
+import { ComfyDialog } from "../utils/dialog.js";
+import { $el } from "../utils/el.js";
 
 function loadImage(imagePath) {
     return new Promise((resolve, reject) => {
@@ -123,10 +124,16 @@ class SAMEditorDialog extends ComfyDialog {
 
     is_layout_created = false;
     constructor() {
-      super();
-      this.element = $el("div.comfy-modal", { parent: document.body }, [
-        $el("div.comfy-modal-content", [...this.createButtons()])
-      ]);
+      super(); // super() 已经创建了 this.element，现在只需要添加按钮
+      const content = this.element.querySelector('.comfy-modal-content');
+      if (content) {
+        const buttons = this.createButtons();
+        buttons.forEach(button => {
+          if (button instanceof Element) {
+            content.appendChild(button);
+          }
+        });
+      }
     }
     createButtons() {
       return [];
