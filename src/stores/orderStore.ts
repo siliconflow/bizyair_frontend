@@ -40,10 +40,10 @@ export const useOrderStore = defineStore('userOrder', {
         delete temp.status
       }
       const res = await getPayPage(temp)
-      const data = res.data
-      data.list = data.list.filter((item: any) => item.platform !== 'share_code')
-      data.total = data.list.length
-      this.payList = res.data
+      const data = res.data || {}
+      data.list = (data.list || []).filter((item: any) => item.platform !== 'share_code')
+      data.total = typeof data.total === 'number' ? data.total : data.list.length
+      this.payList = data
       return data
     },
     countExpire(expireAt: string) {
