@@ -1,7 +1,7 @@
 import { getCookie } from "./subassembly/tools.js";
 
 // API基础地址
-const API_BASE_URL = "https://uat-api.bizyair.cn/y/v1";
+const API_BASE_URL = "https://api.bizyair.cn/y/v1";
 
 /**
  * 货币类型枚举，包含徽章配置信息
