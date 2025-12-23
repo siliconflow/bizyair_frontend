@@ -1,8 +1,3 @@
-import { getCookie } from "./subassembly/tools.js";
-
-// API基础地址
-const API_BASE_URL = "https://api.bizyair.cn/y/v1";
-
 /**
  * 货币类型枚举，包含徽章配置信息
  */
@@ -55,7 +50,6 @@ export function hasModelInput(node) {
   // 如果临时存储中没有，则从outputs中查找
   const localized_name = "bizyair_model_name";
   if (!node.outputs) {
-    console.error(`[modelPrice-hasModelInput] error finding node outputs`);
     return null;
   }
   return node.outputs.find((item) => item.name === localized_name);
@@ -86,7 +80,6 @@ export function addCustomBadge(node, badgeOptions) {
   // 每次添加badge 清空所有badge 因为badge没有一个唯一标识符，并且价格展示也就一个badge 所以直接全部清除
   node.badges = [];
   node.badges.push(() => customBadge);
-  console.log(`[addCustomBadge] 添加badge成功 徽章信息`, node.badges);
 }
 
 /**
@@ -218,22 +211,16 @@ export async function addPriceBadgeToNode(node, modelName = "") {
  */
 export async function fetchNodePrice(model, nodeInputs) {
   try {
-    // 从cookie中获取认证token
-    const authToken = getCookie("bizy_token");
-    if (!authToken) {
-      throw new Error("未找到认证Token，请先登录");
-    }
     if (!nodeInputs) {
       throw new Error("节点输入信息为空，无法获取价格");
     }
-
+    // 调用bizyengine价格查询接口
     const response = await fetch(
-      `${API_BASE_URL}/trd_api/node/${model}/price`,
+      `/bizyair/trd_api_pricing?model=${encodeURIComponent(model)}`,
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(nodeInputs),
       }
@@ -244,7 +231,6 @@ export async function fetchNodePrice(model, nodeInputs) {
     }
 
     const result = await response.json();
-    console.log("节点价格查询结果:", result);
     return result;
   } catch (error) {
     console.error("获取节点价格失败:", error);
