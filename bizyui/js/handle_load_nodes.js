@@ -5,9 +5,9 @@ import { addPriceBadgeToNode, hasModelInput } from "./model_price.js";
 const BIZYAIR_MODEL_TYPE_KEY = "bizyair_model_type";
 
 // 获取node 的模型配置input
-export async function applyBadgeToNode(_this) {
-  // 优先从节点属性中恢复模型类型（用于工作流加载场景）
-  if (_this.properties && _this.properties[BIZYAIR_MODEL_TYPE_KEY]) {
+export async function applyBadgeToNode(_this, forceRefresh = false) {
+  // 如果不是强制刷新，优先从节点属性中恢复模型类型（用于工作流加载场景）
+  if (!forceRefresh && _this.properties && _this.properties[BIZYAIR_MODEL_TYPE_KEY]) {
     const modelType = _this.properties[BIZYAIR_MODEL_TYPE_KEY];
     await addPriceBadgeToNode(_this, modelType);
     return;
@@ -26,8 +26,8 @@ export async function applyBadgeToNode(_this) {
       return;
     }
 
-    // 解析模型类型
-    const modelType = getModelTypeFromHiddenInput(hiddenOutput);
+    // 解析模型类型（传入节点对象以获取用户选择的model）
+    const modelType = getModelTypeFromHiddenInput(hiddenOutput, _this);
     
     // 将hiddenOutput临时存储在节点上，方便后续使用
     _this._bizyairHiddenOutput = hiddenOutput;
@@ -48,10 +48,30 @@ export async function applyBadgeToNode(_this) {
 }
 
 // 从hiddenInput中获取模型类型
-function getModelTypeFromHiddenInput(hiddenOutput){
+function getModelTypeFromHiddenInput(hiddenOutput, node){
   const modelJson = JSON.parse(hiddenOutput.type);
+  
+  // 从节点的widgets中获取用户选择的model
+  let selectedModel = null;
+  const possibleWidgetNames = ["model", "model_name"];
+  
+  if (node.widgets && Array.isArray(node.widgets)) {
+    for (const widget of node.widgets) {
+      if (possibleWidgetNames.includes(widget.name) && widget.value) {
+        selectedModel = widget.value;
+        break;
+      }
+    }
+  }
+  
+  // 如果找到了用户选择的model，使用它作为key
+  if (selectedModel && modelJson[selectedModel]) {
+    return modelJson[selectedModel];
+  }
+  
+  // 如果没找到或key不存在，回退到使用第一个键（兼容旧逻辑）
   const modelsList = Object.keys(modelJson);
-  return modelJson[modelsList[0]]
+  return modelJson[modelsList[0]];
 }
 
 // 自定义节点创建处理函数
