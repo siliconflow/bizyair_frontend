@@ -163,6 +163,11 @@ export async function addPriceBadgeToNode(node, modelName = "") {
       });
     }
 
+    // 如果输入信息中不包含model，需要手动添加model进去
+    if (!nodeInputs.model) {
+      nodeInputs.model = modelName;
+    }
+
     // 获取价格信息
     const priceResult = await fetchNodePrice(modelName, nodeInputs);
 
