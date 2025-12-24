@@ -10,13 +10,9 @@ app.registerExtension({
       // 不仅仅是切换model才会修改模型定价，比如切换输入参数也会修改模型定价
       node.widgets.forEach((widget) => {
         widget.callback = async function () {
-            await applyBadgeToNode(node);
-          };
-        // if (possibleWidgetNames.includes(widget.name)) {
-        // widget.callback = async function () {
-        //   await applyBadgeToNode(node);
-        // };
-        // }
+          // 用户手动修改widget时，强制刷新badge（不使用缓存的模型类型）
+          await applyBadgeToNode(node, true);
+        };
       });
     }
   },
