@@ -108,7 +108,7 @@ const SILICONCLOUD_MODELS_CONFIG = {
 
 // 统一的 Extension - 使用 nodeCreated 钩子避免原型覆盖冲突
 app.registerExtension({
-    name: 'bizyair.siliconcloud.models.unified',
+    name: 'bizyair.siliconcloud.models.llmOrVlm',
 
     async nodeCreated(node, app) {
         const config = SILICONCLOUD_MODELS_CONFIG[node.comfyClass];
