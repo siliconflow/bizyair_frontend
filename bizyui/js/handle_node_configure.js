@@ -9,10 +9,10 @@ app.registerExtension({
       // 只有model选择的widget才注册callback函数
       // 不仅仅是切换model才会修改模型定价，比如切换输入参数也会修改模型定价
       node.widgets.forEach((widget) => {
-        widget.callback = async function () {
-          // 用户手动修改widget时，强制刷新badge（不使用缓存的模型类型）
-          await applyBadgeToNode(node, true);
-        };
+        // widget.callback = async function () {
+        //   // 用户手动修改widget时，强制刷新badge（不使用缓存的模型类型）
+        //   await applyBadgeToNode(node, true);
+        // };
       });
     }
   },
