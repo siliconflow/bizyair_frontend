@@ -146,14 +146,12 @@ export function getBadgeConfigByCoinType(coinType, priceText) {
 
 /**
  * 为节点添加价格徽章
- * TODO 重新添加价格徽章的时候 节点元素不能重新render
  * @param {Object} node - 节点对象，包含 widgets 和其他节点信息
+ * @param {string} modelName - 模型名称
  */
 export async function addPriceBadgeToNode(node, modelName = "") {
   try {
-    console.log(`[modelPrice] addPriceBadgeToNode`, node);
-    // 从节点 widgets 中提取价格计算所需的数据 这个也可以封装一个函数
-    // NODE 上的type 考虑是否也封装一个函数
+    // 从节点 widgets 中提取价格计算所需的数据
     const nodeInputs = {};
     if (node.widgets && Array.isArray(node.widgets)) {
       node.widgets.forEach((widget) => {
@@ -161,6 +159,11 @@ export async function addPriceBadgeToNode(node, modelName = "") {
           nodeInputs[widget.name] = widget.value;
         }
       });
+    }
+
+    // 如果输入信息中不包含model，需要手动添加model进去
+    if (!nodeInputs.model) {
+      nodeInputs.model = modelName;
     }
 
     // 获取价格信息
@@ -172,11 +175,13 @@ export async function addPriceBadgeToNode(node, modelName = "") {
         priceResult.data.coin_type,
         priceResult.data.result
       );
+      
       // 添加价格徽章
       addCustomBadge(node, badgeConfig);
     }
   } catch (error) {
     console.error("添加价格徽章失败:", error);
+    
     // 添加错误徽章
     addCustomBadge(node, {
       text: "价格获取失败",
@@ -214,6 +219,7 @@ export async function fetchNodePrice(model, nodeInputs) {
     if (!nodeInputs) {
       throw new Error("节点输入信息为空，无法获取价格");
     }
+    
     // 调用bizyengine价格查询接口
     const response = await fetch(
       `/bizyair/trd_api_pricing?model=${encodeURIComponent(model)}`,
@@ -225,7 +231,7 @@ export async function fetchNodePrice(model, nodeInputs) {
         body: JSON.stringify(nodeInputs),
       }
     );
-
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
