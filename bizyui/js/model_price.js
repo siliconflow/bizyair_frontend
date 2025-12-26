@@ -1,3 +1,4 @@
+import { getCookie, getIsServerMode } from "./subassembly/tools.js";
 /**
  * 货币类型枚举，包含徽章配置信息
  */
@@ -219,14 +220,30 @@ export async function fetchNodePrice(model, nodeInputs) {
     if (!nodeInputs) {
       throw new Error("节点输入信息为空，无法获取价格");
     }
-    
+    const isServerMode = await getIsServerMode();
+    let token = null;
+    if (isServerMode) {
+        // 服务器模式，需要token
+        token = await new Promise((resolve) => {
+            const checkToken = () => {
+                const token = getCookie("bizy_token");
+                if (token) {
+                    clearInterval(timer);
+                    resolve(token);
+                }
+            };
+            const timer = setInterval(checkToken, 300);
+            checkToken(); // 立即执行一次检查
+        });
+    }
     // 调用bizyengine价格查询接口
     const response = await fetch(
       `/bizyair/trd_api_pricing?model=${encodeURIComponent(model)}`,
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": token
         },
         body: JSON.stringify(nodeInputs),
       }
