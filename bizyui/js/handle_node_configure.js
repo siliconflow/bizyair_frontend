@@ -30,7 +30,6 @@ app.registerExtension({
       }
       // 不仅仅是切换model才会修改模型定价，比如切换输入参数也会修改模型定价
       node.widgets.forEach(widget => {
-        console.log('widget', widget)
         // 对于prompt这种输入频繁的widget 不做获取价格操作
         if (ignoreWidgets.includes(widget.name)) {
           return
