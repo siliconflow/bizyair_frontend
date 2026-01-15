@@ -4,12 +4,33 @@ import { addPriceBadgeToNode, hasModelInput } from "./model_price.js";
 // 用于存储模型类型的属性名（会被序列化保存到工作流中）
 const BIZYAIR_MODEL_TYPE_KEY = "bizyair_model_type";
 
+/**
+ * 检查是否应该显示 API 节点价格徽章
+ * @returns {boolean} 如果设置开启则返回 true，否则返回 false
+ */
+function shouldShowApiPricingBadge() {
+  try {
+    const app = document.querySelector("#vue-app").__vue_app__;
+    const pinia = app.config.globalProperties.$pinia;
+    const settingStore = pinia._s.get("setting");
+    const showApiPricing = settingStore.get("Comfy.NodeBadge.ShowApiPricing");
+    return showApiPricing !== false;
+  } catch (error) {
+    // 如果无法获取 store 或出错，默认返回 true（保持原有行为）
+    return true;
+  }
+}
+
 // 获取node 的模型配置input
 export async function applyBadgeToNode(_this, forceRefresh = false) {
+  const shouldShowBadge = shouldShowApiPricingBadge();
+
   // 如果不是强制刷新，优先从节点属性中恢复模型类型（用于工作流加载场景）
   if (!forceRefresh && _this.properties && _this.properties[BIZYAIR_MODEL_TYPE_KEY]) {
     const modelType = _this.properties[BIZYAIR_MODEL_TYPE_KEY];
-    await addPriceBadgeToNode(_this, modelType);
+    if (shouldShowBadge) {
+      await addPriceBadgeToNode(_this, modelType);
+    }
     return;
   }
 
@@ -38,9 +59,12 @@ export async function applyBadgeToNode(_this, forceRefresh = false) {
     }
     _this.properties[BIZYAIR_MODEL_TYPE_KEY] = modelType;
 
-    await addPriceBadgeToNode(_this, modelType);
+    // 只有在设置开启时才添加badge
+    if (shouldShowBadge) {
+      await addPriceBadgeToNode(_this, modelType);
+    }
 
-    // 删除无用的outputs
+    // 无论是否添加badge，都要删除无用的outputs
     _this.outputs = _this.outputs.filter(
       (output) => output.name !== hiddenOutput.name
     );
