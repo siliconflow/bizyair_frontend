@@ -18,7 +18,7 @@ const createModelFetchExtension = (endpoint, app, node) => {
       const isServerMode = await getIsServerMode();
       let token = null;
       if (isServerMode) {
-        token = getCookie("bizy_token") || getCookie("auth_token");
+        token = getCookie("auth_token") || getCookie("auth_token");
       }
 
       const headers = {
