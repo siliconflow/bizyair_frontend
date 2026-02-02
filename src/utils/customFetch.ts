@@ -15,7 +15,7 @@ export function customFetch(url: string, options = {}, needDebounce = true, need
     fetchCache.set(url, now)
   }
 
-  const Authorization = (window as any).bizyAirAuthorization || Cookies.get('bizy_token') || ''
+  const Authorization = (window as any).bizyAirAuthorization || Cookies.get('auth_token') || ''
 
   // 添加自定义header
   const headers = {

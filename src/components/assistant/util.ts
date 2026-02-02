@@ -336,7 +336,7 @@ export async function sendStreamChatRequest(
     // 通知开始
     callbacks.onStart?.()
 
-    const Authorization = (window as any).bizyAirAuthorization || Cookies.get('bizy_token') || ''
+    const Authorization = (window as any).bizyAirAuthorization || Cookies.get('auth_token') || ''
 
     const response = await fetch(SERVER_MODEL_API_URL, {
       method: 'POST',

@@ -256,7 +256,7 @@ export function mount(container: string | Element, comfyUIApp?: any) {
       const timer = setInterval(() => {
         const authToken = document.cookie
           .split(';')
-          .find(cookie => cookie.trim().startsWith('bizy_token='))
+          .find(cookie => cookie.trim().startsWith('auth_token='))
         if (authToken) {
           clearInterval(timer)
           app.use(i18n)
@@ -281,7 +281,7 @@ export function mount(container: string | Element, comfyUIApp?: any) {
   //     const timer = setInterval(() => {
   //       const authToken = document.cookie
   //         .split(';')
-  //         .find(cookie => cookie.trim().startsWith('bizy_token='))
+  //         .find(cookie => cookie.trim().startsWith('auth_token='))
   //       if (authToken) {
   //         clearInterval(timer)
   //         app.use(i18n)

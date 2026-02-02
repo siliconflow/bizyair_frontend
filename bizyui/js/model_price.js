@@ -226,7 +226,7 @@ export async function fetchNodePrice(model, nodeInputs) {
         // 服务器模式，需要token
         token = await new Promise((resolve) => {
             const checkToken = () => {
-                const token = getCookie("bizy_token");
+                const token = getCookie("auth_token");
                 if (token) {
                     clearInterval(timer);
                     resolve(token);
