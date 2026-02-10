@@ -121,6 +121,10 @@ function initializeDynamicInputs(node) {
       }
     }
   });
+  // 添加下拉选择 widget
+  node.addWidget("combo", "version", "mode", () => {}, {
+    values: ["official", "third-party"],
+  });
 }
 
 app.registerExtension({
