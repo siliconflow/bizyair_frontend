@@ -24,7 +24,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: '20.9.0'
+          cache: 'npm'
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -49,13 +50,9 @@ jobs:
           # 写入临时的 version.txt（只在当前工作目录生效）
           echo "$DEV_VERSION" > version.txt
 
-      - name: Install npm dependencies
+      - name: Install dependencies
         run: |
-          npm ci
-
-      - name: Build frontend
-        run: |
-          npm run build
+          npm install
 
       - name: Install Python build dependencies
         run: |
@@ -64,8 +61,7 @@ jobs:
 
       - name: Build Python package
         run: |
-          rm -rf dist
-          bash scripts/build_python_package.sh
+          npm run build:py
 
       - name: Verify package version
         run: |
