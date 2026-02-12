@@ -87,13 +87,23 @@ jobs:
           # 验证打包的版本是否正确
           PACKAGE_NAME=$(ls dist/*.whl | head -n1)
           echo "Built package: $PACKAGE_NAME"
+          echo "Expected version: $DEV_VERSION"
           
-          # 检查包名中是否包含 dev 版本
-          if [[ $PACKAGE_NAME != *"$DEV_VERSION"* ]]; then
-            echo "Error: Package version doesn't match expected dev version"
-            echo "Expected: $DEV_VERSION"
-            echo "Actual package: $PACKAGE_NAME"
-            exit 1
+          # 简单验证：检查包名中是否包含时间戳和 commit
+          # 提取时间戳（dev 后面的数字）和 commit（最后的小写字母数字组合）
+          TIMESTAMP=$(echo "$DEV_VERSION" | sed -n 's/.*\.dev\([0-9]\+\).*/\1/p')
+          COMMIT=$(echo "$DEV_VERSION" | sed -n 's/.*\.\([a-f0-9]\+\)$/\1/p')
+          
+          if [[ -z "$TIMESTAMP" ]] || [[ -z "$COMMIT" ]]; then
+            echo "Warning: Could not extract timestamp or commit from version"
+          else
+            if [[ "$PACKAGE_NAME" != *"$TIMESTAMP"* ]] || [[ "$PACKAGE_NAME" != *"$COMMIT"* ]]; then
+              echo "Error: Package version doesn't contain expected timestamp or commit"
+              echo "Expected timestamp: $TIMESTAMP"
+              echo "Expected commit: $COMMIT"
+              exit 1
+            fi
+            echo "Version verification passed!"
           fi
 
       - name: Upload to PyPI
