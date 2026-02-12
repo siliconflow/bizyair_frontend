@@ -48,16 +48,17 @@ jobs:
           BRANCH_NAME: ${{ env.branch_name }}
         run: |
           # 读取原始版本
-          ORIGINAL_VERSION=$(cat version.txt)
+          ORIGINAL_VERSION=$(cat version.txt | tr -d '\n' | tr -d '\r')
           echo "Original version: $ORIGINAL_VERSION"
           
-          # 生成带分支、commit 和时间戳的 dev 版本
+          # 生成符合 PEP 440 规范的 dev 版本
+          # 格式: <version>.dev<timestamp>+<branch>.<commit>
           BRANCH="$BRANCH_NAME"
-          BRANCH=$(echo "$BRANCH" | sed 's/\//-/g')
+          BRANCH=$(echo "$BRANCH" | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9.-]/-/g')
           COMMIT=$(git rev-parse --short HEAD)
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           
-          DEV_VERSION="${ORIGINAL_VERSION}.dev${BRANCH}-${COMMIT}-${TIMESTAMP}"
+          DEV_VERSION="${ORIGINAL_VERSION}.dev${TIMESTAMP}+${BRANCH}.${COMMIT}"
           
           # 输出环境变量供后续步骤使用
           echo "DEV_VERSION=$DEV_VERSION" >> $GITHUB_ENV
@@ -65,8 +66,8 @@ jobs:
           echo "Commit: $COMMIT"
           echo "Publishing dev version: $DEV_VERSION"
           
-          # 写入临时的 version.txt（只在当前工作目录生效）
-          echo "$DEV_VERSION" > version.txt
+          # 写入临时的 version.txt
+          printf '%s' "$DEV_VERSION" > version.txt
 
       - name: Install dependencies
         run: |
