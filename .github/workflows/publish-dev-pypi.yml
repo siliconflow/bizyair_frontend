@@ -44,30 +44,21 @@ jobs:
 
       - name: Read original version and create dev version
         id: version_processing
-        env:
-          BRANCH_NAME: ${{ env.branch_name }}
         run: |
           # 读取原始版本
-          ORIGINAL_VERSION=$(cat version.txt | tr -d '\n' | tr -d '\r')
+          ORIGINAL_VERSION=$(cat version.txt)
           echo "Original version: $ORIGINAL_VERSION"
           
-          # 生成符合 PEP 440 规范的 dev 版本
-          # 格式: <version>.dev<timestamp>+<branch>.<commit>
-          BRANCH="$BRANCH_NAME"
-          BRANCH=$(echo "$BRANCH" | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9.-]/-/g')
-          COMMIT=$(git rev-parse --short HEAD)
-          TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          
-          DEV_VERSION="${ORIGINAL_VERSION}.dev${TIMESTAMP}+${BRANCH}.${COMMIT}"
+          # 生成commit 时间戳的 dev 版本号
+          COMMIT_TS=$(git log -1 --format=%cd --date=format:%Y%m%d%H%M%S HEAD)
+          DEV_VERSION="${ORIGINAL_VERSION}.dev${COMMIT_TS}"
           
           # 输出环境变量供后续步骤使用
           echo "DEV_VERSION=$DEV_VERSION" >> $GITHUB_ENV
-          echo "Branch: $BRANCH"
-          echo "Commit: $COMMIT"
           echo "Publishing dev version: $DEV_VERSION"
           
-          # 写入临时的 version.txt
-          printf '%s' "$DEV_VERSION" > version.txt
+          # 写入临时的 version.txt（只在当前工作目录生效）
+          echo "$DEV_VERSION" > version.txt
 
       - name: Install dependencies
         run: |
@@ -87,23 +78,13 @@ jobs:
           # 验证打包的版本是否正确
           PACKAGE_NAME=$(ls dist/*.whl | head -n1)
           echo "Built package: $PACKAGE_NAME"
-          echo "Expected version: $DEV_VERSION"
           
-          # 简单验证：检查包名中是否包含时间戳和 commit
-          # 提取时间戳（dev 后面的数字）和 commit（最后的小写字母数字组合）
-          TIMESTAMP=$(echo "$DEV_VERSION" | sed -n 's/.*\.dev\([0-9]\+\).*/\1/p')
-          COMMIT=$(echo "$DEV_VERSION" | sed -n 's/.*\.\([a-f0-9]\+\)$/\1/p')
-          
-          if [[ -z "$TIMESTAMP" ]] || [[ -z "$COMMIT" ]]; then
-            echo "Warning: Could not extract timestamp or commit from version"
-          else
-            if [[ "$PACKAGE_NAME" != *"$TIMESTAMP"* ]] || [[ "$PACKAGE_NAME" != *"$COMMIT"* ]]; then
-              echo "Error: Package version doesn't contain expected timestamp or commit"
-              echo "Expected timestamp: $TIMESTAMP"
-              echo "Expected commit: $COMMIT"
-              exit 1
-            fi
-            echo "Version verification passed!"
+          # 检查包名中是否包含 dev 版本
+          if [[ $PACKAGE_NAME != *"$DEV_VERSION"* ]]; then
+            echo "Error: Package version doesn't match expected dev version"
+            echo "Expected: $DEV_VERSION"
+            echo "Actual package: $PACKAGE_NAME"
+            exit 1
           fi
 
       - name: Upload to PyPI
@@ -112,4 +93,3 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_KEY }}
         run: |
           python -m twine upload dist/*.whl
-
