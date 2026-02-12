@@ -64,6 +64,7 @@ jobs:
 
       - name: Build Python package
         run: |
+          rm -rf dist
           bash scripts/build_python_package.sh
 
       - name: Verify package version
