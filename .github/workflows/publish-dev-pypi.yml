@@ -1,0 +1,86 @@
+name: Build and Publish Dev Package
+
+on:
+  pull_request:
+    types: ['closed']
+    branches:
+      - dev
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.9.0'
+          cache: 'npm'
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Read original version and create dev version
+        id: version_processing
+        run: |
+          # 读取原始版本
+          ORIGINAL_VERSION=$(cat version.txt)
+          echo "Original version: $ORIGINAL_VERSION"
+          
+          # 生成带时间戳的 dev 版本
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          DEV_VERSION="${ORIGINAL_VERSION}.dev${TIMESTAMP}"
+          
+          # 输出环境变量供后续步骤使用
+          echo "DEV_VERSION=$DEV_VERSION" >> $GITHUB_ENV
+          echo "Publishing dev version: $DEV_VERSION"
+          
+          # 写入临时的 version.txt（只在当前工作目录生效）
+          echo "$DEV_VERSION" > version.txt
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Install Python build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build wheel twine
+
+      - name: Build Python package
+        run: |
+          npm run build:py
+
+      - name: Verify package version
+        run: |
+          # 验证打包的版本是否正确
+          PACKAGE_NAME=$(ls dist/*.whl | head -n1)
+          echo "Built package: $PACKAGE_NAME"
+          
+          # 检查包名中是否包含 dev 版本
+          if [[ $PACKAGE_NAME != *"$DEV_VERSION"* ]]; then
+            echo "Error: Package version doesn't match expected dev version"
+            echo "Expected: $DEV_VERSION"
+            echo "Actual package: $PACKAGE_NAME"
+            exit 1
+          fi
+
+      - name: Upload to PyPI
+        env:
+          TWINE_USERNAME: "__token__"
+          TWINE_PASSWORD: ${{ secrets.PYPI_KEY }}
+        run: |
+          python -m twine upload dist/*.whl
+
