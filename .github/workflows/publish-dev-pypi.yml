@@ -1,25 +1,35 @@
 name: Build and Publish Dev Package
 
 on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'The branch to checkout code from'
+        required: true
+        default: 'dev'
   pull_request:
     types: ['closed']
     branches:
       - dev
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.inputs.branch }}
   cancel-in-progress: true
+
+env:
+  target_branch: ${{ github.event.inputs.branch || github.event.pull_request.merge_commit_sha }}
+  branch_name: ${{ github.event.inputs.branch || github.event.pull_request.head.ref || 'dev' }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          ref: ${{ env.target_branch }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -34,17 +44,25 @@ jobs:
 
       - name: Read original version and create dev version
         id: version_processing
+        env:
+          BRANCH_NAME: ${{ env.branch_name }}
         run: |
           # 读取原始版本
           ORIGINAL_VERSION=$(cat version.txt)
           echo "Original version: $ORIGINAL_VERSION"
           
-          # 生成带时间戳的 dev 版本
+          # 生成带分支、commit 和时间戳的 dev 版本
+          BRANCH="$BRANCH_NAME"
+          BRANCH=$(echo "$BRANCH" | sed 's/\//-/g')
+          COMMIT=$(git rev-parse --short HEAD)
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          DEV_VERSION="${ORIGINAL_VERSION}.dev${TIMESTAMP}"
+          
+          DEV_VERSION="${ORIGINAL_VERSION}.dev${BRANCH}-${COMMIT}-${TIMESTAMP}"
           
           # 输出环境变量供后续步骤使用
           echo "DEV_VERSION=$DEV_VERSION" >> $GITHUB_ENV
+          echo "Branch: $BRANCH"
+          echo "Commit: $COMMIT"
           echo "Publishing dev version: $DEV_VERSION"
           
           # 写入临时的 version.txt（只在当前工作目录生效）
