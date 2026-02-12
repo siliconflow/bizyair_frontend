@@ -52,13 +52,14 @@ jobs:
           echo "Original version: $ORIGINAL_VERSION"
           
           # 生成符合 PEP 440 规范的 dev 版本
-          # 格式: <version>.dev<timestamp>+<branch>.<commit>
+          # 格式: <version>.dev<timestamp><commit>
+          # 注意：dev 后面可以跟字母数字组合，时间戳+commit 足够唯一标识
           BRANCH="$BRANCH_NAME"
-          BRANCH=$(echo "$BRANCH" | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9.-]/-/g')
           COMMIT=$(git rev-parse --short HEAD)
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           
-          DEV_VERSION="${ORIGINAL_VERSION}.dev${TIMESTAMP}+${BRANCH}.${COMMIT}"
+          # 将时间戳和 commit 编码到 dev 版本号中
+          DEV_VERSION="${ORIGINAL_VERSION}.dev${TIMESTAMP}${COMMIT}"
           
           # 输出环境变量供后续步骤使用
           echo "DEV_VERSION=$DEV_VERSION" >> $GITHUB_ENV
@@ -90,9 +91,8 @@ jobs:
           echo "Expected version: $DEV_VERSION"
           
           # 简单验证：检查包名中是否包含时间戳和 commit
-          # 提取时间戳（dev 后面的数字）和 commit（最后的小写字母数字组合）
-          TIMESTAMP=$(echo "$DEV_VERSION" | sed -n 's/.*\.dev\([0-9]\+\).*/\1/p')
-          COMMIT=$(echo "$DEV_VERSION" | sed -n 's/.*\.\([a-f0-9]\+\)$/\1/p')
+          TIMESTAMP=$(echo "$DEV_VERSION" | sed -n 's/.*\.dev\([0-9]\{14\}\).*/\1/p')
+          COMMIT=$(echo "$DEV_VERSION" | sed -n 's/.*\.dev[0-9]\{14\}\([a-f0-9]\{7\}\).*/\1/p')
           
           if [[ -z "$TIMESTAMP" ]] || [[ -z "$COMMIT" ]]; then
             echo "Warning: Could not extract timestamp or commit from version"
