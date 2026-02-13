@@ -9,16 +9,9 @@ const BIZYAIR_MODEL_TYPE_KEY = "bizyair_model_type";
  * @returns {boolean} 如果设置开启则返回 true，否则返回 false
  */
 function shouldShowApiPricingBadge() {
-  // try {
-  //   const app = document.querySelector("#vue-app").__vue_app__;
-  //   const pinia = app.config.globalProperties.$pinia;
-  //   const settingStore = pinia._s.get("setting");
-  //   const showApiPricing = settingStore.get("Comfy.NodeBadge.ShowApiPricing");
-  //   return showApiPricing !== false;
-  // } catch (error) {
-    // 如果无法获取 store 或出错，默认返回 true（保持原有行为）
+
     return true;
-  // }
+
 }
 
 // 获取node 的模型配置input
@@ -28,9 +21,9 @@ export async function applyBadgeToNode(_this, forceRefresh = false) {
     // 如果不是强制刷新，优先从节点属性中恢复模型类型（用于工作流加载场景）
     if (!forceRefresh && _this.properties && _this.properties[BIZYAIR_MODEL_TYPE_KEY]) {
       const modelType = _this.properties[BIZYAIR_MODEL_TYPE_KEY];
-      if (shouldShowBadge) {
+      // if (shouldShowBadge) {
         await addPriceBadgeToNode(_this, modelType);
-      }
+      // }
       return;
     }
 
