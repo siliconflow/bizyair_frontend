@@ -127,12 +127,19 @@ function initializeDynamicInputs(node) {
     nodeIdentifier === "BizyAir_NanoBananaPro" ||
     nodeIdentifier === "BizyAir_NanoBananaProOfficial"
   ) {
-    node.addWidget("combo", "mode", "official", () => {
-      applyBadgeToNode(node, true);
-    }, {
-      values: ["official", "third-party"],
-      tooltip: "官方渠道vs第三方渠道",
-    });
+    const modeWidget = node.widgets?.find(w => w.name === "mode");
+    if (modeWidget) {
+      modeWidget.callback = () => {
+        applyBadgeToNode(node, true);
+      };
+    } else {
+      node.addWidget("combo", "mode", "official", () => {
+        applyBadgeToNode(node, true);
+      }, {
+        values: ["official", "third-party"],
+        tooltip: "官方渠道vs第三方渠道",
+      });
+    }
   }
 }
 
