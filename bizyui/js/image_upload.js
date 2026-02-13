@@ -128,7 +128,7 @@ function initializeDynamicInputs(node) {
     nodeIdentifier === "BizyAir_NanoBananaProOfficial"
   ) {
     node.addWidget("combo", "mode", "official", () => {
-      applyBadgeToNode(node);
+      // applyBadgeToNode(node);
     }, {
       values: ["official", "third-party"],
       tooltip: "官方渠道vs第三方渠道",
