@@ -22,7 +22,7 @@ app.registerExtension({
   name: 'bizyair.handle.node.configure',
   nodeCreated(node, app) {
     // 做忽略的widget 这些widget不做获取价格的操作
-    const ignoreWidgets = ['prompt', 'negative_prompt', 'inputcount']
+    const ignoreWidgets = ['prompt', 'negative_prompt', 'inputcount', 'mode']
     // 在这里可以拿到变化之后的值，并且也可以拿到node，这时候给node切换badge即可
     if (node && node.widgets && Array.isArray(node.widgets)) {
       if (!hasModelInput(node)) {
