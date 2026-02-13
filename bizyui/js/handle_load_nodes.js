@@ -9,72 +9,79 @@ const BIZYAIR_MODEL_TYPE_KEY = "bizyair_model_type";
  * @returns {boolean} 如果设置开启则返回 true，否则返回 false
  */
 function shouldShowApiPricingBadge() {
-  try {
-    const app = document.querySelector("#vue-app").__vue_app__;
-    const pinia = app.config.globalProperties.$pinia;
-    const settingStore = pinia._s.get("setting");
-    const showApiPricing = settingStore.get("Comfy.NodeBadge.ShowApiPricing");
-    return showApiPricing !== false;
-  } catch (error) {
-    // 如果无法获取 store 或出错，默认返回 true（保持原有行为）
+
     return true;
-  }
+
 }
 
 // 获取node 的模型配置input
 export async function applyBadgeToNode(_this, forceRefresh = false) {
-  const shouldShowBadge = shouldShowApiPricingBadge();
+    const shouldShowBadge = shouldShowApiPricingBadge();
 
-  // 如果不是强制刷新，优先从节点属性中恢复模型类型（用于工作流加载场景）
-  if (!forceRefresh && _this.properties && _this.properties[BIZYAIR_MODEL_TYPE_KEY]) {
-    const modelType = _this.properties[BIZYAIR_MODEL_TYPE_KEY];
-    if (shouldShowBadge) {
-      await addPriceBadgeToNode(_this, modelType);
-    }
-    return;
-  }
-
-  // 为包含model输入的节点添加价格徽章
-  const hiddenOutput = hasModelInput(_this);
-  
-  if (hiddenOutput) {
-    if (!hiddenOutput.type) {
-      console.error(`[modelPrice] error finding model type`);
+    // 如果不是强制刷新，优先从节点属性中恢复模型类型（用于工作流加载场景）
+    if (!forceRefresh && _this.properties && _this.properties[BIZYAIR_MODEL_TYPE_KEY]) {
+      const modelType = _this.properties[BIZYAIR_MODEL_TYPE_KEY];
+      // if (shouldShowBadge) {
+        await addPriceBadgeToNode(_this, modelType);
+      // }
       return;
     }
 
-    if (typeof hiddenOutput.type !== "string") {
-      return;
-    }
-
-    // 解析模型类型（传入节点对象以获取用户选择的model）
-    const modelType = getModelTypeFromHiddenInput(hiddenOutput, _this);
+    // 为包含model输入的节点添加价格徽章
+    const hiddenOutput = hasModelInput(_this);
     
-    // 将hiddenOutput临时存储在节点上，方便后续使用
-    _this._bizyairHiddenOutput = hiddenOutput;
+    if (hiddenOutput) {
+      if (!hiddenOutput.type) {
+        console.error(`[modelPrice] error finding model type`);
+        return;
+      }
 
-    // 将模型类型存储到节点属性中，确保保存工作流时能被序列化
-    if (!_this.properties) {
-      _this.properties = {};
-    }
-    _this.properties[BIZYAIR_MODEL_TYPE_KEY] = modelType;
+      if (typeof hiddenOutput.type !== "string") {
+        return;
+      }
 
-    // 只有在设置开启时才添加badge
-    if (shouldShowBadge) {
-      await addPriceBadgeToNode(_this, modelType);
-    }
+      // 解析模型类型（传入节点对象以获取用户选择的model）
+      const modelType = getModelTypeFromHiddenInput(hiddenOutput, _this);
+      
+      // 将hiddenOutput临时存储在节点上，方便后续使用
+      _this._bizyairHiddenOutput = hiddenOutput;
 
-    // 无论是否添加badge，都要删除无用的outputs
-    _this.outputs = _this.outputs.filter(
-      (output) => output.name !== hiddenOutput.name
-    );
+      // 将模型类型存储到节点属性中，确保保存工作流时能被序列化
+      if (!_this.properties) {
+        _this.properties = {};
+      }
+      _this.properties[BIZYAIR_MODEL_TYPE_KEY] = modelType;
+
+      // 只有在设置开启时才添加badge
+      if (shouldShowBadge) {
+        await addPriceBadgeToNode(_this, modelType);
+      }
+
+      // 无论是否添加badge，都要删除无用的outputs
+      _this.outputs = _this.outputs.filter(
+        (output) => output.name !== hiddenOutput.name
+      );
   }
 }
 
 // 从hiddenInput中获取模型类型
 function getModelTypeFromHiddenInput(hiddenOutput, node){
-  const modelJson = JSON.parse(hiddenOutput.type);
+  let modelJson;
+  try {
+    modelJson = JSON.parse(hiddenOutput.type);
+  } catch (e) {
+    return hiddenOutput.type;
+  }
+  // 从 mode widget 获取 key.当 modelJson 包含 "official" 或 "third-party" 键时，才启用 mode 优先逻辑
+  const isModeMap = modelJson && (modelJson.hasOwnProperty("official") || modelJson.hasOwnProperty("third-party"));
   
+  if (isModeMap && node.widgets) {
+      const modeWidget = node.widgets.find(w => w.name === "mode");
+      if (modeWidget && modeWidget.value && modelJson[modeWidget.value]) {
+          return modelJson[modeWidget.value];
+      }
+  }
+
   // 从节点的widgets中获取用户选择的model
   let selectedModel = null;
   const possibleWidgetNames = ["model", "model_name"];
@@ -94,8 +101,14 @@ function getModelTypeFromHiddenInput(hiddenOutput, node){
   }
   
   // 如果没找到或key不存在，回退到使用第一个键（兼容旧逻辑）
-  const modelsList = Object.keys(modelJson);
-  return modelJson[modelsList[0]];
+  if (typeof modelJson === 'object' && modelJson !== null) {
+      const modelsList = Object.keys(modelJson);
+      if (modelsList.length > 0) {
+          return modelJson[modelsList[0]];
+      }
+  }
+  // 如果是字符串或者其他情况，直接返回
+  return hiddenOutput.type;
 }
 
 // 自定义节点创建处理函数

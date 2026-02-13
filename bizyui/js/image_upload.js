@@ -1,4 +1,5 @@
 import { app } from "../../../scripts/app.js";
+import { applyBadgeToNode } from './handle_load_nodes.js'
 /*
   BizyAir_Seedream4_5
   BizyAir_NanoBananaPro
@@ -121,6 +122,25 @@ function initializeDynamicInputs(node) {
       }
     }
   });
+  // 添加下拉选择 widget
+  if (
+    nodeIdentifier === "BizyAir_NanoBananaPro" ||
+    nodeIdentifier === "BizyAir_NanoBananaProOfficial"
+  ) {
+    const modeWidget = node.widgets?.find(w => w.name === "mode");
+    if (modeWidget) {
+      modeWidget.callback = () => {
+        applyBadgeToNode(node, true);
+      };
+    } else {
+      node.addWidget("combo", "mode", "official", () => {
+        applyBadgeToNode(node, true);
+      }, {
+        values: ["official", "third-party"],
+        tooltip: "官方渠道vs第三方渠道",
+      });
+    }
+  }
 }
 
 app.registerExtension({
