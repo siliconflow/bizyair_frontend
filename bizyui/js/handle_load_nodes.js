@@ -9,16 +9,16 @@ const BIZYAIR_MODEL_TYPE_KEY = "bizyair_model_type";
  * @returns {boolean} 如果设置开启则返回 true，否则返回 false
  */
 function shouldShowApiPricingBadge() {
-  try {
-    const app = document.querySelector("#vue-app").__vue_app__;
-    const pinia = app.config.globalProperties.$pinia;
-    const settingStore = pinia._s.get("setting");
-    const showApiPricing = settingStore.get("Comfy.NodeBadge.ShowApiPricing");
-    return showApiPricing !== false;
-  } catch (error) {
+  // try {
+  //   const app = document.querySelector("#vue-app").__vue_app__;
+  //   const pinia = app.config.globalProperties.$pinia;
+  //   const settingStore = pinia._s.get("setting");
+  //   const showApiPricing = settingStore.get("Comfy.NodeBadge.ShowApiPricing");
+  //   return showApiPricing !== false;
+  // } catch (error) {
     // 如果无法获取 store 或出错，默认返回 true（保持原有行为）
     return true;
-  }
+  // }
 }
 
 // 获取node 的模型配置input
