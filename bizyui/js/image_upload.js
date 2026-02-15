@@ -133,7 +133,7 @@ function initializeDynamicInputs(node) {
         applyBadgeToNode(node, true);
       };
     } else {
-      node.addWidget("combo", "mode", "official", () => {
+      node.addWidget("combo", "mode", "third-party", () => {
         applyBadgeToNode(node, true);
       }, {
         values: ["official", "third-party"],
