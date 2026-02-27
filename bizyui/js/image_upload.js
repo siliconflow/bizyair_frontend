@@ -25,6 +25,7 @@ function initializeDynamicInputs(node) {
     nodeIdentifier !== "BizyAir_Seedream4_5" &&
     nodeIdentifier !== "BizyAir_NanoBananaPro" &&
     nodeIdentifier !== "BizyAir_NanoBananaProOfficial" &&
+    nodeIdentifier !== "BizyAir_NanoBanana2" &&
     nodeIdentifier !== "BizyAir_Seedream5"
   ) {
     return;
@@ -65,15 +66,13 @@ function initializeDynamicInputs(node) {
   }
 
   // 检查是否已经存在 "Update inputs" 按钮，避免重复添加
-  const updateButton = node.widgets?.find(
+  let updateButton = node.widgets?.find(
     (w) => w.name === "Update inputs"
   );
-  if (updateButton) {
-    return; // 已经存在，不需要重复添加
-  }
 
-  // 然后添加 "Update inputs" 按钮（会在 inputcount 之后显示）
-  node.addWidget("button", "Update inputs", null, () => {
+  if (!updateButton) {
+    // 然后添加 "Update inputs" 按钮（会在 inputcount 之后显示）
+    updateButton = node.addWidget("button", "Update inputs", null, () => {
     if (!node.inputs) {
       node.inputs = [];
     }
@@ -122,18 +121,26 @@ function initializeDynamicInputs(node) {
       for (let i = num_inputs + 1; i <= target_number_of_inputs; ++i) {
         node.addInput(`image_${i}`, node._type, { shape: 7 });
       }
-    }
-  });
+      }
+    });
+  }
   // 添加下拉选择 widget
   if (
     nodeIdentifier === "BizyAir_NanoBananaPro" ||
-    nodeIdentifier === "BizyAir_NanoBananaProOfficial"
+    nodeIdentifier === "BizyAir_NanoBananaProOfficial" ||
+    nodeIdentifier === "BizyAir_NanoBanana2"
   ) {
     const modeWidget = node.widgets?.find(w => w.name === "mode");
     if (modeWidget) {
       modeWidget.callback = () => {
         applyBadgeToNode(node, true);
       };
+      // 调整顺序：将 mode 移动到最后（确保在 Update inputs 按钮下面）
+      const idx = node.widgets.indexOf(modeWidget);
+      if (idx !== -1) {
+        node.widgets.splice(idx, 1);
+        node.widgets.push(modeWidget);
+      }
     } else {
       node.addWidget("combo", "mode", "third-party", () => {
         applyBadgeToNode(node, true);
@@ -152,7 +159,8 @@ app.registerExtension({
     if (
       nodeData.name !== "BizyAir_Seedream4_5" &&
       nodeData.name !== "BizyAir_NanoBananaPro" &&
-      nodeData.name !== "BizyAir_NanoBananaProOfficial"&&
+      nodeData.name !== "BizyAir_NanoBananaProOfficial" &&
+      nodeData.name !== "BizyAir_NanoBanana2" &&
       nodeData.name !== "BizyAir_Seedream5"
     ) {
       return;
@@ -160,7 +168,8 @@ app.registerExtension({
 
     if (
       nodeData.name === "BizyAir_NanoBananaPro" ||
-      nodeData.name === "BizyAir_NanoBananaProOfficial"
+      nodeData.name === "BizyAir_NanoBananaProOfficial" ||
+      nodeData.name === "BizyAir_NanoBanana2"
     ) {
       if (!nodeData.input) nodeData.input = {};
       if (!nodeData.input.required) nodeData.input.required = {};
