@@ -133,7 +133,7 @@ function initializeDynamicInputs(node) {
         applyBadgeToNode(node, true);
       };
     } else {
-      node.addWidget("combo", "mode", "official", () => {
+      node.addWidget("combo", "mode", "third-party", () => {
         applyBadgeToNode(node, true);
       }, {
         values: ["official", "third-party"],
@@ -153,6 +153,20 @@ app.registerExtension({
       nodeData.name !== "BizyAir_NanoBananaProOfficial"
     ) {
       return;
+    }
+
+    if (
+      nodeData.name === "BizyAir_NanoBananaPro" ||
+      nodeData.name === "BizyAir_NanoBananaProOfficial"
+    ) {
+      if (!nodeData.input) nodeData.input = {};
+      if (!nodeData.input.required) nodeData.input.required = {};
+      if (!nodeData.input.required.mode) {
+        nodeData.input.required.mode = [
+          ["official", "third-party"],
+          { default: "third-party", tooltip: "官方渠道vs第三方渠道" }
+        ];
+      }
     }
 
     // 使用 onNodeCreated 原型方法（同步执行，确保在节点创建时立即初始化）
