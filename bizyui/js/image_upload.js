@@ -39,10 +39,13 @@ function initializeDynamicInputs(node) {
     node.inputs = [];
   }
 
-  // 先检查是否存在 inputcount widget
-  let inputCountWidget = node.widgets?.find(
-    (w) => w.name === "inputcount"
-  );
+  //VIDU 节点不需要 inputcount 和 Update inputs 按钮
+  const isVidu = nodeIdentifier === "BizyAir_VIDU_Q3_T2V_API" || nodeIdentifier === "BizyAir_VIDU_Q3_I2V_API";
+  if (!isVidu) {
+    // 先检查是否存在 inputcount widget
+    let inputCountWidget = node.widgets?.find(
+      (w) => w.name === "inputcount"
+    );
 
   // 如果不存在，先创建 inputcount widget（在按钮之前创建，确保显示顺序）
   if (!inputCountWidget) {
@@ -125,6 +128,7 @@ function initializeDynamicInputs(node) {
       }
       }
     });
+    }
   }
   // 添加下拉选择 widget
   if (
