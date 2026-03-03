@@ -26,7 +26,9 @@ function initializeDynamicInputs(node) {
     nodeIdentifier !== "BizyAir_NanoBananaPro" &&
     nodeIdentifier !== "BizyAir_NanoBananaProOfficial" &&
     nodeIdentifier !== "BizyAir_NanoBanana2" &&
-    nodeIdentifier !== "BizyAir_Seedream5"
+    nodeIdentifier !== "BizyAir_Seedream5" &&
+    nodeIdentifier !== "BizyAir_VIDU_Q3_T2V_API" &&
+    nodeIdentifier !== "BizyAir_VIDU_Q3_I2V_API"
   ) {
     return;
   }
@@ -128,7 +130,9 @@ function initializeDynamicInputs(node) {
   if (
     nodeIdentifier === "BizyAir_NanoBananaPro" ||
     nodeIdentifier === "BizyAir_NanoBananaProOfficial" ||
-    nodeIdentifier === "BizyAir_NanoBanana2"
+    nodeIdentifier === "BizyAir_NanoBanana2" ||
+    nodeIdentifier === "BizyAir_VIDU_Q3_T2V_API" ||
+    nodeIdentifier === "BizyAir_VIDU_Q3_I2V_API"
   ) {
     const modeWidget = node.widgets?.find(w => w.name === "mode");
     if (modeWidget) {
@@ -161,7 +165,9 @@ app.registerExtension({
       nodeData.name !== "BizyAir_NanoBananaPro" &&
       nodeData.name !== "BizyAir_NanoBananaProOfficial" &&
       nodeData.name !== "BizyAir_NanoBanana2" &&
-      nodeData.name !== "BizyAir_Seedream5"
+      nodeData.name !== "BizyAir_Seedream5" &&
+      nodeData.name !== "BizyAir_VIDU_Q3_T2V_API" &&
+      nodeData.name !== "BizyAir_VIDU_Q3_I2V_API"
     ) {
       return;
     }
@@ -169,7 +175,9 @@ app.registerExtension({
     if (
       nodeData.name === "BizyAir_NanoBananaPro" ||
       nodeData.name === "BizyAir_NanoBananaProOfficial" ||
-      nodeData.name === "BizyAir_NanoBanana2"
+      nodeData.name === "BizyAir_NanoBanana2" ||
+      nodeData.name === "BizyAir_VIDU_Q3_T2V_API" ||
+      nodeData.name === "BizyAir_VIDU_Q3_I2V_API"
     ) {
       if (!nodeData.input) nodeData.input = {};
       if (!nodeData.input.required) nodeData.input.required = {};
