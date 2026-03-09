@@ -36,8 +36,8 @@
       </p>
       <p>
         {{ t('apiKeyDialog.visitTo') }}
-        <a class="underline" href="https://cloud.siliconflow.cn" target="_blank"
-          >https://cloud.siliconflow.cn</a
+        <a class="underline" href="https://bizyair.cn/" target="_blank"
+          >https://bizyair.cn/</a
         >
         {{ t('apiKeyDialog.getKey') }}
       </p>
