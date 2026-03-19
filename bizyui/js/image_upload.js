@@ -5,7 +5,8 @@ import { applyBadgeToNode } from './handle_load_nodes.js'
   BizyAir_NanoBananaPro
   BizyAir_NanoBananaProOfficial
   BizyAir_Seedream5
-  以上四个节点添加多图片上传功能
+  BizyAir_Seedance_2_0_REF_API
+  以上节点添加多图片上传功能
 */
 // 简单的链式callback实现
 function chainCallback(originalCallback, newCallback) {
@@ -28,7 +29,8 @@ function initializeDynamicInputs(node) {
     nodeIdentifier !== "BizyAir_NanoBanana2" &&
     nodeIdentifier !== "BizyAir_Seedream5" &&
     nodeIdentifier !== "BizyAir_VIDU_Q3_T2V_API" &&
-    nodeIdentifier !== "BizyAir_VIDU_Q3_I2V_API"
+    nodeIdentifier !== "BizyAir_VIDU_Q3_I2V_API" &&
+    nodeIdentifier !== "BizyAir_Seedance_2_0_REF_API"
   ) {
     return;
   }
@@ -171,7 +173,8 @@ app.registerExtension({
       nodeData.name !== "BizyAir_NanoBanana2" &&
       nodeData.name !== "BizyAir_Seedream5" &&
       nodeData.name !== "BizyAir_VIDU_Q3_T2V_API" &&
-      nodeData.name !== "BizyAir_VIDU_Q3_I2V_API"
+      nodeData.name !== "BizyAir_VIDU_Q3_I2V_API" &&
+      nodeData.name !== "BizyAir_Seedance_2_0_REF_API"
     ) {
       return;
     }
