@@ -85,7 +85,7 @@ function initializeDynamicInputs(node) {
 
   if (!updateButton) {
     // 然后添加 "Update inputs" 按钮（会在 inputcount 之后显示）
-    updateButton = node.addWidget("button", "Update inputs(支持多图点我））", null, () => {
+    updateButton = node.addWidget("button", "Update inputs(支持多图点我）", null, () => {
     if (!node.inputs) {
       node.inputs = [];
     }
