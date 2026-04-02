@@ -22,7 +22,7 @@ app.registerExtension({
   name: 'bizyair.handle.node.configure',
   nodeCreated(node, app) {
     // 做忽略的widget 这些widget不做获取价格的操作
-    const ignoreWidgets = ['prompt', 'negative_prompt', 'inputcount', 'mode']
+    const ignoreWidgets = ['prompt', 'negative_prompt', 'inputcount']
     // 在这里可以拿到变化之后的值，并且也可以拿到node，这时候给node切换badge即可
     if (node && node.widgets && Array.isArray(node.widgets)) {
       if (!hasModelInput(node)) {
@@ -31,7 +31,7 @@ app.registerExtension({
       // 不仅仅是切换model才会修改模型定价，比如切换输入参数也会修改模型定价
       node.widgets.forEach(widget => {
         // 对于prompt这种输入频繁的widget 不做获取价格操作
-        if (ignoreWidgets.includes(widget.name)) {
+        if (ignoreWidgets.includes(widget.name) || widget._bizyairManualPriceRefresh === true) {
           return
         }
         // 保存原始callback，使用链式callback保留原始功能

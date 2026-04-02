@@ -148,6 +148,7 @@ function initializeDynamicInputs(node) {
   ) {
     const modeWidget = node.widgets?.find(w => w.name === "mode");
     if (modeWidget) {
+      modeWidget._bizyairManualPriceRefresh = true;
       modeWidget.callback = () => {
         applyBadgeToNode(node, true);
       };
@@ -158,12 +159,13 @@ function initializeDynamicInputs(node) {
         node.widgets.push(modeWidget);
       }
     } else {
-      node.addWidget("combo", "mode", "third-party", () => {
+      const createdModeWidget = node.addWidget("combo", "mode", "third-party", () => {
         applyBadgeToNode(node, true);
       }, {
         values: ["official", "third-party"],
         tooltip: "官方渠道vs第三方渠道",
       });
+      createdModeWidget._bizyairManualPriceRefresh = true;
     }
   }
 }
