@@ -72,10 +72,10 @@ function getModelTypeFromHiddenInput(hiddenOutput, node){
   } catch (e) {
     return hiddenOutput.type;
   }
-  // 从 mode widget 获取 key.当 modelJson 包含 "official" 或 "third-party" 键时，才启用 mode 优先逻辑
-  const isModeMap = modelJson && (modelJson.hasOwnProperty("official") || modelJson.hasOwnProperty("third-party"));
-  
-  if (isModeMap && node.widgets) {
+
+  // 如果节点存在 mode widget，且其 value 能匹配到返回 map 中的 key，
+  // 则优先使用该 value 对应的 model name 请求价格。
+  if (modelJson && typeof modelJson === "object" && node.widgets) {
       const modeWidget = node.widgets.find(w => w.name === "mode");
       if (modeWidget && modeWidget.value && modelJson[modeWidget.value]) {
           return modelJson[modeWidget.value];
