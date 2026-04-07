@@ -18,6 +18,10 @@ function chainCallback(originalCallback, newCallback) {
   }
 }
 
+function isImagesInputSlot(slot) {
+  return slot?.name === 'images' || slot?.localized_name === 'images'
+}
+
 app.registerExtension({
   name: 'bizyair.handle.node.configure',
   nodeCreated(node, app) {
@@ -28,6 +32,28 @@ app.registerExtension({
       if (!hasModelInput(node)) {
         return
       }
+
+      if (!node._bizyairPriceConnectionHooked) {
+        const originalOnConnectionsChange = node.onConnectionsChange
+        node.onConnectionsChange = chainCallback(
+          originalOnConnectionsChange,
+          async function (type, slotIndex, isConnected, linkInfo, ioSlot) {
+            const inputSlot = this.inputs?.[slotIndex]
+            if (!isImagesInputSlot(inputSlot)) {
+              return
+            }
+
+            // 只处理 images 输入槽位本身的连线变化，避免误判 output 变化。
+            if (ioSlot && ioSlot !== inputSlot) {
+              return
+            }
+
+            await applyBadgeToNode(node, true)
+          }
+        )
+        node._bizyairPriceConnectionHooked = true
+      }
+
       // 不仅仅是切换model才会修改模型定价，比如切换输入参数也会修改模型定价
       node.widgets.forEach(widget => {
         // 对于prompt这种输入频繁的widget 不做获取价格操作
