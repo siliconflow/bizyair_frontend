@@ -145,6 +145,18 @@ export function getBadgeConfigByCoinType(coinType, priceText) {
   };
 }
 
+function getImagesLinkFlag(node) {
+  if (!node?.inputs || !Array.isArray(node.inputs)) {
+    return "false";
+  }
+
+  const imagesInput = node.inputs.find(
+    (input) => input?.name === "images" || input?.localized_name === "images"
+  );
+
+  return imagesInput?.link != null ? "true" : "false";
+}
+
 /**
  * 为节点添加价格徽章
  * @param {Object} node - 节点对象，包含 widgets 和其他节点信息
@@ -166,6 +178,8 @@ export async function addPriceBadgeToNode(node, modelName = "") {
     if (!nodeInputs.model) {
       nodeInputs.model = modelName;
     }
+
+    nodeInputs.images = getImagesLinkFlag(node);
 
     // 获取价格信息
     const priceResult = await fetchNodePrice(modelName, nodeInputs);
