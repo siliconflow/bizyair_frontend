@@ -18,8 +18,8 @@ function chainCallback(originalCallback, newCallback) {
   }
 }
 
-function isImagesInputSlot(slot) {
-  return slot?.name === 'images' || slot?.localized_name === 'images'
+function isTrackedLinkedInput(slot) {
+  return Boolean((slot?.name || slot?.localized_name) && slot?.widget === undefined)
 }
 
 app.registerExtension({
@@ -39,11 +39,11 @@ app.registerExtension({
           originalOnConnectionsChange,
           async function (type, slotIndex, isConnected, linkInfo, ioSlot) {
             const inputSlot = this.inputs?.[slotIndex]
-            if (!isImagesInputSlot(inputSlot)) {
+            if (!isTrackedLinkedInput(inputSlot)) {
               return
             }
 
-            // 只处理 images 输入槽位本身的连线变化，避免误判 output 变化。
+            // 只处理这类输入槽位本身的连线变化，避免误判 output 变化。
             if (ioSlot && ioSlot !== inputSlot) {
               return
             }
