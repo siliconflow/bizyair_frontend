@@ -77,7 +77,12 @@ export function hasModelInput(node) {
  * @param {number} badgeOptions.iconOptions.uuid - 图标uuid 用于删除 自定义属性
  */
 export function addCustomBadge(node, badgeOptions) {
-  const customBadge = new LGraphBadge(badgeOptions);
+  const BadgeConstructor = globalThis.LGraphBadge;
+  if (typeof BadgeConstructor !== "function") {
+    throw new Error("LGraphBadge is not available");
+  }
+
+  const customBadge = new BadgeConstructor(badgeOptions);
   // 每次添加badge 清空所有badge 因为badge没有一个唯一标识符，并且价格展示也就一个badge 所以直接全部清除
   node.badges = [];
   node.badges.push(() => customBadge);
@@ -145,16 +150,20 @@ export function getBadgeConfigByCoinType(coinType, priceText) {
   };
 }
 
-function getImagesLinkFlag(node) {
+function getLinkedInputFlags(node) {
   if (!node?.inputs || !Array.isArray(node.inputs)) {
-    return "false";
+    return {};
   }
 
-  const imagesInput = node.inputs.find(
-    (input) => input?.name === "images" || input?.localized_name === "images"
-  );
+  return node.inputs.reduce((flags, input) => {
+    const inputName = input?.name || input?.localized_name;
+    if (!inputName || input?.widget !== undefined) {
+      return flags;
+    }
 
-  return imagesInput?.link != null ? "true" : "false";
+    flags[inputName] = input?.link != null ? "true" : "false";
+    return flags;
+  }, {});
 }
 
 /**
@@ -179,7 +188,7 @@ export async function addPriceBadgeToNode(node, modelName = "") {
       nodeInputs.model = modelName;
     }
 
-    nodeInputs.images = getImagesLinkFlag(node);
+    Object.assign(nodeInputs, getLinkedInputFlags(node));
 
     // 获取价格信息
     const priceResult = await fetchNodePrice(modelName, nodeInputs);
