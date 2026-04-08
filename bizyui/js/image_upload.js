@@ -9,6 +9,7 @@ import { applyBadgeToNode } from './handle_load_nodes.js'
   BizyAir_Seedance_2_0_Multimodal_API
   BizyAir_Kling_O3_VI2V_REF_API
   BizyAir_Kling_O3_VIDEO_EDIT_API
+  BizyAir_Wan_V2_7_IMAGE_API
   以上节点添加多图片上传功能
 */
 // 简单的链式callback实现
@@ -36,7 +37,8 @@ function initializeDynamicInputs(node) {
     nodeIdentifier !== "BizyAir_Seedance_2_0_REF_API" &&
     nodeIdentifier !== "BizyAir_Seedance_2_0_Multimodal_API" &&
     nodeIdentifier !== "BizyAir_Kling_O3_VI2V_REF_API" &&
-    nodeIdentifier !== "BizyAir_Kling_O3_VIDEO_EDIT_API"
+    nodeIdentifier !== "BizyAir_Kling_O3_VIDEO_EDIT_API" &&
+    nodeIdentifier !== "BizyAir_Wan_V2_7_IMAGE_API"
   ) {
     return;
   }
@@ -185,7 +187,8 @@ app.registerExtension({
       nodeData.name !== "BizyAir_Seedance_2_0_REF_API" &&
       nodeData.name !== "BizyAir_Seedance_2_0_Multimodal_API" &&
       nodeData.name !== "BizyAir_Kling_O3_VI2V_REF_API" &&
-      nodeData.name !== "BizyAir_Kling_O3_VIDEO_EDIT_API"
+      nodeData.name !== "BizyAir_Kling_O3_VIDEO_EDIT_API" &&
+      nodeData.name !== "BizyAir_Wan_V2_7_IMAGE_API"
     ) {
       return;
     }
