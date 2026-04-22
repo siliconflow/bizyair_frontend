@@ -10,7 +10,7 @@ import { applyBadgeToNode } from './handle_load_nodes.js'
   BizyAir_Kling_O3_VI2V_REF_API
   BizyAir_Kling_O3_VIDEO_EDIT_API
   BizyAir_Wan_V2_7_IMAGE_API
-  以上节点添加多图片上传功能
+  以及所有包含 "inputcount" 属性的节点，添加多图片上传功能
 */
 // 简单的链式callback实现
 function chainCallback(originalCallback, newCallback) {
@@ -22,24 +22,27 @@ function chainCallback(originalCallback, newCallback) {
   };
 }
 
-// 统一的函数：初始化动态输入相关的 widgets
 function initializeDynamicInputs(node) {
-  // 只处理目标节点类型（使用 comfyClass 或 type 来匹配）
+  // 检查是否包含 inputcount widget 或者是我们指定的节点
+  const hasInputCount = node.widgets?.some(w => w.name === "inputcount");
   const nodeIdentifier = node.comfyClass || node.type;
-  if (
-    nodeIdentifier !== "BizyAir_Seedream4_5" &&
-    nodeIdentifier !== "BizyAir_NanoBananaPro" &&
-    nodeIdentifier !== "BizyAir_NanoBananaProOfficial" &&
-    nodeIdentifier !== "BizyAir_NanoBanana2" &&
-    nodeIdentifier !== "BizyAir_Seedream5" &&
-    nodeIdentifier !== "BizyAir_VIDU_Q3_T2V_API" &&
-    nodeIdentifier !== "BizyAir_VIDU_Q3_I2V_API" &&
-    nodeIdentifier !== "BizyAir_Seedance_2_0_REF_API" &&
-    nodeIdentifier !== "BizyAir_Seedance_2_0_Multimodal_API" &&
-    nodeIdentifier !== "BizyAir_Kling_O3_VI2V_REF_API" &&
-    nodeIdentifier !== "BizyAir_Kling_O3_VIDEO_EDIT_API" &&
-    nodeIdentifier !== "BizyAir_Wan_V2_7_IMAGE_API"
-  ) {
+  
+  const isHardcodedNode = [
+    "BizyAir_Seedream4_5",
+    "BizyAir_NanoBananaPro",
+    "BizyAir_NanoBananaProOfficial",
+    "BizyAir_NanoBanana2",
+    "BizyAir_Seedream5",
+    "BizyAir_VIDU_Q3_T2V_API",
+    "BizyAir_VIDU_Q3_I2V_API",
+    "BizyAir_Seedance_2_0_REF_API",
+    "BizyAir_Seedance_2_0_Multimodal_API",
+    "BizyAir_Kling_O3_VI2V_REF_API",
+    "BizyAir_Kling_O3_VIDEO_EDIT_API",
+    "BizyAir_Wan_V2_7_IMAGE_API"
+  ].includes(nodeIdentifier);
+
+  if (!hasInputCount && !isHardcodedNode) {
     return;
   }
 
@@ -175,21 +178,32 @@ function initializeDynamicInputs(node) {
 app.registerExtension({
   name: "bizyair.dynamicImageInputs",
   async beforeRegisterNodeDef(nodeType, nodeData, app) {
-    // 只处理目标节点类型
-    if (
-      nodeData.name !== "BizyAir_Seedream4_5" &&
-      nodeData.name !== "BizyAir_NanoBananaPro" &&
-      nodeData.name !== "BizyAir_NanoBananaProOfficial" &&
-      nodeData.name !== "BizyAir_NanoBanana2" &&
-      nodeData.name !== "BizyAir_Seedream5" &&
-      nodeData.name !== "BizyAir_VIDU_Q3_T2V_API" &&
-      nodeData.name !== "BizyAir_VIDU_Q3_I2V_API" &&
-      nodeData.name !== "BizyAir_Seedance_2_0_REF_API" &&
-      nodeData.name !== "BizyAir_Seedance_2_0_Multimodal_API" &&
-      nodeData.name !== "BizyAir_Kling_O3_VI2V_REF_API" &&
-      nodeData.name !== "BizyAir_Kling_O3_VIDEO_EDIT_API" &&
-      nodeData.name !== "BizyAir_Wan_V2_7_IMAGE_API"
-    ) {
+    // 检查是否有 inputcount 输入参数（从 nodeData 中判断）
+    let hasInputCountData = false;
+    if (nodeData.input) {
+      if (nodeData.input.required && nodeData.input.required.inputcount) {
+        hasInputCountData = true;
+      } else if (nodeData.input.optional && nodeData.input.optional.inputcount) {
+        hasInputCountData = true;
+      }
+    }
+
+    const isHardcodedNode = [
+      "BizyAir_Seedream4_5",
+      "BizyAir_NanoBananaPro",
+      "BizyAir_NanoBananaProOfficial",
+      "BizyAir_NanoBanana2",
+      "BizyAir_Seedream5",
+      "BizyAir_VIDU_Q3_T2V_API",
+      "BizyAir_VIDU_Q3_I2V_API",
+      "BizyAir_Seedance_2_0_REF_API",
+      "BizyAir_Seedance_2_0_Multimodal_API",
+      "BizyAir_Kling_O3_VI2V_REF_API",
+      "BizyAir_Kling_O3_VIDEO_EDIT_API",
+      "BizyAir_Wan_V2_7_IMAGE_API"
+    ].includes(nodeData.name);
+
+    if (!hasInputCountData && !isHardcodedNode) {
       return;
     }
 
