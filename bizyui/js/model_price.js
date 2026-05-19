@@ -88,6 +88,71 @@ export function addCustomBadge(node, badgeOptions) {
   node.badges.push(() => customBadge);
 }
 
+function createPriceInfoBadge(priceBadge, node) {
+  const BadgeConstructor = globalThis.LGraphBadge;
+  if (typeof BadgeConstructor !== "function") {
+    throw new Error("LGraphBadge is not available");
+  }
+
+  const infoBadge = new BadgeConstructor({
+    text: "",
+    bgColor: "rgba(0, 0, 0, 0)",
+    padding: 4,
+    height: 18,
+    cornerRadius: 9,
+    iconOptions: {
+      unicode: "ⓘ",
+      fontFamily: "Arial, sans-serif",
+      color: "#D7D7D7",
+      fontSize: 16,
+    },
+    xOffset: -30,
+    yOffset: 26,
+    onClick: () => {
+      const endpoint = node._bizyairHiddenOutput?.bizyair_endpoint?.type;
+      if (endpoint) {
+        window.parent?.postMessage({ type: "openPricingDialog", endpoint }, "*");
+      }
+    },
+  });
+
+  const drawInfoBadge = infoBadge.draw.bind(infoBadge);
+  infoBadge.draw = (ctx, x, y) => {
+    const originalXOffset = infoBadge.xOffset;
+    const priceWidth = priceBadge.getWidth(ctx);
+    const infoWidth = infoBadge.getWidth(ctx);
+
+    infoBadge.xOffset = priceWidth + infoWidth - 26;
+    drawInfoBadge(ctx, x, y);
+    infoBadge.xOffset = originalXOffset;
+  };
+
+  return infoBadge;
+}
+
+/**
+ * 为节点添加价格徽章和价格信息入口
+ * @param {Object} node - 要添加徽章的节点对象
+ * @param {Object} badgeOptions - 价格徽章配置选项
+ */
+export function addPriceBadges(node, badgeOptions, showPriceInfo = true) {
+  const BadgeConstructor = globalThis.LGraphBadge;
+  if (typeof BadgeConstructor !== "function") {
+    throw new Error("LGraphBadge is not available");
+  }
+
+  const priceBadge = new BadgeConstructor(badgeOptions);
+
+  node.badgePosition = "top-right";
+  // 每次添加badge 清空所有badge 因为badge没有一个唯一标识符，并且价格展示也就一个badge 所以直接全部清除
+  node.badges = [];
+  if (showPriceInfo) {
+    const infoBadge = createPriceInfoBadge(priceBadge, node);
+    node.badges.push(() => infoBadge);
+  }
+  node.badges.push(() => priceBadge);
+}
+
 /**
  * 根据货币类型获取徽章配置
  * @param {number} coinType - 货币类型值
@@ -200,8 +265,8 @@ export async function addPriceBadgeToNode(node, modelName = "") {
         priceResult.data.result
       );
       
-      // 添加价格徽章
-      addCustomBadge(node, badgeConfig);
+      // 添加价格徽章和价格信息入口
+      addPriceBadges(node, badgeConfig, (await getIsServerMode()) === true);
     }
   } catch (error) {
     console.error("添加价格徽章失败:", error);

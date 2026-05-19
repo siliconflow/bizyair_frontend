@@ -3,6 +3,18 @@ import { addPriceBadgeToNode, hasModelInput } from "./model_price.js";
 
 // 用于存储模型类型的属性名（会被序列化保存到工作流中）
 const BIZYAIR_MODEL_TYPE_KEY = "bizyair_model_type";
+const BIZYAIR_MODEL_OUTPUT_NAME = "bizyair_model_name";
+const BIZYAIR_ENDPOINT_OUTPUT_NAME = "bizyair_endpoint";
+
+function cacheBizyAirEndpointOutput(node, hiddenOutput) {
+  const endpointOutput = node.outputs?.find(
+    (output) => output.name === BIZYAIR_ENDPOINT_OUTPUT_NAME
+  );
+
+  if (endpointOutput && hiddenOutput) {
+    hiddenOutput[BIZYAIR_ENDPOINT_OUTPUT_NAME] = endpointOutput;
+  }
+}
 
 /**
  * 检查是否应该显示 API 节点价格徽章
@@ -21,6 +33,11 @@ export async function applyBadgeToNode(_this, forceRefresh = false) {
     // 如果不是强制刷新，优先从节点属性中恢复模型类型（用于工作流加载场景）
     if (!forceRefresh && _this.properties && _this.properties[BIZYAIR_MODEL_TYPE_KEY]) {
       const modelType = _this.properties[BIZYAIR_MODEL_TYPE_KEY];
+      _this._bizyairHiddenOutput = {
+        name: BIZYAIR_MODEL_OUTPUT_NAME,
+        type: modelType,
+      };
+      cacheBizyAirEndpointOutput(_this, _this._bizyairHiddenOutput);
       // if (shouldShowBadge) {
         await addPriceBadgeToNode(_this, modelType);
       // }
@@ -45,6 +62,7 @@ export async function applyBadgeToNode(_this, forceRefresh = false) {
       
       // 将hiddenOutput临时存储在节点上，方便后续使用
       _this._bizyairHiddenOutput = hiddenOutput;
+      cacheBizyAirEndpointOutput(_this, _this._bizyairHiddenOutput);
 
       // 将模型类型存储到节点属性中，确保保存工作流时能被序列化
       if (!_this.properties) {
@@ -59,7 +77,9 @@ export async function applyBadgeToNode(_this, forceRefresh = false) {
 
       // 无论是否添加badge，都要删除无用的outputs
       _this.outputs = _this.outputs.filter(
-        (output) => output.name !== hiddenOutput.name
+        (output) =>
+          output.name !== hiddenOutput.name &&
+          output.name !== BIZYAIR_ENDPOINT_OUTPUT_NAME
       );
   }
 }

@@ -10,7 +10,7 @@ import { applyBadgeToNode } from './handle_load_nodes.js'
   BizyAir_Kling_O3_VI2V_REF_API
   BizyAir_Kling_O3_VIDEO_EDIT_API
   BizyAir_Wan_V2_7_IMAGE_API
-  以及所有包含 "inputcount" 属性的节点，添加多图片上传功能
+  以及所有包含 "inputcount" 属性的 BizyAir 节点，添加多图片上传功能
 */
 // 简单的链式callback实现
 function chainCallback(originalCallback, newCallback) {
@@ -26,6 +26,7 @@ function initializeDynamicInputs(node) {
   // 检查是否包含 inputcount widget 或者是我们指定的节点
   const hasInputCount = node.widgets?.some(w => w.name === "inputcount");
   const nodeIdentifier = node.comfyClass || node.type;
+  const isBizyAirNode = nodeIdentifier?.startsWith("BizyAir_");
   
   const isHardcodedNode = [
     "BizyAir_Seedream4_5",
@@ -42,7 +43,7 @@ function initializeDynamicInputs(node) {
     "BizyAir_Wan_V2_7_IMAGE_API"
   ].includes(nodeIdentifier);
 
-  if (!hasInputCount && !isHardcodedNode) {
+  if ((!hasInputCount || !isBizyAirNode) && !isHardcodedNode) {
     return;
   }
 
@@ -188,6 +189,8 @@ app.registerExtension({
       }
     }
 
+    const isBizyAirNode = nodeData.name?.startsWith("BizyAir_");
+
     const isHardcodedNode = [
       "BizyAir_Seedream4_5",
       "BizyAir_NanoBananaPro",
@@ -203,7 +206,7 @@ app.registerExtension({
       "BizyAir_Wan_V2_7_IMAGE_API"
     ].includes(nodeData.name);
 
-    if (!hasInputCountData && !isHardcodedNode) {
+    if ((!hasInputCountData || !isBizyAirNode) && !isHardcodedNode) {
       return;
     }
 
