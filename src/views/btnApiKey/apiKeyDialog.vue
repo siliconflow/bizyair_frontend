@@ -43,19 +43,13 @@
       </p>
       <p>
         {{ t('apiKeyDialog.agreement') }}
-        <a
-          class="underline"
-          href="https://docs.siliconflow.cn/docs/user-agreement"
-          target="_blank"
-          >{{ t('apiKeyDialog.userAgreement') }}</a
-        >
+        <a class="underline" href="https://bizyair.cn/user-agreement" target="_blank">{{
+          t('apiKeyDialog.userAgreement')
+        }}</a>
         {{ t('apiKeyDialog.and') }}
-        <a
-          class="underline"
-          href="https://docs.siliconflow.cn/docs/privacy-policy"
-          target="_blank"
-          >{{ t('apiKeyDialog.privacyPolicy') }}</a
-        >
+        <a class="underline" href="https://bizyair.cn/privacy-policy" target="_blank">{{
+          t('apiKeyDialog.privacyPolicy')
+        }}</a>
       </p>
     </div>
     <template #footer>
@@ -93,7 +87,7 @@
   const openOAuthPopup = async (setKey: (key: string) => void) => {
     const clientId = 'SFtNABXGEb5rZxogl8p3cM'
     // const clientId = 'SF1RAE3KAmVBGTTHRkAL87'
-    const ACCOUNT_ENDPOINT = 'https://account.siliconflow.cn'
+    const ACCOUNT_ENDPOINT = 'https://bizyair.cn'
     const authUrl = `${ACCOUNT_ENDPOINT}/oauth?client_id=${clientId}`
     const popup = window.open(authUrl, 'oauthPopup', 'width=600,height=600')
     window.addEventListener('message', event => {
