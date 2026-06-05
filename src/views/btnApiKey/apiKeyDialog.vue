@@ -43,19 +43,13 @@
       </p>
       <p>
         {{ t('apiKeyDialog.agreement') }}
-        <a
-          class="underline"
-          href="https://bizyair.cn/user-agreement"
-          target="_blank"
-          >{{ t('apiKeyDialog.userAgreement') }}</a
-        >
+        <a class="underline" href="https://bizyair.cn/user-agreement" target="_blank">{{
+          t('apiKeyDialog.userAgreement')
+        }}</a>
         {{ t('apiKeyDialog.and') }}
-        <a
-          class="underline"
-          href="https://bizyair.cn/privacy-policy"
-          target="_blank"
-          >{{ t('apiKeyDialog.privacyPolicy') }}</a
-        >
+        <a class="underline" href="https://bizyair.cn/privacy-policy" target="_blank">{{
+          t('apiKeyDialog.privacyPolicy')
+        }}</a>
       </p>
     </div>
     <template #footer>
